@@ -143,7 +143,9 @@ const generateGraph = async (compilation) => {
           });
         } else if (isPage) {
           let root = filename.split("/")[filename.split("/").length - 1].replace(extension, "");
-          let layout = extension === ".html" ? null : "page";
+          // should we even have a default page layout?
+          // https://github.com/ProjectEvergreen/greenwood/issues/1271
+          let layout = "page";
           let title = null;
           let label = getLabelFromRoute(`${route}/`);
           let imports = [];

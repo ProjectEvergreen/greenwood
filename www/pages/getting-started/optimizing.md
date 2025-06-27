@@ -1,4 +1,5 @@
 ---
+layout: docs
 collection: getting-started
 order: 7
 tocHeading: 3

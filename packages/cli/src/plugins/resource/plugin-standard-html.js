@@ -11,8 +11,8 @@ import rehypeRaw from "rehype-raw";
 import remarkFrontmatter from "remark-frontmatter";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
-import { getUserScripts, getPageLayout, getAppLayout } from "../../lib/layout-utils.js";
-import { requestAsObject } from "../../lib/resource-utils.js";
+import { getPageLayout, getAppLayout, getGreenwoodScripts } from "../../lib/layout-utils.js";
+import { requestAsObject, checkResourceExists } from "../../lib/resource-utils.js";
 import { unified } from "unified";
 import { Worker } from "worker_threads";
 import { parse as htmlparser } from "node-html-parser";
@@ -37,26 +37,32 @@ class StandardHtmlResource {
 
   async serve(url, request) {
     const { config, context } = this.compilation;
-    const { userWorkspace } = context;
+    const { userWorkspace, pagesDir, layoutsDir } = context;
     const { pathname } = url;
     const isSpaRoute = this.compilation.graph.find((node) => node.isSPA);
     const matchingRoute = this.compilation.graph.find((node) => node.route === pathname) || {};
-    const { pageHref } = matchingRoute;
+    const { pageHref, route } = matchingRoute;
     const filePath =
       !matchingRoute.external && pageHref
         ? new URL(pageHref).pathname.replace(userWorkspace.pathname, "./")
         : "";
     const isMarkdownContent = (filePath || "").split(".").pop() === "md";
+    const isHtmlContent = (filePath || "").split(".").pop() === "html";
     let body = "";
-    let layout = matchingRoute.layout || null;
-    let customImports = matchingRoute.imports || [];
     let ssrBody;
     let ssrLayout;
     let processedMarkdown = null;
+    // final contents to return from the plugin
+    let html = "";
 
-    if (matchingRoute.external) {
-      layout = matchingRoute.layout || layout;
-    }
+    const customPageFormatPlugins = config.plugins
+      .filter((plugin) => plugin.type === "resource" && !plugin.isGreenwoodDefaultPlugin)
+      .map((plugin) => plugin.provider(this.compilation));
+    const isCustomStaticPage =
+      customPageFormatPlugins[0] &&
+      customPageFormatPlugins[0].servePage === "static" &&
+      customPageFormatPlugins[0].shouldServe &&
+      (await customPageFormatPlugins[0].shouldServe(new URL(pageHref)));
 
     if (isMarkdownContent) {
       const markdownContents = await fs.readFile(new URL(pageHref), "utf-8");
@@ -85,9 +91,21 @@ class StandardHtmlResource {
         .use(rehypePlugins) // apply userland rehype plugins
         .use(rehypeStringify) // convert AST to HTML string
         .process(markdownContents);
-    }
+    } else if (isHtmlContent) {
+      if (route.endsWith("/404/")) {
+        const pathUrl = (await checkResourceExists(new URL("./404.html", pagesDir)))
+          ? new URL("./404.html", pagesDir)
+          : new URL("./404.html", layoutsDir);
 
-    if (matchingRoute.isSSR) {
+        body = await fs.readFile(pathUrl, "utf-8");
+      } else {
+        body = await fs.readFile(new URL(pageHref), "utf-8");
+      }
+    } else if (isCustomStaticPage) {
+      const transformed = await customPageFormatPlugins[0].serve(new URL(pageHref));
+
+      body = await transformed.text();
+    } else if (matchingRoute.isSSR) {
       const routeModuleLocationUrl = new URL(pageHref);
       const routeWorkerUrl = this.compilation.config.plugins
         .find((plugin) => plugin.type === "renderer")
@@ -124,15 +142,6 @@ class StandardHtmlResource {
       });
     }
 
-    if (isSpaRoute) {
-      body = await fs.readFile(new URL(isSpaRoute.pageHref), "utf-8");
-    } else {
-      body = ssrLayout ? ssrLayout : await getPageLayout(pageHref, this.compilation, layout);
-    }
-
-    body = await getAppLayout(body, this.compilation, customImports, matchingRoute);
-    body = await getUserScripts(body, this.compilation);
-
     if (processedMarkdown) {
       const wrappedCustomElementRegex =
         /<p><[a-zA-Z]*-[a-zA-Z](.*)>(.*)<\/[a-zA-Z]*-[a-zA-Z](.*)><\/p>/g;
@@ -149,25 +158,43 @@ class StandardHtmlResource {
       }
 
       // https://github.com/ProjectEvergreen/greenwood/issues/1126
-      body = body.replace(
-        /<content-outlet>(.*)<\/content-outlet>/s,
-        processedMarkdown.value.replace(/\$/g, "$$$"),
-      );
+      body = processedMarkdown.value.replace(/\$/g, "$$$");
     } else if (matchingRoute.external) {
-      body = body.replace(/<content-outlet>(.*)<\/content-outlet>/s, matchingRoute.body);
+      body = matchingRoute.body;
     } else if (ssrBody) {
-      body = body.replace(
-        /<content-outlet>(.*)<\/content-outlet>/s,
-        `<!-- greenwood-ssr-start -->${ssrBody.replace(/\$/g, "$$$")}<!-- greenwood-ssr-end -->`,
-      );
+      // we wrap SSR content in comments so we can extract it during prerendering to avoid double pre-rendering
+      body = `<!-- greenwood-ssr-start -->${ssrBody.replace(/\$/g, "$$$")}<!-- greenwood-ssr-end -->`;
     }
+
+    if (isSpaRoute) {
+      html = await fs.readFile(new URL(isSpaRoute.pageHref), "utf-8");
+    } else {
+      const mergedPageLayoutContents = await getPageLayout(
+        body,
+        this.compilation,
+        matchingRoute,
+        ssrLayout,
+      );
+
+      const mergedAppLayoutContents = await getAppLayout(
+        mergedPageLayoutContents,
+        this.compilation,
+        matchingRoute,
+      );
+
+      html = mergedAppLayoutContents;
+    }
+
+    html = await getGreenwoodScripts(html, this.compilation);
 
     // clean up any empty placeholder content-outlet
-    if (body.indexOf("<content-outlet></content-outlet>") > 0) {
-      body = body.replace("<content-outlet></content-outlet>", "");
+    // TODO do we even want this?
+    // https://github.com/ProjectEvergreen/greenwood/issues/1271
+    if (html.indexOf("<content-outlet></content-outlet>") > 0) {
+      html = html.replace("<content-outlet></content-outlet>", "");
     }
 
-    return new Response(body, {
+    return new Response(html, {
       headers: new Headers({
         "Content-Type": this.contentType,
       }),

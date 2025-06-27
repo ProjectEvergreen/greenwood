@@ -1,4 +1,5 @@
 ---
+layout: docs
 collection: docs
 title: Content as Data
 label: Content as Data

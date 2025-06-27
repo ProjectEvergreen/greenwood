@@ -1,4 +1,5 @@
 ---
+layout: docs
 collection: getting-started
 title: 'Build and Deploy'
 order: 6

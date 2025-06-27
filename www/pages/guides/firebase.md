@@ -1,4 +1,5 @@
 ---
+layout: docs
 title: 'Firebase Deployment'
 collection: guides
 tocHeading: 3

@@ -1,4 +1,5 @@
 ---
+layout: docs
 title: 'Deploy on Netlify'
 collection: guides
 tocHeading: 3

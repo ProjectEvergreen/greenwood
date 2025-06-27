@@ -1,4 +1,5 @@
 ---
+layout: docs
 title: 'Netlify CMS'
 collection: guides
 tocHeading: 3

@@ -1,4 +1,5 @@
 ---
+layout: docs
 collection: docs
 title: Styles and Assets
 label: Styles and Assets
