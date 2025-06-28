@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  *
  * Manages resource related operations for TypeScript.

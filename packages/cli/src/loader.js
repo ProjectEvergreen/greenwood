@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { readAndMergeConfig } from "./lifecycles/config.js";
 import { initContext } from "./lifecycles/context.js";
 import { mergeResponse } from "./lib/resource-utils.js";

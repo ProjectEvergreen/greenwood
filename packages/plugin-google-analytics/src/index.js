@@ -52,7 +52,7 @@ class GoogleAnalyticsResource {
 }
 
 /** @type {import('./types/index.d.ts').GoogleAnalyticsPlugin} */
-const greenwoodPluginGoogleAnalytics = (options = {}) => {
+const greenwoodPluginGoogleAnalytics = (options) => {
   return [
     {
       type: "resource",
