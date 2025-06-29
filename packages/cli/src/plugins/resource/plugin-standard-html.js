@@ -162,8 +162,7 @@ class StandardHtmlResource {
     } else if (matchingRoute.external) {
       body = matchingRoute.body;
     } else if (ssrBody) {
-      // we wrap SSR content in comments so we can extract it during prerendering to avoid double pre-rendering
-      body = `<!-- greenwood-ssr-start -->${ssrBody.replace(/\$/g, "$$$")}<!-- greenwood-ssr-end -->`;
+      body = ssrBody.replace(/\$/g, "$$$");
     }
 
     if (isSpaRoute) {
