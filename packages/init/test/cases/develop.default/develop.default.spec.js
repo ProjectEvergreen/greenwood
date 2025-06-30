@@ -44,7 +44,7 @@ describe("Initialize a new Greenwood project: ", function () {
     });
 
     describe("should run the Greenwood dev server", function () {
-      const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+      const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
 
       before(async function () {
         runner.setup(initOutputPath);

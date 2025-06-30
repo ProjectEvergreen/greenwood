@@ -36,7 +36,7 @@ const expect = chai.expect;
 
 describe("Serve Greenwood With: ", function () {
   const LABEL = "API Routes";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
   const hostname = "http://127.0.0.1:8080";
   let runner;

@@ -35,7 +35,7 @@ const expect = chai.expect;
 
 describe("Serve Greenwood With: ", function () {
   const LABEL = "A Server Rendered Application (SSR) with prerender configuration";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const hostname = "http://127.0.0.1:8080";
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
   let runner;

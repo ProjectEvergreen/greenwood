@@ -40,7 +40,7 @@ const expect = chai.expect;
 
 describe("Serve Greenwood With: ", function () {
   const LABEL = "Import Attributes Polyfill Configuration and prerendering";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputUrl = new URL(".", import.meta.url);
   const outputPath = fileURLToPath(outputUrl);
   const hostname = "http://127.0.0.1:8080";

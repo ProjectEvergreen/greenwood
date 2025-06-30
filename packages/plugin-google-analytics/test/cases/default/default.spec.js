@@ -36,7 +36,7 @@ const expect = chai.expect;
 describe("Build Greenwood With: ", function () {
   const LABEL = "Google Analytics Plugin with default options and Default Workspace";
   const mockAnalyticsId = "UA-123456-1";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
   let runner;
 

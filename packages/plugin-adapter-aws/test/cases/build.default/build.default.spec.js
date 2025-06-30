@@ -56,7 +56,7 @@ const expect = chai.expect;
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "AWS Adapter plugin output";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
   const awsOutputFolder = new URL("./.aws-output/", import.meta.url);
   const awsApiFunctionsOutputUrl = new URL("./api/", awsOutputFolder);

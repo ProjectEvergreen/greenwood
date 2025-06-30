@@ -32,7 +32,7 @@ const expect = chai.expect;
 
 describe("Develop Greenwood With: ", function () {
   const LABEL = "A Server Rendered Application (SSR) with API Routes in TypeScript";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
   const hostname = "http://127.0.0.1:1984";
   let runner;
