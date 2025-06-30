@@ -31,9 +31,9 @@ const PACKAGE_MANAGERS = [
 async function init() {
   try {
     const CWD = process.cwd();
-    const packageJson = (
-      await import(new URL("../package.json", import.meta.url), { with: { type: "json" } })
-    ).default;
+    const packageJson = // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
+      (await import(new URL("../package.json", import.meta.url), { with: { type: "json" } }))
+        .default;
     const { name, version } = packageJson;
 
     console.log(
@@ -50,18 +50,17 @@ async function init() {
       .option("-y, --yes", "Accept all default options")
       .option("--name <name>", "Name and directory location to scaffold your application with")
       .addOption(
-        new Option(
-          "--ts [choice]",
-          "Optionally configure your project with TypeScript",
-          DEFAULTS.ts,
-        ).choices(["yes", "no"]),
+        new Option("--ts [choice]", "Optionally configure your project with TypeScript")
+          .choices(["yes", "no"])
+          .default(DEFAULTS.ts),
       )
       .addOption(
         new Option(
           "-i, --install <choice>",
           "Install dependencies with the package manager of your choice",
-          DEFAULTS.install,
-        ).choices(PACKAGE_MANAGERS.map((manager) => manager.name.toLowerCase()).concat("no")),
+        )
+          .choices(PACKAGE_MANAGERS.map((manager) => manager.name.toLowerCase()).concat("no"))
+          .default(DEFAULTS.install),
       )
       .parse(process.argv)
       .opts();

@@ -25,7 +25,7 @@ function setupPackageJson(outputDirUrl, { name, version }) {
   console.log("setting up package.json...");
 
   const packageJsonOutputUrl = new URL("./package.json", outputDirUrl);
-  const pkgJson = JSON.parse(fs.readFileSync(packageJsonOutputUrl));
+  const pkgJson = JSON.parse(fs.readFileSync(packageJsonOutputUrl, "utf-8"));
   const json = {};
 
   // setup standard fields

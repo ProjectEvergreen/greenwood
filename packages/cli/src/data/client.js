@@ -8,7 +8,6 @@ const PRERENDER = globalThis.__CONTENT_OPTIONS__?.PRERENDER === "true";
 const PORT = globalThis?.__CONTENT_OPTIONS__?.PORT ?? 1984;
 const BASE_PATH = globalThis?.__GWD_BASE_PATH__ ?? "";
 
-/** @type {import('../types/content.d.ts').Graph} */
 async function getContentAsData(key = "") {
   if (CONTENT_STATE && PRERENDER) {
     // fetch customized query files when a user has opted-in for prerendering with active content

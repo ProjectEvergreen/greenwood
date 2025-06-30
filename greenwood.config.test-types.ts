@@ -65,7 +65,7 @@ const config: Config = {
     greenwoodPluginGraphQL(),
     greenwoodPluginImportCommonJs(),
     greenwoodPluginImportJsx(),
-    greenwoodPluginImportRaw,
+    greenwoodPluginImportRaw(),
     greenwoodPluginIncludeHTML(),
     greenwoodPluginPolyfills(),
     greenwoodPluginPostCss(),

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  *
  * A plugin for enabling CSS Modules. :tm:

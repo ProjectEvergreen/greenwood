@@ -32,7 +32,7 @@ export interface Plugin {
 // https://greenwoodjs.dev/docs/reference/plugins-api/#adapter
 export interface AdapterPlugin extends Plugin {
   type: Extract<PLUGIN_TYPES, "adapter">;
-  provider: (compilation: Compilation) => Promise<Function>;
+  provider: (compilation: Compilation) => Promise;
 }
 
 // https://greenwoodjs.dev/docs/reference/plugins-api/#context

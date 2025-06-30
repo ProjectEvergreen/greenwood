@@ -1,0 +1,15 @@
+diff --git a/node_modules/wc-compiler/src/index.d.ts b/node_modules/wc-compiler/src/index.d.ts
+index 3c32133..5d24936 100644
+--- a/node_modules/wc-compiler/src/index.d.ts
++++ b/node_modules/wc-compiler/src/index.d.ts
+@@ -16,4 +16,7 @@ export type renderFromHTML = (html: string, elementURLs: URL[]) => Promise<{
+   metadata: Metadata
+ }>
+ 
+-declare module "wc-compiler" { }
+\ No newline at end of file
++declare module "wc-compiler" { 
++  export const renderToString: renderToString;
++  export const renderFromHTML: renderFromHTML;
++}
+\ No newline at end of file

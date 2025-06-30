@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  *
  * Detects and fully resolves import requests for CommonJS files in node_modules.
