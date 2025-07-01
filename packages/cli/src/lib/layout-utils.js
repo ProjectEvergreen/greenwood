@@ -269,10 +269,20 @@ async function getPageLayout(pageContents, compilation, matchingRoute, ssrLayout
     layoutContents = ssrLayout;
   } else if (layout && (customPluginPageLayouts.length > 0 || hasCustomStaticLayout)) {
     // has a custom layout from markdown frontmatter or context plugin
-    layoutContents =
+    const contents =
       customPluginPageLayouts.length > 0
-        ? await fs.readFile(new URL(`./${layout}.html`, customPluginPageLayouts[0]), "utf-8")
+        ? await fs.readFile(customPluginPageLayouts[0], "utf-8")
         : await fs.readFile(new URL(`./${layout}.html`, userLayoutsDir), "utf-8");
+
+    if (pageContents) {
+      layoutContents = contents;
+    } else {
+      pageContents = contents;
+    }
+    // layoutContents =
+    //   customPluginPageLayouts.length > 0
+    //     ? await fs.readFile(new URL(`./${layout}.html`, customPluginPageLayouts[0]), "utf-8")
+    //     : await fs.readFile(new URL(`./${layout}.html`, userLayoutsDir), "utf-8");
   } else if (customPluginDefaultPageLayouts.length > 0 || (!is404Page && hasPageLayout)) {
     // has a dynamic default page layout from context plugin
     layoutContents =
