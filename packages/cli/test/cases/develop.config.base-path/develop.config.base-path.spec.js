@@ -35,9 +35,9 @@
  */
 import chai from "chai";
 import { JSDOM } from "jsdom";
-import path from "path";
+import path from "node:path";
 import { Runner } from "gallinago";
-import { fileURLToPath, URL } from "url";
+import { fileURLToPath } from "node:url";
 
 const expect = chai.expect;
 

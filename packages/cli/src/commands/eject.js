@@ -1,4 +1,4 @@
-import fs from "fs/promises";
+import fs from "node:fs/promises";
 
 const ejectConfiguration = async (compilation) => {
   const configFileDirUrl = new URL("../config/", import.meta.url);

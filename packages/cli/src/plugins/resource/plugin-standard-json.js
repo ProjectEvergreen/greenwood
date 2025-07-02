@@ -5,7 +5,7 @@
  *
  */
 import { checkResourceExists } from "../../lib/resource-utils.js";
-import fs from "fs/promises";
+import fs from "node:fs/promises";
 
 class StandardJsonResource {
   constructor(compilation) {

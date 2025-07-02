@@ -59,14 +59,14 @@ For libraries like Material Web Components, this plugin will [resolve references
 If you plan to use PostCSS, then it is recommended to use our [**PostCSS plugin**](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-postcss) and make sure **plugin-postcss** comes _before_ this plugin in your _greenwood.config.js_.
 
 ```javascript
-import { greenwoodPluginPostcss } from '@greenwood/plugin-postcss';
+import { greenwoodPluginPostCss } from '@greenwood/plugin-postcss';
 import { greenwoodPluginImportCss } from '@greenwood/plugin-import-css';
 
 export default {
   // ...
 
   plugins: [
-    greenwoodPluginPostcss(),
+    greenwoodPluginPostCss(),
     greenwoodPluginImportCss()
   ]
 }

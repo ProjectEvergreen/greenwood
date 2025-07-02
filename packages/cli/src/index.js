@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { generateCompilation } from "./lifecycles/compile.js";
-import fs from "fs/promises";
+import fs from "node:fs/promises";
 import program from "commander";
 
 const greenwoodPackageJson = JSON.parse(

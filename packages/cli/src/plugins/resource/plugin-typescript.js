@@ -6,7 +6,7 @@
  *
  */
 import { transform } from "sucrase";
-import fs from "fs/promises";
+import fs from "node:fs/promises";
 import { checkResourceExists } from "../../lib/resource-utils.js";
 
 const defaultCompilerOptions = {

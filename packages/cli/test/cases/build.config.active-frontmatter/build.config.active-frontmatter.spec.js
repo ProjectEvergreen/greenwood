@@ -24,11 +24,11 @@
  *     blog.html
  */
 import { JSDOM } from "jsdom";
-import path from "path";
+import path from "node:path";
 import chai from "chai";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
-import { fileURLToPath, URL } from "url";
+import { fileURLToPath } from "node:url";
 
 const expect = chai.expect;
 

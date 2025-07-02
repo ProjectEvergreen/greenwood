@@ -1,4 +1,4 @@
-import fs from "fs";
+import fs from "node:fs";
 import { html } from "lit";
 import { unsafeHTML } from "lit-html/directives/unsafe-html.js";
 import "../components/greeting.js";

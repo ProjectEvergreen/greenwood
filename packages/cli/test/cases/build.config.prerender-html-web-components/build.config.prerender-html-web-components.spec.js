@@ -23,12 +23,12 @@
  */
 import chai from "chai";
 import { JSDOM } from "jsdom";
-import path from "path";
+import path from "node:path";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
-import { fileURLToPath, URL } from "url";
-import fs from "fs/promises";
+import { fileURLToPath } from "node:url";
+import fs from "node:fs/promises";
 
 const expect = chai.expect;
 

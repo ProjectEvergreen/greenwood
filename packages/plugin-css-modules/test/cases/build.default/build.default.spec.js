@@ -30,14 +30,14 @@
  */
 import chai from "chai";
 import { JSDOM } from "jsdom";
-import fs from "fs";
+import fs from "node:fs";
 import glob from "glob-promise";
-import path from "path";
+import path from "node:path";
 import { parse, walk } from "css-tree";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
-import { fileURLToPath, URL } from "url";
+import { fileURLToPath } from "node:url";
 import { implementation } from "jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js";
 
 const expect = chai.expect;

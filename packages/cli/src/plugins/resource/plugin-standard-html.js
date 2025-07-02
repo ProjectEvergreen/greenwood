@@ -5,7 +5,7 @@
  * This is a Greenwood default plugin.
  *
  */
-import fs from "fs/promises";
+import fs from "node:fs/promises";
 import rehypeStringify from "rehype-stringify";
 import rehypeRaw from "rehype-raw";
 import remarkFrontmatter from "remark-frontmatter";
@@ -14,7 +14,7 @@ import remarkRehype from "remark-rehype";
 import { getPageLayout, getAppLayout, getGreenwoodScripts } from "../../lib/layout-utils.js";
 import { requestAsObject, checkResourceExists } from "../../lib/resource-utils.js";
 import { unified } from "unified";
-import { Worker } from "worker_threads";
+import { Worker } from "node:worker_threads";
 import { parse as htmlparser } from "node-html-parser";
 
 class StandardHtmlResource {
