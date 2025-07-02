@@ -30,7 +30,7 @@ import glob from "glob-promise";
 import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
-import { fileURLToPath, URL } from "node:url";
+import { fileURLToPath } from "node:url";
 
 const expect = chai.expect;
 

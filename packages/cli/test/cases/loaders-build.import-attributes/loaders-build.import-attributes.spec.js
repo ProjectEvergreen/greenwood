@@ -28,7 +28,7 @@ import glob from "glob-promise";
 import path from "node:path";
 import { Runner } from "gallinago";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
-import { fileURLToPath, URL } from "node:url";
+import { fileURLToPath } from "node:url";
 
 const expect = chai.expect;
 

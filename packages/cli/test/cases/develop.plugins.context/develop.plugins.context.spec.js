@@ -24,7 +24,7 @@ import { JSDOM } from "jsdom";
 import path from "node:path";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { Runner } from "gallinago";
-import { fileURLToPath, URL } from "node:url";
+import { fileURLToPath } from "node:url";
 
 const expect = chai.expect;
 const packageJson = JSON.parse(

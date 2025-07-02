@@ -32,7 +32,7 @@ import path from "node:path";
 import { getDependencyFiles, getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { Runner } from "gallinago";
-import { fileURLToPath, URL } from "node:url";
+import { fileURLToPath } from "node:url";
 
 const expect = chai.expect;
 
