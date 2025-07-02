@@ -47,31 +47,21 @@ async function mergeContentIntoLayout(
   matchingRoute,
 ) {
   const activeFrontmatterTitleKey = "${globalThis.page.title}";
-  const parentRoot = htmlparser.parse(parentContents, {
-    comment: true,
-    script: true,
-    style: true,
-    noscript: true,
-    pre: true,
-  });
-  const childRoot = htmlparser.parse(childContents, {
-    comment: true,
-    script: true,
-    style: true,
-    noscript: true,
-    pre: true,
-  });
+  const parentRoot = parentContents && parse(parentContents);
+  const childRoot = parse(childContents);
   let mergedContents = "";
 
-  if (!parentRoot.valid || !childRoot.valid) {
-    console.error("ERROR: Invalid HTML detected");
-    const invalidContents = !childRoot.valid ? childContents : parentContents;
-    const validContents = childRoot.valid
-      ? childContents
-      : (parentContents ?? `<html><body></body></html>`);
+  if ((parentContents && !valid(parentContents)) || (childContents && !valid(childContents))) {
+    console.error(`ERROR: Invalid HTML detected for route => ${matchingRoute.route}`);
     const enableHud = compilation.config.devServer.hud;
 
-    if (enableHud) {
+    if (process.env.__GWD_COMMAND__ === "develop" && enableHud) {
+      const invalidContents =
+        parentContents && !valid(parentContents) ? parentContents : childContents;
+      const validContents = valid(childContents)
+        ? childContents
+        : (parentContents ?? `<html><body></body></html>`);
+
       mergedContents = validContents.replace(
         "<body>",
         `
@@ -84,7 +74,7 @@ async function mergeContentIntoLayout(
               </pre>
             </details>
           </div>
-      `,
+        `,
       );
     }
   } else {
@@ -92,9 +82,10 @@ async function mergeContentIntoLayout(
     const customImports = outletType === "content" ? (matchingRoute?.imports ?? []) : [];
 
     const parentTitle = parentRoot ? parentRoot.querySelector("head title") : null;
-    const parentBody = parentRoot.querySelector("body")
-      ? parentRoot.querySelector("body").innerHTML
-      : undefined;
+    const parentBody =
+      parentRoot && parentRoot.querySelector("body")
+        ? parentRoot.querySelector("body").innerHTML
+        : undefined;
     const childBody =
       childRoot && childRoot.querySelector("body")
         ? childRoot.querySelector("body").innerHTML
@@ -141,17 +132,17 @@ async function mergeContentIntoLayout(
           : "<html>";
 
     const mergedMeta = [
-      ...parentRoot.querySelectorAll("head meta"),
+      ...(parentRoot?.querySelectorAll("head meta") ?? []),
       ...[...((childRoot && childRoot.querySelectorAll("head meta")) || [])],
     ].join("\n");
 
     const mergedLinks = [
-      ...parentRoot.querySelectorAll("head link"),
+      ...(parentRoot?.querySelectorAll("head link") ?? []),
       ...[...((childRoot && childRoot.querySelectorAll("head link")) || [])],
     ].join("\n");
 
     const mergedStyles = [
-      ...parentRoot.querySelectorAll("head style"),
+      ...(parentRoot?.querySelectorAll("head style") ?? []),
       ...[...((childRoot && childRoot.querySelectorAll("head style")) || [])],
       ...(
         await asyncFilter(customImports, async (resource) => {
@@ -184,7 +175,7 @@ async function mergeContentIntoLayout(
     ].join("\n");
 
     const mergedScripts = [
-      ...parentRoot.querySelectorAll("head script"),
+      ...(parentRoot?.querySelectorAll("head script") || []),
       ...[...((childRoot && childRoot.querySelectorAll("head script")) || [])],
       ...(
         await asyncFilter(customImports, async (resource) => {
