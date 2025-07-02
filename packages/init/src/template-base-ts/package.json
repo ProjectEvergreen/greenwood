@@ -3,7 +3,8 @@
     "dev": "NODE_OPTIONS='--experimental-strip-types' greenwood develop",
     "start": "NODE_OPTIONS='--experimental-strip-types' greenwood develop",
     "build": "NODE_OPTIONS='--experimental-strip-types' greenwood build",
-    "serve": "NODE_OPTIONS='--experimental-strip-types' greenwood serve"
+    "serve": "NODE_OPTIONS='--experimental-strip-types' greenwood serve",
+    "lint": "tsc"
   },
   "devDependencies": {
     "typescript": "^5.8.0"

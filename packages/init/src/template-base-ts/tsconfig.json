@@ -8,5 +8,5 @@
     "verbatimModuleSyntax": false,
     "noEmit": true
   },
-  "exclude": ["./public/", "./greenwood/"]
+  "exclude": ["./public/", "./greenwood/", "node_modules"]
 }

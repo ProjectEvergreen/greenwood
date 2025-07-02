@@ -105,6 +105,12 @@ describe("Initialize a new Greenwood project: ", function () {
         expect(scripts.serve).to.equal("NODE_OPTIONS='--experimental-strip-types' greenwood serve");
       });
 
+      it("the should have the correct lint script for type-checking", function () {
+        const scripts = pkgJson.scripts;
+
+        expect(scripts.lint).to.equal("tsc");
+      });
+
       it("the should have the correct Greenwood devDependency", function () {
         const initPkg = JSON.parse(
           fs.readFileSync(new URL("../../../package.json", import.meta.url), "utf-8"),
@@ -161,6 +167,7 @@ describe("Initialize a new Greenwood project: ", function () {
 
         expect(exclude).to.contain("./public/");
         expect(exclude).to.contain("./greenwood/");
+        expect(exclude).to.contain("node_modules");
       });
     });
 
