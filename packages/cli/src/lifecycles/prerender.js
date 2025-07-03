@@ -96,13 +96,16 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
     // https://github.com/ProjectEvergreen/greenwood/issues/988#issuecomment-1288168858
     if (page.isSSR) {
       const ssrContentsMatch = /<!-- greenwood-ssr-start -->(.*.)<!-- greenwood-ssr-end -->/s;
+      const match = body.match(ssrContentsMatch);
 
-      ssrContents = body.match(ssrContentsMatch)[0];
-      body = body.replace(ssrContents, "<!-- greenwood-ssr-start --><!-- greenwood-ssr-end -->");
+      if (match) {
+        ssrContents = match[0];
+        body = body.replace(ssrContents, "<!-- greenwood-ssr-start --><!-- greenwood-ssr-end -->");
 
-      ssrContents = ssrContents
-        .replace("<!-- greenwood-ssr-start -->", "")
-        .replace("<!-- greenwood-ssr-end -->", "");
+        ssrContents = ssrContents
+          .replace("<!-- greenwood-ssr-start -->", "")
+          .replace("<!-- greenwood-ssr-end -->", "");
+      }
     }
 
     const resources = await trackResourcesForRoute(body, compilation, route);

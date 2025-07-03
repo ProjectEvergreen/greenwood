@@ -230,12 +230,6 @@ async function mergeContentIntoLayout(
             ? childContents
             : "";
 
-    // we wrap SSR content in comments so we can extract it during prerendering to avoid double pre-rendering
-    // TODO is this a bit of a leaky abstraction?
-    if (matchingRoute.isSSR && outletType === "content") {
-      finalBody = `<!-- greenwood-ssr-start -->${finalBody}<!-- greenwood-ssr-end -->`;
-    }
-
     mergedContents = `<!DOCTYPE html>
       ${mergedHtml}
         <head>
