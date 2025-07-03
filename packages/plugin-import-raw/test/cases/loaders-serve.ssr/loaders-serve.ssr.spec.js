@@ -40,7 +40,7 @@ const expect = chai.expect;
 
 describe("Serve Greenwood With: ", function () {
   const LABEL = "A Server Rendered Application (SSR) with API Routes importing raw CSS";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
   const hostname = "http://localhost:8080";
   let runner;

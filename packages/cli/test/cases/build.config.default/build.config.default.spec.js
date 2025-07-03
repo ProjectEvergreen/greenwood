@@ -22,7 +22,7 @@ import { fileURLToPath } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Empty Configuration and Default Workspace";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
   let runner;
 

@@ -44,7 +44,7 @@ const expectedPolyfillFiles = [
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Polyfill Plugin with default options and Default Workspace";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
   let runner;
 

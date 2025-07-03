@@ -27,7 +27,7 @@ const expect = chai.expect;
 
 describe("Develop Greenwood With: ", function () {
   const LABEL = "Default Greenwood Configuration and Workspace w/HUD disabled";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/index.js");
+  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
   const hostname = "http://localhost";
   const port = 1984;
