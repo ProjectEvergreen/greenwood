@@ -67,7 +67,7 @@ describe("Build Greenwood With: ", function () {
         expect(headings[0].textContent).to.equal("This is the home page.");
       });
 
-      it("should have one top level <app-header> tag with a <layout> with an open shadowroot", function () {
+      it("should have one top level <app-header> tag with an open shadowroot", function () {
         const header = dom.window.document.querySelectorAll(
           'app-header template[shadowrootmode="open"]',
         );
@@ -82,7 +82,7 @@ describe("Build Greenwood With: ", function () {
       // specifically to test for these bugs
       // https://github.com/ProjectEvergreen/greenwood/issues/1044
       // https://github.com/ProjectEvergreen/greenwood/issues/988#issuecomment-1288168858
-      it("should have one two top level <app-social-links> tag with expected link items", function () {
+      it("should have the expected number of items pre-rendered for the two <app-social-links> tags", function () {
         // one set comes from the HTML, one from the SSR page
         const links = dom.window.document.querySelectorAll("body > app-social-links ul li a");
 

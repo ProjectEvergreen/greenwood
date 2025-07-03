@@ -98,6 +98,27 @@ describe("Serve Greenwood With: ", function () {
           expect(headings[0].textContent).to.equal("This is the home page.");
         });
 
+        it("should have the expected output for the footer component", function () {
+          const footer = dom.window.document.querySelectorAll(
+            'body app-footer template[shadowrootmode="open"]',
+          );
+
+          expect(footer.length).to.equal(1);
+          expect(footer[0].innerHTML.trim()).to.equal(
+            "<footer>This is the footer component.</footer>",
+          );
+        });
+
+        // specifically to test for these bugs
+        // https://github.com/ProjectEvergreen/greenwood/issues/1044
+        // https://github.com/ProjectEvergreen/greenwood/issues/988#issuecomment-1288168858
+        it("should have the expected number of items pre-rendered for the two <app-social-links> tags", function () {
+          // one set comes from the HTML, one from the SSR page
+          const links = dom.window.document.querySelectorAll("body > app-social-links ul li a");
+
+          expect(links.length).to.equal(6);
+        });
+
         it("should have no bundled SSR output for the page", async function () {
           const scriptFiles = (
             await glob.promise(path.join(this.context.publicDir, "*.js"))
