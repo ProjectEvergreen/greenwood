@@ -1,8 +1,7 @@
-// @ts-nocheck
 import fs from "node:fs/promises";
 import { hashString } from "./hashing-utils.js";
 import { getResolvedHrefFromPathnameShortcut } from "../lib/node-modules-utils.js";
-import htmlparser from "node-html-parser";
+import { parse } from "node-html-parser";
 import { asyncMap } from "./async-utils.js";
 
 async function modelResource(
@@ -122,9 +121,11 @@ async function resolveForRelativeUrl(url, rootUrl) {
 
 async function trackResourcesForRoute(html, compilation, route) {
   const { context } = compilation;
-  const root = htmlparser.parse(html, {
-    script: true,
-    style: true,
+  const root = parse(html, {
+    blockTextElements: {
+      noscript: false,
+      pre: false,
+    },
   });
 
   // intentionally support <script> tags from the <head> or <body>
