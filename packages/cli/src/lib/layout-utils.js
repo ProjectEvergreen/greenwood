@@ -221,7 +221,7 @@ async function mergeContentIntoLayout(
       outletType === "content"
         ? /<content-outlet><\/content-outlet>/
         : /<page-outlet><\/page-outlet>/;
-    let finalBody =
+    const finalBody =
       parentBody && parentBody.match(outletRegex)
         ? parentBody.replace(outletRegex, childBody ?? childContents)
         : childRoot.querySelector("html") && childBody
