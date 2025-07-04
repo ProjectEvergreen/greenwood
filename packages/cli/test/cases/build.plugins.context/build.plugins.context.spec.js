@@ -16,6 +16,7 @@
  *   pages/
  *     slides/
  *       index.md
+ *     about-me.md
  *     index.md
  */
 import chai from "chai";
@@ -39,7 +40,7 @@ describe("Build Greenwood With: ", function () {
     this.context = {
       publicDir: path.join(outputPath, "public"),
     };
-    runner = new Runner();
+    runner = new Runner(true);
   });
 
   describe(LABEL, function () {
@@ -65,11 +66,48 @@ describe("Build Greenwood With: ", function () {
 
     runSmokeTest(["public", "index"], LABEL);
 
-    describe("Custom Default App and Page Layout", function () {
+    describe("App and Custom Index Page Layouts for the home page", function () {
       let dom;
 
       before(async function () {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "index.html"));
+      });
+
+      it("should have expected text from from a mock package layout/app.html in node_modules/", function () {
+        const pageLayoutHeading = dom.window.document.querySelectorAll("body h1")[0];
+
+        expect(pageLayoutHeading.textContent).to.be.equal(
+          "This is a custom app layout from the custom layouts directory.",
+        );
+      });
+
+      it("should have expected <body> content from the index layout", function () {
+        const customElement = dom.window.document.querySelectorAll("body presenter-mode");
+
+        expect(customElement.length).to.equal(1);
+      });
+
+      it("should have expected <head> content from the index layout", function () {
+        const scriptTags = dom.window.document.querySelectorAll("head script");
+        const tags = Array.from(scriptTags).filter((tag) => tag.getAttribute("type") === "module");
+
+        expect(tags.length).to.equal(1);
+      });
+
+      it("should not have any content from the index page since index layout has no <content-outlet></content-outlet>", function () {
+        const h3 = dom.window.document.querySelectorAll("body h3");
+        const h4 = dom.window.document.querySelectorAll("body h3");
+
+        expect(h3.length).to.equal(0);
+        expect(h4.length).to.equal(0);
+      });
+    });
+
+    describe("Default App and Page Layouts for the about page", function () {
+      let dom;
+
+      before(async function () {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "about-me/index.html"));
       });
 
       it("should have expected text from from a mock package layout/app.html in node_modules/", function () {
@@ -90,10 +128,10 @@ describe("Build Greenwood With: ", function () {
 
       it("should have expected text from user workspace pages/index.md", function () {
         const pageHeadingPrimary = dom.window.document.querySelectorAll("body h3")[0];
-        const pageHeadingSecondary = dom.window.document.querySelectorAll("body h4")[0];
+        const pageHeadingSecondary = dom.window.document.querySelectorAll("body p")[0];
 
-        expect(pageHeadingPrimary.textContent).to.be.equal("Context Plugin Theme Pack Test");
-        expect(pageHeadingSecondary.textContent).to.be.equal("From user workspace pages/index.md");
+        expect(pageHeadingPrimary.textContent).to.be.equal("About Me");
+        expect(pageHeadingSecondary.textContent).to.be.equal("Hello from me!");
       });
     });
 

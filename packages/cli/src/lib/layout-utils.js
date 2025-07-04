@@ -214,14 +214,21 @@ async function mergeContentIntoLayout(
       outletType === "content"
         ? /<content-outlet><\/content-outlet>/
         : /<page-outlet><\/page-outlet>/;
+    // we need to make sure that if parent layouts don't have an "outlet" tag
+    // then we _do not_ favor the child contents in that case
     const finalBody =
       parentBody && parentBody.match(outletRegex)
         ? parentBody.replace(outletRegex, childBody ?? childContents)
-        : childRoot.querySelector("html") && childBody
-          ? childBody
-          : !childRoot.querySelector("html")
-            ? childContents
-            : "";
+        : parentContents &&
+            childContents &&
+            !parentBody?.match(outletRegex) &&
+            outletType === "content"
+          ? parentBody
+          : childRoot.querySelector("html") && childBody
+            ? childBody
+            : !childRoot.querySelector("html")
+              ? childContents
+              : "";
 
     mergedContents = `<!DOCTYPE html>
       ${mergedHtml}
@@ -269,20 +276,10 @@ async function getPageLayout(pageContents, compilation, matchingRoute, ssrLayout
     layoutContents = ssrLayout;
   } else if (layout && (customPluginPageLayouts.length > 0 || hasCustomStaticLayout)) {
     // has a custom layout from markdown frontmatter or context plugin
-    const contents =
+    layoutContents =
       customPluginPageLayouts.length > 0
         ? await fs.readFile(customPluginPageLayouts[0], "utf-8")
         : await fs.readFile(new URL(`./${layout}.html`, userLayoutsDir), "utf-8");
-
-    if (pageContents) {
-      layoutContents = contents;
-    } else {
-      pageContents = contents;
-    }
-    // layoutContents =
-    //   customPluginPageLayouts.length > 0
-    //     ? await fs.readFile(new URL(`./${layout}.html`, customPluginPageLayouts[0]), "utf-8")
-    //     : await fs.readFile(new URL(`./${layout}.html`, userLayoutsDir), "utf-8");
   } else if (customPluginDefaultPageLayouts.length > 0 || (!is404Page && hasPageLayout)) {
     // has a dynamic default page layout from context plugin
     layoutContents =
