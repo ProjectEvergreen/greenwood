@@ -216,11 +216,13 @@ async function mergeContentIntoLayout(
         : /<page-outlet><\/page-outlet>/;
     // we need to make sure that if parent layouts don't have an "outlet" tag
     // then we _do not_ favor the child contents in that case
+    // this can happen in the case of context plugins in which pages may _only_ be used for loading a layout
+    // https://github.com/ProjectEvergreen/greenwood/pull/1527
     const finalBody =
       parentBody && parentBody.match(outletRegex)
         ? parentBody.replace(outletRegex, childBody ?? childContents)
         : parentContents &&
-            childContents &&
+            (childContents || childContents === "") &&
             !parentBody?.match(outletRegex) &&
             outletType === "content"
           ? parentBody
