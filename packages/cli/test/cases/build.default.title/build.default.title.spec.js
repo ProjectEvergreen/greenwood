@@ -66,7 +66,7 @@ describe("Build Greenwood With: ", function () {
       });
     });
 
-    describe("Custom Front-Matter Title", function () {
+    describe("Custom Frontmatter Title", function () {
       let dom;
 
       before(async function () {

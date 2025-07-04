@@ -111,13 +111,16 @@ async function mergeContentIntoLayout(
           : parentTitle.rawText;
       title = text.replace(activeFrontmatterTitleKey, matchingRoute.title || matchingRoute.label);
     } else {
-      title = matchingRoute.title
-        ? matchingRoute.title
-        : childTitle && childTitle.rawText
-          ? childTitle.rawText
-          : parentTitle && parentTitle.rawText
-            ? parentTitle.rawText
-            : "";
+      // we favor frontmatter title for the page
+      // otherwise we defer to page layouts and then ultimately the app layout
+      title =
+        outletType === "content" && matchingRoute?.title
+          ? matchingRoute.title
+          : childTitle && childTitle.rawText
+            ? childTitle.rawText
+            : parentTitle && parentTitle.rawText
+              ? parentTitle.rawText
+              : "";
     }
 
     const mergedHtml =
