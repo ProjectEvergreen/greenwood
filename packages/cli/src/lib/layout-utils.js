@@ -111,22 +111,15 @@ async function mergeContentIntoLayout(
           : parentTitle.rawText;
       title = text.replace(activeFrontmatterTitleKey, matchingRoute.title || matchingRoute.label);
     } else {
-      // TODO need to reconcile against frontmatter title
-      // is this an issue with us setting a default title?
-      // title = matchingRoute.title
-      //   ? matchingRoute.title
-      //   : childTitle && childTitle.rawText
-      //     ? childTitle.rawText
-      //     : parentTitle && parentTitle.rawText
-      //       ? parentTitle.rawText
-      //       : "";
+      // we favor frontmatter title for the page
+      // otherwise we defer to page layouts and then ultimately the app layout
       title =
-        childTitle && childTitle.rawText
-          ? childTitle.rawText
-          : parentTitle && parentTitle.rawText
-            ? parentTitle.rawText
-            : matchingRoute.title
-              ? matchingRoute.title
+        outletType === "content" && matchingRoute?.title
+          ? matchingRoute.title
+          : childTitle && childTitle.rawText
+            ? childTitle.rawText
+            : parentTitle && parentTitle.rawText
+              ? parentTitle.rawText
               : "";
     }
 

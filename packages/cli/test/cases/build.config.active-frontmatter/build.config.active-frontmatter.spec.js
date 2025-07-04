@@ -27,6 +27,7 @@ import { JSDOM } from "jsdom";
 import path from "node:path";
 import chai from "chai";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
+import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
 
@@ -50,6 +51,8 @@ describe("Build Greenwood With: ", function () {
       runner.setup(outputPath);
       runner.runCommand(cliPath, "build");
     });
+
+    runSmokeTest(["public", "index"], LABEL);
 
     describe("Default Greenwood frontmatter should be interpolated in the correct places for the home page", function () {
       let dom;
@@ -83,7 +86,7 @@ describe("Build Greenwood With: ", function () {
       });
     });
 
-    describe("Simple frontmatter should be interpolated in the correct places", function () {
+    describe("Simple active frontmatter should be interpolated in the correct places for the first blog post page", function () {
       let dom;
 
       before(async function () {
@@ -95,7 +98,7 @@ describe("Build Greenwood With: ", function () {
       it("should have the correct value for the <title> tag in the <head> for the first post page", function () {
         const title = dom.window.document.querySelector("head title").textContent;
 
-        expect(title).to.be.equal("My First Post");
+        expect(title).to.be.equal("My Blog - My First Post");
       });
 
       it("should have the correct value for author <meta> tag in the <head>", function () {
@@ -119,7 +122,7 @@ describe("Build Greenwood With: ", function () {
       });
     });
 
-    describe("Rich frontmatter should be interpolated in the correct places", function () {
+    describe("Rich active frontmatter should be interpolated in the correct places for the second blog post page", function () {
       let dom;
 
       before(async function () {
@@ -131,7 +134,7 @@ describe("Build Greenwood With: ", function () {
       it("should have the correct value for the <title> tag in the <head> for second post page", function () {
         const title = dom.window.document.querySelector("head title").textContent;
 
-        expect(title).to.be.equal("My Second Post");
+        expect(title).to.be.equal("My Blog - My Second Post");
       });
 
       it("should have the correct songs frontmatter data in the page output", function () {
@@ -146,6 +149,26 @@ describe("Build Greenwood With: ", function () {
           expect(song.title).to.equal(`Song ${num}`);
           expect(song.url).to.equal(`song${num}.mp3`);
         });
+      });
+    });
+
+    describe("Page level custom title for the about page", function () {
+      let dom;
+
+      before(async function () {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "./about/index.html"));
+      });
+
+      it("should have the correct value for the <title> tag in the <head>", function () {
+        const title = dom.window.document.querySelector("head title").textContent;
+
+        expect(title).to.be.equal("My Custom About Page Title");
+      });
+
+      it("should have the correct content for the page", function () {
+        const heading = dom.window.document.querySelector("body h1").textContent;
+
+        expect(heading).to.be.equal("This is the about page");
       });
     });
   });
