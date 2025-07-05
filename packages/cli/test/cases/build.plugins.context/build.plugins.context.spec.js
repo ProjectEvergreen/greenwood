@@ -94,7 +94,7 @@ describe("Build Greenwood With: ", function () {
         expect(tags.length).to.equal(1);
       });
 
-      it("should not have any content from the index page since index layout has no <content-outlet></content-outlet>", function () {
+      it("should NOT have any content from the index page since index layout has no <content-outlet></content-outlet> tag", function () {
         const h3 = dom.window.document.querySelectorAll("body h3");
         const h4 = dom.window.document.querySelectorAll("body h3");
 

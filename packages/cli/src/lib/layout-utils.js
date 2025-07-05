@@ -221,10 +221,7 @@ async function mergeContentIntoLayout(
     const finalBody =
       parentBody && parentBody.match(outletRegex)
         ? parentBody.replace(outletRegex, childBody ?? childContents)
-        : parentContents &&
-            (childContents || childContents === "") &&
-            !parentBody?.match(outletRegex) &&
-            outletType === "content"
+        : parentContents && outletType === "content"
           ? parentBody
           : childRoot.querySelector("html") && childBody
             ? childBody
