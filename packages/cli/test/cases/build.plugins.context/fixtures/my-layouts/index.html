@@ -1,0 +1,15 @@
+<!doctype html>
+<html>
+  <head>
+    <script type="module">
+      document.addEventListener("slide-selected", (event) => {
+        document.querySelector("slide-viewer").setAttribute("slide", JSON.stringify(event.detail));
+      });
+    </script>
+  </head>
+  <body>
+    <main>
+      <presenter-mode></presenter-mode>
+    </main>
+  </body>
+</html>
