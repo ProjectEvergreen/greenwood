@@ -61,5 +61,5 @@ export type {
 export type CLI_COMMAND = "develop" | "build" | "serve";
 
 declare module "@greenwood/cli" {
-  export const run: (CLI_COMMAND) => Promise<void>;
+  export const run: (command: CLI_COMMAND) => Promise<void>;
 }
