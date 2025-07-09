@@ -9,12 +9,12 @@
  * greenwood build
  *
  * User Config
- * const pluginPostCss = require('@greenwood/plugin-postcss');
+ * import { greenwoodPluginPostCss } from '@greenwood/plugin-postcss';
  *
  * {
  *   plugins: [
- *     pluginPostCss()
- *  ]
+ *     greenwoodPluginPostCss()
+ *   ]
  * }
  *
  * User Workspace
@@ -25,9 +25,9 @@
  *     main.css
  *
  * User postcss.config.js
- * module.exports = {
+ * export default {
  *   plugins: [
- *     require('postcss-nested')
+ *     (await import('postcss-nested')).default
  *   ]
  * };
  */

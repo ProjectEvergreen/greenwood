@@ -9,12 +9,12 @@
  * greenwood build
  *
  * User Config
- * const pluginBabel = require('@greenwood/plugin-babel');
+ * import { greenwoodPluginBabel } from '@greenwood/plugin-babel';
  *
  * {
  *   plugins: [
- *     ...pluginBabel()
- *  ]
+ *     greenwoodPluginBabel()
+ *   ]
  * }
  *
  * User Workspace

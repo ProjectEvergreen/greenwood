@@ -9,12 +9,12 @@
  * greenwood build
  *
  * User Config
- * const pluginPostCss = require('@greenwood/plugin-postcss');
+ * import { greenwoodPluginPostCss } from '@greenwood/plugin-postcss';
  *
  * {
  *   plugins: [
- *     pluginPostCss()
- *  ]
+ *     greenwoodPluginPostCss()
+ *   ]
  * }
  *
  * User Workspace
