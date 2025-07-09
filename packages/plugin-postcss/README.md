@@ -66,7 +66,7 @@ import type { PostCssPlugin } from '@greenwood/plugin-postcss';
 
 ### Configuration
 
-To use your own PostCSS configuration, you'll want to create your own _postcss.config.js_ file at the root of your project, by which you can provide your own [custom plugins and settings](https://github.com/postcss/postcss-cli?tab=readme-ov-file#config).
+To use your own PostCSS configuration, you'll want to create your own _postcss.config.js_ (or _.ts_) file at the root of your project, by which you can provide your own [custom plugins and settings](https://github.com/postcss/postcss-cli?tab=readme-ov-file#config).
 
 ```js
 export default {

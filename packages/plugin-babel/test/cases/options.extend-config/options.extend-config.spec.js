@@ -10,15 +10,16 @@
  * greenwood build
  *
  * User Config
- * const pluginBabel = require('@greenwood/plugin-babel');
+ * import { greenwoodPluginBabel } from '@greenwood/plugin-babel';
  *
  * {
  *   plugins: [
- *     ...pluginBabel({
- *        extendConfig: true
+ *     greenwoodPluginBabel({
+ *       extendConfig: true
  *     })
  *   ]
  * }
+ *
  *
  * User Workspace
  *  src/
@@ -28,7 +29,7 @@
  *     main.js
  *
  * User babel.config.js
- * module.exports = {
+ * export default {
  *   plugins: [
  *     '@babel/plugin-proposal-class-properties',
  *     '@babel/plugin-proposal-private-methods'
