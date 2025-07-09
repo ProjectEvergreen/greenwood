@@ -9,12 +9,13 @@ import rollupBabelPlugin from "@rollup/plugin-babel";
 
 async function getConfig(compilation, extendConfig = false) {
   const { projectDirectory } = compilation.context;
+  const configFile = "babel.config";
   // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
   const defaultConfig = (await import(new URL(`./babel.config.js`, import.meta.url))).default;
-  const userConfig = (await checkResourceExists(new URL(`./babel.config.js`, projectDirectory)))
-    ? (await import(`${projectDirectory}/babel.config.js`)).default
-    : (await checkResourceExists(new URL(`./babel.config.ts`, projectDirectory)))
-      ? (await import(`${projectDirectory}/babel.config.ts`)).default
+  const userConfig = (await checkResourceExists(new URL(`./${configFile}.js`, projectDirectory)))
+    ? (await import(`${projectDirectory}/${configFile}.js`)).default
+    : (await checkResourceExists(new URL(`./${configFile}.ts`, projectDirectory)))
+      ? (await import(`${projectDirectory}/${configFile}.ts`)).default
       : {};
   const finalConfig = Object.assign({}, userConfig);
 
