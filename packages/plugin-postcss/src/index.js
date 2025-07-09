@@ -14,11 +14,12 @@ async function getConfig(compilation, extendConfig = false) {
   const configFile = "postcss.config";
   // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
   const defaultConfig = (await import(new URL(`./${configFile}.js`, import.meta.url))).default;
-  const userConfigUrl = new URL(`./${configFile}.js`, projectDirectory);
-  const userConfig = (await checkResourceExists(userConfigUrl))
+  const userConfig = (await checkResourceExists(new URL(`./${configFile}.js`, projectDirectory)))
     ? // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
-      (await import(userConfigUrl)).default
-    : {};
+      (await import(new URL(`./${configFile}.js`, projectDirectory))).default
+    : (await checkResourceExists(new URL(`./${configFile}.ts`, projectDirectory)))
+      ? (await import(new URL(`./${configFile}.ts`, projectDirectory))).default
+      : {};
   const finalConfig = Object.assign({}, userConfig);
 
   if (userConfig && extendConfig) {

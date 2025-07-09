@@ -127,7 +127,8 @@ const getTemplate = async (data) => {
 };
 
 const getData = async () => {
-  const version = require('../../package.json').version;
+  const packageJson = (await import(new URL("./package.json", import.meta.url), { with: { type: "json" } })).default;
+  const { version } = packageJson;
 
   return { version };
 };

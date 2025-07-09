@@ -1,0 +1,9 @@
+@import "./theme.css";
+
+body {
+  color: red;
+
+  & h1 {
+    color: blue;
+  }
+}
