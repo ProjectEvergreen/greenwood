@@ -23,7 +23,7 @@ export default {
       matches: ["eve-button.css", "eve-container.css"],
     }),
     greenwoodPluginIncludeHTML(),
-    greenwoodPluginRendererPuppeteer(),
+    // greenwoodPluginRendererPuppeteer(),
     {
       type: "rollup",
       name: "rollup-plugin-analyzer",
