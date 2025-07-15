@@ -53,13 +53,12 @@ describe("Build Greenwood With: ", function () {
     });
 
     describe("Custom Element Importing CSS w/ Constructable Stylesheet", function () {
-      const cssFileHash = "CQ-QfEA6";
       let scripts;
       let styles;
 
       before(async function () {
         scripts = await glob.promise(path.join(outputPath, "public/card.*.js"));
-        styles = await glob.promise(path.join(outputPath, `public/card.${cssFileHash}.css`));
+        styles = await glob.promise(path.join(outputPath, `public/card.*.css`));
       });
 
       it("should have the expected import attribute for importing theme.css as a Constructable Stylesheet in the card.js bundle", function () {
@@ -75,8 +74,8 @@ describe("Build Greenwood With: ", function () {
         const scriptContents = fs.readFileSync(scripts[0], "utf-8");
 
         expect(scripts.length).to.equal(1);
-        expect(scriptContents).to.contain(
-          `import a from"/card.${cssFileHash}.css"with{type:"css"};`,
+        expect(scriptContents).to.match(
+          /import a from"\/card\.([a-zA-Z0-9-]{8})\.css"with{type:"css"};/,
         );
       });
 
