@@ -222,6 +222,9 @@ const generateGraph = async (compilation) => {
                   label,
                 }),
                 request,
+                contentOptions: JSON.stringify({
+                  frontmatter: true
+                })
               });
             });
 

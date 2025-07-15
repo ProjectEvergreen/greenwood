@@ -137,6 +137,10 @@ class StandardHtmlResource {
           compilation: JSON.stringify(this.compilation),
           page: JSON.stringify(matchingRoute),
           request: req,
+          contentOptions: JSON.stringify({
+            body: true,
+            layout: true
+          })
         });
       });
     }
