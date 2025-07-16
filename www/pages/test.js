@@ -1,7 +1,7 @@
 export default class TestPage extends HTMLElement {
   constructor() {
     super();
-    console.log('ENTER TestPage#constructor');
+    console.log("ENTER TestPage#constructor");
     // this.innerHTML = `
     //   <h1>Hello World from Test Page default export</h1>
     // `
@@ -10,7 +10,7 @@ export default class TestPage extends HTMLElement {
   connectedCallback() {
     this.innerHTML = `
       <h1>Hello World from Test Page default export</h1>
-    `
+    `;
   }
 }
 
@@ -20,7 +20,6 @@ export default class TestPage extends HTMLElement {
 //   return `<h1>Hello World from Test Page getBody</h1>`
 // }
 
-
 // TODO this causes undefined in the output / is broken
 // function getLayout() {
 //   console.log('ENTER TestPage#getLayout')
@@ -28,11 +27,11 @@ export default class TestPage extends HTMLElement {
 // }
 
 function getFrontmatter() {
-  console.log('ENTER TestPage#getFrontmatter')
+  console.log("ENTER TestPage#getFrontmatter");
   return {
-    collection: 'navigation',
-    order: 7
-  }
+    collection: "navigation",
+    order: 7,
+  };
 }
 
 export { getFrontmatter };

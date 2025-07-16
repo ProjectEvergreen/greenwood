@@ -315,8 +315,8 @@ async function getPageLayout(pageContents, compilation, matchingRoute, ssrLayout
         moduleUrl: routeModuleLocationUrl.href,
         compilation: JSON.stringify(compilation),
         contentOptions: JSON.stringify({
-          body: true
-        })
+          body: true,
+        }),
       });
     });
   } else if (!pageContents) {
@@ -379,8 +379,8 @@ async function getAppLayout(pageLayoutContents, compilation, matchingRoute) {
           : userDynamicAppLayoutTypeScriptUrl.href,
         compilation: JSON.stringify(compilation),
         contentOptions: JSON.stringify({
-          body: true
-        })
+          body: true,
+        }),
       });
     });
   }
