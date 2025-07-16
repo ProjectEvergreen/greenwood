@@ -223,8 +223,8 @@ const generateGraph = async (compilation) => {
                 }),
                 request,
                 contentOptions: JSON.stringify({
-                  frontmatter: true
-                })
+                  frontmatter: true,
+                }),
               });
             });
 

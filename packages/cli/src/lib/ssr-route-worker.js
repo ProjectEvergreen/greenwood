@@ -10,7 +10,7 @@ async function executeModule({
   htmlContents = null,
   scripts = "[]",
   request,
-  contentOptions = '{}',
+  contentOptions = "{}",
 }) {
   const { executeRouteModule } = await import(executeModuleUrl);
   const data = await executeRouteModule({

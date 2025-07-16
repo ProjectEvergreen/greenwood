@@ -139,8 +139,8 @@ class StandardHtmlResource {
           request: req,
           contentOptions: JSON.stringify({
             body: true,
-            layout: true
-          })
+            layout: true,
+          }),
         });
       });
     }
