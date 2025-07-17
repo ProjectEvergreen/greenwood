@@ -49,7 +49,6 @@ class StandardHtmlResource {
     const isHtmlContent = (filePath || "").split(".").pop() === "html";
     let body = "";
     let ssrBody;
-    let ssrLayout;
     let processedMarkdown = null;
     // final contents to return from the plugin
     let html = "";
@@ -115,13 +114,10 @@ class StandardHtmlResource {
         const worker = new Worker(new URL("../../lib/ssr-route-worker.js", import.meta.url));
 
         worker.on("message", (result) => {
-          if (result.layout) {
-            ssrLayout = result.layout;
-          }
-
           if (result.body) {
             ssrBody = result.body;
           }
+
           resolve();
         });
         worker.on("error", reject);
@@ -139,7 +135,6 @@ class StandardHtmlResource {
           request: req,
           contentOptions: JSON.stringify({
             body: true,
-            layout: true,
           }),
         });
       });
@@ -174,12 +169,7 @@ class StandardHtmlResource {
     if (isSpaRoute) {
       html = await fs.readFile(new URL(isSpaRoute.pageHref), "utf-8");
     } else {
-      const mergedPageLayoutContents = await getPageLayout(
-        body,
-        this.compilation,
-        matchingRoute,
-        ssrLayout,
-      );
+      const mergedPageLayoutContents = await getPageLayout(body, this.compilation, matchingRoute);
 
       const mergedAppLayoutContents = await getAppLayout(
         mergedPageLayoutContents,
