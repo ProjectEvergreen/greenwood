@@ -12,7 +12,7 @@ export default {
   optimization: "inline",
   staticRouter: true,
   activeContent: true,
-  prerender: true,
+  // prerender: true,
   plugins: [
     greenwoodPluginGraphQL(),
     greenwoodPluginPolyfills({
