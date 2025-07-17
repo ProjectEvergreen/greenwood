@@ -300,7 +300,7 @@ const generateGraph = async (compilation) => {
               route === "/404/"
                 ? new URL("./404.html", outputDir).href
                 : new URL(`.${route}index.html`, outputDir).href,
-            isSSR: !isStatic,
+            isSSR: isDynamic,
             prerender,
             isolation,
             hydration,
