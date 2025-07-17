@@ -156,10 +156,14 @@ describe("Initialize a new Greenwood project: ", function () {
 
       it("should have the expected recommended compiler options", function () {
         const { compilerOptions } = tsConfigJson;
-        const { erasableSyntaxOnly, verbatimModuleSyntax } = compilerOptions;
+        const { erasableSyntaxOnly, verbatimModuleSyntax, lib } = compilerOptions;
 
         expect(erasableSyntaxOnly).to.equal(true);
         expect(verbatimModuleSyntax).to.equal(false);
+
+        expect(lib).to.contain("ES2020");
+        expect(lib).to.contain("DOM");
+        expect(lib).to.contain("DOM.Iterable");
       });
 
       it("should have the expected exclude configuration for Greenwood build output", function () {
