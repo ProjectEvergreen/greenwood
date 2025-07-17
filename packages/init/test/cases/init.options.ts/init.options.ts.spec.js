@@ -134,6 +134,7 @@ describe("Initialize a new Greenwood project: ", function () {
     });
 
     describe("initial tsconfig.json contents", function () {
+      const target = "es2020";
       let tsConfigJson;
 
       before(function () {
@@ -147,7 +148,7 @@ describe("Initialize a new Greenwood project: ", function () {
         const { target, module, moduleResolution, allowImportingTsExtensions, noEmit } =
           compilerOptions;
 
-        expect(target).to.equal("es2020");
+        expect(target).to.equal(target);
         expect(module).to.equal("preserve");
         expect(moduleResolution).to.equal("bundler");
         expect(allowImportingTsExtensions).to.equal(true);
@@ -161,7 +162,7 @@ describe("Initialize a new Greenwood project: ", function () {
         expect(erasableSyntaxOnly).to.equal(true);
         expect(verbatimModuleSyntax).to.equal(false);
 
-        expect(lib).to.contain("ES2020");
+        expect(lib).to.contain(target.toUpperCase()); // should match compilerOptions.target
         expect(lib).to.contain("DOM");
         expect(lib).to.contain("DOM.Iterable");
       });
