@@ -47,7 +47,7 @@ async function executeRouteModule({
       // TODO can this just be managed from the call site?
       // support dynamic layouts that are just custom elements
       if (!getLayout && !data.body && !page.isSSR && module.default) {
-        const { html } = await renderToString(new URL(moduleUrl), false, { request, compilation });
+        const { html } = await renderToString(new URL(moduleUrl), false, { compilation, page });
 
         data.layout = html;
       } else if (getLayout) {
