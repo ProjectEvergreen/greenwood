@@ -105,10 +105,10 @@ describe("Initialize a new Greenwood project: ", function () {
         expect(scripts.serve).to.equal("NODE_OPTIONS='--experimental-strip-types' greenwood serve");
       });
 
-      it("the should have the correct lint script for type-checking", function () {
+      it("the should have the correct script for type-checking", function () {
         const scripts = pkgJson.scripts;
 
-        expect(scripts.lint).to.equal("tsc");
+        expect(scripts.check).to.equal("tsc");
       });
 
       it("the should have the correct Greenwood devDependency", function () {
