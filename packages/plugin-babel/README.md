@@ -37,10 +37,10 @@ export default {
 }
 ```
 
-Create a _babel.config.cjs_ in the root of your project with your own custom plugins / settings that you've installed and want to use:
+Create a _babel.config.js_ (or _.ts_) in the root of your project with your own custom plugins / settings that you've installed and want to use:
 
 ```javascript
-module.exports = {
+export default {
   plugins: [
     '@babel/plugin-proposal-class-properties',
     '@babel/plugin-proposal-private-methods'
