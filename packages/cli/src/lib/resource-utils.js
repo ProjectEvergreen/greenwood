@@ -197,7 +197,15 @@ async function trackResourcesForRoute(html, compilation, route) {
   const resources = [...scripts, ...styles, ...links];
 
   resources.forEach((resource) => {
-    compilation.resources.set(resource.sourcePathURL.pathname, resource);
+    // make sure we don't throw away existing optimizations if they already exist
+    // like when we have to "re-track" scripts and links for SSR page layouts + prerendering
+    const existing = compilation.resources.get(resource.sourcePathURL.pathname) ?? {};
+
+    compilation.resources.set(resource.sourcePathURL.pathname, {
+      ...resource,
+      optimizedFileName: existing.optimizedFileName ?? resource.optimizedFileName,
+      optimizedFileContents: existing.optimizedFileContents ?? resource.optimizedFileContents,
+    });
   });
 
   compilation.graph.find((page) => page.route === route).resources = resources.map(
