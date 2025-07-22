@@ -203,6 +203,12 @@ describe("Initialize a new Greenwood project: ", function () {
         expect(pageContents).to.contain("<x-logo></x-logo>");
       });
     });
+
+    describe("Default Types", function () {
+      it("should generate a types.d.ts file", function () {
+        expect(fs.existsSync(path.join(initOutputPath, "types.d.ts"))).to.be.true;
+      });
+    });
   });
 
   after(function () {
