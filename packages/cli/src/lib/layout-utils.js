@@ -221,13 +221,15 @@ async function mergeContentIntoLayout(
     const finalBody =
       parentBody && parentBody.match(outletRegex)
         ? parentBody.replace(outletRegex, childBody ?? childContents)
-        : parentContents && outletType === "content"
-          ? parentBody
-          : childRoot.querySelector("html") && childBody
-            ? childBody
-            : !childRoot.querySelector("html")
-              ? childContents
-              : "";
+        : parentContents && parentContents.match(outletRegex) && outletType === "content"
+          ? parentContents.replace(outletRegex, childBody ?? childContents)
+          : parentBody
+            ? parentBody
+            : childRoot.querySelector("html") && childBody
+              ? childBody
+              : !childRoot.querySelector("html")
+                ? childContents
+                : "";
 
     mergedContents = `<!DOCTYPE html>
       ${mergedHtml}
@@ -363,6 +365,7 @@ async function getAppLayout(pageLayoutContents, compilation, matchingRoute) {
       const worker = new Worker(new URL("./ssr-route-worker.js", import.meta.url));
 
       worker.on("message", (result) => {
+        // TODO why ??
         // if (result.layout) {
         dynamicAppLayoutContents = result.body ?? result.layout;
         // }
