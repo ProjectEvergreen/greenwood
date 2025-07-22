@@ -38,10 +38,10 @@ import { fileURLToPath } from "node:url";
 
 const expect = chai.expect;
 
-// we should really try and figure out how we can re-enable this test case
+// TODO we should really try and figure out how we can re-enable this test case
 // https://github.com/ProjectEvergreen/greenwood/issues/1463
 xdescribe("Build Greenwood With Custom Lit Renderer for SSG prerendering: ", function () {
-  const LABEL = "For SSG prerendering of Getting Started example";
+  const LABEL = "For SSG prerendering with Import Attributes";
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
   let runner;
