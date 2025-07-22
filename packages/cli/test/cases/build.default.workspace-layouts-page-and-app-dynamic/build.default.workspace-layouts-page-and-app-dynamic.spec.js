@@ -120,11 +120,18 @@ describe("Build Greenwood With: ", function () {
         expect(heading[0].textContent).to.equal("App Layout");
       });
 
-      it("should have the expected <h2> tag from the dynamic page layout", function () {
+      it("should have the expected <h2> tag from the dynamic page layout with layout constructor prop", function () {
         const heading = dom.window.document.querySelectorAll("h2");
 
         expect(heading.length).to.equal(1);
-        expect(heading[0].textContent).to.equal("Page Layout");
+        expect(heading[0].textContent).to.equal("Page Layout for /about/");
+      });
+
+      it("should have the expected <span> tag from the dynamic page layout with layout constructor prop", function () {
+        const span = dom.window.document.querySelectorAll("span");
+
+        expect(span.length).to.equal(1);
+        expect(span[0].textContent).to.equal("Number of pages 3");
       });
 
       it("should have the expected content from the index.md", function () {
