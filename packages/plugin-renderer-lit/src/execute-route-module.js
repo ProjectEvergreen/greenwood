@@ -40,8 +40,6 @@ async function executeRouteModule({
       hydration = true,
     } = module;
 
-    // TODO cant we get these from just pulling from the file during the graph phase?
-    // https://github.com/ProjectEvergreen/greenwood/issues/991
     if (isolation) {
       data.isolation = true;
     }

@@ -44,8 +44,7 @@ async function executeRouteModule({
     }
 
     if (layout) {
-      // TODO can this just be managed from the call site?
-      // support dynamic layouts that are just custom elements
+      // support dynamic layouts that are just custom elements vs calls to getLayout
       if (!getLayout && !data.body && !page.isSSR && module.default) {
         const { html } = await renderToString(new URL(moduleUrl), false, { compilation, page });
 
@@ -59,8 +58,6 @@ async function executeRouteModule({
       data.frontmatter = await getFrontmatter(compilation, page);
     }
 
-    // TODO cant we get these from just pulling from the file during the graph phase?
-    // https://github.com/ProjectEvergreen/greenwood/issues/991
     data.prerender = prerender;
     data.isolation = isolation;
   }

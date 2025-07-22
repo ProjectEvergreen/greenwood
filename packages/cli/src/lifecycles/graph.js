@@ -119,8 +119,7 @@ const generateGraph = async (compilation) => {
             return;
           }
 
-          // should this be run in isolation like SSR pages?
-          // https://github.com/ProjectEvergreen/greenwood/issues/991
+          // TODO should API routes be run in isolation mode like SSR pages?
           const { isolation } = await import(filenameUrl).then((module) => module);
 
           /*

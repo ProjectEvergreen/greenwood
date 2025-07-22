@@ -365,10 +365,9 @@ async function getAppLayout(pageLayoutContents, compilation, matchingRoute) {
       const worker = new Worker(new URL("./ssr-route-worker.js", import.meta.url));
 
       worker.on("message", (result) => {
-        // TODO why ??
-        // if (result.layout) {
+        // result.body if it is an SSR custom element page layout, e.g. default export
+        // result.layout if it is a getLayout call
         dynamicAppLayoutContents = result.body ?? result.layout;
-        // }
         resolve();
       });
       worker.on("error", reject);
