@@ -119,8 +119,7 @@ const generateGraph = async (compilation) => {
             return;
           }
 
-          // should this be run in isolation like SSR pages?
-          // https://github.com/ProjectEvergreen/greenwood/issues/991
+          // TODO should API routes be run in isolation mode like SSR pages?
           const { isolation } = await import(filenameUrl).then((module) => module);
 
           /*
@@ -222,6 +221,9 @@ const generateGraph = async (compilation) => {
                   label,
                 }),
                 request,
+                contentOptions: JSON.stringify({
+                  frontmatter: true,
+                }),
               });
             });
 
@@ -297,7 +299,7 @@ const generateGraph = async (compilation) => {
               route === "/404/"
                 ? new URL("./404.html", outputDir).href
                 : new URL(`.${route}index.html`, outputDir).href,
-            isSSR: !isStatic,
+            isSSR: isDynamic,
             prerender,
             isolation,
             hydration,

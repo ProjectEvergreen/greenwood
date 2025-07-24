@@ -8,6 +8,7 @@ async function executeRouteModule({
   htmlContents = null,
   scripts = [],
   request,
+  contentOptions = {},
 }) {
   const data = {
     layout: null,
@@ -23,6 +24,7 @@ async function executeRouteModule({
     data.html = html;
   } else {
     const module = await import(moduleUrl).then((module) => module);
+    const { body, layout, frontmatter } = contentOptions;
     const {
       prerender = false,
       getLayout = null,
@@ -31,26 +33,31 @@ async function executeRouteModule({
       isolation,
     } = module;
 
-    if (module.default) {
-      const { html } = await renderToString(new URL(moduleUrl), false, { request, compilation });
+    if (body) {
+      if (module.default) {
+        const { html } = await renderToString(new URL(moduleUrl), false, { request, compilation });
 
-      data.body = html;
-    } else {
-      if (getBody) {
+        data.body = html;
+      } else if (getBody) {
         data.body = await getBody(compilation, page, request);
       }
     }
 
-    if (getLayout) {
-      data.layout = await getLayout(compilation, page);
+    if (layout) {
+      // support dynamic layouts that are just custom elements vs calls to getLayout
+      if (!getLayout && !data.body && !page.isSSR && module.default) {
+        const { html } = await renderToString(new URL(moduleUrl), false, { compilation, page });
+
+        data.layout = html;
+      } else if (getLayout) {
+        data.layout = await getLayout(compilation, page);
+      }
     }
 
-    if (getFrontmatter) {
+    if (frontmatter && getFrontmatter) {
       data.frontmatter = await getFrontmatter(compilation, page);
     }
 
-    // TODO cant we get these from just pulling from the file during the graph phase?
-    // https://github.com/ProjectEvergreen/greenwood/issues/991
     data.prerender = prerender;
     data.isolation = isolation;
   }

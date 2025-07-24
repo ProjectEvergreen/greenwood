@@ -10,6 +10,7 @@ async function executeRouteModule({
   prerender,
   htmlContents,
   scripts,
+  contentOptions = {},
 }) {
   const data = {
     layout: null,
@@ -30,6 +31,7 @@ async function executeRouteModule({
     data.html = await collectResult(render(templateResult));
   } else {
     const module = await import(moduleUrl).then((module) => module);
+    const { body, layout, frontmatter } = contentOptions;
     const {
       getLayout = null,
       getBody = null,
@@ -38,8 +40,6 @@ async function executeRouteModule({
       hydration = true,
     } = module;
 
-    // TODO cant we get these from just pulling from the file during the graph phase?
-    // https://github.com/ProjectEvergreen/greenwood/issues/991
     if (isolation) {
       data.isolation = true;
     }
@@ -48,19 +48,19 @@ async function executeRouteModule({
       data.hydration = true;
     }
 
-    if (getBody) {
+    if (body && getBody) {
       const templateResult = await getBody(compilation, page, data.pageData);
 
       data.body = await collectResult(render(templateResult));
     }
 
-    if (getLayout) {
+    if (layout && getLayout) {
       const templateResult = await getLayout(compilation, page);
 
       data.layout = await collectResult(render(templateResult));
     }
 
-    if (getFrontmatter) {
+    if (frontmatter && getFrontmatter) {
       data.frontmatter = await getFrontmatter(compilation, page);
     }
   }

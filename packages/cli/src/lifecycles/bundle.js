@@ -318,9 +318,8 @@ async function bundleSsrPages(compilation, optimizePlugins) {
     const { executeModuleUrl } = config.plugins
       .find((plugin) => plugin.type === "renderer")
       .provider();
-    const { executeRouteModule } = await import(executeModuleUrl);
     const { pagesDir, scratchDir } = context;
-    // SSR pages do not support static routing (yet)
+    // SSR pages do not support static / SPA routing (yet)
     // https://github.com/ProjectEvergreen/greenwood/discussions/1033
     const plugins = getPluginInstances(compilation, ["plugin-static-router"]);
 
@@ -328,21 +327,10 @@ async function bundleSsrPages(compilation, optimizePlugins) {
     // and before we optimize so that all bundled assets can tracked up front
     // would be nice to see if this can be done in a single pass though...
     for (const page of ssrPages) {
-      const { route, pageHref } = page;
-      const moduleUrl = new URL(pageHref);
-      const request = new Request(moduleUrl);
-      const data = await executeRouteModule({
-        moduleUrl,
-        compilation,
-        page,
-        prerender: false,
-        htmlContents: null,
-        scripts: [],
-        request,
-      });
+      const { route } = page;
       let staticHtml = "<content-outlet></content-outlet>";
 
-      staticHtml = await getPageLayout(staticHtml, compilation, page, data.layout);
+      staticHtml = await getPageLayout(staticHtml, compilation, page);
       staticHtml = await getAppLayout(staticHtml, compilation, page);
       staticHtml = await getGreenwoodScripts(staticHtml, compilation);
 
@@ -413,7 +401,7 @@ async function bundleSsrPages(compilation, optimizePlugins) {
           const page = JSON.parse(\`${JSON.stringify(pruneGraph([page])[0])
             .replace(/\\"/g, "&quote")
             .replace(/\\n/g, "")}\`);
-          const data = await executeRouteModule({ moduleUrl, compilation, page, request });
+          const data = await executeRouteModule({ moduleUrl, compilation, page, request, contentOptions: { body: true } });
           let staticHtml = \`${staticHtml}\`;
 
           if (data.body) {

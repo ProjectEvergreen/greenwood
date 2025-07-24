@@ -221,13 +221,15 @@ async function mergeContentIntoLayout(
     const finalBody =
       parentBody && parentBody.match(outletRegex)
         ? parentBody.replace(outletRegex, childBody ?? childContents)
-        : parentContents && outletType === "content"
-          ? parentBody
-          : childRoot.querySelector("html") && childBody
-            ? childBody
-            : !childRoot.querySelector("html")
-              ? childContents
-              : "";
+        : parentContents && parentContents.match(outletRegex) && outletType === "content"
+          ? parentContents.replace(outletRegex, childBody ?? childContents)
+          : parentBody
+            ? parentBody
+            : childRoot.querySelector("html") && childBody
+              ? childBody
+              : !childRoot.querySelector("html")
+                ? childContents
+                : "";
 
     mergedContents = `<!DOCTYPE html>
       ${mergedHtml}
@@ -250,10 +252,10 @@ async function mergeContentIntoLayout(
 
 // merges provided page content into a page layout
 // optionally using an already acquired SSR layout to avoid executing an SSR route worker
-async function getPageLayout(pageContents, compilation, matchingRoute, ssrLayout) {
+async function getPageLayout(pageContents, compilation, matchingRoute) {
   const { context } = compilation;
   const { layoutsDir, userLayoutsDir } = context;
-  const { layout, route } = matchingRoute;
+  const { layout, route, pageHref } = matchingRoute;
   const customPluginDefaultPageLayouts = await getCustomPageLayoutsFromPlugins(compilation, "page");
   const customPluginPageLayouts = await getCustomPageLayoutsFromPlugins(compilation, layout);
   const is404Page = route.endsWith("/404/");
@@ -270,10 +272,7 @@ async function getPageLayout(pageContents, compilation, matchingRoute, ssrLayout
 
   let layoutContents;
 
-  if (ssrLayout) {
-    // use existing layout from SSR rendering
-    layoutContents = ssrLayout;
-  } else if (layout && (customPluginPageLayouts.length > 0 || hasCustomStaticLayout)) {
+  if (layout && (customPluginPageLayouts.length > 0 || hasCustomStaticLayout)) {
     // has a custom layout from markdown frontmatter or context plugin
     layoutContents =
       customPluginPageLayouts.length > 0
@@ -285,11 +284,16 @@ async function getPageLayout(pageContents, compilation, matchingRoute, ssrLayout
       customPluginDefaultPageLayouts.length > 0
         ? await fs.readFile(new URL("./page.html", customPluginDefaultPageLayouts[0]), "utf-8")
         : await fs.readFile(new URL("./page.html", userLayoutsDir), "utf-8");
-  } else if ((hasCustomDynamicLayout || hasCustomDynamicTypeScriptLayout) && !is404Page) {
+  } else if (
+    (hasCustomDynamicLayout || hasCustomDynamicTypeScriptLayout || matchingRoute.isSSR) &&
+    !is404Page
+  ) {
     // has a dynamic page layout
     const routeModuleLocationUrl = hasCustomDynamicLayout
       ? new URL(`./${layout}.js`, userLayoutsDir)
-      : new URL(`./${layout}.ts`, userLayoutsDir);
+      : hasCustomDynamicTypeScriptLayout
+        ? new URL(`./${layout}.ts`, userLayoutsDir)
+        : new URL(pageHref);
     const routeWorkerUrl = compilation.config.plugins
       .find((plugin) => plugin.type === "renderer")
       .provider().executeModuleUrl;
@@ -298,8 +302,8 @@ async function getPageLayout(pageContents, compilation, matchingRoute, ssrLayout
       const worker = new Worker(new URL("./ssr-route-worker.js", import.meta.url));
 
       worker.on("message", (result) => {
-        if (result.body) {
-          layoutContents = result.body;
+        if (result.layout) {
+          layoutContents = result.layout;
         }
         resolve();
       });
@@ -314,6 +318,10 @@ async function getPageLayout(pageContents, compilation, matchingRoute, ssrLayout
         executeModuleUrl: routeWorkerUrl.href,
         moduleUrl: routeModuleLocationUrl.href,
         compilation: JSON.stringify(compilation),
+        contentOptions: JSON.stringify({
+          layout: true,
+        }),
+        page: JSON.stringify(matchingRoute),
       });
     });
   } else if (!pageContents) {
@@ -357,9 +365,9 @@ async function getAppLayout(pageLayoutContents, compilation, matchingRoute) {
       const worker = new Worker(new URL("./ssr-route-worker.js", import.meta.url));
 
       worker.on("message", (result) => {
-        if (result.body) {
-          dynamicAppLayoutContents = result.body;
-        }
+        // result.body if it is an SSR custom element page layout, e.g. default export
+        // result.layout if it is a getLayout call
+        dynamicAppLayoutContents = result.body ?? result.layout;
         resolve();
       });
       worker.on("error", reject);
@@ -375,6 +383,10 @@ async function getAppLayout(pageLayoutContents, compilation, matchingRoute) {
           ? userDynamicAppLayoutUrl.href
           : userDynamicAppLayoutTypeScriptUrl.href,
         compilation: JSON.stringify(compilation),
+        contentOptions: JSON.stringify({
+          layout: true,
+          body: true,
+        }),
       });
     });
   }
