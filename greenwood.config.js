@@ -3,7 +3,7 @@ import { greenwoodPluginIncludeHTML } from "@greenwood/plugin-include-html";
 import { greenwoodPluginPolyfills } from "@greenwood/plugin-polyfills";
 import { greenwoodPluginPostCss } from "@greenwood/plugin-postcss";
 import { greenwoodPluginImportRaw } from "@greenwood/plugin-import-raw";
-// import { greenwoodPluginRendererPuppeteer } from "@greenwood/plugin-renderer-puppeteer";
+import { greenwoodPluginRendererPuppeteer } from "@greenwood/plugin-renderer-puppeteer";
 import rollupPluginAnalyzer from "rollup-plugin-analyzer";
 
 /** @type {import('@greenwood/cli').Config} */
@@ -12,7 +12,7 @@ export default {
   optimization: "inline",
   staticRouter: true,
   activeContent: true,
-  // prerender: true,
+  prerender: true,
   plugins: [
     greenwoodPluginGraphQL(),
     greenwoodPluginPolyfills({
@@ -23,7 +23,7 @@ export default {
       matches: ["eve-button.css", "eve-container.css"],
     }),
     greenwoodPluginIncludeHTML(),
-    // greenwoodPluginRendererPuppeteer(),
+    greenwoodPluginRendererPuppeteer(),
     {
       type: "rollup",
       name: "rollup-plugin-analyzer",
