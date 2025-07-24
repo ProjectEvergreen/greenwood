@@ -8,5 +8,5 @@ export type SsrRouteHandler = {
 };
 
 export type GetBody = (compilation: Compilation, page: Page, request: Request) => Promise<string>;
-export type GetLayout = (compilation: Compilation, route: string) => Promise<string>;
-export type GetFrontmatter = (compilation: Compilation, route: string) => Promise<Frontmatter>;
+export type GetLayout = (compilation: Compilation, page: Page) => Promise<string>;
+export type GetFrontmatter = (compilation: Compilation, page: Page) => Promise<Frontmatter>;
