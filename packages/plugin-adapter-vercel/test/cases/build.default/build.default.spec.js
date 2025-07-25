@@ -369,7 +369,7 @@ describe("Build Greenwood With: ", function () {
     describe("Nested API Route adapter", function () {
       it("should return the expected response when the serverless adapter entry point handler is invoked", async function () {
         const handler = (
-          await import(new URL("./api/nested-endpoint.func/index.js", vercelFunctionsOutputUrl))
+          await import(new URL("./api/nested/endpoint.func/index.js", vercelFunctionsOutputUrl))
         ).default;
         const response = {
           headers: new Headers(),
@@ -445,9 +445,8 @@ describe("Build Greenwood With: ", function () {
 
     describe("Blog Index (collision test) SSR Page adapter", function () {
       it("should return the expected response when the serverless adapter entry point handler is invoked", async function () {
-        const handler = (
-          await import(new URL("./blog-index.func/index.js", vercelFunctionsOutputUrl))
-        ).default;
+        const handler = (await import(new URL("./blog.func/index.js", vercelFunctionsOutputUrl)))
+          .default;
         const response = {
           headers: new Headers(),
         };
@@ -488,7 +487,7 @@ describe("Build Greenwood With: ", function () {
     describe("Blog First Post (nested) SSR Page adapter", function () {
       it("should return the expected response when the serverless adapter entry point handler is invoked", async function () {
         const handler = (
-          await import(new URL("./blog-first-post.func/index.js", vercelFunctionsOutputUrl))
+          await import(new URL("./blog/first-post.func/index.js", vercelFunctionsOutputUrl))
         ).default;
         const response = {
           headers: new Headers(),
