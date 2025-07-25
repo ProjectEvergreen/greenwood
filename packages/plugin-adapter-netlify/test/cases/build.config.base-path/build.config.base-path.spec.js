@@ -188,7 +188,8 @@ describe("Build Greenwood With: ", function () {
       it("should return the expected response when the serverless adapter entry point handler is invoked", async function () {
         expect(redirectsFileContents).to.be.equal(
           `${basePath}/users/ /.netlify/functions/users 200
-${basePath}/api/* /.netlify/functions/api-:splat 200`,
+${basePath}/api/greeting /.netlify/functions/api-greeting 200
+`,
         );
       });
     });
