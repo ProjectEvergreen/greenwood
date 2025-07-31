@@ -61,8 +61,8 @@ export type Resource = {
   servePage?: SERVE_PAGE_OPTIONS;
   shouldResolve?: (url: URL) => Promise<boolean>;
   resolve?: (url: URL) => Promise<Request>;
-  shouldServe?: (url: URL) => Promise<boolean>;
-  serve?: (url: URL) => Promise<Response>;
+  shouldServe?: (url: URL, request: Request) => Promise<boolean>;
+  serve?: (url: URL, request: Request) => Promise<Response>;
   shouldPreIntercept?: (url: URL, request: Request, response: Response) => Promise<boolean>;
   preIntercept?: (url: URL, request: Request, response: Response) => Promise<Response>;
   shouldIntercept?: (url: URL, request: Request, response: Response) => Promise<boolean>;
