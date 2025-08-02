@@ -20,7 +20,8 @@
  * }
  *
  * User Workspace
- * Greenwood default
+ * src/
+ *   index.html
  */
 import chai from "chai";
 import fs from "node:fs";

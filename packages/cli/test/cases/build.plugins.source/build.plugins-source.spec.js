@@ -29,6 +29,7 @@
  *   pages/
  *     about.md
  *     index.md
+ *     404.html
  *   layouts/
  *     artist.html
  */
@@ -181,12 +182,11 @@ describe("Build Greenwood With: ", function () {
       it("should have links to known pages", function () {
         const links = dom.window.document.querySelectorAll("body ul li a");
 
-        expect(links.length).to.equal(3);
+        expect(links.length).to.equal(2);
         const linkHrefs = Array.from(links).map((link) => link.getAttribute("href"));
 
         expect(linkHrefs).to.include("/about/");
         expect(linkHrefs).to.include("/");
-        expect(linkHrefs).to.include("/404/");
       });
     });
   });

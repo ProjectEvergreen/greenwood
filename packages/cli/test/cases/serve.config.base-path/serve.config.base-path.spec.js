@@ -23,6 +23,7 @@
  *   pages/
  *     api/
  *       greeting.js
+ *     404.html
  *     about.md
  *     index.html
  *     users.js

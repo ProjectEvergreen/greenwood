@@ -221,69 +221,7 @@ async function getStaticServer(compilation, composable) {
     return plugin.type === "resource" && plugin.isGreenwoodDefaultPlugin;
   });
 
-  app.use(async (ctx, next) => {
-    try {
-      const url = new URL(`http://localhost:${port}${ctx.url}`);
-      const matchingRoute = compilation.graph.find((page) => page.route === url.pathname);
-      const isSPA = compilation.graph.find((page) => page.isSPA);
-      const { isSSR } = matchingRoute || {};
-      const isStatic =
-        (matchingRoute && !isSSR) ||
-        (isSSR && compilation.config.prerender) ||
-        (isSSR && matchingRoute.prerender);
-
-      if (isSPA || (matchingRoute && isStatic) || url.pathname.split(".").pop() === "html") {
-        const outputHref = isSPA
-          ? isSPA.outputHref
-          : isStatic
-            ? matchingRoute.outputHref
-            : new URL(`.${url.pathname.replace(basePath, "")}`, outputDir).href;
-        const body = await fs.readFile(new URL(outputHref), "utf-8");
-
-        ctx.set("Content-Type", "text/html");
-        ctx.body = body;
-      }
-    } catch (e) {
-      ctx.status = 500;
-      console.error(e);
-    }
-
-    await next();
-  });
-
-  // TODO devServer.proxy is not really just for dev
-  // should it be renamed?  should this be a middleware?
-  app.use(async (ctx, next) => {
-    try {
-      const url = new URL(`http://localhost:${port}${ctx.url}`);
-      const request = new Request(url, {
-        method: ctx.request.method,
-        headers: ctx.request.header,
-      });
-
-      if (compilation.config.devServer.proxy) {
-        const proxyPlugin = standardResourcePlugins
-          .find((plugin) => plugin.name === "plugin-dev-proxy")
-          .provider(compilation);
-
-        if (await proxyPlugin.shouldServe(url, request)) {
-          const response = await proxyPlugin.serve(url, request);
-
-          ctx.body = Readable.from(response.body);
-          response.headers.forEach((value, key) => {
-            ctx.set(key, value);
-          });
-          ctx.message = response.statusText;
-        }
-      }
-    } catch (e) {
-      ctx.status = 500;
-      console.error(e);
-    }
-
-    await next();
-  });
-
+  // check for static assets first, otherwise default to 404
   app.use(async (ctx, next) => {
     try {
       const url = new URL(`.${ctx.url.replace(basePath, "")}`, outputDir.href);
@@ -316,6 +254,83 @@ async function getStaticServer(compilation, composable) {
             ctx.set(key, value);
           });
         }
+      } else {
+        ctx.body = "Not Found";
+        ctx.status = 404;
+        ctx.set("Content-Type", "text/plain");
+      }
+    } catch (e) {
+      ctx.status = 500;
+      console.error(e);
+    }
+
+    await next();
+  });
+
+  // TODO devServer.proxy is not really just for dev
+  // should it be renamed?  should this be a middleware?
+  app.use(async (ctx, next) => {
+    try {
+      const url = new URL(`http://localhost:${port}${ctx.url}`);
+      const request = new Request(url, {
+        method: ctx.request.method,
+        headers: ctx.request.header,
+      });
+
+      if (compilation.config.devServer.proxy) {
+        const proxyPlugin = standardResourcePlugins
+          .find((plugin) => plugin.name === "plugin-dev-proxy")
+          .provider(compilation);
+
+        if (await proxyPlugin.shouldServe(url, request)) {
+          const response = await proxyPlugin.serve(url, request);
+
+          ctx.body = Readable.from(response.body);
+          ctx.status = response.status;
+          response.headers.forEach((value, key) => {
+            ctx.set(key, value);
+          });
+          ctx.message = response.statusText;
+        }
+      }
+    } catch (e) {
+      ctx.status = 500;
+      console.error(e);
+    }
+
+    await next();
+  });
+
+  // resolve pages / SPAs last
+  app.use(async (ctx, next) => {
+    try {
+      const url = new URL(`http://localhost:${port}${ctx.url}`);
+      const matchingRoute = compilation.graph.find((page) => page.route === url.pathname);
+      const isSPA = compilation.graph.find((page) => page.isSPA);
+      const { isSSR } = matchingRoute || {};
+      const extension = url.pathname.split(".").pop();
+      const isStatic =
+        (matchingRoute && !isSSR) ||
+        (isSSR && compilation.config.prerender) ||
+        (isSSR && matchingRoute.prerender);
+
+      // TODO maybe we can clean this up a bit? or change ordering
+      if (
+        ctx.response.status === 404 &&
+        ((isSPA && extension === url.pathname) ||
+          (matchingRoute && isStatic) ||
+          extension === "html")
+      ) {
+        const outputHref = isSPA
+          ? isSPA.outputHref
+          : isStatic
+            ? matchingRoute.outputHref
+            : new URL(`.${url.pathname.replace(basePath, "")}`, outputDir).href;
+        const body = await fs.readFile(new URL(outputHref), "utf-8");
+
+        ctx.body = body;
+        ctx.status = 200;
+        ctx.set("Content-Type", "text/html");
       }
     } catch (e) {
       ctx.status = 500;

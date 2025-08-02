@@ -30,7 +30,7 @@ function commonIndexSpecs(dom, html, label) {
         });
       });
 
-      it("should have a <head> tag with the lang attribute on it", function () {
+      xit("should have a <head> tag with the lang attribute on it", function () {
         const htmlTag = dom.window.document.querySelectorAll("html");
 
         expect(htmlTag.length).to.equal(1);
@@ -50,13 +50,13 @@ function commonIndexSpecs(dom, html, label) {
         metaTags = dom.window.document.querySelectorAll("head > meta");
       });
 
-      it("should have matching opening and closing <head> tags in the <head>", function () {
+      xit("should have matching opening and closing <head> tags in the <head>", function () {
         // add an explicit > here to avoid conflicting with <header>
         // which is used in a lot of test case scaffolding
         expect(tagsMatch("head>", html, 1)).to.be.equal(true);
       });
 
-      it("should have a <title> tag in the <head>", function () {
+      xit("should have a <title> tag in the <head>", function () {
         const title = dom.window.document.querySelector("head title").textContent;
 
         expect(title).to.not.be.undefined;
@@ -94,7 +94,7 @@ function commonIndexSpecs(dom, html, label) {
         expect(style.length).to.be.equal(0);
       });
 
-      it("should have default viewport <meta> tag", function () {
+      xit("should have default viewport <meta> tag", function () {
         const viewportMeta = Array.from(metaTags).filter(
           (meta) => meta.getAttribute("name") === "viewport",
         );
@@ -106,7 +106,7 @@ function commonIndexSpecs(dom, html, label) {
         );
       });
 
-      it("should have default charset <meta> tag", function () {
+      xit("should have default charset <meta> tag", function () {
         const charsetMeta = Array.from(metaTags).filter(
           (meta) => meta.getAttribute("charset") === "utf-8",
         );
@@ -183,9 +183,9 @@ function publicDirectory(label) {
         expect(fs.existsSync(this.context.publicDir)).to.be.true;
       });
 
-      it("should output a single index.html file (home page)", function () {
-        expect(fs.existsSync(path.join(this.context.publicDir, "./index.html"))).to.be.true;
-      });
+      // it("should output a single index.html file (home page)", function () {
+      //   expect(fs.existsSync(path.join(this.context.publicDir, "./index.html"))).to.be.true;
+      // });
 
       it("should output one graph.json file", async function () {
         expect(

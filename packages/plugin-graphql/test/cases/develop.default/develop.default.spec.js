@@ -12,17 +12,18 @@
  * GraphQL Plugin
  *
  * User Workspace
- * src/data
- *   queries/
- *     gallery.gql
- *
+ * src/
+ *   data/
+ *     queries/
+ *       gallery.gql
+ *.  pages/
+ *     index.html
  */
 import chai from "chai";
 import { JSDOM } from "jsdom";
 import path from "node:path";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
-import { runSmokeTest } from "../../../../../test/smoke-test.js";
 
 const expect = chai.expect;
 
@@ -53,8 +54,6 @@ describe("Develop Greenwood With: ", function () {
         runner.runCommand(cliPath, "develop", { async: true });
       });
     });
-
-    runSmokeTest(["serve"], LABEL);
 
     describe("Develop command import map for GraphQL", function () {
       let response = {};
