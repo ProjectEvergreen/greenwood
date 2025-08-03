@@ -162,7 +162,6 @@ class StandardHtmlResource {
       html = await fs.readFile(new URL(isSpaRoute.pageHref), "utf-8");
     } else {
       const mergedPageLayoutContents = await getPageLayout(body, this.compilation, matchingRoute);
-
       const mergedAppLayoutContents = await getAppLayout(
         mergedPageLayoutContents,
         this.compilation,
@@ -173,13 +172,6 @@ class StandardHtmlResource {
     }
 
     html = await getGreenwoodScripts(html, this.compilation);
-
-    // clean up any empty placeholder content-outlet
-    // TODO do we even want this?
-    // https://github.com/ProjectEvergreen/greenwood/issues/1271
-    if (html.indexOf("<content-outlet></content-outlet>") > 0) {
-      html = html.replace("<content-outlet></content-outlet>", "");
-    }
 
     return new Response(html, {
       headers: new Headers({
