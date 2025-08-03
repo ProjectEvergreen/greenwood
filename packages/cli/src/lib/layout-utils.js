@@ -254,20 +254,16 @@ async function mergeContentIntoLayout(
 // optionally using an already acquired SSR layout to avoid executing an SSR route worker
 async function getPageLayout(pageContents, compilation, matchingRoute) {
   const { context } = compilation;
-  const { userLayoutsDir } = context;
+  const { layoutsDir } = context;
   const { layout, pageHref } = matchingRoute;
   const customPluginDefaultPageLayouts = await getCustomPageLayoutsFromPlugins(compilation, "page");
   const customPluginPageLayouts = await getCustomPageLayoutsFromPlugins(compilation, layout);
-  const hasCustomStaticLayout = await checkResourceExists(
-    new URL(`./${layout}.html`, userLayoutsDir),
-  );
-  const hasCustomDynamicLayout = await checkResourceExists(
-    new URL(`./${layout}.js`, userLayoutsDir),
-  );
+  const hasCustomStaticLayout = await checkResourceExists(new URL(`./${layout}.html`, layoutsDir));
+  const hasCustomDynamicLayout = await checkResourceExists(new URL(`./${layout}.js`, layoutsDir));
   const hasCustomDynamicTypeScriptLayout = await checkResourceExists(
-    new URL(`./${layout}.ts`, userLayoutsDir),
+    new URL(`./${layout}.ts`, layoutsDir),
   );
-  const hasPageLayout = await checkResourceExists(new URL("./page.html", userLayoutsDir));
+  const hasPageLayout = await checkResourceExists(new URL("./page.html", layoutsDir));
 
   let layoutContents;
 
@@ -276,19 +272,19 @@ async function getPageLayout(pageContents, compilation, matchingRoute) {
     layoutContents =
       customPluginPageLayouts.length > 0
         ? await fs.readFile(customPluginPageLayouts[0], "utf-8")
-        : await fs.readFile(new URL(`./${layout}.html`, userLayoutsDir), "utf-8");
+        : await fs.readFile(new URL(`./${layout}.html`, layoutsDir), "utf-8");
   } else if (customPluginDefaultPageLayouts.length > 0 || hasPageLayout) {
     // has a dynamic default page layout from context plugin
     layoutContents =
       customPluginDefaultPageLayouts.length > 0
         ? await fs.readFile(new URL("./page.html", customPluginDefaultPageLayouts[0]), "utf-8")
-        : await fs.readFile(new URL("./page.html", userLayoutsDir), "utf-8");
+        : await fs.readFile(new URL("./page.html", layoutsDir), "utf-8");
   } else if (hasCustomDynamicLayout || hasCustomDynamicTypeScriptLayout || matchingRoute.isSSR) {
     // has a dynamic page layout
     const routeModuleLocationUrl = hasCustomDynamicLayout
-      ? new URL(`./${layout}.js`, userLayoutsDir)
+      ? new URL(`./${layout}.js`, layoutsDir)
       : hasCustomDynamicTypeScriptLayout
-        ? new URL(`./${layout}.ts`, userLayoutsDir)
+        ? new URL(`./${layout}.ts`, layoutsDir)
         : new URL(pageHref);
     const routeWorkerUrl = compilation.config.plugins
       .find((plugin) => plugin.type === "renderer")
@@ -335,10 +331,10 @@ async function getPageLayout(pageContents, compilation, matchingRoute) {
 
 // merges provided page + app layout contents into an app level layout
 async function getAppLayout(pageLayoutContents, compilation, matchingRoute) {
-  const { userLayoutsDir } = compilation.context;
-  const userStaticAppLayoutUrl = new URL("./app.html", userLayoutsDir);
-  const userDynamicAppLayoutUrl = new URL("./app.js", userLayoutsDir);
-  const userDynamicAppLayoutTypeScriptUrl = new URL("./app.ts", userLayoutsDir);
+  const { layoutsDir } = compilation.context;
+  const userStaticAppLayoutUrl = new URL("./app.html", layoutsDir);
+  const userDynamicAppLayoutUrl = new URL("./app.js", layoutsDir);
+  const userDynamicAppLayoutTypeScriptUrl = new URL("./app.ts", layoutsDir);
   const userHasStaticAppLayout = await checkResourceExists(userStaticAppLayoutUrl);
   const userHasDynamicAppLayout = await checkResourceExists(userDynamicAppLayoutUrl);
   const userHasDynamicAppTypeScriptLayout = await checkResourceExists(
