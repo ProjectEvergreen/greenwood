@@ -254,7 +254,7 @@ async function mergeContentIntoLayout(
 // optionally using an already acquired SSR layout to avoid executing an SSR route worker
 async function getPageLayout(pageContents, compilation, matchingRoute) {
   const { context } = compilation;
-  const { layoutsDir, userLayoutsDir } = context;
+  const { userLayoutsDir } = context;
   const { layout, pageHref } = matchingRoute;
   const customPluginDefaultPageLayouts = await getCustomPageLayoutsFromPlugins(compilation, "page");
   const customPluginPageLayouts = await getCustomPageLayoutsFromPlugins(compilation, layout);
@@ -320,11 +320,6 @@ async function getPageLayout(pageContents, compilation, matchingRoute) {
         page: JSON.stringify(matchingRoute),
       });
     });
-  } else if (!pageContents) {
-    // fallback to using Greenwood's stock page layout
-    // TODO do we even want this?
-    // https://github.com/ProjectEvergreen/greenwood/issues/1271
-    layoutContents = await fs.readFile(new URL("./page.html", layoutsDir), "utf-8");
   }
 
   const mergedContents = await mergeContentIntoLayout(
@@ -387,8 +382,6 @@ async function getAppLayout(pageLayoutContents, compilation, matchingRoute) {
     });
   }
 
-  // TODO do we even want a default app.html layout?
-  // https://github.com/ProjectEvergreen/greenwood/issues/1271
   let appLayoutContents =
     customAppLayoutsFromPlugins.length > 0
       ? await fs.readFile(new URL("./app.html", customAppLayoutsFromPlugins[0]), "utf-8")
