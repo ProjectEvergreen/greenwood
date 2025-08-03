@@ -123,36 +123,40 @@ async function optimizeStaticPages(compilation, plugins) {
           (page.isSSR && page.prerender) ||
           (page.isSSR && compilation.config.prerender),
       )
-      .map(async (page) => {
-        const { route, outputHref } = page;
-        const outputDirUrl = new URL(outputHref.replace("index.html", "").replace("404.html", ""));
-        const url = new URL(`http://localhost:${compilation.config.port}${route}`);
-        const contents = await fs.readFile(
-          new URL(`./${outputHref.replace(outputDir.href, "")}`, scratchDir),
-          "utf-8",
-        );
-        const headers = new Headers({ "Content-Type": "text/html" });
-        let response = new Response(contents, { headers });
+      .map((page) =>
+        (async () => {
+          const { route, outputHref } = page;
+          const outputDirUrl = new URL(
+            outputHref.replace("index.html", "").replace("404.html", ""),
+          );
+          const url = new URL(`http://localhost:${compilation.config.port}${route}`);
+          const contents = await fs.readFile(
+            new URL(`./${outputHref.replace(outputDir.href, "")}`, scratchDir),
+            "utf-8",
+          );
+          const headers = new Headers({ "Content-Type": "text/html" });
+          let response = new Response(contents, { headers });
 
-        if (!(await checkResourceExists(outputDirUrl))) {
-          await fs.mkdir(outputDirUrl, {
-            recursive: true,
-          });
-        }
-
-        for (const plugin of plugins) {
-          if (plugin.shouldOptimize && (await plugin.shouldOptimize(url, response.clone()))) {
-            const currentResponse = await plugin.optimize(url, response.clone());
-
-            response = mergeResponse(response.clone(), currentResponse.clone());
+          if (!(await checkResourceExists(outputDirUrl))) {
+            await fs.mkdir(outputDirUrl, {
+              recursive: true,
+            });
           }
-        }
 
-        // clean up optimization markers
-        const body = (await response.text()).replace(/data-gwd-opt=".*?[a-z]"/g, "");
+          for (const plugin of plugins) {
+            if (plugin.shouldOptimize && (await plugin.shouldOptimize(url, response.clone()))) {
+              const currentResponse = await plugin.optimize(url, response.clone());
 
-        await fs.writeFile(new URL(outputHref), body);
-      }),
+              response = mergeResponse(response.clone(), currentResponse.clone());
+            }
+          }
+
+          // clean up optimization markers
+          const body = (await response.text()).replace(/data-gwd-opt=".*?[a-z]"/g, "");
+
+          await fs.writeFile(new URL(outputHref), body);
+        })(),
+      ),
   );
 }
 
@@ -202,84 +206,58 @@ async function bundleStyleResources(compilation, resourcePlugins) {
       const request = new Request(url, { headers });
       const initResponse = new Response(contents, { headers });
 
-      let response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
-        const intermediateResponse = await responsePromise;
+      let response = initResponse;
+
+      for (const plugin in resourcePlugins) {
         const shouldServe = plugin.shouldServe && (await plugin.shouldServe(url, request));
 
         if (shouldServe) {
           const currentResponse = await plugin.serve(url, request);
-          const mergedResponse = mergeResponse(
-            intermediateResponse.clone(),
-            currentResponse.clone(),
-          );
+          const mergedResponse = mergeResponse(response.clone(), currentResponse.clone());
 
           if (mergedResponse.headers.get("Content-Type").indexOf(contentType) >= 0) {
-            return Promise.resolve(mergedResponse.clone());
+            response = mergedResponse.clone();
           }
         }
+      }
 
-        return Promise.resolve(responsePromise);
-      }, Promise.resolve(initResponse));
-
-      response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
-        const intermediateResponse = await responsePromise;
+      for (const plugin in resourcePlugins) {
         const shouldPreIntercept =
           plugin.shouldPreIntercept &&
-          (await plugin.shouldPreIntercept(url, request, intermediateResponse.clone()));
+          (await plugin.shouldPreIntercept(url, request, response.clone()));
 
         if (shouldPreIntercept) {
-          const currentResponse = await plugin.preIntercept(
-            url,
-            request,
-            intermediateResponse.clone(),
-          );
-          const mergedResponse = mergeResponse(
-            intermediateResponse.clone(),
-            currentResponse.clone(),
-          );
+          const currentResponse = await plugin.preIntercept(url, request, response.clone());
+          const mergedResponse = mergeResponse(response.clone(), currentResponse.clone());
 
           if (mergedResponse.headers.get("Content-Type").indexOf(contentType) >= 0) {
-            return Promise.resolve(mergedResponse.clone());
+            response = mergedResponse.clone();
           }
         }
+      }
 
-        return Promise.resolve(responsePromise);
-      }, Promise.resolve(response.clone()));
-
-      response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
-        const intermediateResponse = await responsePromise;
+      for (const plugin in resourcePlugins) {
         const shouldIntercept =
-          plugin.shouldIntercept &&
-          (await plugin.shouldIntercept(url, request, intermediateResponse.clone()));
+          plugin.shouldIntercept && (await plugin.shouldIntercept(url, request, response.clone()));
 
         if (shouldIntercept) {
-          const currentResponse = await plugin.intercept(
-            url,
-            request,
-            intermediateResponse.clone(),
-          );
-          const mergedResponse = mergeResponse(
-            intermediateResponse.clone(),
-            currentResponse.clone(),
-          );
+          const currentResponse = await plugin.intercept(url, request, response.clone());
+          const mergedResponse = mergeResponse(response.clone(), currentResponse.clone());
 
           if (mergedResponse.headers.get("Content-Type").indexOf(contentType) >= 0) {
-            return Promise.resolve(mergedResponse.clone());
+            response = mergedResponse.clone();
           }
         }
+      }
 
-        return Promise.resolve(responsePromise);
-      }, Promise.resolve(response.clone()));
-
-      response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
-        const intermediateResponse = await responsePromise;
+      for (const plugin in resourcePlugins) {
         const shouldOptimize =
-          plugin.shouldOptimize && (await plugin.shouldOptimize(url, intermediateResponse.clone()));
+          plugin.shouldOptimize && (await plugin.shouldOptimize(url, response.clone()));
 
-        return shouldOptimize
-          ? Promise.resolve(await plugin.optimize(url, intermediateResponse.clone()))
-          : Promise.resolve(responsePromise);
-      }, Promise.resolve(response.clone()));
+        if (shouldOptimize) {
+          response = await plugin.optimize(url, response.clone());
+        }
+      }
 
       optimizedFileContents = await response.text();
 

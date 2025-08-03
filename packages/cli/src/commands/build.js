@@ -38,13 +38,7 @@ const runProductionBuild = async (compilation) => {
       });
     }
 
-    await Promise.all(
-      servers.map(async (server) => {
-        await server.start();
-
-        return Promise.resolve(server);
-      }),
-    );
+    await Promise.all(servers.map((server) => server.start()));
 
     if (prerenderPlugin.executeModuleUrl) {
       await preRenderCompilationWorker(compilation, prerenderPlugin);
