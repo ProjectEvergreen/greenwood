@@ -255,10 +255,9 @@ async function mergeContentIntoLayout(
 async function getPageLayout(pageContents, compilation, matchingRoute) {
   const { context } = compilation;
   const { layoutsDir, userLayoutsDir } = context;
-  const { layout, route, pageHref } = matchingRoute;
+  const { layout, pageHref } = matchingRoute;
   const customPluginDefaultPageLayouts = await getCustomPageLayoutsFromPlugins(compilation, "page");
   const customPluginPageLayouts = await getCustomPageLayoutsFromPlugins(compilation, layout);
-  const is404Page = route.endsWith("/404/");
   const hasCustomStaticLayout = await checkResourceExists(
     new URL(`./${layout}.html`, userLayoutsDir),
   );
@@ -278,16 +277,13 @@ async function getPageLayout(pageContents, compilation, matchingRoute) {
       customPluginPageLayouts.length > 0
         ? await fs.readFile(customPluginPageLayouts[0], "utf-8")
         : await fs.readFile(new URL(`./${layout}.html`, userLayoutsDir), "utf-8");
-  } else if (customPluginDefaultPageLayouts.length > 0 || (!is404Page && hasPageLayout)) {
+  } else if (customPluginDefaultPageLayouts.length > 0 || hasPageLayout) {
     // has a dynamic default page layout from context plugin
     layoutContents =
       customPluginDefaultPageLayouts.length > 0
         ? await fs.readFile(new URL("./page.html", customPluginDefaultPageLayouts[0]), "utf-8")
         : await fs.readFile(new URL("./page.html", userLayoutsDir), "utf-8");
-  } else if (
-    (hasCustomDynamicLayout || hasCustomDynamicTypeScriptLayout || matchingRoute.isSSR) &&
-    !is404Page
-  ) {
+  } else if (hasCustomDynamicLayout || hasCustomDynamicTypeScriptLayout || matchingRoute.isSSR) {
     // has a dynamic page layout
     const routeModuleLocationUrl = hasCustomDynamicLayout
       ? new URL(`./${layout}.js`, userLayoutsDir)

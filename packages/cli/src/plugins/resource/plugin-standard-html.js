@@ -11,7 +11,7 @@ import remarkFrontmatter from "remark-frontmatter";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { getPageLayout, getAppLayout, getGreenwoodScripts } from "../../lib/layout-utils.js";
-import { requestAsObject, checkResourceExists } from "../../lib/resource-utils.js";
+import { requestAsObject } from "../../lib/resource-utils.js";
 import { unified } from "unified";
 import { Worker } from "node:worker_threads";
 import { parse } from "node-html-parser";
@@ -36,11 +36,11 @@ class StandardHtmlResource {
 
   async serve(url, request) {
     const { config, context } = this.compilation;
-    const { userWorkspace, pagesDir, layoutsDir } = context;
+    const { userWorkspace } = context;
     const { pathname } = url;
     const isSpaRoute = this.compilation.graph.find((node) => node.isSPA);
     const matchingRoute = this.compilation.graph.find((node) => node.route === pathname) || {};
-    const { pageHref, route } = matchingRoute;
+    const { pageHref } = matchingRoute;
     const filePath =
       !matchingRoute.external && pageHref
         ? new URL(pageHref).pathname.replace(userWorkspace.pathname, "./")
@@ -90,15 +90,7 @@ class StandardHtmlResource {
         .use(rehypeStringify) // convert AST to HTML string
         .process(markdownContents);
     } else if (isHtmlContent) {
-      if (route.endsWith("/404/")) {
-        const pathUrl = (await checkResourceExists(new URL("./404.html", pagesDir)))
-          ? new URL("./404.html", pagesDir)
-          : new URL("./404.html", layoutsDir);
-
-        body = await fs.readFile(pathUrl, "utf-8");
-      } else {
-        body = await fs.readFile(new URL(pageHref), "utf-8");
-      }
+      body = await fs.readFile(new URL(pageHref), "utf-8");
     } else if (isCustomStaticPage) {
       const transformed = await customPageFormatPlugins[0].serve(new URL(pageHref));
 

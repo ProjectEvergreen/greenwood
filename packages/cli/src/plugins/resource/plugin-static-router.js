@@ -33,7 +33,7 @@ class StaticRouterResource {
     return (
       process.env.__GWD_COMMAND__ === "build" &&
       this.compilation.config.staticRouter &&
-      !pathname.startsWith("/404") &&
+      !pathname.endsWith("/404/") &&
       protocol === "http:" &&
       contentType.indexOf(this.contentType) >= 0
     );
@@ -56,7 +56,7 @@ class StaticRouterResource {
   async shouldOptimize(url, response) {
     return (
       this.compilation.config.staticRouter &&
-      !url.pathname.startsWith("/404") &&
+      !url.pathname.endsWith("/404/") &&
       response.headers.get("Content-Type").indexOf(this.contentType) >= 0
     );
   }
