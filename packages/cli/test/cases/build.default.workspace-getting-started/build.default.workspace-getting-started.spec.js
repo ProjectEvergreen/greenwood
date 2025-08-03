@@ -28,6 +28,7 @@
  *   layouts/
  *     app.html
  *     blog.html
+ *     page.html
  */
 import chai from "chai";
 import fs from "node:fs";
@@ -74,7 +75,7 @@ describe("Build Greenwood With: ", function () {
       });
 
       describe("document <html>", function () {
-        it("should have an <DOCTYE> tag with the html attribute", function () {
+        it("should have an <DOCTYPE> tag with the html attribute", function () {
           expect(html.indexOf("<!DOCTYPE html>")).to.be.equal(0);
         });
 
@@ -104,31 +105,29 @@ describe("Build Greenwood With: ", function () {
           expect(title).to.be.equal("My App");
         });
 
-        it("should have five default <meta> tags in the <head>", function () {
-          expect(metaTags.length).to.be.equal(5);
+        it("should have the expected meta charset tag", function (done) {
+          const charset = Array.from(metaTags).filter((tag) => tag.getAttribute("charset"));
+
+          expect(charset.length).to.equal(1);
+          expect(charset[0].getAttribute("charset")).to.equal("utf-8");
+
+          done();
         });
 
-        it("should have default mobile-web-app-capable <meta> tag", function () {
-          const mwacMeta = metaTags[2];
+        it("should have the expected meta viewport tag", function (done) {
+          const viewport = Array.from(metaTags).filter((tag) => tag.getAttribute("name"));
 
-          expect(mwacMeta.getAttribute("name")).to.be.equal("mobile-web-app-capable");
-          expect(mwacMeta.getAttribute("content")).to.be.equal("yes");
-        });
-
-        it("should have default apple-mobile-web-app-capable <meta> tag", function () {
-          const amwacMeta = metaTags[3];
-
-          expect(amwacMeta.getAttribute("name")).to.be.equal("apple-mobile-web-app-capable");
-          expect(amwacMeta.getAttribute("content")).to.be.equal("yes");
-        });
-
-        it("should have default apple-mobile-web-app-status-bar-style <meta> tag", function () {
-          const amwasbsMeta = metaTags[4];
-
-          expect(amwasbsMeta.getAttribute("name")).to.be.equal(
-            "apple-mobile-web-app-status-bar-style",
+          expect(viewport.length).to.equal(1);
+          expect(viewport[0].getAttribute("name")).to.equal("viewport");
+          expect(viewport[0].getAttribute("content")).to.equal(
+            "width=device-width, initial-scale=1",
           );
-          expect(amwasbsMeta.getAttribute("content")).to.be.equal("black");
+
+          done();
+        });
+
+        it("should have five default <meta> tags in the <head>", function () {
+          expect(metaTags.length).to.be.equal(2);
         });
       });
 

@@ -135,17 +135,17 @@ async function mergeContentIntoLayout(
           : "<html>";
 
     const mergedMeta = [
-      ...(parentRoot?.querySelectorAll("head meta") ?? []),
+      ...((parentRoot && parentRoot?.querySelectorAll("head meta")) ?? []),
       ...[...((childRoot && childRoot.querySelectorAll("head meta")) || [])],
     ].join("\n");
 
     const mergedLinks = [
-      ...(parentRoot?.querySelectorAll("head link") ?? []),
+      ...((parentRoot && parentRoot?.querySelectorAll("head link")) ?? []),
       ...[...((childRoot && childRoot.querySelectorAll("head link")) || [])],
     ].join("\n");
 
     const mergedStyles = [
-      ...(parentRoot?.querySelectorAll("head style") ?? []),
+      ...((parentRoot && parentRoot?.querySelectorAll("head style")) ?? []),
       ...[...((childRoot && childRoot.querySelectorAll("head style")) || [])],
       ...(
         await asyncFilter(customImports, async (resource) => {
@@ -178,7 +178,7 @@ async function mergeContentIntoLayout(
     ].join("\n");
 
     const mergedScripts = [
-      ...(parentRoot?.querySelectorAll("head script") || []),
+      ...((parentRoot && parentRoot?.querySelectorAll("head script")) || []),
       ...[...((childRoot && childRoot.querySelectorAll("head script")) || [])],
       ...(
         await asyncFilter(customImports, async (resource) => {
@@ -340,7 +340,7 @@ async function getPageLayout(pageContents, compilation, matchingRoute) {
 
 // merges provided page + app layout contents into an app level layout
 async function getAppLayout(pageLayoutContents, compilation, matchingRoute) {
-  const { layoutsDir, userLayoutsDir } = compilation.context;
+  const { userLayoutsDir } = compilation.context;
   const userStaticAppLayoutUrl = new URL("./app.html", userLayoutsDir);
   const userDynamicAppLayoutUrl = new URL("./app.js", userLayoutsDir);
   const userDynamicAppLayoutTypeScriptUrl = new URL("./app.ts", userLayoutsDir);
@@ -396,7 +396,7 @@ async function getAppLayout(pageLayoutContents, compilation, matchingRoute) {
         ? await fs.readFile(userStaticAppLayoutUrl, "utf-8")
         : userHasDynamicAppLayout || userHasDynamicAppTypeScriptLayout
           ? dynamicAppLayoutContents
-          : await fs.readFile(new URL("./app.html", layoutsDir), "utf-8");
+          : "";
   let mergedLayoutContents = "";
 
   mergedLayoutContents = await mergeContentIntoLayout(

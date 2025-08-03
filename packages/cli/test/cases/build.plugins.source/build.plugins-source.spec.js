@@ -31,6 +31,7 @@
  *     index.md
  *     404.html
  *   layouts/
+ *     app.html
  *     artist.html
  */
 import chai from "chai";
