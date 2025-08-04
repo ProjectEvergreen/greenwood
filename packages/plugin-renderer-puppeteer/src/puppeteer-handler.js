@@ -47,8 +47,7 @@ export default async function (compilation, callback) {
     console.info(
       "For more information please see this guide - https://github.com/puppeteer/puppeteer/blob/main/docs/troubleshooting.md",
     );
-
-    return Promise.reject();
+    throw e;
   }
 
   const pages = compilation.graph.filter((page) => !page.isSSR);
