@@ -58,9 +58,7 @@ const generateCompilation = async () => {
     console.info("Loading graph from build output...");
 
     if (!(await checkResourceExists(new URL("./graph.json", outputDir)))) {
-      return Promise.reject(
-        new Error("No build output detected.  Make sure you have run greenwood build"),
-      );
+      throw new Error("No build output detected.  Make sure you have run greenwood build");
     }
 
     compilation.graph = JSON.parse(await fs.readFile(new URL("./graph.json", outputDir), "utf-8"));
@@ -131,7 +129,7 @@ const generateCompilation = async () => {
     await fs.writeFile(new URL("./graph.json", scratchDir), JSON.stringify(compilation.graph));
   }
 
-  return Promise.resolve(compilation);
+  return compilation;
 };
 
 export { generateCompilation };
