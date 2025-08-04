@@ -129,13 +129,13 @@ const readAndMergeConfig = async () => {
     // workspace validation
     if (workspace) {
       if (!(workspace instanceof URL)) {
-        throw new Error("Configuration error: workspace must be an instance of URL");
+        return Promise.reject("Configuration error: workspace must be an instance of URL");
       }
 
       if (await checkResourceExists(workspace)) {
         customConfig.workspace = workspace;
       } else {
-        throw new Error(
+        return Promise.reject(
           "Configuration error: Workspace doesn't exist! Please double check your configuration.",
         );
       }
@@ -147,14 +147,14 @@ const readAndMergeConfig = async () => {
     ) {
       customConfig.optimization = optimization;
     } else if (optimization) {
-      throw new Error(
+      return Promise.reject(
         `Configuration error: provided optimization "${optimization}" is not supported.  Please use one of: ${optimizations.join(", ")}.`,
       );
     }
 
     if (activeContent) {
       if (typeof activeContent !== "boolean") {
-        throw new Error("Configuration error: activeContent must be a boolean");
+        return Promise.reject("Configuration error: activeContent must be a boolean");
       }
       customConfig.activeContent = activeContent;
     }
@@ -164,7 +164,7 @@ const readAndMergeConfig = async () => {
 
       flattened.forEach((plugin) => {
         if (!plugin.type || pluginTypes.indexOf(plugin.type) < 0) {
-          throw new Error(
+          return Promise.reject(
             `Configuration error: plugins must be one of type "${pluginTypes.join(", ")}". got "${plugin.type}" instead.`,
           );
         }
@@ -172,7 +172,7 @@ const readAndMergeConfig = async () => {
         if (!plugin.provider || typeof plugin.provider !== "function") {
           const providerTypeof = typeof plugin.provider;
 
-          throw new Error(
+          return Promise.reject(
             `Configuration error: plugins provider must be a function. got ${providerTypeof} instead.`,
           );
         }
@@ -180,7 +180,7 @@ const readAndMergeConfig = async () => {
         if (!plugin.name || typeof plugin.name !== "string") {
           const nameTypeof = typeof plugin.name;
 
-          throw new Error(
+          return Promise.reject(
             `Configuration error: plugins must have a name. got ${nameTypeof} instead.`,
           );
         }
@@ -208,7 +208,7 @@ const readAndMergeConfig = async () => {
         if (typeof devServer.hud === "boolean") {
           customConfig.devServer.hud = devServer.hud;
         } else {
-          throw new Error(
+          return Promise.reject(
             `Configuration error: devServer hud options must be a boolean.  Passed value was: ${devServer.hud}`,
           );
         }
@@ -216,7 +216,7 @@ const readAndMergeConfig = async () => {
 
       if (devServer.port) {
         if (!Number.isInteger(devServer.port)) {
-          throw new Error(
+          return Promise.reject(
             `Configuration error: devServer port must be an integer.  Passed value was: ${devServer.port}`,
           );
         } else {
@@ -232,7 +232,7 @@ const readAndMergeConfig = async () => {
         if (Array.isArray(devServer.extensions)) {
           customConfig.devServer.extensions = devServer.extensions;
         } else {
-          throw new Error(
+          return Promise.reject(
             "Configuration error: provided extensions is not an array.  Please provide an array like ['txt', 'foo']",
           );
         }
@@ -246,7 +246,9 @@ const readAndMergeConfig = async () => {
 
     if (port) {
       if (!Number.isInteger(port)) {
-        throw new Error(`Configuration error: port must be an integer.  Passed value was: ${port}`);
+        return Promise.reject(
+          `Configuration error: port must be an integer.  Passed value was: ${port}`,
+        );
       } else {
         customConfig.port = port;
       }
@@ -254,7 +256,7 @@ const readAndMergeConfig = async () => {
 
     if (basePath) {
       if (typeof basePath !== "string") {
-        throw new Error(
+        return Promise.reject(
           `Configuration error: basePath must be a string.  Passed value was: ${basePath}`,
         );
       } else {
@@ -265,7 +267,7 @@ const readAndMergeConfig = async () => {
     if (pagesDirectory && typeof pagesDirectory === "string") {
       customConfig.pagesDirectory = pagesDirectory;
     } else if (pagesDirectory) {
-      throw new Error(
+      return Promise.reject(
         `Configuration error: provided pagesDirectory "${pagesDirectory}" is not supported.  Please make sure to pass something like 'docs/'`,
       );
     }
@@ -273,7 +275,7 @@ const readAndMergeConfig = async () => {
     if (layoutsDirectory && typeof layoutsDirectory === "string") {
       customConfig.layoutsDirectory = layoutsDirectory;
     } else if (layoutsDirectory) {
-      throw new Error(
+      return Promise.reject(
         `Configuration error: provided layoutsDirectory "${layoutsDirectory}" is not supported.  Please make sure to pass something like 'layouts/'`,
       );
     }
@@ -282,7 +284,7 @@ const readAndMergeConfig = async () => {
       if (typeof prerender === "boolean") {
         customConfig.prerender = prerender;
       } else {
-        throw new Error(
+        return Promise.reject(
           `Configuration error: prerender must be a boolean; true or false.  Passed value was typeof: ${typeof prerender}`,
         );
       }
@@ -297,7 +299,7 @@ const readAndMergeConfig = async () => {
       if (typeof isolation === "boolean") {
         customConfig.isolation = isolation;
       } else {
-        throw new Error(
+        return Promise.reject(
           `Configuration error: isolation must be a boolean; true or false.  Passed value was typeof: ${typeof staticRouter}`,
         );
       }
@@ -307,7 +309,7 @@ const readAndMergeConfig = async () => {
       if (typeof staticRouter === "boolean") {
         customConfig.staticRouter = staticRouter;
       } else {
-        throw new Error(
+        return Promise.reject(
           `Configuration error: staticRouter must be a boolean; true or false.  Passed value was typeof: ${typeof staticRouter}`,
         );
       }
@@ -322,7 +324,7 @@ const readAndMergeConfig = async () => {
         if (typeof importMaps === "boolean") {
           customConfig.polyfills.importMaps = true;
         } else {
-          throw new Error(
+          return Promise.reject(
             `Configuration error: polyfills.importMaps must be a boolean; true or false.  Passed value was typeof: ${typeof importMaps}`,
           );
         }
@@ -332,7 +334,7 @@ const readAndMergeConfig = async () => {
         if (Array.isArray(importAttributes)) {
           customConfig.polyfills.importAttributes = importAttributes;
         } else {
-          throw new Error(
+          Promise.reject(
             `Configuration error: polyfills.importAttributes must be an array of types; ['css', 'json'].  Passed value was typeof: ${typeof importAttributes}`,
           );
         }
@@ -343,7 +345,7 @@ const readAndMergeConfig = async () => {
       if (typeof useTsc === "boolean") {
         customConfig.useTsc = useTsc;
       } else {
-        throw new Error(
+        return Promise.reject(
           `Configuration error: useTsc must be a boolean; true or false.  Passed value was typeof: ${typeof useTsc}`,
         );
       }
@@ -355,7 +357,7 @@ const readAndMergeConfig = async () => {
     }
   }
 
-  return { ...defaultConfig, ...customConfig };
+  return Promise.resolve({ ...defaultConfig, ...customConfig });
 };
 
 export { readAndMergeConfig };

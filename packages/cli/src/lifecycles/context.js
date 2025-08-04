@@ -22,7 +22,7 @@ const initContext = async ({ config }) => {
     layoutsDir,
   };
 
-  return context;
+  return Promise.resolve(context);
 };
 
 export { initContext };

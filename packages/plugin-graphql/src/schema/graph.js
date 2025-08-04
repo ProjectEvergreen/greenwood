@@ -66,7 +66,7 @@ const getParsedHeadingsFromPage = (tableOfContents = [], headingLevel) => {
 };
 
 const getPagesFromGraph = async (root, query, context) => {
-  return context.graph;
+  return Promise.resolve(context.graph);
 };
 
 const getChildrenFromParentRoute = async (root, query, context) => {
@@ -84,7 +84,7 @@ const getChildrenFromParentRoute = async (root, query, context) => {
     }
   });
 
-  return pages;
+  return Promise.resolve(pages);
 };
 
 const graphTypeDefs = gql`

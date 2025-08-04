@@ -15,6 +15,8 @@ class PuppeteerServer {
       (await getDevServer(this.compilation)).listen(offsetPort, async () => {
         console.info(`Started puppeteer prerender server at http://localhost:${offsetPort}`);
       });
+    } else {
+      await Promise.resolve();
     }
   }
 }

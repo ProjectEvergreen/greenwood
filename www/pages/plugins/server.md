@@ -46,9 +46,9 @@ class LiveReloadServer extends ServerInterface {
   async start() {
     const { userWorkspace } = this.compilation.context;
 
-    return this.liveReloadServer.watch(userWorkspace, async () => {
+    return this.liveReloadServer.watch(userWorkspace, () => {
       console.info(`Now watching directory "${userWorkspace}" for changes.`);
-      return true;
+      return Promise.resolve(true);
     });
   }
 }

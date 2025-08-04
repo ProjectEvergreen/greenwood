@@ -206,7 +206,7 @@ const generateGraph = async (compilation) => {
               worker.on("error", reject);
               worker.on("exit", (code) => {
                 if (code !== 0) {
-                  throw new Error(`Worker stopped with exit code ${code}`);
+                  return Promise.reject(new Error(`Worker stopped with exit code ${code}`));
                 }
               });
 
@@ -380,7 +380,7 @@ const generateGraph = async (compilation) => {
         if (!body || !route) {
           const missingKey = !body ? "body" : "route";
 
-          throw new Error(`ERROR: provided node does not provide a ${missingKey} property.`);
+          return Promise.reject(`ERROR: provided node does not provide a ${missingKey} property.`);
         }
 
         const page = {
@@ -404,7 +404,7 @@ const generateGraph = async (compilation) => {
     }
   }
 
-  return compilation;
+  return Promise.resolve(compilation);
 };
 
 export { generateGraph };
