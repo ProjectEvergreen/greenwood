@@ -83,8 +83,7 @@ class StaticRouterResource {
     let currentLayout;
 
     const routeTags = this.compilation.graph
-      .filter((page) => !page.isSSR)
-      .filter((page) => !page.route.endsWith("/404/"))
+      .filter((page) => !page.isSSR && !page.route.endsWith("/404/"))
       .map((page) => {
         const layout =
           page.pageHref && page.pageHref.split(".").pop() === this.extensions[0]

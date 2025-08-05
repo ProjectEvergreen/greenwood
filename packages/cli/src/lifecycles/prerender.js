@@ -7,8 +7,10 @@ import {
 import os from "node:os";
 import { WorkerPool } from "../lib/threadpool.js";
 
-async function createOutputDirectory(route, outputDir) {
-  if (!route.endsWith("/404/") && !(await checkResourceExists(outputDir))) {
+async function createOutputDirectory(outputDir) {
+  console.log({ outputDir });
+  // ignore creating directory for 404 pages since they live at the root of the output directory
+  if (!outputDir.href.endsWith("404.html") && !(await checkResourceExists(outputDir))) {
     await fs.mkdir(outputDir, {
       recursive: true,
     });
@@ -138,7 +140,7 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
       body = body.replace("<!-- greenwood-ssr-start --><!-- greenwood-ssr-end -->", ssrContents);
     }
 
-    await createOutputDirectory(route, new URL(scratchUrl.href.replace("index.html", "")));
+    await createOutputDirectory(new URL(scratchUrl.href.replace("index.html", "")));
     await fs.writeFile(scratchUrl, body);
 
     console.info("generated page...", route);
@@ -172,7 +174,7 @@ async function preRenderCompilationCustom(compilation, customPrerender) {
     body = body.replace(/<script src="(.*webcomponents-bundle.js)"><\/script>/, "");
 
     await trackResourcesForRoute(body, compilation, route);
-    await createOutputDirectory(route, new URL(scratchUrl.href.replace("index.html", "")));
+    await createOutputDirectory(new URL(scratchUrl.href.replace("index.html", "")));
     await fs.writeFile(scratchUrl, body);
 
     console.info("generated page...", route);
@@ -197,7 +199,7 @@ async function staticRenderCompilation(compilation) {
       body = await (await interceptPage(url, request, plugins, body)).text();
 
       await trackResourcesForRoute(body, compilation, route);
-      await createOutputDirectory(route, new URL(scratchUrl.href.replace("index.html", "")));
+      await createOutputDirectory(new URL(scratchUrl.href.replace("index.html", "")));
       await fs.writeFile(scratchUrl, body);
 
       console.info("generated page...", route);
