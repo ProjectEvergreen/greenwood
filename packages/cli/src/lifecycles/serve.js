@@ -221,7 +221,7 @@ async function getStaticServer(compilation, composable) {
     return plugin.type === "resource" && plugin.isGreenwoodDefaultPlugin;
   });
 
-  // check for static assets first, otherwise default to 404
+  // check for static assets first, otherwise default to a 404 response
   app.use(async (ctx, next) => {
     try {
       const url = new URL(`.${ctx.url.replace(basePath, "")}`, outputDir.href);
@@ -314,7 +314,6 @@ async function getStaticServer(compilation, composable) {
         (isSSR && compilation.config.prerender) ||
         (isSSR && matchingRoute.prerender);
 
-      // TODO maybe we can clean this up a bit? or change ordering
       if (
         ctx.response.status === 404 &&
         ((isSPA && extension === url.pathname) ||
