@@ -15,20 +15,24 @@ const greenwoodPlugins = (
       new URL("./renderer/", greenwoodPluginsDirectoryUrl),
       new URL("./resource/", greenwoodPluginsDirectoryUrl),
       new URL("./server/", greenwoodPluginsDirectoryUrl),
-    ].map(async (pluginDirectoryUrl) => {
-      const files = await fs.readdir(pluginDirectoryUrl);
+    ].map((pluginDirectoryUrl) =>
+      (async () => {
+        const files = await fs.readdir(pluginDirectoryUrl);
 
-      return await Promise.all(
-        files.map(async (file) => {
-          const importUrl = new URL(`./${file}`, pluginDirectoryUrl);
-          // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
-          const pluginImport = await import(importUrl);
-          const plugin = pluginImport[Object.keys(pluginImport)[0]];
+        return await Promise.all(
+          files.map((file) =>
+            (async () => {
+              const importUrl = new URL(`./${file}`, pluginDirectoryUrl);
+              // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
+              const pluginImport = await import(importUrl);
+              const plugin = pluginImport[Object.keys(pluginImport)[0]];
 
-          return Array.isArray(plugin) ? plugin : [plugin];
-        }),
-      );
-    }),
+              return Array.isArray(plugin) ? plugin : [plugin];
+            })(),
+          ),
+        );
+      })(),
+    ),
   )
 )
   .flat(PLUGINS_FLATTENED_DEPTH)

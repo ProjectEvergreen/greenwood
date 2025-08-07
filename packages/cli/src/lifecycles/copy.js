@@ -7,10 +7,10 @@ async function rreaddir(dir, allFiles = []) {
   allFiles.push(...files);
 
   await Promise.all(
-    files.map(
-      async (f) =>
+    files.map((f) =>
+      (async () =>
         (await fs.stat(f)).isDirectory() &&
-        (await rreaddir(new URL(`file://${f.pathname}/`), allFiles)),
+        (await rreaddir(new URL(`file://${f.pathname}/`), allFiles)))(),
     ),
   );
 
