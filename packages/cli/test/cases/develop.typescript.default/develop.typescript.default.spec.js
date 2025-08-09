@@ -20,7 +20,6 @@ import chai from "chai";
 import path from "node:path";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
-import { runSmokeTest } from "../../../../../test/smoke-test.js";
 
 const expect = chai.expect;
 
@@ -51,8 +50,6 @@ describe("Develop Greenwood With: ", function () {
         runner.runCommand(cliPath, "develop", { async: true });
       });
     });
-
-    runSmokeTest(["serve"], LABEL);
 
     describe("Develop command specific .ts behaviors", function () {
       let response = {};

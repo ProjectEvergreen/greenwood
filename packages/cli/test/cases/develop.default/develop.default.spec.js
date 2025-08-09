@@ -40,7 +40,8 @@
  *       nothing.js
  *       submit-form-data.js
  *       submit-json.js
- *      index.html
+ *     index.html
+ *     404.html
  *   styles/
  *     main.css
  * package.json

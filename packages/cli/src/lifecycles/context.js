@@ -1,14 +1,14 @@
 const initContext = async ({ config }) => {
   const { workspace, pagesDirectory, layoutsDirectory } = config;
+
+  const userWorkspace = workspace;
   const projectDirectory = new URL(`file://${process.cwd()}/`);
   const scratchDir = new URL("./.greenwood/", projectDirectory);
   const outputDir = new URL("./public/", projectDirectory);
   const dataDir = new URL("../data/", import.meta.url);
-  const layoutsDir = new URL("../layouts/", import.meta.url);
-  const userWorkspace = workspace;
+  const layoutsDir = new URL(`./${layoutsDirectory}/`, userWorkspace);
   const pagesDir = new URL(`./${pagesDirectory}/`, userWorkspace);
   const apisDir = new URL("./api/", pagesDir);
-  const userLayoutsDir = new URL(`./${layoutsDirectory}/`, userWorkspace);
 
   const context = {
     dataDir,
@@ -16,7 +16,6 @@ const initContext = async ({ config }) => {
     userWorkspace,
     apisDir,
     pagesDir,
-    userLayoutsDir,
     scratchDir,
     projectDirectory,
     layoutsDir,

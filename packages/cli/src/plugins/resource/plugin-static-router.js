@@ -33,7 +33,7 @@ class StaticRouterResource {
     return (
       process.env.__GWD_COMMAND__ === "build" &&
       this.compilation.config.staticRouter &&
-      !pathname.startsWith("/404") &&
+      !pathname.endsWith("/404/") &&
       protocol === "http:" &&
       contentType.indexOf(this.contentType) >= 0
     );
@@ -56,7 +56,7 @@ class StaticRouterResource {
   async shouldOptimize(url, response) {
     return (
       this.compilation.config.staticRouter &&
-      !url.pathname.startsWith("/404") &&
+      !url.pathname.endsWith("/404/") &&
       response.headers.get("Content-Type").indexOf(this.contentType) >= 0
     );
   }
@@ -83,8 +83,7 @@ class StaticRouterResource {
     let currentLayout;
 
     const routeTags = this.compilation.graph
-      .filter((page) => !page.isSSR)
-      .filter((page) => !page.route.endsWith("/404/"))
+      .filter((page) => !page.isSSR && !page.route.endsWith("/404/"))
       .map((page) => {
         const layout =
           page.pageHref && page.pageHref.split(".").pop() === this.extensions[0]

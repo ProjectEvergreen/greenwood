@@ -30,36 +30,16 @@ function commonIndexSpecs(dom, html, label) {
         });
       });
 
-      it("should have a <head> tag with the lang attribute on it", function () {
-        const htmlTag = dom.window.document.querySelectorAll("html");
-
-        expect(htmlTag.length).to.equal(1);
-        expect(htmlTag[0].getAttribute("lang")).to.be.equal("en");
-        expect(htmlTag[0].getAttribute("prefix")).to.be.equal("og:http://ogp.me/ns#");
-      });
-
       it("should have matching opening and closing <html> tags", function () {
         expect(tagsMatch("html", html, 1)).to.be.equal(true);
       });
     });
 
     describe("document <head>", function () {
-      let metaTags;
-
-      before(function () {
-        metaTags = dom.window.document.querySelectorAll("head > meta");
-      });
-
       it("should have matching opening and closing <head> tags in the <head>", function () {
         // add an explicit > here to avoid conflicting with <header>
         // which is used in a lot of test case scaffolding
         expect(tagsMatch("head>", html, 1)).to.be.equal(true);
-      });
-
-      it("should have a <title> tag in the <head>", function () {
-        const title = dom.window.document.querySelector("head title").textContent;
-
-        expect(title).to.not.be.undefined;
       });
 
       it("should have matching opening and closing <script> tags in the <head>", function () {
@@ -92,27 +72,6 @@ function commonIndexSpecs(dom, html, label) {
         const style = dom.window.document.querySelectorAll("head style > style");
 
         expect(style.length).to.be.equal(0);
-      });
-
-      it("should have default viewport <meta> tag", function () {
-        const viewportMeta = Array.from(metaTags).filter(
-          (meta) => meta.getAttribute("name") === "viewport",
-        );
-
-        expect(viewportMeta.length).to.be.equal(1);
-        expect(viewportMeta[0].getAttribute("name")).to.be.equal("viewport");
-        expect(viewportMeta[0].getAttribute("content")).to.be.equal(
-          "width=device-width, initial-scale=1",
-        );
-      });
-
-      it("should have default charset <meta> tag", function () {
-        const charsetMeta = Array.from(metaTags).filter(
-          (meta) => meta.getAttribute("charset") === "utf-8",
-        );
-
-        expect(charsetMeta.length).to.be.equal(1);
-        expect(charsetMeta[0].getAttribute("charset")).to.be.equal("utf-8");
       });
 
       it("should not have any optimization markers left in the HTML", function () {
@@ -181,10 +140,6 @@ function publicDirectory(label) {
     describe("Public Directory Generated Output", function () {
       it("should create a public directory", function () {
         expect(fs.existsSync(this.context.publicDir)).to.be.true;
-      });
-
-      it("should output a single index.html file (home page)", function () {
-        expect(fs.existsSync(path.join(this.context.publicDir, "./index.html"))).to.be.true;
       });
 
       it("should output one graph.json file", async function () {

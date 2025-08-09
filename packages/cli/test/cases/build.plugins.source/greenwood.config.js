@@ -46,6 +46,7 @@ const customExternalSourcesPlugin = {
           body: `
             <ul>
               ${compilation.graph
+                .filter((page) => page.route !== "/404/")
                 .map((page) => {
                   const { label, route } = page;
 

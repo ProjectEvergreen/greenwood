@@ -7,6 +7,10 @@
  *
  * User Command
  * greenwood eject
+ *
+ * User Workspace
+ * src/
+ *   index.html
  */
 import fs from "node:fs";
 import path from "node:path";

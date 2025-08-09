@@ -13,6 +13,8 @@
  *
  * User Workspace
  * src/
+ *   layouts/
+ *     app.html
  *   pages/
  *     index.md
  */

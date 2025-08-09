@@ -15,12 +15,12 @@
  * }
  *
  * User Workspace
- *  src/
+ * src/
  *   components/
- *    blog-posts-lists.js
- *    footer.js
- *    header.js
- *    toc.js
+ *     blog-posts-lists.js
+ *     footer.js
+ *     header.js
+ *     toc.js
  *   pages/
  *     blog/
  *       first-post.md
@@ -238,9 +238,8 @@ describe("Build Greenwood With: ", function () {
           pageLinks = dom.window.document.querySelectorAll("ol li a");
         });
 
-        // includes 404 page
         it("should have the expected number of post links from all pages in the collection (minus the index route)", function () {
-          expect(pageLinks.length).to.equal(7);
+          expect(pageLinks.length).to.equal(6);
         });
       });
     });

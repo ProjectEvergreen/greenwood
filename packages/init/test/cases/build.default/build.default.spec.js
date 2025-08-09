@@ -62,9 +62,27 @@ describe("Initialize a new Greenwood project: ", function () {
         });
 
         it("should display default project title", function (done) {
-          const title = dom.window.document.querySelector("head > title");
+          const title = dom.window.document.querySelectorAll("head > title");
 
-          expect(title.textContent).to.equal("Greenwood");
+          expect(title.length).to.equal(1);
+          expect(title[0].textContent).to.equal("Greenwood");
+
+          done();
+        });
+
+        it("should have the expected meta charset tag", function (done) {
+          const meta = dom.window.document.querySelectorAll("meta[charset='utf-8']");
+
+          expect(meta.length).to.equal(1);
+
+          done();
+        });
+
+        it("should have the expected meta viewport tag", function (done) {
+          const meta = dom.window.document.querySelectorAll("meta[name='viewport']");
+
+          expect(meta.length).to.equal(1);
+          expect(meta[0].getAttribute("content")).to.equal("width=device-width, initial-scale=1");
 
           done();
         });

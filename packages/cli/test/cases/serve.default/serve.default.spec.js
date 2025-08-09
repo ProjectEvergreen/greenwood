@@ -21,8 +21,7 @@
  *
  * User Workspace
  * src/
- *   api/
- *     greeting.js
+ *   index.html
  *   assets/
  *     data.json
  *     favicon.ico
@@ -37,7 +36,6 @@ import chai from "chai";
 import { JSDOM } from "jsdom";
 import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
-import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
 
@@ -70,8 +68,6 @@ describe("Serve Greenwood With: ", function () {
         runner.runCommand(cliPath, "serve", { async: true });
       });
     });
-
-    runSmokeTest(["serve"], LABEL);
 
     describe("<script> tag setup for active content", function () {
       let dom;
@@ -362,15 +358,52 @@ describe("Serve Greenwood With: ", function () {
       });
     });
 
-    describe("Serve command with 404 not found behavior", function () {
+    describe("Serve command with 404 not found behavior for a static asset", function () {
       let response = {};
+      let body = "";
 
       before(async function () {
         response = await fetch(`${hostname}/foo.png`);
+        body = await response.text();
+      });
+
+      it("should return a Not Found body", function (done) {
+        expect(body).to.equal("Not Found");
+        done();
       });
 
       it("should return a 404 status", function (done) {
         expect(response.status).to.equal(404);
+        done();
+      });
+
+      it("should return a Content-Type of text/plain", function (done) {
+        expect(response.headers.get("Content-Type")).to.equal("text/plain");
+        done();
+      });
+    });
+
+    describe("Serve command with 404 not found behavior for a non existent page", function () {
+      let response = {};
+      let body = "";
+
+      before(async function () {
+        response = await fetch(`${hostname}/foo`);
+        body = await response.text();
+      });
+
+      it("should return a Not Found body", function (done) {
+        expect(body).to.equal("Not Found");
+        done();
+      });
+
+      it("should return a 404 status", function (done) {
+        expect(response.status).to.equal(404);
+        done();
+      });
+
+      it("should return a Content-Type of text/plain", function (done) {
+        expect(response.headers.get("Content-Type")).to.equal("text/plain");
         done();
       });
     });

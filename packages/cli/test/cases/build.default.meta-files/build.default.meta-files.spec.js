@@ -15,6 +15,7 @@
  * src/
  *   favicon.ico
  *   robots.txt
+ *   sitemap.xml
  */
 import chai from "chai";
 import glob from "glob-promise";
@@ -45,7 +46,7 @@ describe("Build Greenwood With: ", function () {
       runner.runCommand(cliPath, "build");
     });
 
-    runSmokeTest(["public", "index"], LABEL);
+    runSmokeTest(["public"], LABEL);
 
     describe("Default output for project level favicon.ico", function () {
       let favicons;

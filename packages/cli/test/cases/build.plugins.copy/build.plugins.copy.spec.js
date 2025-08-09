@@ -42,7 +42,7 @@ describe("Build Greenwood With: ", function () {
       runner.runCommand(cliPath, "build");
     });
 
-    runSmokeTest(["public", "index"], LABEL);
+    runSmokeTest(["public"], LABEL);
 
     describe("Copy Directory", function () {
       it("should create the expected output folder for prism.css assets", function () {

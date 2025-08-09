@@ -14,7 +14,13 @@
  * None (Greenwood Default)
  *
  * User Workspace
- * Greenwood default (src/)
+ * src/
+ *   components/
+ *     header.js
+ *   pages/
+ *     index.md
+ *   layouts/
+ *     page.html
  */
 import chai from "chai";
 import { JSDOM } from "jsdom";
@@ -55,56 +61,16 @@ describe("Build Greenwood With: ", function () {
       });
 
       describe("head section tags", function () {
-        let metaTags;
-
-        before(function () {
-          metaTags = dom.window.document.querySelectorAll("head > meta");
-        });
-
         it("should have a <title> tag in the <head>", function () {
           const title = dom.window.document.querySelector("head title").textContent;
 
           expect(title).to.be.equal("My App");
         });
 
-        it("should have five default <meta> tags in the <head>", function () {
-          expect(metaTags.length).to.be.equal(5);
-        });
+        it("should have two <script> tag in the <head>", function () {
+          const scripts = dom.window.document.querySelectorAll("head script[type='module']");
 
-        it("should have default charset <meta> tag", function () {
-          expect(metaTags[0].getAttribute("charset")).to.be.equal("utf-8");
-        });
-
-        it("should have default viewport <meta> tag", function () {
-          const viewportMeta = metaTags[1];
-
-          expect(viewportMeta.getAttribute("name")).to.be.equal("viewport");
-          expect(viewportMeta.getAttribute("content")).to.be.equal(
-            "width=device-width, initial-scale=1",
-          );
-        });
-
-        it("should have default mobile-web-app-capable <meta> tag", function () {
-          const mwacMeta = metaTags[2];
-
-          expect(mwacMeta.getAttribute("name")).to.be.equal("mobile-web-app-capable");
-          expect(mwacMeta.getAttribute("content")).to.be.equal("yes");
-        });
-
-        it("should have default apple-mobile-web-app-capable <meta> tag", function () {
-          const amwacMeta = metaTags[3];
-
-          expect(amwacMeta.getAttribute("name")).to.be.equal("apple-mobile-web-app-capable");
-          expect(amwacMeta.getAttribute("content")).to.be.equal("yes");
-        });
-
-        it("should have default apple-mobile-web-app-status-bar-style <meta> tag", function () {
-          const amwasbsMeta = metaTags[4];
-
-          expect(amwasbsMeta.getAttribute("name")).to.be.equal(
-            "apple-mobile-web-app-status-bar-style",
-          );
-          expect(amwasbsMeta.getAttribute("content")).to.be.equal("black");
+          expect(scripts.length).to.be.equal(1);
         });
       });
     });

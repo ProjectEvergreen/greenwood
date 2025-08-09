@@ -22,7 +22,9 @@
  * }
  *
  * User Workspace
- * Greenwood default (src/)
+ * src/
+ *   pages/
+ *     index.html
  */
 import chai from "chai";
 import { JSDOM } from "jsdom";
