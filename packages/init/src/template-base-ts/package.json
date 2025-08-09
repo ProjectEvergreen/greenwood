@@ -1,9 +1,9 @@
 {
   "scripts": {
-    "dev": "NODE_OPTIONS='--experimental-strip-types' greenwood develop",
-    "start": "NODE_OPTIONS='--experimental-strip-types' greenwood develop",
-    "build": "NODE_OPTIONS='--experimental-strip-types' greenwood build",
-    "serve": "NODE_OPTIONS='--experimental-strip-types' greenwood serve",
+    "dev": "greenwood develop",
+    "start": "greenwood develop",
+    "build": "greenwood build",
+    "serve": "greenwood serve",
     "check": "tsc"
   },
   "devDependencies": {

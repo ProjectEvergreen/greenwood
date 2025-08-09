@@ -6043,6 +6043,11 @@ all-node-versions@^11.3.0:
     semver "^7.3.7"
     write-file-atomic "^4.0.1"
 
+amaro@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/amaro/-/amaro-1.1.1.tgz#2ec4f2a6710e2fd703fb0af2a43bf0da6a778483"
+  integrity sha512-0+T4jGuJcCLqq/tyAXZHspTn1cCt2G8wLY0gjO/03uRf/q6B/HzsFJSYo83ge9eVGz0yaQ2uUCw/KS6mrjpTIA==
+
 ansi-align@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/ansi-align/-/ansi-align-3.0.1.tgz#0cdf12e111ace773a86e9a1fad1225c43cb19a59"

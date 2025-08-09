@@ -5,7 +5,7 @@
  * This is a Greenwood default plugin.
  *
  */
-import { transform } from "sucrase";
+import amaro from "amaro";
 import fs from "node:fs/promises";
 import { checkResourceExists } from "../../lib/resource-utils.js";
 
@@ -55,9 +55,7 @@ class StandardTypeScriptResource {
 
       code = tsc.transpileModule(body, { compilerOptions }).outputText;
     } else {
-      code = transform(body, {
-        transforms: ["typescript"],
-      }).code;
+      code = amaro.transformSync(body, { mode: "strip-only" }).code;
     }
 
     return new Response(code, {
