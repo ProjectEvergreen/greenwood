@@ -8,7 +8,6 @@ import os from "node:os";
 import { WorkerPool } from "../lib/threadpool.js";
 
 async function createOutputDirectory(outputDir) {
-  console.log({ outputDir });
   // ignore creating directory for 404 pages since they live at the root of the output directory
   if (!outputDir.href.endsWith("404.html") && !(await checkResourceExists(outputDir))) {
     await fs.mkdir(outputDir, {
