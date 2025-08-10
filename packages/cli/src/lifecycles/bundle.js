@@ -427,13 +427,13 @@ const bundleCompilation = async (compilation) => {
 
   console.info("bundling static assets...");
 
+  // order matters here - https://github.com/ProjectEvergreen/greenwood/issues/1517
   // need styles bundled first for usage with import attributes syncing in Rollup
   await bundleStyleResources(compilation, optimizeResourcePlugins);
-
-  await Promise.all([await bundleApiRoutes(compilation), await bundleScriptResources(compilation)]);
-
-  // bundleSsrPages depends on bundleScriptResources having run first
+  // bundleSsrPages runs its own tracking for scripts and styles
   await bundleSsrPages(compilation, optimizeResourcePlugins);
+  // then bundle everything else
+  await Promise.all([await bundleApiRoutes(compilation), await bundleScriptResources(compilation)]);
 
   console.info("optimizing static pages....");
   await optimizeStaticPages(compilation, optimizeResourcePlugins);
