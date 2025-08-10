@@ -80,7 +80,6 @@ async function createOutputZip(id, outputType, outputRootUrl, projectDirectory) 
 
 async function netlifyAdapter(compilation) {
   const { outputDir, projectDirectory, scratchDir } = compilation.context;
-  const { basePath } = compilation.config;
   const adapterOutputUrl = new URL("./netlify/functions/", projectDirectory);
   const adapterOutputScratchUrl = new URL("./netlify/functions/", scratchDir);
   const ssrPages = compilation.graph.filter((page) => page.isSSR);
@@ -136,13 +135,9 @@ async function netlifyAdapter(compilation) {
 `;
   }
 
-  if (apiRoutes.size > 0) {
-    redirects += `${basePath}/api/* /.netlify/functions/api-:splat 200`;
-  }
-
   for (const [key, value] of apiRoutes.entries()) {
     const outputType = "api";
-    const { id, outputHref } = apiRoutes.get(key);
+    const { id, outputHref, route } = apiRoutes.get(key);
     const outputRoot = new URL(`./api/${id}/`, adapterOutputScratchUrl);
     const { assets = [] } = value;
 
@@ -159,6 +154,9 @@ async function netlifyAdapter(compilation) {
     // NOTE: All functions must live at the top level
     // https://github.com/netlify/netlify-lambda/issues/90#issuecomment-486047201
     await createOutputZip(id, outputType, outputRoot, projectDirectory);
+
+    redirects += `${route} /.netlify/functions/api-${id} 200
+`;
   }
 
   if (redirects !== "") {
