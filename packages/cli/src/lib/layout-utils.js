@@ -47,8 +47,9 @@ async function mergeContentIntoLayout(
   matchingRoute,
 ) {
   const activeFrontmatterTitleKey = "${globalThis.page.title}";
-  const parentRoot = parentContents && parse(parentContents);
-  const childRoot = parse(childContents);
+  // keep comments, especially for SSR placeholder markers
+  const parentRoot = parentContents && parse(parentContents, { comment: true });
+  const childRoot = parse(childContents, { comment: true });
   let mergedContents = "";
 
   if ((parentContents && !valid(parentContents)) || (childContents && !valid(childContents))) {
