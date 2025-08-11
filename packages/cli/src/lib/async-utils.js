@@ -14,14 +14,15 @@ async function asyncFilter(arr, cb) {
 }
 
 // https://stackoverflow.com/a/71278238/417806
+// Constraint: mapper functions must not depend on each other
 async function asyncMap(items, mapper) {
-  const mappedItems = [];
+  const promises = [];
 
   for (const item of items) {
-    mappedItems.push(await mapper(item));
+    promises.push(mapper(item));
   }
 
-  return mappedItems;
+  return Promise.all(promises);
 }
 
 export { asyncFilter, asyncMap };
