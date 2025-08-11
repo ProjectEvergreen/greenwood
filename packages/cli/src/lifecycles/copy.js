@@ -1,17 +1,17 @@
 import fs from "node:fs/promises";
 import { checkResourceExists } from "../lib/resource-utils.js";
+import { asyncMap } from "../lib/async-utils.js";
 
 async function rreaddir(dir, allFiles = []) {
   const files = (await fs.readdir(dir)).map((f) => new URL(`./${f}`, dir));
 
   allFiles.push(...files);
 
-  await Promise.all(
-    files.map((f) =>
-      (async () =>
-        (await fs.stat(f)).isDirectory() &&
-        (await rreaddir(new URL(`file://${f.pathname}/`), allFiles)))(),
-    ),
+  await asyncMap(
+    files,
+    async (f) =>
+      (await fs.stat(f)).isDirectory() &&
+      (await rreaddir(new URL(`file://${f.pathname}/`), allFiles)),
   );
 
   return allFiles;

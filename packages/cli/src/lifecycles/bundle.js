@@ -16,6 +16,7 @@ import {
 import path from "node:path";
 import { rollup } from "rollup";
 import { pruneGraph } from "../lib/content-utils.js";
+import { asyncMap } from "../lib/async-utils.js";
 
 async function interceptPage(url, request, plugins, body) {
   let response = new Response(body, {
@@ -115,49 +116,41 @@ async function cleanUpResources(compilation) {
 async function optimizeStaticPages(compilation, plugins) {
   const { scratchDir, outputDir } = compilation.context;
 
-  return Promise.all(
-    compilation.graph
-      .filter(
-        (page) =>
-          !page.isSSR ||
-          (page.isSSR && page.prerender) ||
-          (page.isSSR && compilation.config.prerender),
-      )
-      .map((page) =>
-        (async () => {
-          const { route, outputHref } = page;
-          const outputDirUrl = new URL(
-            outputHref.replace("index.html", "").replace("404.html", ""),
-          );
-          const url = new URL(`http://localhost:${compilation.config.port}${route}`);
-          const contents = await fs.readFile(
-            new URL(`./${outputHref.replace(outputDir.href, "")}`, scratchDir),
-            "utf-8",
-          );
-          const headers = new Headers({ "Content-Type": "text/html" });
-          let response = new Response(contents, { headers });
-
-          if (!(await checkResourceExists(outputDirUrl))) {
-            await fs.mkdir(outputDirUrl, {
-              recursive: true,
-            });
-          }
-
-          for (const plugin of plugins) {
-            if (plugin.shouldOptimize && (await plugin.shouldOptimize(url, response.clone()))) {
-              const currentResponse = await plugin.optimize(url, response.clone());
-
-              response = mergeResponse(response.clone(), currentResponse.clone());
-            }
-          }
-
-          // clean up optimization markers
-          const body = (await response.text()).replace(/data-gwd-opt=".*?[a-z]"/g, "");
-
-          await fs.writeFile(new URL(outputHref), body);
-        })(),
-      ),
+  const pages = compilation.graph.filter(
+    (page) =>
+      !page.isSSR || (page.isSSR && page.prerender) || (page.isSSR && compilation.config.prerender),
   );
+
+  await asyncMap(pages, async (page) => {
+    const { route, outputHref } = page;
+    const outputDirUrl = new URL(outputHref.replace("index.html", "").replace("404.html", ""));
+    const url = new URL(`http://localhost:${compilation.config.port}${route}`);
+    const contents = await fs.readFile(
+      new URL(`./${outputHref.replace(outputDir.href, "")}`, scratchDir),
+      "utf-8",
+    );
+    const headers = new Headers({ "Content-Type": "text/html" });
+    let response = new Response(contents, { headers });
+
+    if (!(await checkResourceExists(outputDirUrl))) {
+      await fs.mkdir(outputDirUrl, {
+        recursive: true,
+      });
+    }
+
+    for (const plugin of plugins) {
+      if (plugin.shouldOptimize && (await plugin.shouldOptimize(url, response.clone()))) {
+        const currentResponse = await plugin.optimize(url, response.clone());
+
+        response = mergeResponse(response.clone(), currentResponse.clone());
+      }
+    }
+
+    // clean up optimization markers
+    const body = (await response.text()).replace(/data-gwd-opt=".*?[a-z]"/g, "");
+
+    await fs.writeFile(new URL(outputHref), body);
+  });
 }
 
 async function bundleStyleResources(compilation, resourcePlugins) {
