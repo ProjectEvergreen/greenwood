@@ -56,7 +56,7 @@
     "css-tree": "^3.0.0",
     "es-module-shims": "^1.8.3",
     "front-matter": "^4.0.2",
-    "koa": "^2.13.0",
+    "koa": "^3.0.1",
     "koa-body": "^6.0.1",
     "livereload": "^0.9.1",
     "markdown-toc": "^1.2.0",
