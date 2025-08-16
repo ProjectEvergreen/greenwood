@@ -1,4 +1,4 @@
-import fs from "fs/promises";
+import fs from "node:fs/promises";
 import toc from "markdown-toc";
 import rehypeStringify from "rehype-stringify";
 import rehypeRaw from "rehype-raw";

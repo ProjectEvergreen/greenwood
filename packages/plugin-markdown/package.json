@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/plugin-markdown",
-  "version": "0.32.0",
+  "version": "0.33.0-alpha.5",
   "description": "A Greenwood plugin for processing markdown files for pages using the Unified ecosystem.",
   "repository": {
     "type": "git",
