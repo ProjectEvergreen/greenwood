@@ -35,11 +35,15 @@ class StandardHtmlResource {
     const isSpaRoute = this.compilation.graph.find((node) => node.isSPA);
     const matchingRoute = this.compilation.graph.find((node) => node.route === pathname) || {};
     const { pageHref } = matchingRoute;
-    const initContents = (await response?.text()) ?? "";
+    const filePath =
+      !matchingRoute.external && pageHref
+        ? new URL(pageHref).pathname.replace(userWorkspace.pathname, "./")
+        : "";
+    const t = await response.clone()?.text();
+    const initContents = t ?? "";
     const isHtmlContent = (filePath || "").split(".").pop() === "html";
     let body = "";
     let ssrBody;
-    let processedMarkdown = null;
     // final contents to return from the plugin
     let html = "";
 
@@ -52,8 +56,8 @@ class StandardHtmlResource {
       customPageFormatPlugins[0].shouldServe &&
       (await customPageFormatPlugins[0].shouldServe(new URL(pageHref)));
 
-    if(initContents) {
-      body = initContents
+    if (!isHtmlContent && initContents) {
+      body = initContents;
     } else if (isHtmlContent) {
       body = await fs.readFile(new URL(pageHref), "utf-8");
     } else if (isCustomStaticPage) {
