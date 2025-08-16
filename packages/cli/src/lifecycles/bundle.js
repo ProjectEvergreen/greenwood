@@ -16,7 +16,7 @@ import {
 import path from "node:path";
 import { rollup } from "rollup";
 import { pruneGraph } from "../lib/content-utils.js";
-import { asyncMap } from "../lib/async-utils.js";
+import { asyncForEach } from "../lib/async-utils.js";
 
 async function interceptPage(url, request, plugins, body) {
   let response = new Response(body, {
@@ -121,7 +121,7 @@ async function optimizeStaticPages(compilation, plugins) {
       !page.isSSR || (page.isSSR && page.prerender) || (page.isSSR && compilation.config.prerender),
   );
 
-  await asyncMap(pages, async (page) => {
+  await asyncForEach(pages, async (page) => {
     const { route, outputHref } = page;
     const outputDirUrl = new URL(outputHref.replace("index.html", "").replace("404.html", ""));
     const url = new URL(`http://localhost:${compilation.config.port}${route}`);

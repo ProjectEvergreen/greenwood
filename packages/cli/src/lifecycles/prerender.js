@@ -6,7 +6,7 @@ import {
 } from "../lib/resource-utils.js";
 import os from "node:os";
 import { WorkerPool } from "../lib/threadpool.js";
-import { asyncMap } from "../lib/async-utils.js";
+import { asyncForEach } from "../lib/async-utils.js";
 
 async function createOutputDirectory(route, outputDir) {
   if (!route.endsWith("/404/") && !(await checkResourceExists(outputDir))) {
@@ -187,7 +187,7 @@ async function staticRenderCompilation(compilation) {
 
   console.info("pages to generate", `\n ${pages.map((page) => page.route).join("\n ")}`);
 
-  await asyncMap(pages, async (page) => {
+  await asyncForEach(pages, async (page) => {
     const { route, outputHref } = page;
     const scratchUrl = toScratchUrl(outputHref, context);
     const url = new URL(`http://localhost:${config.port}${route}`);

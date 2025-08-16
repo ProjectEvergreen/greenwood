@@ -25,4 +25,8 @@ async function asyncMap(items, mapper) {
   return Promise.all(promises);
 }
 
-export { asyncFilter, asyncMap };
+async function asyncForEach(items, callback) {
+  await asyncMap(items, callback);
+}
+
+export { asyncFilter, asyncMap, asyncForEach };
