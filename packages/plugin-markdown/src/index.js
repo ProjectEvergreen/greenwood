@@ -74,6 +74,7 @@ class MarkdownResource {
     const rehypePlugins = [];
     const remarkPlugins = [];
     let processedMarkdown = "";
+    let html = "";
 
     for (const plugin of this.options?.plugins || []) {
       const name = typeof plugin === "string" ? plugin : plugin.name;
@@ -104,30 +105,25 @@ class MarkdownResource {
       await trackAllTocHeadings(this.compilation);
     }
 
-    // TODO
-    // if (processedMarkdown) {
-    //   const wrappedCustomElementRegex =
-    //     /<p><[a-zA-Z]*-[a-zA-Z](.*)>(.*)<\/[a-zA-Z]*-[a-zA-Z](.*)><\/p>/g;
-    //   const ceTest = wrappedCustomElementRegex.test(processedMarkdown.value);
+    html = String(processedMarkdown);
 
-    //   if (ceTest) {
-    //     const ceMatches = processedMarkdown.value.match(wrappedCustomElementRegex);
+    // remove markdown wrapping custom elements in <p></p> tags
+    // https://github.com/ProjectEvergreen/greenwood/discussions/1267
+    const wrappedCustomElementRegex =
+      /<p><[a-zA-Z]*-[a-zA-Z](.*)>(.*)<\/[a-zA-Z]*-[a-zA-Z](.*)><\/p>/g;
+    const ceTest = wrappedCustomElementRegex.test(html);
 
-    //     ceMatches.forEach((match) => {
-    //       const stripWrappingTags = match.replace("<p>", "").replace("</p>", "");
+    if (ceTest) {
+      const ceMatches = html.match(wrappedCustomElementRegex);
 
-    //       processedMarkdown.value = processedMarkdown.value.replace(match, stripWrappingTags);
-    //     });
-    //   }
+      ceMatches.forEach((match) => {
+        const stripWrappingTags = match.replace("<p>", "").replace("</p>", "");
 
-    //   // https://github.com/ProjectEvergreen/greenwood/issues/1126
-    //   body = body.replace(
-    //     /<content-outlet>(.*)<\/content-outlet>/s,
-    //     processedMarkdown.value.replace(/\$/g, "$$$"),
-    //   );
-    // }
+        html = html.replace(match, stripWrappingTags);
+      });
+    }
 
-    return new Response(String(processedMarkdown), {
+    return new Response(html, {
       headers: new Headers({
         "Content-Type": this.contentType,
       }),
