@@ -300,6 +300,7 @@ async function getStaticServer(compilation, composable) {
         }
       } else {
         ctx.body = "Not Found";
+        ctx.message = "Not Found";
         ctx.status = 404;
         ctx.set("Content-Type", "text/plain");
       }
@@ -373,6 +374,7 @@ async function getStaticServer(compilation, composable) {
 
         ctx.body = body;
         ctx.status = 200;
+        ctx.message = "OK";
         ctx.set("Content-Type", "text/html");
       }
     } catch (e) {
@@ -442,6 +444,7 @@ async function getHybridServer(compilation) {
         }
 
         ctx.body = html;
+        ctx.message = "OK";
         ctx.set("Content-Type", "text/html");
         ctx.status = 200;
       } else if (isApiRoute) {
