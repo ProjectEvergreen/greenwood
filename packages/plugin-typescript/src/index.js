@@ -59,6 +59,7 @@ class TypeScriptResource {
     const body = tsc.transpileModule(source, { compilerOptions }).outputText;
 
     return new Response(body, {
+      statusText: "OK",
       headers: new Headers({
         "Content-Type": this.contentType,
       }),

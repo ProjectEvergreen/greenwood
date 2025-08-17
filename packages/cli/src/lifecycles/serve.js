@@ -84,11 +84,17 @@ async function getDevServer(compilation) {
         }
       }, Promise.resolve(initResponse.clone()));
 
-      ctx.body = response.body ? Readable.from(response.body) : initResponse;
-      ctx.message = response.statusText;
+      ctx.body = response.body ? Readable.from(response.body) : initResponse.body;
+      ctx.status = response.status;
+      ctx.message = response.status === 404 ? "Not Found" : response.statusText;
       response.headers.forEach((value, key) => {
         ctx.set(key, value);
       });
+
+      // for some reason Koa is overriding this to be application/json
+      if (response.status === 404) {
+        ctx.set("Content-Type", "text/plain; charset=utf-8");
+      }
     } catch (e) {
       ctx.status = 500;
       console.error(e);

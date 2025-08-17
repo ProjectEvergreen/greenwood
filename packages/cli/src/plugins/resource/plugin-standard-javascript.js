@@ -25,6 +25,7 @@ class StandardJavaScriptResource {
     const body = await fs.readFile(url, "utf-8");
 
     return new Response(body, {
+      statusText: "OK",
       headers: {
         "Content-Type": this.contentType,
       },

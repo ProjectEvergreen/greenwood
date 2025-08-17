@@ -27,6 +27,7 @@ class ImportJsxResource {
     const result = escodegen.generate(tree);
 
     return new Response(result, {
+      statusText: "OK",
       headers: new Headers({
         "Content-Type": this.contentType,
       }),

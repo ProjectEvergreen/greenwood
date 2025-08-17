@@ -11,6 +11,7 @@ export async function handler(request: Request) {
   );
 
   return new Response(html, {
+    statusText: "OK",
     headers: {
       "Content-Type": "text/html",
     },

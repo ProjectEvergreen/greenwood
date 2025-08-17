@@ -25,6 +25,7 @@ class StandardImageResource {
     const contentType = extension === "ico" ? "x-icon" : type;
 
     return new Response(body, {
+      statusText: "OK",
       headers: new Headers({
         "Content-Type": `image/${contentType}`,
       }),

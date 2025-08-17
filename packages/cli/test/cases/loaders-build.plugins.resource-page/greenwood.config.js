@@ -18,6 +18,7 @@ class FooResource {
     const body = await fs.readFile(url, "utf-8");
 
     return new Response(body, {
+      statusText: "OK",
       headers: new Headers({
         "Content-Type": this.contentType,
       }),
@@ -45,6 +46,7 @@ class BarResource {
     body = body.replace(/interface (.*){(.*)}/, "");
 
     return new Response(body, {
+      statusText: "OK",
       headers: new Headers({
         "Content-Type": this.contentType,
       }),

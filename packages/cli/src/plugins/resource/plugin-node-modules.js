@@ -50,6 +50,7 @@ class NodeModulesResource {
     const body = await fs.readFile(url, "utf-8");
 
     return new Response(body, {
+      statusText: "OK",
       headers: new Headers({
         "Content-Type": this.contentType,
       }),

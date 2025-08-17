@@ -22,6 +22,7 @@ class NaiveFooResource {
     body = body.replace(": string", "");
 
     return new Response(body, {
+      statusText: "OK",
       headers: new Headers({
         "Content-Type": this.contentType,
       }),
@@ -52,6 +53,7 @@ class NaiveSassResource {
     body = body.replace(/\$my-color/, "'red'");
 
     return new Response(body, {
+      statusText: "OK",
       headers: new Headers({
         "Content-Type": this.contentType,
       }),
