@@ -56,6 +56,7 @@ class StandardAudioResource {
     }
 
     return new Response(body, {
+      statusText: "OK",
       headers: new Headers({
         "Content-Type": contentType,
         "Content-Length": String(body.toString().length),
