@@ -17,9 +17,9 @@
  * User Workspace
  * src/
  *   pages/
- *     about.md
+ *     about.html
  *     artists.js
- *     index.md
+ *     index.html
  */
 import chai from "chai";
 import path from "node:path";

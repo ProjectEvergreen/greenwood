@@ -1,3 +1,0 @@
-## Hello SSR
-
-Lorum Ipsum.
