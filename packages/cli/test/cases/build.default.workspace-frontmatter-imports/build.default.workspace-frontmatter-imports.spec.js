@@ -31,8 +31,8 @@
  *     frontmatter-custom.scss
  *   pages/
  *     examples/
- *       counter.md
- *     index.md
+ *       demo.html
+ *     index.html
  */
 import chai from "chai";
 import fs from "node:fs";

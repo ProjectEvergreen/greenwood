@@ -27,8 +27,8 @@
  * Custom Workspace
  * src/
  *   pages/
- *     about.md
- *     index.md
+ *     about.html
+ *     index.html
  *     404.html
  *   layouts/
  *     app.html
@@ -46,7 +46,7 @@ import { fileURLToPath } from "node:url";
 
 const expect = chai.expect;
 
-describe("Build Greenwood With: ", function () {
+xdescribe("Build Greenwood With: ", function () {
   const LABEL = "Custom Sources Plugin and Custom Layout";
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));

@@ -23,8 +23,8 @@
  *     toc.js
  *   pages/
  *     blog/
- *       first-post.md
- *       second-post.md
+ *       first-post.html
+ *       second-post.html
  *       index.html
  *     index.html
  *     toc.html

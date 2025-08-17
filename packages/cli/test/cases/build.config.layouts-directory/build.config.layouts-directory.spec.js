@@ -17,7 +17,7 @@
  * Greenwood default
  *  src/
  *   pages/
- *     index.md
+ *     index.html
  *   layouts/
  *     page.html
  */
@@ -33,7 +33,7 @@ import { fileURLToPath } from "node:url";
 const expect = chai.expect;
 
 describe("Build Greenwood With: ", function () {
-  const LABEL = "Custom Pages Directory from Configuration";
+  const LABEL = "Custom Layouts Directory from Configuration";
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
   let runner;

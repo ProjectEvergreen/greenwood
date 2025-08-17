@@ -15,9 +15,9 @@
  * src/
  *   pages/
  *     slides/
- *       index.md
- *     about-me.md
- *     index.md
+ *       index.html
+ *     about-me.html
+ *     index.html
  */
 import chai from "chai";
 import glob from "glob-promise";
@@ -126,7 +126,7 @@ describe("Build Greenwood With: ", function () {
         );
       });
 
-      it("should have expected text from user workspace pages/index.md", function () {
+      it("should have expected text from user workspace about-me.md", function () {
         const pageHeadingPrimary = dom.window.document.querySelectorAll("body h3")[0];
         const pageHeadingSecondary = dom.window.document.querySelectorAll("body p")[0];
 
@@ -158,12 +158,14 @@ describe("Build Greenwood With: ", function () {
         );
       });
 
-      it("should have expected text from user workspace pages/index.md", function () {
+      it("should have expected text from user workspace slides/index.html", function () {
         const pageHeadingPrimary = dom.window.document.querySelectorAll("body h3")[0];
         const pageHeadingSecondary = dom.window.document.querySelectorAll("body h4")[0];
 
         expect(pageHeadingPrimary.textContent).to.be.equal("Title Page");
-        expect(pageHeadingSecondary.textContent).to.be.equal("Some content from title.md.");
+        expect(pageHeadingSecondary.textContent).to.be.equal(
+          "Some content from slides/index.html.",
+        );
       });
     });
 

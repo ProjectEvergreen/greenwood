@@ -14,7 +14,7 @@
  * User Workspace
  * src/
  *   pages/
- *     index.md
+ *     index.html
  *   layouts/
  *     page.html
  */
