@@ -4,6 +4,7 @@ export async function handler(request) {
   const body = { message: `Hello ${name}!!!` };
 
   return new Response(JSON.stringify(body), {
+    statusText: "OK",
     headers: new Headers({
       "Content-Type": "application/json",
     }),
