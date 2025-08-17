@@ -56,7 +56,8 @@ class StandardHtmlResource {
       customPageFormatPlugins[0].shouldServe &&
       (await customPageFormatPlugins[0].shouldServe(new URL(pageHref)));
 
-    if (!isHtmlContent && initContents) {
+    // TODO better way to uniquely check for initContents
+    if (!isHtmlContent && !matchingRoute.isSSR && !isCustomStaticPage && initContents) {
       body = initContents;
     } else if (isHtmlContent) {
       body = await fs.readFile(new URL(pageHref), "utf-8");

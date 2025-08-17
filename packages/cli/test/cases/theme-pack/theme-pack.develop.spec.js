@@ -21,7 +21,7 @@
  *   layouts/
  *     blog-post.html
  *   pages/
- *     index.md
+ *     index.html
  *   styles/
  *     theme.css
  */

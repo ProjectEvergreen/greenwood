@@ -15,8 +15,8 @@
  * Greenwood default
  *  src/
  *   pages/
- *     index.md
- *     hello.md
+ *     index.html
+ *     hello.html
  *   layouts/
  *     page.html
  */

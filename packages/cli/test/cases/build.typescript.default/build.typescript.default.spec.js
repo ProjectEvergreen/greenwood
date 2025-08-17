@@ -16,6 +16,9 @@
  *   layouts/
  *     app.ts
  *   pages/
+ *     blog/
+ *       index.html
+ *.    contact.html
  *     index.html
  *   scripts/
  *     main.ts

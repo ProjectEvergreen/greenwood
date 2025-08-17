@@ -29,9 +29,9 @@
  *     header.js
  *   pages/
  *     blog/
- *       first-post.md
- *       second-post.md
- *     index.md
+ *       first-post.html
+ *       second-post.html
+ *     index.html
  *   styles/
  *     theme.css
  *   layouts/

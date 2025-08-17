@@ -1,3 +1,0 @@
-# Second Post
-
-Lorum Ipsum

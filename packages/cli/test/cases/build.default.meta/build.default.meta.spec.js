@@ -16,9 +16,9 @@
  *  src/
  *   pages/
  *     about/
- *       index.md
- *     hello.md
- *     index.md
+ *       index.html
+ *     hello.html
+ *     index.html
  *   layout/
  *     app.html
  *     page.html

@@ -19,10 +19,10 @@
  *       header.js
  *   pages/
  *     plugins/
- *       index-hooks.md
- *       index.md
- *     index.md
- *     pages.md
+ *       index-hooks.html
+ *       index.html
+ *     index.html
+ *     pages.html
  *   services/
  *     pages/
  *       pages.js
