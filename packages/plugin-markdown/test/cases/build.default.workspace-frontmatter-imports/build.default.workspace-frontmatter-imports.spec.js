@@ -13,7 +13,7 @@
  * export default {
  *   prerender: true,
  *   plugins: [{
- *     // naive TS and Sass plugins
+ *     greenwoodPluginMarkdown()
  *   }]
  * }
  *
@@ -23,18 +23,12 @@
  *     counter/
  *       counter.js
  *       counter.css
- *     multi-hyphen/
- *       multi-hyphen.js
- *   scripts/
- *     frontmatter-standard.js
- *     frontmatter-typescript.ts
- *     frontmatter-custom.foo
- *   styles/
- *     frontmatter-custom.scss
+ *   multi-hyphen/
+ *     multi-hyphen.js
  *   pages/
  *     examples/
- *       demo.html
- *     index.html
+ *       demo.md
+ *     index.md
  */
 import chai from "chai";
 import fs from "node:fs";
@@ -58,7 +52,7 @@ describe("Build Greenwood With: ", function () {
     this.context = {
       publicDir: path.join(outputPath, "public"),
     };
-    runner = new Runner();
+    runner = new Runner(true);
   });
 
   describe(LABEL, function () {
@@ -83,7 +77,7 @@ describe("Build Greenwood With: ", function () {
       it("should output the expected number of JS files from frontmatter imports", async function () {
         const jsFiles = await glob.promise(`${this.context.publicDir}**/**/*.js`);
 
-        expect(jsFiles).to.have.lengthOf(5);
+        expect(jsFiles).to.have.lengthOf(2);
       });
 
       it("should output an unoptimized counter.css file from frontmatter import", async function () {
@@ -163,67 +157,6 @@ describe("Build Greenwood With: ", function () {
 
           expect(script.getAttribute("foo")).to.equal("bar");
           expect(script.getAttribute("type")).to.equal("module");
-        });
-      });
-
-      describe("Frontmatter JavaScript import", () => {
-        it("should output a transformed frontmatter-standard.js file from custom frontmatter import", async function () {
-          const jsFiles = await glob.promise(
-            `${this.context.publicDir}**/**/frontmatter-standard.*.js`,
-          );
-          const contents = await fs.promises.readFile(jsFiles[0], "utf-8");
-
-          expect(jsFiles).to.have.lengthOf(1);
-          expect(contents).to.contain('console.log({message:"Hello from frontmatter standard"});');
-        });
-
-        it("should have expected attributes on the `<script>` tag from frontmatter imports", function () {
-          const script = Array.from(dom.window.document.querySelectorAll("head script")).find(
-            (script) => script.getAttribute("src")?.startsWith("/frontmatter-standard.DoXOcwxl"),
-          );
-
-          expect(script.getAttribute("type")).to.equal("module");
-        });
-      });
-
-      describe("Custom Frontmatter JavaScript import format with expected contents transformed", () => {
-        it("should output a transformed frontmatter-typescript.js file from custom frontmatter import", async function () {
-          const jsFiles = await glob.promise(
-            `${this.context.publicDir}**/**/frontmatter-typescript.*.js`,
-          );
-          const contents = await fs.promises.readFile(jsFiles[0], "utf-8");
-
-          expect(jsFiles).to.have.lengthOf(1);
-          expect(contents).to.contain('console.log({message:"Hello from frontmatter custom"});');
-        });
-
-        it("should have expected attributes on the `<script>` tag from frontmatter imports", function () {
-          const script = Array.from(dom.window.document.querySelectorAll("head script")).find(
-            (script) =>
-              script.getAttribute("src")?.startsWith("/frontmatter-typescript.CqVHikqT.js"),
-          );
-
-          expect(script.getAttribute("type")).to.equal("module");
-        });
-      });
-
-      describe("Custom Frontmatter CSS import format with expected contents transformed", () => {
-        it("should output a frontmatter-custom.css file from custom frontmatter import", async function () {
-          const cssFiles = await glob.promise(
-            `${this.context.publicDir}**/**/frontmatter-custom.*.css`,
-          );
-          const contents = await fs.promises.readFile(cssFiles[0], "utf-8");
-
-          expect(cssFiles).to.have.lengthOf(1);
-          expect(contents).to.equal("body{--primary-color:'red'}");
-        });
-
-        it("should have expected attributes on the `<link>` tag from frontmatter imports", async function () {
-          const link = Array.from(dom.window.document.querySelectorAll("head link")).find(
-            (link) => link.getAttribute("href") === "/styles/frontmatter-custom.1672594117.css",
-          );
-
-          expect(link).to.not.be.undefined;
         });
       });
     });
