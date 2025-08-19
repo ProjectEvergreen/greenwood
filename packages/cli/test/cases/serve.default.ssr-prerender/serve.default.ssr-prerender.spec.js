@@ -17,6 +17,7 @@
  *  src/
  *   components/
  *     footer.js
+ *     social-links.js
  *   pages/
  *     index.js
  *   layouts/

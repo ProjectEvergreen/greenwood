@@ -14,11 +14,12 @@
  * }
  *
  * User Workspace
- * Greenwood default w/ nested page
- *  src/
+ * src/
  *   pages/
  *     about.md
+ *     artists.js
  *     index.md
+ *     regex-test.html
  */
 import chai from "chai";
 import fs from "node:fs";
@@ -129,8 +130,8 @@ describe("Build Greenwood With: ", function () {
       });
 
       // tests to make sure we filter out 404 page from _route partials
-      it("should have the expected top level HTML files (index.html, 404.html) in the output", function () {
-        expect(pages.length).to.equal(2);
+      it("should have the expected top level HTML files (index.html) in the output", function () {
+        expect(pages.length).to.equal(1);
       });
 
       it("should have the expected number of _route partials in the output directory for each page", function () {

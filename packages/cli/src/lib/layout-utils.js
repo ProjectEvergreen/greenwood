@@ -135,17 +135,17 @@ async function mergeContentIntoLayout(
           : "<html>";
 
     const mergedMeta = [
-      ...(parentRoot?.querySelectorAll("head meta") ?? []),
+      ...((parentRoot && parentRoot?.querySelectorAll("head meta")) ?? []),
       ...[...((childRoot && childRoot.querySelectorAll("head meta")) || [])],
     ].join("\n");
 
     const mergedLinks = [
-      ...(parentRoot?.querySelectorAll("head link") ?? []),
+      ...((parentRoot && parentRoot?.querySelectorAll("head link")) ?? []),
       ...[...((childRoot && childRoot.querySelectorAll("head link")) || [])],
     ].join("\n");
 
     const mergedStyles = [
-      ...(parentRoot?.querySelectorAll("head style") ?? []),
+      ...((parentRoot && parentRoot?.querySelectorAll("head style")) ?? []),
       ...[...((childRoot && childRoot.querySelectorAll("head style")) || [])],
       ...(
         await asyncFilter(customImports, async (resource) => {
@@ -178,7 +178,7 @@ async function mergeContentIntoLayout(
     ].join("\n");
 
     const mergedScripts = [
-      ...(parentRoot?.querySelectorAll("head script") || []),
+      ...((parentRoot && parentRoot?.querySelectorAll("head script")) || []),
       ...[...((childRoot && childRoot.querySelectorAll("head script")) || [])],
       ...(
         await asyncFilter(customImports, async (resource) => {
@@ -254,21 +254,16 @@ async function mergeContentIntoLayout(
 // optionally using an already acquired SSR layout to avoid executing an SSR route worker
 async function getPageLayout(pageContents, compilation, matchingRoute) {
   const { context } = compilation;
-  const { layoutsDir, userLayoutsDir } = context;
-  const { layout, route, pageHref } = matchingRoute;
+  const { layoutsDir } = context;
+  const { layout, pageHref } = matchingRoute;
   const customPluginDefaultPageLayouts = await getCustomPageLayoutsFromPlugins(compilation, "page");
   const customPluginPageLayouts = await getCustomPageLayoutsFromPlugins(compilation, layout);
-  const is404Page = route.endsWith("/404/");
-  const hasCustomStaticLayout = await checkResourceExists(
-    new URL(`./${layout}.html`, userLayoutsDir),
-  );
-  const hasCustomDynamicLayout = await checkResourceExists(
-    new URL(`./${layout}.js`, userLayoutsDir),
-  );
+  const hasCustomStaticLayout = await checkResourceExists(new URL(`./${layout}.html`, layoutsDir));
+  const hasCustomDynamicLayout = await checkResourceExists(new URL(`./${layout}.js`, layoutsDir));
   const hasCustomDynamicTypeScriptLayout = await checkResourceExists(
-    new URL(`./${layout}.ts`, userLayoutsDir),
+    new URL(`./${layout}.ts`, layoutsDir),
   );
-  const hasPageLayout = await checkResourceExists(new URL("./page.html", userLayoutsDir));
+  const hasPageLayout = await checkResourceExists(new URL("./page.html", layoutsDir));
 
   let layoutContents;
 
@@ -277,22 +272,19 @@ async function getPageLayout(pageContents, compilation, matchingRoute) {
     layoutContents =
       customPluginPageLayouts.length > 0
         ? await fs.readFile(customPluginPageLayouts[0], "utf-8")
-        : await fs.readFile(new URL(`./${layout}.html`, userLayoutsDir), "utf-8");
-  } else if (customPluginDefaultPageLayouts.length > 0 || (!is404Page && hasPageLayout)) {
+        : await fs.readFile(new URL(`./${layout}.html`, layoutsDir), "utf-8");
+  } else if (customPluginDefaultPageLayouts.length > 0 || hasPageLayout) {
     // has a dynamic default page layout from context plugin
     layoutContents =
       customPluginDefaultPageLayouts.length > 0
         ? await fs.readFile(new URL("./page.html", customPluginDefaultPageLayouts[0]), "utf-8")
-        : await fs.readFile(new URL("./page.html", userLayoutsDir), "utf-8");
-  } else if (
-    (hasCustomDynamicLayout || hasCustomDynamicTypeScriptLayout || matchingRoute.isSSR) &&
-    !is404Page
-  ) {
+        : await fs.readFile(new URL("./page.html", layoutsDir), "utf-8");
+  } else if (hasCustomDynamicLayout || hasCustomDynamicTypeScriptLayout || matchingRoute.isSSR) {
     // has a dynamic page layout
     const routeModuleLocationUrl = hasCustomDynamicLayout
-      ? new URL(`./${layout}.js`, userLayoutsDir)
+      ? new URL(`./${layout}.js`, layoutsDir)
       : hasCustomDynamicTypeScriptLayout
-        ? new URL(`./${layout}.ts`, userLayoutsDir)
+        ? new URL(`./${layout}.ts`, layoutsDir)
         : new URL(pageHref);
     const routeWorkerUrl = compilation.config.plugins
       .find((plugin) => plugin.type === "renderer")
@@ -324,11 +316,6 @@ async function getPageLayout(pageContents, compilation, matchingRoute) {
         page: JSON.stringify(matchingRoute),
       });
     });
-  } else if (!pageContents) {
-    // fallback to using Greenwood's stock page layout
-    // TODO do we even want this?
-    // https://github.com/ProjectEvergreen/greenwood/issues/1271
-    layoutContents = await fs.readFile(new URL("./page.html", layoutsDir), "utf-8");
   }
 
   const mergedContents = await mergeContentIntoLayout(
@@ -344,10 +331,10 @@ async function getPageLayout(pageContents, compilation, matchingRoute) {
 
 // merges provided page + app layout contents into an app level layout
 async function getAppLayout(pageLayoutContents, compilation, matchingRoute) {
-  const { layoutsDir, userLayoutsDir } = compilation.context;
-  const userStaticAppLayoutUrl = new URL("./app.html", userLayoutsDir);
-  const userDynamicAppLayoutUrl = new URL("./app.js", userLayoutsDir);
-  const userDynamicAppLayoutTypeScriptUrl = new URL("./app.ts", userLayoutsDir);
+  const { layoutsDir } = compilation.context;
+  const userStaticAppLayoutUrl = new URL("./app.html", layoutsDir);
+  const userDynamicAppLayoutUrl = new URL("./app.js", layoutsDir);
+  const userDynamicAppLayoutTypeScriptUrl = new URL("./app.ts", layoutsDir);
   const userHasStaticAppLayout = await checkResourceExists(userStaticAppLayoutUrl);
   const userHasDynamicAppLayout = await checkResourceExists(userDynamicAppLayoutUrl);
   const userHasDynamicAppTypeScriptLayout = await checkResourceExists(
@@ -391,8 +378,6 @@ async function getAppLayout(pageLayoutContents, compilation, matchingRoute) {
     });
   }
 
-  // TODO do we even want a default app.html layout?
-  // https://github.com/ProjectEvergreen/greenwood/issues/1271
   let appLayoutContents =
     customAppLayoutsFromPlugins.length > 0
       ? await fs.readFile(new URL("./app.html", customAppLayoutsFromPlugins[0]), "utf-8")
@@ -400,7 +385,7 @@ async function getAppLayout(pageLayoutContents, compilation, matchingRoute) {
         ? await fs.readFile(userStaticAppLayoutUrl, "utf-8")
         : userHasDynamicAppLayout || userHasDynamicAppTypeScriptLayout
           ? dynamicAppLayoutContents
-          : await fs.readFile(new URL("./app.html", layoutsDir), "utf-8");
+          : "";
   let mergedLayoutContents = "";
 
   mergedLayoutContents = await mergeContentIntoLayout(

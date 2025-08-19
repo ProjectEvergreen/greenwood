@@ -10,7 +10,10 @@
  *
  * Default Config
  *
- * Default Workspace
+ * User Workspace
+ * src/
+ *   assets/
+ *     brand.png
  */
 import chai from "chai";
 import fs from "node:fs";
@@ -41,7 +44,7 @@ describe("Build Greenwood With: ", function () {
       runner.runCommand(cliPath, "build");
     });
 
-    runSmokeTest(["public", "index"], LABEL);
+    runSmokeTest(["public"], LABEL);
 
     describe("Assets folder", function () {
       it("should create a new assets directory", function () {

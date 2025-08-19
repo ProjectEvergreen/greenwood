@@ -19,6 +19,8 @@
  *     theme.css
  *   layouts/
  *     page.html
+ *   pages/
+ *     index.html
  */
 import chai from "chai";
 import { JSDOM } from "jsdom";

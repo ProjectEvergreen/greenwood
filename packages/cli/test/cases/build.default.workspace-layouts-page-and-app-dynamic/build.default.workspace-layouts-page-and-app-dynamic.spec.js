@@ -131,7 +131,7 @@ describe("Build Greenwood With: ", function () {
         const span = dom.window.document.querySelectorAll("span");
 
         expect(span.length).to.equal(1);
-        expect(span[0].textContent).to.equal("Number of pages 3");
+        expect(span[0].textContent).to.equal("Number of pages 2");
       });
 
       it("should have the expected content from the index.md", function () {

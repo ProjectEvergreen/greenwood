@@ -9,7 +9,6 @@ export type Compilation = {
     userWorkspace: URL;
     apisDir: URL;
     pagesDir: URL;
-    userLayoutsDir: URL;
     scratchDir: URL;
     projectDirectory: URL;
     layoutsDir: URL;

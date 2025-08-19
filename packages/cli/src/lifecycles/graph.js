@@ -9,7 +9,7 @@ import { Worker } from "node:worker_threads";
 function getLabelFromRoute(_route) {
   let route = _route;
 
-  if (route === "/index/") {
+  if (route === "/index/" || route === "/") {
     return "Home";
   } else if (route.endsWith("/index/")) {
     route = route.replace("index/", "");
@@ -61,20 +61,7 @@ const generateGraph = async (compilation) => {
     .map((plugin) => plugin.provider(compilation));
 
   let apis = new Map();
-  let graph = [
-    {
-      id: "index",
-      outputHref: new URL("./index.html", outputDir).href,
-      route: `${basePath}/`,
-      label: "Home",
-      title: null,
-      data: {},
-      imports: [],
-      resources: [],
-      prerender: true,
-      isolation: false,
-    },
-  ];
+  let graph = [];
 
   const walkDirectoryForPages = async function (directory, pages = [], apiRoutes = new Map()) {
     const files = (await fs.readdir(directory)).filter((file) => !file.startsWith("."));
@@ -323,42 +310,27 @@ const generateGraph = async (compilation) => {
 
   // test for SPA
   if (await checkResourceExists(new URL("./index.html", userWorkspace))) {
-    graph = [
-      {
-        ...graph[0],
-        pageHref: new URL("./index.html", userWorkspace).href,
-        isSPA: true,
-      },
-    ];
+    graph.push({
+      id: "index",
+      outputHref: new URL("./index.html", outputDir).href,
+      route: `${basePath}/`,
+      label: getLabelFromRoute("/"),
+      title: null,
+      data: {},
+      imports: [],
+      resources: [],
+      prerender: false,
+      isolation: false,
+      pageHref: new URL("./index.html", userWorkspace).href,
+      isSPA: true,
+    });
   } else {
-    const oldGraph = graph[0];
     const pages = (await checkResourceExists(pagesDir))
       ? await walkDirectoryForPages(pagesDir)
       : { pages: graph, apiRoutes: apis };
 
     graph = pages.pages;
     apis = pages.apiRoutes;
-
-    const has404Page = graph.find((page) => page.route.endsWith("/404/"));
-
-    // if the _only_ page is a 404 page, still provide a default index.html
-    if (has404Page && graph.length === 1) {
-      graph = [oldGraph, ...graph];
-    } else if (!has404Page) {
-      graph = [
-        ...graph,
-        {
-          ...oldGraph,
-          id: "404",
-          outputHref: new URL("./404.html", outputDir).href,
-          pageHref: new URL("./404.html", pagesDir).href,
-          route: `${basePath}/404/`,
-          path: "404.html",
-          label: "Not Found",
-          title: "Page Not Found",
-        },
-      ];
-    }
   }
 
   const sourcePlugins = compilation.config.plugins.filter((plugin) => plugin.type === "source");

@@ -107,7 +107,7 @@ describe("Develop Greenwood With: ", function () {
         it("should have the expected content response data", async () => {
           const data = await response.json();
 
-          expect(data.length).to.equal(7);
+          expect(data.length).to.equal(6);
         });
       });
 

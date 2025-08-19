@@ -23,6 +23,7 @@
  *   pages/
  *     api/
  *       greeting.js
+ *     404.html
  *     about.md
  *     index.html
  *     users.js
@@ -335,10 +336,10 @@ describe("Serve Greenwood With: ", function () {
       });
 
       it("should have the expected number of _route partials in the output directory for each page", function () {
-        expect(partials.length).to.be.equal(3);
+        expect(partials.length).to.be.equal(2);
       });
 
-      it("should have the expected partial output to match the contents of the home page in the <router-outlet> tag in the <body>", function () {
+      it("should have the expected partial output to match the contents of the about page in the <router-outlet> tag in the <body>", function () {
         const aboutPartial = fs.readFileSync(
           path.join(publicPath, "_routes/about/index.html"),
           "utf-8",
@@ -349,7 +350,7 @@ describe("Serve Greenwood With: ", function () {
         expect(aboutRouterOutlet.innerHTML).to.contain(aboutPartial);
       });
 
-      it("should have the expected partial output to match the contents of the about page in the <router-outlet> tag in the <body>", function () {
+      it("should have the expected partial output to match the contents of the home page in the <router-outlet> tag in the <body>", function () {
         const homePartial = fs.readFileSync(path.join(publicPath, "_routes/index.html"), "utf-8");
         const homeRouterOutlet = dom.window.document.querySelectorAll("body > router-outlet")[0];
 

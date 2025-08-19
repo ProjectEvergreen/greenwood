@@ -63,37 +63,14 @@ describe("Build Greenwood With: ", function () {
           metaTags = dom.window.document.querySelectorAll("head > meta");
         });
 
-        it("should have a <title> tag in the <head>", function () {
+        it("should have not have a <title> tag in the <head>", function () {
           const title = dom.window.document.querySelector("head title").textContent;
 
-          expect(title).to.be.equal("My App");
+          expect(title).to.be.equal("");
         });
 
-        it("should have five default <meta> tags in the <head>", function () {
-          expect(metaTags.length).to.be.equal(5);
-        });
-
-        it("should have default mobile-web-app-capable <meta> tag", function () {
-          const mwacMeta = metaTags[2];
-
-          expect(mwacMeta.getAttribute("name")).to.be.equal("mobile-web-app-capable");
-          expect(mwacMeta.getAttribute("content")).to.be.equal("yes");
-        });
-
-        it("should have default apple-mobile-web-app-capable <meta> tag", function () {
-          const amwacMeta = metaTags[3];
-
-          expect(amwacMeta.getAttribute("name")).to.be.equal("apple-mobile-web-app-capable");
-          expect(amwacMeta.getAttribute("content")).to.be.equal("yes");
-        });
-
-        it("should have default apple-mobile-web-app-status-bar-style <meta> tag", function () {
-          const amwasbsMeta = metaTags[4];
-
-          expect(amwasbsMeta.getAttribute("name")).to.be.equal(
-            "apple-mobile-web-app-status-bar-style",
-          );
-          expect(amwasbsMeta.getAttribute("content")).to.be.equal("black");
+        it("should not have any default <meta> tags in the <head>", function () {
+          expect(metaTags.length).to.be.equal(0);
         });
       });
 
