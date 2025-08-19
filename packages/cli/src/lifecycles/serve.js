@@ -58,33 +58,27 @@ async function getDevServer(compilation) {
     await next();
   });
 
-  // allow pre-serving of userland plugins _before_ Greenwood "standardizes" it
+  // allow pre-serving of userland plugins _before_ Greenwood "standardizes" the transformation
   app.use(async (ctx, next) => {
     try {
       const url = new URL(ctx.url);
       const { header, status, message } = ctx.response;
       const request = transformKoaRequestIntoStandardRequest(url, ctx.request);
-      const initResponse = new Response(ctx.body, {
+      let response = new Response(ctx.body, {
         statusText: message,
         status,
         headers: new Headers(header),
       }).clone();
-      const response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
-        const intermediateResponse = await responsePromise;
-        if (
-          plugin.shouldPreServe &&
-          (await plugin.shouldPreServe(url, request, intermediateResponse.clone()))
-        ) {
-          const current = await plugin.preServe(url, request, await intermediateResponse.clone());
-          const merged = mergeResponse(intermediateResponse.clone(), current.clone());
 
-          return Promise.resolve(merged);
-        } else {
-          return Promise.resolve(await responsePromise);
+      for (const plugin of resourcePlugins) {
+        if (plugin.shouldPreServe && (await plugin.shouldPreServe(url, request))) {
+          const current = await plugin.preServe(url, request);
+
+          response = mergeResponse(response.clone(), current.clone());
         }
-      }, Promise.resolve(initResponse.clone()));
+      }
 
-      ctx.body = response.body ? Readable.from(response.body) : initResponse.body;
+      ctx.body = response.body ? Readable.from(response.body) : null;
       ctx.status = response.status;
       ctx.message = response.status === 404 ? "Not Found" : response.statusText;
       response.headers.forEach((value, key) => {
