@@ -59,13 +59,14 @@ async function getDevServer(compilation) {
         statusText: message,
         status,
         headers: new Headers(header),
-      }).clone();
+      });
 
       for (const plugin of resourcePlugins) {
         if (plugin.shouldPreServe && (await plugin.shouldPreServe(url, request))) {
           const current = await plugin.preServe(url, request);
+          const merged = mergeResponse(response.clone(), current.clone());
 
-          response = mergeResponse(response.clone(), current.clone());
+          response = merged.clone();
         }
       }
 
@@ -99,7 +100,7 @@ async function getDevServer(compilation) {
         statusText: message,
         status,
         headers: new Headers(header),
-      }).clone();
+      });
 
       for (const plugin of resourcePlugins) {
         if (plugin.shouldServe && (await plugin.shouldServe(url, request, response.clone()))) {
@@ -212,7 +213,7 @@ async function getDevServer(compilation) {
         statusText: message,
         status,
         headers: new Headers(header),
-      }).clone();
+      });
       const splitResponse = response.clone();
       const contents = await splitResponse.text();
       const inm = ctx.headers["if-none-match"];
