@@ -1,14 +1,15 @@
 // https://stackoverflow.com/a/76974728/417806
+// Constraint: callback functions must not depend on each other
 async function asyncFilter(arr, cb) {
   const filtered = [];
 
-  for (const element of arr) {
+  await asyncForEach(arr, async (element) => {
     const needAdd = await cb(element);
 
     if (needAdd) {
       filtered.push(element);
     }
-  }
+  });
 
   return filtered;
 }

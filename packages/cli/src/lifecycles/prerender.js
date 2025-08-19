@@ -82,7 +82,7 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
     new URL("../lib/ssr-route-worker.js", import.meta.url),
   );
 
-  for (const page of pages) {
+  asyncForEach(pages, async (page) => {
     const { route, outputHref } = page;
     const scratchUrl = toScratchUrl(outputHref, context);
     const url = new URL(`http://localhost:${config.port}${route}`);
@@ -144,7 +144,7 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
     await fs.writeFile(scratchUrl, body);
 
     console.info("generated page...", route);
-  }
+  });
 }
 
 async function preRenderCompilationCustom(compilation, customPrerender) {

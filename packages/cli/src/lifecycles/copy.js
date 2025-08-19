@@ -39,7 +39,7 @@ async function copyDirectory(fromUrl, toUrl, projectDirectory) {
         });
       }
 
-      for (const fileUrl of files) {
+      asyncForEach(files, async (fileUrl) => {
         const targetUrl = new URL(
           `file://${fileUrl.pathname.replace(fromUrl.pathname, toUrl.pathname)}`,
         );
@@ -52,7 +52,7 @@ async function copyDirectory(fromUrl, toUrl, projectDirectory) {
         } else if (!isDirectory) {
           await copyFile(fileUrl, targetUrl, projectDirectory);
         }
-      }
+      });
     }
   } catch (e) {
     console.error("ERROR", e);
@@ -63,10 +63,10 @@ const copyAssets = async (compilation) => {
   const copyPlugins = compilation.config.plugins.filter((plugin) => plugin.type === "copy");
   const { projectDirectory } = compilation.context;
 
-  for (const plugin of copyPlugins) {
+  asyncForEach(copyPlugins, async (plugin) => {
     const locations = await plugin.provider(compilation);
 
-    for (const location of locations) {
+    asyncForEach(locations, async (location) => {
       const { from, to } = location;
 
       if (from.pathname.endsWith("/")) {
@@ -74,8 +74,8 @@ const copyAssets = async (compilation) => {
       } else {
         await copyFile(from, to, projectDirectory);
       }
-    }
-  }
+    });
+  });
 };
 
 export { copyAssets };

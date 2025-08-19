@@ -47,6 +47,7 @@ export default [
       "no-only-tests/no-only-tests": "error",
       "import/no-unresolved": "off",
       "import/enforce-node-protocol-usage": ["error", "always"],
+      "no-await-in-loop": "warn",
     },
     plugins: {
       "no-only-tests": noOnlyTests,

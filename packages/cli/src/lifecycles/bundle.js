@@ -102,7 +102,7 @@ async function emitResources(compilation) {
 async function cleanUpResources(compilation) {
   const { outputDir } = compilation.context;
 
-  for (const resource of compilation.resources.values()) {
+  asyncForEach(compilation.resources.values(), async (resource) => {
     const { src, optimizedFileName, optimizationAttr } = resource;
     const optConfig = ["inline", "static"].indexOf(compilation.config.optimization) >= 0;
     const optAttr = ["inline", "static"].indexOf(optimizationAttr) >= 0;
@@ -110,7 +110,7 @@ async function cleanUpResources(compilation) {
     if (optimizedFileName && (!src || optAttr || optConfig)) {
       await fs.unlink(new URL(`./${optimizedFileName}`, outputDir));
     }
-  }
+  });
 }
 
 async function optimizeStaticPages(compilation, plugins) {
@@ -156,7 +156,7 @@ async function optimizeStaticPages(compilation, plugins) {
 async function bundleStyleResources(compilation, resourcePlugins) {
   const { outputDir } = compilation.context;
 
-  for (const resource of compilation.resources.values()) {
+  await asyncForEach(compilation.resources.values(), async (resource) => {
     const { contents, src = "", type } = resource;
 
     if (["style", "link"].includes(type)) {
@@ -262,7 +262,7 @@ async function bundleStyleResources(compilation, resourcePlugins) {
 
       await fs.writeFile(new URL(`./${optimizedFileName}`, outputDir), optimizedFileContents);
     }
-  }
+  });
 }
 
 async function bundleApiRoutes(compilation) {
@@ -271,11 +271,10 @@ async function bundleApiRoutes(compilation) {
 
   if (apiConfigs.length > 0 && apiConfigs[0].input.length !== 0) {
     console.info("bundling API routes...");
-    for (const configIndex in apiConfigs) {
-      const rollupConfig = apiConfigs[configIndex];
+    await asyncForEach(apiConfigs, async (rollupConfig) => {
       const bundle = await rollup(rollupConfig);
       await bundle.write(rollupConfig.output);
-    }
+    });
   }
 }
 
@@ -297,7 +296,7 @@ async function bundleSsrPages(compilation, optimizePlugins) {
     // one pass to generate initial static HTML and to track all combined static resources across layouts
     // and before we optimize so that all bundled assets can tracked up front
     // would be nice to see if this can be done in a single pass though...
-    for (const page of ssrPages) {
+    await asyncForEach(ssrPages, async (page) => {
       const { route } = page;
       let staticHtml = "<content-outlet></content-outlet>";
 
@@ -317,7 +316,7 @@ async function bundleSsrPages(compilation, optimizePlugins) {
       await trackResourcesForRoute(staticHtml, compilation, route);
 
       ssrPrerenderPagesRouteMapper[route] = staticHtml;
-    }
+    });
 
     // technically this happens in the start of bundleCompilation once
     // so might be nice to detect those static assets to see if they have be "de-duped" from bundling here
@@ -325,7 +324,7 @@ async function bundleSsrPages(compilation, optimizePlugins) {
     await bundleStyleResources(compilation, optimizePlugins);
 
     // second pass to link all bundled assets to their resources before optimizing and generating SSR bundles
-    for (const page of ssrPages) {
+    await asyncForEach(ssrPages, async (page) => {
       const { id, route, pageHref } = page;
       const pagePath = new URL(pageHref).pathname.replace(pagesDir.pathname, "./");
       const entryFileUrl = new URL(pageHref);
@@ -393,17 +392,16 @@ async function bundleSsrPages(compilation, optimizePlugins) {
         id,
         inputPath: normalizePathnameForWindows(entryFileOutputUrl),
       });
-    }
+    });
 
     const ssrConfigs = await getRollupConfigForSsrPages(compilation, input);
 
     if (ssrConfigs.length > 0 && ssrConfigs[0].input !== "") {
       console.info("bundling dynamic pages...");
-      for (const configIndex in ssrConfigs) {
-        const rollupConfig = ssrConfigs[configIndex];
+      await asyncForEach(ssrConfigs, async (rollupConfig) => {
         const bundle = await rollup(rollupConfig);
         await bundle.write(rollupConfig.output);
-      }
+      });
     }
   }
 }
