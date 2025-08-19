@@ -16,22 +16,13 @@ async function getDevServer(compilation) {
   const app = new Koa();
   const compilationCopy = Object.assign({}, compilation);
   const resourcePlugins = [
-    // Greenwood default standard resource and import plugins
     ...compilation.config.plugins
       .filter((plugin) => {
-        return plugin.type === "resource" && plugin.isGreenwoodDefaultPlugin;
+        return plugin.type === "resource";
       })
       .map((plugin) => {
         return plugin.provider(compilationCopy);
       }),
-
-    // TODO with pre lifecycles, do we even need this distinction
-    // custom user resource plugins
-    ...compilation.config.plugins
-      .filter((plugin) => {
-        return plugin.type === "resource" && !plugin.isGreenwoodDefaultPlugin;
-      })
-      .map((plugin) => plugin.provider(compilationCopy)),
   ];
 
   app.use(koaBody());
