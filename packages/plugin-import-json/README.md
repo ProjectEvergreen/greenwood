@@ -1,6 +1,6 @@
 # @greenwood/plugin-import-json
 
-> _**THIS PACKAGE HAS BEEN DEPRECATED**_
+> _**THIS PACKAGE HAS BEEN DEPRECATED**.  You can use [**@greenwood/plugin-import-raw**](https://greenwoodjs.dev/docs/plugins/raw/) to achieve the same result.
 
 ## Overview
 A Greenwood plugin to allow you use ESM (`import`) syntax to load your JSON.
