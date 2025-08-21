@@ -63,10 +63,10 @@ const copyAssets = async (compilation) => {
   const copyPlugins = compilation.config.plugins.filter((plugin) => plugin.type === "copy");
   const { projectDirectory } = compilation.context;
 
-  asyncForEach(copyPlugins, async (plugin) => {
+  await asyncForEach(copyPlugins, async (plugin) => {
     const locations = await plugin.provider(compilation);
 
-    asyncForEach(locations, async (location) => {
+    await asyncForEach(locations, async (location) => {
       const { from, to } = location;
 
       if (from.pathname.endsWith("/")) {
