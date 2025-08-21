@@ -20,7 +20,7 @@ const greenwoodPlugins = (
     async (pluginDirectoryUrl) => {
       const files = await fs.readdir(pluginDirectoryUrl);
 
-      return asyncMap(files, async (file) => {
+      return await asyncMap(files, async (file) => {
         const importUrl = new URL(`./${file}`, pluginDirectoryUrl);
         // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
         const pluginImport = await import(importUrl);
