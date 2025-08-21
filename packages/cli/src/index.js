@@ -20,10 +20,6 @@ async function run(command) {
         await (await import("./commands/serve.js")).runProdServer(compilation);
 
         break;
-      case "eject":
-        await (await import("./commands/eject.js")).ejectConfiguration(compilation);
-
-        break;
       default:
         console.warn(`
           Error: not able to detect command. try using the --help flag if 
