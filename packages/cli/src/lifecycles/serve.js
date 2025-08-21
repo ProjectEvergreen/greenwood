@@ -69,8 +69,9 @@ async function getDevServer(compilation) {
       for (const plugin of resourcePlugins) {
         if (plugin.shouldServe && (await plugin.shouldServe(url, request))) {
           const current = await plugin.serve(url, request);
+          const merged = mergeResponse(response.clone(), current.clone());
 
-          response = mergeResponse(response.clone(), current.clone());
+          response = merged.clone();
         }
       }
 
