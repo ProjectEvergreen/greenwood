@@ -23,7 +23,7 @@ async function asyncMap(items, mapper) {
     promises.push(mapper(item));
   }
 
-  return Promise.all(promises);
+  return await Promise.all(promises);
 }
 
 async function asyncForEach(items, callback) {
