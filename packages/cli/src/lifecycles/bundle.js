@@ -102,7 +102,7 @@ async function emitResources(compilation) {
 async function cleanUpResources(compilation) {
   const { outputDir } = compilation.context;
 
-  asyncForEach(compilation.resources.values(), async (resource) => {
+  await asyncForEach(compilation.resources.values(), async (resource) => {
     const { src, optimizedFileName, optimizationAttr } = resource;
     const optConfig = ["inline", "static"].indexOf(compilation.config.optimization) >= 0;
     const optAttr = ["inline", "static"].indexOf(optimizationAttr) >= 0;
