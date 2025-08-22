@@ -160,7 +160,7 @@ describe("Initialize a new Greenwood project: ", function () {
         const { erasableSyntaxOnly, verbatimModuleSyntax, lib } = compilerOptions;
 
         expect(erasableSyntaxOnly).to.equal(true);
-        expect(verbatimModuleSyntax).to.equal(false);
+        expect(verbatimModuleSyntax).to.equal(true);
 
         expect(lib).to.contain(target.toUpperCase()); // should match compilerOptions.target
         expect(lib).to.contain("DOM");
