@@ -1,24 +1,24 @@
+import { asyncMap } from "../../cli/src/lib/async-utils.js";
+
 export default async function (compilation, callback) {
   const BrowserRunner = (await import("./lib/browser.js")).BrowserRunner;
   const browserRunner = new BrowserRunner();
 
   const runBrowser = async (serverUrl, pages) => {
     try {
-      return Promise.all(
-        pages.map(async (page) => {
-          const { route } = page;
-          console.info("prerendering page...", route);
+      return asyncMap(pages, async (page) => {
+        const { route } = page;
+        console.info("prerendering page...", route);
 
-          return await browserRunner.serialize(`${serverUrl}${route}`).then(async (html) => {
-            console.info(`prerendering complete for page ${route}.`);
+        return await browserRunner.serialize(`${serverUrl}${route}`).then(async (html) => {
+          console.info(`prerendering complete for page ${route}.`);
 
-            // clean this up here to avoid sending webcomponents-bundle to rollup
-            html = html.replace(/<script src="(.*webcomponents-bundle.js)"><\/script>/, "");
+          // clean this up here to avoid sending webcomponents-bundle to rollup
+          html = html.replace(/<script src="(.*webcomponents-bundle.js)"><\/script>/, "");
 
-            await callback(page, html);
-          });
-        }),
-      );
+          await callback(page, html);
+        });
+      });
     } catch (e) {
       console.error(e);
       return false;

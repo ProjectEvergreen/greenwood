@@ -224,7 +224,7 @@ function serve(label) {
 }
 
 async function runSmokeTest(testCases, label) {
-  testCases.forEach(async (testCase) => {
+  testCases.forEach((testCase) => {
     switch (testCase) {
       case "index":
         defaultIndex(label);

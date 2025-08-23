@@ -40,13 +40,13 @@ async function getDevServer(compilation) {
     try {
       const url = new URL(`http://localhost:${compilation.config.port}${ctx.url}`);
       const initRequest = transformKoaRequestIntoStandardRequest(url, ctx.request);
-      const request = await resourcePlugins.reduce(async (requestPromise, plugin) => {
-        const intermediateRequest = await requestPromise;
-        return plugin.shouldResolve &&
-          (await plugin.shouldResolve(url, intermediateRequest.clone()))
-          ? Promise.resolve(await plugin.resolve(url, intermediateRequest.clone()))
-          : Promise.resolve(await requestPromise);
-      }, Promise.resolve(initRequest));
+
+      let request = initRequest;
+      for (const plugin of resourcePlugins) {
+        if (plugin.shouldResolve && (await plugin.shouldResolve(url, request.clone()))) {
+          request = await plugin.resolve(url, request.clone());
+        }
+      }
 
       ctx.url = request.url;
     } catch (e) {
@@ -100,24 +100,18 @@ async function getDevServer(compilation) {
         status,
         headers: new Headers(header),
       });
-      const response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
-        const intermediateResponse = await responsePromise;
+
+      let response = initResponse;
+      for (const plugin of resourcePlugins) {
         if (
           plugin.shouldPreIntercept &&
-          (await plugin.shouldPreIntercept(url, request, intermediateResponse.clone()))
+          (await plugin.shouldPreIntercept(url, request, response.clone()))
         ) {
-          const current = await plugin.preIntercept(
-            url,
-            request,
-            await intermediateResponse.clone(),
-          );
-          const merged = mergeResponse(intermediateResponse.clone(), current);
+          const current = await plugin.preIntercept(url, request, response.clone());
 
-          return Promise.resolve(merged);
-        } else {
-          return Promise.resolve(await responsePromise);
+          response = mergeResponse(response.clone(), current.clone());
         }
-      }, Promise.resolve(initResponse.clone()));
+      }
 
       ctx.body = response.body ? Readable.from(response.body) : "";
       ctx.message = response.statusText;
@@ -143,20 +137,18 @@ async function getDevServer(compilation) {
         status,
         headers: new Headers(header),
       });
-      const response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
-        const intermediateResponse = await responsePromise;
+
+      let response = initResponse;
+      for (const plugin of resourcePlugins) {
         if (
           plugin.shouldIntercept &&
-          (await plugin.shouldIntercept(url, request, intermediateResponse.clone()))
+          (await plugin.shouldIntercept(url, request, response.clone()))
         ) {
-          const current = await plugin.intercept(url, request, await intermediateResponse.clone());
-          const merged = mergeResponse(intermediateResponse.clone(), current);
+          const current = await plugin.intercept(url, request, response.clone());
 
-          return Promise.resolve(merged);
-        } else {
-          return Promise.resolve(await responsePromise);
+          response = mergeResponse(response.clone(), current.clone());
         }
-      }, Promise.resolve(initResponse.clone()));
+      }
 
       ctx.body = response.body ? Readable.from(response.body) : "";
       ctx.message = response.statusText;
@@ -240,11 +232,13 @@ async function getStaticServer(compilation, composable) {
           status: ctx.response.status,
           headers: new Headers(ctx.response.header),
         });
-        const response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
-          return plugin.shouldServe && (await plugin.shouldServe(url, request))
-            ? Promise.resolve(await plugin.serve(url, request))
-            : responsePromise;
-        }, Promise.resolve(initResponse));
+
+        let response = initResponse;
+        for (const plugin of resourcePlugins) {
+          if (plugin.shouldServe && (await plugin.shouldServe(url, request))) {
+            response = await plugin.serve(url, request);
+          }
+        }
 
         if (response.ok) {
           ctx.body = Readable.from(response.body);

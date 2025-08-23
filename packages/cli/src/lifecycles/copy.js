@@ -1,17 +1,17 @@
 import fs from "node:fs/promises";
 import { checkResourceExists } from "../lib/resource-utils.js";
+import { asyncForEach } from "../lib/async-utils.js";
 
 async function rreaddir(dir, allFiles = []) {
   const files = (await fs.readdir(dir)).map((f) => new URL(`./${f}`, dir));
 
   allFiles.push(...files);
 
-  await Promise.all(
-    files.map(
-      async (f) =>
-        (await fs.stat(f)).isDirectory() &&
-        (await rreaddir(new URL(`file://${f.pathname}/`), allFiles)),
-    ),
+  await asyncForEach(
+    files,
+    async (f) =>
+      (await fs.stat(f)).isDirectory() &&
+      (await rreaddir(new URL(`file://${f.pathname}/`), allFiles)),
   );
 
   return allFiles;
@@ -39,7 +39,7 @@ async function copyDirectory(fromUrl, toUrl, projectDirectory) {
         });
       }
 
-      for (const fileUrl of files) {
+      await asyncForEach(files, async (fileUrl) => {
         const targetUrl = new URL(
           `file://${fileUrl.pathname.replace(fromUrl.pathname, toUrl.pathname)}`,
         );
@@ -52,7 +52,7 @@ async function copyDirectory(fromUrl, toUrl, projectDirectory) {
         } else if (!isDirectory) {
           await copyFile(fileUrl, targetUrl, projectDirectory);
         }
-      }
+      });
     }
   } catch (e) {
     console.error("ERROR", e);
@@ -63,10 +63,10 @@ const copyAssets = async (compilation) => {
   const copyPlugins = compilation.config.plugins.filter((plugin) => plugin.type === "copy");
   const { projectDirectory } = compilation.context;
 
-  for (const plugin of copyPlugins) {
+  await asyncForEach(copyPlugins, async (plugin) => {
     const locations = await plugin.provider(compilation);
 
-    for (const location of locations) {
+    await asyncForEach(locations, async (location) => {
       const { from, to } = location;
 
       if (from.pathname.endsWith("/")) {
@@ -74,8 +74,8 @@ const copyAssets = async (compilation) => {
       } else {
         await copyFile(from, to, projectDirectory);
       }
-    }
-  }
+    });
+  });
 };
 
 export { copyAssets };

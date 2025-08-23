@@ -16,6 +16,7 @@ import {
 import path from "node:path";
 import { rollup } from "rollup";
 import { pruneGraph } from "../lib/content-utils.js";
+import { asyncForEach } from "../lib/async-utils.js";
 
 async function interceptPage(url, request, plugins, body) {
   let response = new Response(body, {
@@ -101,7 +102,7 @@ async function emitResources(compilation) {
 async function cleanUpResources(compilation) {
   const { outputDir } = compilation.context;
 
-  for (const resource of compilation.resources.values()) {
+  await asyncForEach(compilation.resources.values(), async (resource) => {
     const { src, optimizedFileName, optimizationAttr } = resource;
     const optConfig = ["inline", "static"].indexOf(compilation.config.optimization) >= 0;
     const optAttr = ["inline", "static"].indexOf(optimizationAttr) >= 0;
@@ -109,57 +110,53 @@ async function cleanUpResources(compilation) {
     if (optimizedFileName && (!src || optAttr || optConfig)) {
       await fs.unlink(new URL(`./${optimizedFileName}`, outputDir));
     }
-  }
+  });
 }
 
 async function optimizeStaticPages(compilation, plugins) {
   const { scratchDir, outputDir } = compilation.context;
 
-  return Promise.all(
-    compilation.graph
-      .filter(
-        (page) =>
-          !page.isSSR ||
-          (page.isSSR && page.prerender) ||
-          (page.isSSR && compilation.config.prerender),
-      )
-      .map(async (page) => {
-        const { route, outputHref } = page;
-        const outputDirUrl = new URL(outputHref.replace("index.html", "").replace("404.html", ""));
-        const url = new URL(`http://localhost:${compilation.config.port}${route}`);
-        const contents = await fs.readFile(
-          new URL(`./${outputHref.replace(outputDir.href, "")}`, scratchDir),
-          "utf-8",
-        );
-        const headers = new Headers({ "Content-Type": "text/html" });
-        let response = new Response(contents, { headers });
-
-        if (!(await checkResourceExists(outputDirUrl))) {
-          await fs.mkdir(outputDirUrl, {
-            recursive: true,
-          });
-        }
-
-        for (const plugin of plugins) {
-          if (plugin.shouldOptimize && (await plugin.shouldOptimize(url, response.clone()))) {
-            const currentResponse = await plugin.optimize(url, response.clone());
-
-            response = mergeResponse(response.clone(), currentResponse.clone());
-          }
-        }
-
-        // clean up optimization markers
-        const body = (await response.text()).replace(/data-gwd-opt=".*?[a-z]"/g, "");
-
-        await fs.writeFile(new URL(outputHref), body);
-      }),
+  const pages = compilation.graph.filter(
+    (page) =>
+      !page.isSSR || (page.isSSR && page.prerender) || (page.isSSR && compilation.config.prerender),
   );
+
+  await asyncForEach(pages, async (page) => {
+    const { route, outputHref } = page;
+    const outputDirUrl = new URL(outputHref.replace("index.html", "").replace("404.html", ""));
+    const url = new URL(`http://localhost:${compilation.config.port}${route}`);
+    const contents = await fs.readFile(
+      new URL(`./${outputHref.replace(outputDir.href, "")}`, scratchDir),
+      "utf-8",
+    );
+    const headers = new Headers({ "Content-Type": "text/html" });
+    let response = new Response(contents, { headers });
+
+    if (!(await checkResourceExists(outputDirUrl))) {
+      await fs.mkdir(outputDirUrl, {
+        recursive: true,
+      });
+    }
+
+    for (const plugin of plugins) {
+      if (plugin.shouldOptimize && (await plugin.shouldOptimize(url, response.clone()))) {
+        const currentResponse = await plugin.optimize(url, response.clone());
+
+        response = mergeResponse(response.clone(), currentResponse.clone());
+      }
+    }
+
+    // clean up optimization markers
+    const body = (await response.text()).replace(/data-gwd-opt=".*?[a-z]"/g, "");
+
+    await fs.writeFile(new URL(outputHref), body);
+  });
 }
 
 async function bundleStyleResources(compilation, resourcePlugins) {
   const { outputDir } = compilation.context;
 
-  for (const resource of compilation.resources.values()) {
+  await asyncForEach(compilation.resources.values(), async (resource) => {
     const { contents, src = "", type } = resource;
 
     if (["style", "link"].includes(type)) {
@@ -202,84 +199,58 @@ async function bundleStyleResources(compilation, resourcePlugins) {
       const request = new Request(url, { headers });
       const initResponse = new Response(contents, { headers });
 
-      let response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
-        const intermediateResponse = await responsePromise;
+      let response = initResponse;
+
+      for (const plugin of resourcePlugins) {
         const shouldServe = plugin.shouldServe && (await plugin.shouldServe(url, request));
 
         if (shouldServe) {
           const currentResponse = await plugin.serve(url, request);
-          const mergedResponse = mergeResponse(
-            intermediateResponse.clone(),
-            currentResponse.clone(),
-          );
+          const mergedResponse = mergeResponse(response.clone(), currentResponse.clone());
 
           if (mergedResponse.headers.get("Content-Type").indexOf(contentType) >= 0) {
-            return Promise.resolve(mergedResponse.clone());
+            response = mergedResponse.clone();
           }
         }
+      }
 
-        return Promise.resolve(responsePromise);
-      }, Promise.resolve(initResponse));
-
-      response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
-        const intermediateResponse = await responsePromise;
+      for (const plugin of resourcePlugins) {
         const shouldPreIntercept =
           plugin.shouldPreIntercept &&
-          (await plugin.shouldPreIntercept(url, request, intermediateResponse.clone()));
+          (await plugin.shouldPreIntercept(url, request, response.clone()));
 
         if (shouldPreIntercept) {
-          const currentResponse = await plugin.preIntercept(
-            url,
-            request,
-            intermediateResponse.clone(),
-          );
-          const mergedResponse = mergeResponse(
-            intermediateResponse.clone(),
-            currentResponse.clone(),
-          );
+          const currentResponse = await plugin.preIntercept(url, request, response.clone());
+          const mergedResponse = mergeResponse(response.clone(), currentResponse.clone());
 
           if (mergedResponse.headers.get("Content-Type").indexOf(contentType) >= 0) {
-            return Promise.resolve(mergedResponse.clone());
+            response = mergedResponse.clone();
           }
         }
+      }
 
-        return Promise.resolve(responsePromise);
-      }, Promise.resolve(response.clone()));
-
-      response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
-        const intermediateResponse = await responsePromise;
+      for (const plugin of resourcePlugins) {
         const shouldIntercept =
-          plugin.shouldIntercept &&
-          (await plugin.shouldIntercept(url, request, intermediateResponse.clone()));
+          plugin.shouldIntercept && (await plugin.shouldIntercept(url, request, response.clone()));
 
         if (shouldIntercept) {
-          const currentResponse = await plugin.intercept(
-            url,
-            request,
-            intermediateResponse.clone(),
-          );
-          const mergedResponse = mergeResponse(
-            intermediateResponse.clone(),
-            currentResponse.clone(),
-          );
+          const currentResponse = await plugin.intercept(url, request, response.clone());
+          const mergedResponse = mergeResponse(response.clone(), currentResponse.clone());
 
           if (mergedResponse.headers.get("Content-Type").indexOf(contentType) >= 0) {
-            return Promise.resolve(mergedResponse.clone());
+            response = mergedResponse.clone();
           }
         }
+      }
 
-        return Promise.resolve(responsePromise);
-      }, Promise.resolve(response.clone()));
-
-      response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
-        const intermediateResponse = await responsePromise;
+      for (const plugin of resourcePlugins) {
         const shouldOptimize =
-          plugin.shouldOptimize && (await plugin.shouldOptimize(url, intermediateResponse.clone()));
+          plugin.shouldOptimize && (await plugin.shouldOptimize(url, response.clone()));
 
-        return shouldOptimize
-          ? Promise.resolve(await plugin.optimize(url, intermediateResponse.clone()))
-          : Promise.resolve(responsePromise);
-      }, Promise.resolve(response.clone()));
+        if (shouldOptimize) {
+          response = await plugin.optimize(url, response.clone());
+        }
+      }
 
       optimizedFileContents = await response.text();
 
@@ -291,7 +262,7 @@ async function bundleStyleResources(compilation, resourcePlugins) {
 
       await fs.writeFile(new URL(`./${optimizedFileName}`, outputDir), optimizedFileContents);
     }
-  }
+  });
 }
 
 async function bundleApiRoutes(compilation) {
@@ -300,11 +271,10 @@ async function bundleApiRoutes(compilation) {
 
   if (apiConfigs.length > 0 && apiConfigs[0].input.length !== 0) {
     console.info("bundling API routes...");
-    for (const configIndex in apiConfigs) {
-      const rollupConfig = apiConfigs[configIndex];
+    await asyncForEach(apiConfigs, async (rollupConfig) => {
       const bundle = await rollup(rollupConfig);
       await bundle.write(rollupConfig.output);
-    }
+    });
   }
 }
 
@@ -326,7 +296,7 @@ async function bundleSsrPages(compilation, optimizePlugins) {
     // one pass to generate initial static HTML and to track all combined static resources across layouts
     // and before we optimize so that all bundled assets can tracked up front
     // would be nice to see if this can be done in a single pass though...
-    for (const page of ssrPages) {
+    await asyncForEach(ssrPages, async (page) => {
       const { route } = page;
       let staticHtml = "<content-outlet></content-outlet>";
 
@@ -346,7 +316,7 @@ async function bundleSsrPages(compilation, optimizePlugins) {
       await trackResourcesForRoute(staticHtml, compilation, route);
 
       ssrPrerenderPagesRouteMapper[route] = staticHtml;
-    }
+    });
 
     // technically this happens in the start of bundleCompilation once
     // so might be nice to detect those static assets to see if they have be "de-duped" from bundling here
@@ -354,7 +324,7 @@ async function bundleSsrPages(compilation, optimizePlugins) {
     await bundleStyleResources(compilation, optimizePlugins);
 
     // second pass to link all bundled assets to their resources before optimizing and generating SSR bundles
-    for (const page of ssrPages) {
+    await asyncForEach(ssrPages, async (page) => {
       const { id, route, pageHref } = page;
       const pagePath = new URL(pageHref).pathname.replace(pagesDir.pathname, "./");
       const entryFileUrl = new URL(pageHref);
@@ -422,17 +392,16 @@ async function bundleSsrPages(compilation, optimizePlugins) {
         id,
         inputPath: normalizePathnameForWindows(entryFileOutputUrl),
       });
-    }
+    });
 
     const ssrConfigs = await getRollupConfigForSsrPages(compilation, input);
 
     if (ssrConfigs.length > 0 && ssrConfigs[0].input !== "") {
       console.info("bundling dynamic pages...");
-      for (const configIndex in ssrConfigs) {
-        const rollupConfig = ssrConfigs[configIndex];
+      await asyncForEach(ssrConfigs, async (rollupConfig) => {
         const bundle = await rollup(rollupConfig);
         await bundle.write(rollupConfig.output);
-      }
+      });
     }
   }
 }

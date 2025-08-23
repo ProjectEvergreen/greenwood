@@ -59,7 +59,7 @@ const generateCompilation = async () => {
 
     if (!(await checkResourceExists(new URL("./graph.json", outputDir)))) {
       return Promise.reject(
-        new Error("No build output detected.  Make sure you have run greenwood build"),
+        new Error("No build output detected. Make sure you have run greenwood build"),
       );
     }
 
