@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/plugin-adapter-aws",
-  "version": "0.33.0-alpha.5",
+  "version": "0.33.0-alpha.6",
   "description": "A Greenwood plugin for supporting AWS serverless and edge runtimes.",
   "repository": {
     "type": "git",
@@ -39,6 +39,6 @@
     "@greenwood/cli": "^0.32.0"
   },
   "devDependencies": {
-    "@greenwood/cli": "^0.33.0-alpha.5"
+    "@greenwood/cli": "^0.33.0-alpha.6"
   }
 }
