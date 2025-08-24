@@ -202,7 +202,7 @@ describe("Develop Greenwood With: ", function () {
 
         describe("CSS module should be processed as ESM", function () {
           let headerModuleText;
-          let modulesMap;
+          let modulesMaps;
 
           before(async function () {
             const response = await fetch(
@@ -210,16 +210,25 @@ describe("Develop Greenwood With: ", function () {
             );
 
             headerModuleText = await response.text();
-            modulesMap = JSON.parse(
-              await fs.promises.readFile(
-                new URL("./.greenwood/__css-modules-map/938405408.map.json", import.meta.url),
-                "utf-8",
-              ),
+            modulesMaps = await Array.fromAsync(
+              fs.promises.glob("*.map.json", {
+                cwd: new URL("./.greenwood/__css-modules-map/", import.meta.url),
+              }),
             );
           });
 
           it("the served content should be untouched", function () {
-            const expected = `export default ${JSON.stringify(modulesMap.module)}`;
+            const headersMap = modulesMaps
+              .map((map) =>
+                JSON.parse(
+                  fs.readFileSync(
+                    new URL(`./.greenwood/__css-modules-map/${map}`, import.meta.url),
+                    "utf-8",
+                  ),
+                ),
+              )
+              .find((map) => map.contents.indexOf("header") >= 0);
+            const expected = `export default ${JSON.stringify(headersMap.module)}`;
 
             expect(headerModuleText).to.equal(expected);
           });
