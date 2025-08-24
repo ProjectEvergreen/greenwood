@@ -124,14 +124,13 @@ async function walkAllImportsForCssModules(cssModulesMap = {}, scriptUrl, sheets
           },
         });
 
-        // TODO better truncate name
         const outputPathUrl = new URL(
-          `./${MODULES_MAP_DIR_NAME}${scriptUrl.pathname}.json`,
+          `./${MODULES_MAP_DIR_NAME}/${hashString(scriptUrl.pathname)}.map.json`,
           compilation.context.scratchDir,
         );
 
         if (!fs.existsSync(outputPathUrl)) {
-          fs.mkdirSync(path.dirname(outputPathUrl.pathname), { recursive: true });
+          fs.mkdirSync(path.dirname(scriptUrl.pathname), { recursive: true });
         }
 
         const moduleContents = {
@@ -149,7 +148,7 @@ async function walkAllImportsForCssModules(cssModulesMap = {}, scriptUrl, sheets
         // output one file for SSR / prerendering handling in loaders as ESM
         fs.writeFileSync(
           new URL(
-            `./${MODULES_MAP_DIR_NAME}${cssModuleUrl.pathname}.json`,
+            `./${MODULES_MAP_DIR_NAME}/${hashString(cssModuleUrl.pathname)}.module.json`,
             compilation.context.scratchDir,
           ),
           JSON.stringify(moduleContents),
@@ -243,7 +242,7 @@ class ScanForCssModulesResource {
       const cssModulesMap = JSON.parse(
         fs.readFileSync(
           new URL(
-            `./${MODULES_MAP_DIR_NAME}${url.pathname}.json`,
+            `./${MODULES_MAP_DIR_NAME}/${hashString(url.pathname)}.module.json`,
             this.compilation.context.scratchDir,
           ),
         ),
@@ -271,7 +270,10 @@ class StripCssModulesResource {
 
   async shouldIntercept(url) {
     return fs.existsSync(
-      new URL(`./${MODULES_MAP_DIR_NAME}${url.pathname}.json`, this.compilation.context.scratchDir),
+      new URL(
+        `./${MODULES_MAP_DIR_NAME}/${hashString(url.pathname)}.map.json`,
+        this.compilation.context.scratchDir,
+      ),
     );
   }
 
@@ -288,7 +290,10 @@ class StripCssModulesResource {
           contents = `${contents.slice(0, start)} \n ${contents.slice(end)}`;
           const cssModulesMap = JSON.parse(
             fs.readFileSync(
-              new URL(`./${MODULES_MAP_DIR_NAME}${url.pathname}.json`, context.scratchDir),
+              new URL(
+                `./${MODULES_MAP_DIR_NAME}/${hashString(url.pathname)}.map.json`,
+                context.scratchDir,
+              ),
             ),
           );
           const { identifier, module } = cssModulesMap;

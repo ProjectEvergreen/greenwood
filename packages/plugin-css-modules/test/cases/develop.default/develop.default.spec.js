@@ -200,7 +200,7 @@ describe("Develop Greenwood With: ", function () {
           });
         });
 
-        xdescribe("CSS module should be processed as ESM", function () {
+        describe("CSS module should be processed as ESM", function () {
           let headerModuleText;
           let modulesMap;
 
@@ -212,18 +212,14 @@ describe("Develop Greenwood With: ", function () {
             headerModuleText = await response.text();
             modulesMap = JSON.parse(
               await fs.promises.readFile(
-                new URL("./.greenwood/__css-modules-map.json", import.meta.url),
+                new URL("./.greenwood/__css-modules-map/938405408.map.json", import.meta.url),
                 "utf-8",
               ),
             );
           });
 
           it("the served content should be untouched", function () {
-            const headerModule =
-              modulesMap[
-                new URL("./src/components/header/header.module.css", import.meta.url).href
-              ];
-            const expected = `export default ${JSON.stringify(headerModule.module)}`;
+            const expected = `export default ${JSON.stringify(modulesMap.module)}`;
 
             expect(headerModuleText).to.equal(expected);
           });
