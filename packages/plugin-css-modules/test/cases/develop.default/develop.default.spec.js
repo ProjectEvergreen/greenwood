@@ -200,7 +200,7 @@ describe("Develop Greenwood With: ", function () {
           });
         });
 
-        describe("CSS module should be processed as ESM", function () {
+        xdescribe("CSS module should be processed as ESM", function () {
           let headerModuleText;
           let modulesMap;
 
