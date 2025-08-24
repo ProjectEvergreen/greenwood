@@ -45,13 +45,21 @@ async function copyDirectory(fromUrl, toUrl, projectDirectory) {
         );
         const isDirectory = (await fs.stat(fileUrl)).isDirectory();
 
-        if (isDirectory && !(await checkResourceExists(targetUrl))) {
-          await fs.mkdir(targetUrl, {
+        // eject early, we will make directories on the fly as we copy over filee. since we are copying recursively and concurrently.
+        // not sure if its the most performant, but otherwise we will get errors if directories are not ready at time of file copy
+        if (isDirectory) {
+          return;
+        }
+
+        const targetUrlDir = new URL(`${targetUrl.href.split("/").slice(0, -1).join("/")}/`);
+
+        if (!(await checkResourceExists(targetUrlDir))) {
+          await fs.mkdir(targetUrlDir, {
             recursive: true,
           });
-        } else if (!isDirectory) {
-          await copyFile(fileUrl, targetUrl, projectDirectory);
         }
+
+        await copyFile(fileUrl, targetUrl, projectDirectory);
       });
     }
   } catch (e) {
