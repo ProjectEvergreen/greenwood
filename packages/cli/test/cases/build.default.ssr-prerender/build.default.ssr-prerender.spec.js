@@ -39,6 +39,7 @@ const expect = chai.expect;
 // contains test cases for these bugs
 // https://github.com/ProjectEvergreen/greenwood/issues/1044
 // https://github.com/ProjectEvergreen/greenwood/issues/988#issuecomment-1288168858
+// https://github.com/ProjectEvergreen/greenwood/pull/1559
 describe("Build Greenwood With: ", function () {
   const LABEL = "A Server Rendered Application (SSR) with prerender configuration";
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");

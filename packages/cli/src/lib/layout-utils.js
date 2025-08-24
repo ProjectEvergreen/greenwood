@@ -235,6 +235,7 @@ async function mergeContentIntoLayout(
     // we wrap SSR content in comments so we can extract it during prerendering to avoid double pre-rendering
     // https://github.com/ProjectEvergreen/greenwood/issues/1044
     // https://github.com/ProjectEvergreen/greenwood/issues/988#issuecomment-1288168858
+    // https://github.com/ProjectEvergreen/greenwood/pull/1559
     if (matchingRoute.isSSR && outletType === "content") {
       finalBody = `<!-- greenwood-ssr-start -->${finalBody}<!-- greenwood-ssr-end -->`;
     }
