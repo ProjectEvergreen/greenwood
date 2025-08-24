@@ -130,7 +130,7 @@ async function walkAllImportsForCssModules(cssModulesMap = {}, scriptUrl, sheets
         );
 
         if (!fs.existsSync(outputPathUrl)) {
-          fs.mkdirSync(path.dirname(scriptUrl.pathname), { recursive: true });
+          fs.mkdirSync(new URL(`${path.dirname(scriptUrl.href)}/`), { recursive: true });
         }
 
         const moduleContents = {
