@@ -151,7 +151,7 @@ async function walkAllImportsForCssModules(cssModulesMap = {}, scriptUrl, sheets
             `./${MODULES_MAP_DIR_NAME}/${hashString(cssModuleUrl.pathname)}.module.json`,
             compilation.context.scratchDir,
           ),
-          JSON.stringify(moduleContents),
+          JSON.stringify(classNameMap),
         );
       } else {
         const recursiveScriptUrl = new URL(value, scriptUrl);
@@ -247,8 +247,7 @@ class ScanForCssModulesResource {
           ),
         ),
       );
-      const { module } = cssModulesMap;
-      const cssModule = `export default ${JSON.stringify(module)}`;
+      const cssModule = `export default ${JSON.stringify(cssModulesMap)}`;
 
       return new Response(cssModule, {
         headers: {
