@@ -45,7 +45,7 @@ async function copyDirectory(fromUrl, toUrl, projectDirectory) {
         );
         const isDirectory = (await fs.stat(fileUrl)).isDirectory();
 
-        // eject early, we will make directories on the fly as we copy over filee. since we are copying recursively and concurrently.
+        // eject early, we will make directories on the fly as we copy over files. since we are copying recursively and concurrently.
         // not sure if its the most performant, but otherwise we will get errors if directories are not ready at time of file copy
         if (isDirectory) {
           return;
