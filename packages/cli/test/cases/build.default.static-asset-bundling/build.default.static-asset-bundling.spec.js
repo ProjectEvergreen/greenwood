@@ -14,6 +14,8 @@
  * User Workspace
  *  src/
  *    assets/
+ *     blog-images/
+ *       wcc-logo.png
  *     greenwood-logo.png
  *     nodejs.svg
  *   components/
@@ -23,7 +25,6 @@
  */
 import chai from "chai";
 import fs from "node:fs/promises";
-import glob from "glob-promise";
 import path from "node:path";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
@@ -57,9 +58,14 @@ describe("Build Greenwood With: ", function () {
       let headerContents;
 
       before(async function () {
-        const headerScripts = await glob.promise(path.join(this.context.publicDir, "header.*.js"));
+        const headerScripts = await Array.fromAsync(
+          fs.glob("header.*.js", { cwd: new URL("./public/", import.meta.url) }),
+        );
 
-        headerContents = await fs.readFile(headerScripts[0], "utf-8");
+        headerContents = await fs.readFile(
+          new URL(`./public/${headerScripts[0]}`, import.meta.url),
+          "utf-8",
+        );
       });
 
       it("should have the expected bundle path for the first static asset", function () {
@@ -72,6 +78,22 @@ describe("Build Greenwood With: ", function () {
         const bundleName = "nodejs.aX7vmD85.svg";
 
         expect(headerContents).to.contain(bundleName);
+      });
+    });
+
+    describe("Default file output for auto copied assets directory", function () {
+      let assets;
+
+      before(async function () {
+        assets = (
+          await Array.fromAsync(
+            fs.glob("**", { cwd: new URL("./public/assets/", import.meta.url) }),
+          )
+        ).filter((assets) => assets.indexOf(".") > 0);
+      });
+
+      it("should have the expected number of copied static assets", function () {
+        expect(assets.length).to.equal(3);
       });
     });
   });
