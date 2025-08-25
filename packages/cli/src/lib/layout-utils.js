@@ -219,7 +219,7 @@ async function mergeContentIntoLayout(
     // then we _do not_ favor the child contents in that case
     // this can happen in the case of context plugins in which pages may _only_ be used for loading a layout
     // https://github.com/ProjectEvergreen/greenwood/pull/1527
-    const finalBody =
+    let finalBody =
       parentBody && parentBody.match(outletRegex)
         ? parentBody.replace(outletRegex, childBody ?? childContents)
         : parentContents && parentContents.match(outletRegex) && outletType === "content"
@@ -231,6 +231,14 @@ async function mergeContentIntoLayout(
               : !childRoot.querySelector("html")
                 ? childContents
                 : "";
+
+    // we wrap SSR content in comments so we can extract it during prerendering to avoid double pre-rendering
+    // https://github.com/ProjectEvergreen/greenwood/issues/1044
+    // https://github.com/ProjectEvergreen/greenwood/issues/988#issuecomment-1288168858
+    // https://github.com/ProjectEvergreen/greenwood/pull/1559
+    if (matchingRoute.isSSR && outletType === "content") {
+      finalBody = `<!-- greenwood-ssr-start -->${finalBody}<!-- greenwood-ssr-end -->`;
+    }
 
     mergedContents = `<!DOCTYPE html>
       ${mergedHtml}
