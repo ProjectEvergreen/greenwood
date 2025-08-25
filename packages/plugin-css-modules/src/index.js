@@ -239,15 +239,14 @@ class ScanForCssModulesResource {
       return new Response(newBody);
     } else if (protocol === "file:" && pathname.endsWith(this.extensions[0])) {
       // handle this primarily for SSR / prerendering use case
-      const cssModulesMap = JSON.parse(
-        fs.readFileSync(
-          new URL(
-            `./${MODULES_MAP_DIR_NAME}/${hashString(url.pathname)}.module.json`,
-            this.compilation.context.scratchDir,
-          ),
+      const cssModulesMap = fs.readFileSync(
+        new URL(
+          `./${MODULES_MAP_DIR_NAME}/${hashString(url.pathname)}.module.json`,
+          this.compilation.context.scratchDir,
         ),
+        "utf-8",
       );
-      const cssModule = `export default ${JSON.stringify(cssModulesMap)}`;
+      const cssModule = `export default ${cssModulesMap}`;
 
       return new Response(cssModule, {
         headers: {
