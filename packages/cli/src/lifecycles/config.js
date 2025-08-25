@@ -1,6 +1,7 @@
 // @ts-nocheck
 import fs from "node:fs/promises";
 import { checkResourceExists } from "../lib/resource-utils.js";
+import { asyncMap } from "../lib/async-utils.js";
 
 const cwd = new URL(`file://${process.cwd()}/`);
 const greenwoodPluginsDirectoryUrl = new URL("../plugins/", import.meta.url);
@@ -9,26 +10,25 @@ const PLUGINS_FLATTENED_DEPTH = 2;
 // get and "tag" all plugins provided / maintained by the @greenwood/cli
 // and include as the default set, with all user plugins getting appended
 const greenwoodPlugins = (
-  await Promise.all(
+  await asyncMap(
     [
       new URL("./copy/", greenwoodPluginsDirectoryUrl),
       new URL("./renderer/", greenwoodPluginsDirectoryUrl),
       new URL("./resource/", greenwoodPluginsDirectoryUrl),
       new URL("./server/", greenwoodPluginsDirectoryUrl),
-    ].map(async (pluginDirectoryUrl) => {
+    ],
+    async (pluginDirectoryUrl) => {
       const files = await fs.readdir(pluginDirectoryUrl);
 
-      return await Promise.all(
-        files.map(async (file) => {
-          const importUrl = new URL(`./${file}`, pluginDirectoryUrl);
-          // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
-          const pluginImport = await import(importUrl);
-          const plugin = pluginImport[Object.keys(pluginImport)[0]];
+      return await asyncMap(files, async (file) => {
+        const importUrl = new URL(`./${file}`, pluginDirectoryUrl);
+        // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
+        const pluginImport = await import(importUrl);
+        const plugin = pluginImport[Object.keys(pluginImport)[0]];
 
-          return Array.isArray(plugin) ? plugin : [plugin];
-        }),
-      );
-    }),
+        return Array.isArray(plugin) ? plugin : [plugin];
+      });
+    },
   )
 )
   .flat(PLUGINS_FLATTENED_DEPTH)

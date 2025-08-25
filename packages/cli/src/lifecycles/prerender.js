@@ -6,9 +6,9 @@ import {
 } from "../lib/resource-utils.js";
 import os from "node:os";
 import { WorkerPool } from "../lib/threadpool.js";
+import { asyncForEach } from "../lib/async-utils.js";
 
 async function createOutputDirectory(outputDir) {
-  console.log({ outputDir });
   // ignore creating directory for 404 pages since they live at the root of the output directory
   if (!outputDir.href.endsWith("404.html") && !(await checkResourceExists(outputDir))) {
     await fs.mkdir(outputDir, {
@@ -82,7 +82,7 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
     new URL("../lib/ssr-route-worker.js", import.meta.url),
   );
 
-  for (const page of pages) {
+  await asyncForEach(pages, async (page) => {
     const { route, outputHref } = page;
     const scratchUrl = toScratchUrl(outputHref, context);
     const url = new URL(`http://localhost:${config.port}${route}`);
@@ -144,7 +144,7 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
     await fs.writeFile(scratchUrl, body);
 
     console.info("generated page...", route);
-  }
+  });
 }
 
 async function preRenderCompilationCustom(compilation, customPrerender) {
@@ -188,25 +188,23 @@ async function staticRenderCompilation(compilation) {
 
   console.info("pages to generate", `\n ${pages.map((page) => page.route).join("\n ")}`);
 
-  await Promise.all(
-    pages.map(async (page) => {
-      const { route, outputHref } = page;
-      const scratchUrl = toScratchUrl(outputHref, context);
-      const url = new URL(`http://localhost:${config.port}${route}`);
-      const request = new Request(url);
+  await asyncForEach(pages, async (page) => {
+    const { route, outputHref } = page;
+    const scratchUrl = toScratchUrl(outputHref, context);
+    const url = new URL(`http://localhost:${config.port}${route}`);
+    const request = new Request(url);
 
-      let body = await (await servePage(url, request, plugins)).text();
-      body = await (await interceptPage(url, request, plugins, body)).text();
+    let body = await (await servePage(url, request, plugins)).text();
+    body = await (await interceptPage(url, request, plugins, body)).text();
 
-      await trackResourcesForRoute(body, compilation, route);
-      await createOutputDirectory(new URL(scratchUrl.href.replace("index.html", "")));
-      await fs.writeFile(scratchUrl, body);
+    await trackResourcesForRoute(body, compilation, route);
+    await createOutputDirectory(new URL(scratchUrl.href.replace("index.html", "")));
+    await fs.writeFile(scratchUrl, body);
 
-      console.info("generated page...", route);
+    console.info("generated page...", route);
 
-      return Promise.resolve();
-    }),
-  );
+    return Promise.resolve();
+  });
 }
 
 export { preRenderCompilationWorker, preRenderCompilationCustom, staticRenderCompilation };

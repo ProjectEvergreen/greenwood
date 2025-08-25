@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/plugin-css-modules",
-  "version": "0.33.0-alpha.5",
+  "version": "0.33.0-alpha.7",
   "description": "A Greenwood plugin for authoring CSS Modules",
   "repository": {
     "type": "git",
@@ -44,6 +44,6 @@
     "node-html-parser": "^7.0.1"
   },
   "devDependencies": {
-    "@greenwood/cli": "^0.33.0-alpha.5"
+    "@greenwood/cli": "^0.33.0-alpha.7"
   }
 }
