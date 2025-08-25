@@ -4,6 +4,7 @@
  *
  */
 import fs from "node:fs";
+import path from "node:path";
 import { parse as hparse } from "node-html-parser";
 import { parse, walk } from "css-tree";
 import * as acornWalk from "acorn-walk";
@@ -11,24 +12,7 @@ import * as acorn from "acorn";
 import { hashString } from "@greenwood/cli/src/lib/hashing-utils.js";
 import { ACORN_OPTIONS } from "@greenwood/cli/src/lib/parsing-utils.js";
 
-const MODULES_MAP_FILENAME = "__css-modules-map.json";
-/*
- * we have to write the modules map to a file to preserve the state between static and SSR / prerendering
- * since if we try and do something like `globalThis.cssModulesMap = globalThis.cssModulesMap ?? {}`
- * it won't persist across Worker threads.  Maybe if we find a solution to this, we would handle this all in memory.
- *
- * https://github.com/ProjectEvergreen/greenwood/discussions/1117
- */
-function getCssModulesMap(compilation) {
-  const locationUrl = new URL(`./${MODULES_MAP_FILENAME}`, compilation.context.scratchDir);
-  let cssModulesMap = {};
-
-  if (fs.existsSync(locationUrl)) {
-    cssModulesMap = JSON.parse(fs.readFileSync(locationUrl, "utf-8"));
-  }
-
-  return cssModulesMap;
-}
+const MODULES_MAP_DIR_NAME = "__css-modules-map";
 
 async function getTransformedScriptContents(scriptUrl, compilation) {
   const resourcePlugins = compilation.config.plugins
@@ -74,7 +58,7 @@ async function getTransformedScriptContents(scriptUrl, compilation) {
   return await response.text();
 }
 
-async function walkAllImportsForCssModules(scriptUrl, sheets, compilation) {
+async function walkAllImportsForCssModules(cssModulesMap = {}, scriptUrl, sheets, compilation) {
   const scriptContents = await getTransformedScriptContents(scriptUrl, compilation);
   const additionalScripts = [];
 
@@ -140,19 +124,34 @@ async function walkAllImportsForCssModules(scriptUrl, sheets, compilation) {
           },
         });
 
-        const cssModulesMap = getCssModulesMap(compilation);
+        const outputPathUrl = new URL(
+          `./${MODULES_MAP_DIR_NAME}/${hashString(scriptUrl.pathname)}.map.json`,
+          compilation.context.scratchDir,
+        );
 
+        if (!fs.existsSync(outputPathUrl)) {
+          fs.mkdirSync(new URL(`${path.dirname(scriptUrl.href)}/`), { recursive: true });
+        }
+
+        const moduleContents = {
+          module: classNameMap,
+          contents: scopedCssContents,
+          importer: scriptUrl,
+          identifier,
+        };
+
+        cssModulesMap[outputPathUrl] = moduleContents;
+
+        // output one file for transforming imports from CSS -> ESM
+        fs.writeFileSync(outputPathUrl, JSON.stringify(moduleContents));
+
+        // output one file for SSR / prerendering handling in loaders as ESM
         fs.writeFileSync(
-          new URL(`./${MODULES_MAP_FILENAME}`, compilation.context.scratchDir),
-          JSON.stringify({
-            ...cssModulesMap,
-            [`${cssModuleUrl.href}`]: {
-              module: classNameMap,
-              contents: scopedCssContents,
-              importer: scriptUrl,
-              identifier,
-            },
-          }),
+          new URL(
+            `./${MODULES_MAP_DIR_NAME}/${hashString(cssModuleUrl.pathname)}.module.json`,
+            compilation.context.scratchDir,
+          ),
+          JSON.stringify(classNameMap),
         );
       } else {
         const recursiveScriptUrl = new URL(value, scriptUrl);
@@ -165,8 +164,10 @@ async function walkAllImportsForCssModules(scriptUrl, sheets, compilation) {
   });
 
   for (const script of additionalScripts) {
-    await walkAllImportsForCssModules(script, sheets, compilation);
+    await walkAllImportsForCssModules(cssModulesMap, script, sheets, compilation);
   }
+
+  return cssModulesMap;
 }
 
 // this happens 'first' as the HTML is returned, to find viable references to CSS Modules
@@ -178,35 +179,28 @@ class ScanForCssModulesResource {
     this.contentType = "text/javascript";
     const { scratchDir } = this.compilation.context;
 
-    if (
-      fs.existsSync(scratchDir) &&
-      !fs.existsSync(new URL(`./${MODULES_MAP_FILENAME}`, scratchDir))
-    ) {
-      fs.writeFileSync(new URL(`./${MODULES_MAP_FILENAME}`, scratchDir), JSON.stringify({}));
+    if (!fs.existsSync(new URL(`./${MODULES_MAP_DIR_NAME}/`, scratchDir))) {
+      fs.mkdirSync(new URL(`./${MODULES_MAP_DIR_NAME}/`, scratchDir), { recursive: true });
     }
   }
 
   async shouldIntercept(url) {
     const { pathname, protocol } = url;
-    const mapKey = `${protocol}//${pathname}`;
-    const cssModulesMap = getCssModulesMap(this.compilation);
 
     return (
-      url.pathname.endsWith("/") ||
-      (protocol === "file:" && pathname.endsWith(this.extensions[0]) && cssModulesMap[mapKey])
+      url.pathname.endsWith("/") || (protocol === "file:" && pathname.endsWith(this.extensions[0]))
     );
   }
 
   async intercept(url, request, response) {
     const { pathname, protocol } = url;
-    const mapKey = `${protocol}//${pathname}`;
-    const cssModulesMap = getCssModulesMap(this.compilation);
 
     if (url.pathname.endsWith("/")) {
       const body = await response.text();
       const dom = hparse(body);
       const scripts = dom.querySelectorAll("head script");
       const sheets = [];
+      let cssModulesMap = {};
 
       for (const script of scripts) {
         const type = script.getAttribute("type") ?? "";
@@ -219,11 +213,14 @@ class ScanForCssModulesResource {
             this.compilation.context.userWorkspace,
           );
 
-          await walkAllImportsForCssModules(scriptUrl, sheets, this.compilation);
+          cssModulesMap = await walkAllImportsForCssModules(
+            cssModulesMap,
+            scriptUrl,
+            sheets,
+            this.compilation,
+          );
         }
       }
-
-      const cssModulesMap = getCssModulesMap(this.compilation);
 
       Object.keys(cssModulesMap).forEach((key) => {
         sheets.push(cssModulesMap[key].contents);
@@ -240,13 +237,16 @@ class ScanForCssModulesResource {
       );
 
       return new Response(newBody);
-    } else if (
-      protocol === "file:" &&
-      pathname.endsWith(this.extensions[0]) &&
-      cssModulesMap[mapKey]
-    ) {
+    } else if (protocol === "file:" && pathname.endsWith(this.extensions[0])) {
       // handle this primarily for SSR / prerendering use case
-      const cssModule = `export default ${JSON.stringify(cssModulesMap[mapKey].module)}`;
+      const cssModulesMap = fs.readFileSync(
+        new URL(
+          `./${MODULES_MAP_DIR_NAME}/${hashString(url.pathname)}.module.json`,
+          this.compilation.context.scratchDir,
+        ),
+        "utf-8",
+      );
+      const cssModule = `export default ${cssModulesMap}`;
 
       return new Response(cssModule, {
         headers: {
@@ -267,13 +267,12 @@ class StripCssModulesResource {
   }
 
   async shouldIntercept(url) {
-    const cssModulesMap = getCssModulesMap(this.compilation);
-
-    for (const [, value] of Object.entries(cssModulesMap)) {
-      if (url.href === value.importer) {
-        return true;
-      }
-    }
+    return fs.existsSync(
+      new URL(
+        `./${MODULES_MAP_DIR_NAME}/${hashString(url.pathname)}.map.json`,
+        this.compilation.context.scratchDir,
+      ),
+    );
   }
 
   async intercept(url, request, response) {
@@ -287,26 +286,28 @@ class StripCssModulesResource {
 
         if (value.endsWith(".module.css") && specifiers.length === 1) {
           contents = `${contents.slice(0, start)} \n ${contents.slice(end)}`;
-          const cssModulesMap = getCssModulesMap({ context });
+          const cssModulesMap = JSON.parse(
+            fs.readFileSync(
+              new URL(
+                `./${MODULES_MAP_DIR_NAME}/${hashString(url.pathname)}.map.json`,
+                context.scratchDir,
+              ),
+            ),
+          );
+          const { identifier, module } = cssModulesMap;
 
-          Object.values(cssModulesMap).forEach((value) => {
-            const { importer, module, identifier } = value;
+          Object.keys(module).forEach((key) => {
+            const literalUsageRegex = new RegExp(String.raw`\$\{${identifier}.${key}\}`, "g");
+            // https://stackoverflow.com/a/20851557/417806
+            const expressionUsageRegex = new RegExp(
+              String.raw`(((?<![-\w\d\W])|(?<=[> \n\r\b]))${identifier}\.${key}((?![-\w\d\W])|(?=[ <.,:;!?\n\r\b])))`,
+              "g",
+            );
 
-            if (importer === url.href) {
-              Object.keys(module).forEach((key) => {
-                const literalUsageRegex = new RegExp(String.raw`\$\{${identifier}.${key}\}`, "g");
-                // https://stackoverflow.com/a/20851557/417806
-                const expressionUsageRegex = new RegExp(
-                  String.raw`(((?<![-\w\d\W])|(?<=[> \n\r\b]))${identifier}\.${key}((?![-\w\d\W])|(?=[ <.,:;!?\n\r\b])))`,
-                  "g",
-                );
-
-                if (literalUsageRegex.test(contents)) {
-                  contents = contents.replace(literalUsageRegex, module[key]);
-                } else if (expressionUsageRegex.test(contents)) {
-                  contents = contents.replace(expressionUsageRegex, `'${module[key]}'`);
-                }
-              });
+            if (literalUsageRegex.test(contents)) {
+              contents = contents.replace(literalUsageRegex, module[key]);
+            } else if (expressionUsageRegex.test(contents)) {
+              contents = contents.replace(expressionUsageRegex, `'${module[key]}'`);
             }
           });
         }
