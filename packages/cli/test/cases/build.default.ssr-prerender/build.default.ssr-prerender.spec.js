@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood with an SSR route that is prerender using configuration.
+ * Run Greenwood with an SSR route that is prerendered using configuration and checks for double SSR rendering.
  *
  * User Result
  * Should generate a bare bones Greenwood build for hosting a prerender SSR application.
@@ -132,9 +132,6 @@ describe("Build Greenwood With: ", function () {
         expect(heading[0].textContent.trim()).to.equal("This is the header component.");
       });
 
-      // specifically to test for these bugs
-      // https://github.com/ProjectEvergreen/greenwood/issues/1044
-      // https://github.com/ProjectEvergreen/greenwood/issues/988#issuecomment-1288168858
       it("should have the expected number of top level items pre-rendered for the <app-social-links> tag in the body", function () {
         // one set comes from the HTML, one from the SSR page
         const links = dom.window.document.querySelectorAll("body > app-social-links ul li a");
