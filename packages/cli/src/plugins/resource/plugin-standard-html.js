@@ -21,10 +21,21 @@ class StandardHtmlResource {
     const { protocol, pathname } = url;
     const hasMatchingPageRoute = this.compilation.graph.find((node) => node.route === pathname);
     const isSPA = this.compilation.graph.find((node) => node.isSPA) && pathname.indexOf(".") < 0;
+    // TODO consolidate with other graph matching logic
+    const matchingRouteWithSegment = this.compilation.graph.find((node) => {
+      return (
+        (pathname !== "/404/") !== "/404/" &&
+        node.segment &&
+        new URLPattern({ pathname: node.segment.pathname }).test(`https://example.com${pathname}`)
+      );
+    });
 
+    // console.log({ matchingRouteWithSegment });
     return (
       protocol.startsWith("http") &&
-      (hasMatchingPageRoute || (isSPA && request.headers.get("Accept").indexOf("text/html") >= 0))
+      (hasMatchingPageRoute ||
+        matchingRouteWithSegment ||
+        (isSPA && request.headers.get("Accept").indexOf("text/html") >= 0))
     );
   }
 
@@ -34,6 +45,15 @@ class StandardHtmlResource {
     const { pathname } = url;
     const isSpaRoute = this.compilation.graph.find((node) => node.isSPA);
     const matchingRoute = this.compilation.graph.find((node) => node.route === pathname) || {};
+    const matchingRouteWithSegment =
+      this.compilation.graph.find((node) => {
+        // TODO better way to handle 404?
+        return (
+          pathname !== "/404/" &&
+          node.segment &&
+          new URLPattern({ pathname: node.segment.pathname }).test(`https://example.com${pathname}`)
+        );
+      }) || {};
     const { pageHref } = matchingRoute;
     const filePath =
       !matchingRoute.external && pageHref
@@ -68,12 +88,21 @@ class StandardHtmlResource {
           break;
         }
       }
-    } else if (matchingRoute.isSSR) {
-      const routeModuleLocationUrl = new URL(pageHref);
+    } else if (matchingRoute.isSSR || matchingRouteWithSegment.isSSR) {
+      const routeModuleLocationUrl = new URL(pageHref ?? matchingRouteWithSegment.pageHref);
       const routeWorkerUrl = this.compilation.config.plugins
         .find((plugin) => plugin.type === "renderer")
         .provider().executeModuleUrl;
       const req = await requestAsObject(request);
+      console.log("html plugin", { matchingRouteWithSegment });
+      // TODO shouldn't we be able to get this from segment.key?
+      const props =
+        matchingRouteWithSegment && matchingRouteWithSegment.segment
+          ? new URLPattern({ pathname: matchingRouteWithSegment.segment.pathname }).exec(
+              `https://example.com${pathname}`,
+            ).pathname.groups
+          : undefined;
+      console.log("HTML Plugin PROPS to send", { props });
 
       await new Promise((resolve, reject) => {
         const worker = new Worker(new URL("../../lib/ssr-route-worker.js", import.meta.url));
@@ -97,10 +126,12 @@ class StandardHtmlResource {
           moduleUrl: routeModuleLocationUrl.href,
           compilation: JSON.stringify(this.compilation),
           page: JSON.stringify(matchingRoute),
+          // TODO consolidate all constructor props into a single object?
           request: req,
           contentOptions: JSON.stringify({
             body: true,
           }),
+          props,
         });
       });
     }

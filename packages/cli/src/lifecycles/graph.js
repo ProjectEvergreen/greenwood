@@ -245,8 +245,26 @@ const generateGraph = async (compilation) => {
            * hydration: if this page needs hydration support
            * servePage: signal that this is a custom page file type (static | dynamic)
            */
+
+          // TODO would be nice to use new URLPattern({ pathname: route }); // /users/[id]/
+          // TODO how to handle brackets for thing like generated IDs and whatnot for page metadata
+          const pattern = new URLPattern({ pathname: route.replace("[", ":").replace("]", "") });
+          // console.log({ pattern });
+          // console.log({ route, relativePagePath }, pattern.test("https://example.com/users/123/")); // true
+          const dynamicSegments = pattern.test(`https://example.com${basePath}${route}`);
+          // console.log({ dynamicSegments });
+          // console.log('segments', pattern.exec("https://example.com/users/123/"))
+          const segmentKey = relativePagePath
+            .split("/")
+            [relativePagePath.split("/").length - 1].replace(extension, "")
+            .replace("[", "")
+            .replace("]", "");
+
+          // TODO figure out best filename output naming convention for these special [id] routes
           const page = {
-            id: decodeURIComponent(getIdFromRelativePathPath(relativePagePath, extension)),
+            id: decodeURIComponent(getIdFromRelativePathPath(relativePagePath, extension))
+              .replace("[", "-")
+              .replace("]", "-"),
             label: decodeURIComponent(label),
             title: title ? decodeURIComponent(title) : title,
             route: `${basePath}${route}`,
@@ -264,6 +282,9 @@ const generateGraph = async (compilation) => {
             isolation,
             hydration,
             servePage: isCustom,
+            segment: dynamicSegments
+              ? { key: segmentKey, pathname: route.replace("[", ":").replace("]", "") }
+              : null,
           };
 
           pages.push(page);
