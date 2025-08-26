@@ -60,7 +60,7 @@ async function getDevServer(compilation) {
         statusText: message,
         status,
         headers: new Headers(header),
-      });
+      }).clone();
 
       for (const plugin of resourcePlugins) {
         // ignore plugins that serve pages, as those will be handled by Greenwood's standard HTML plugin
