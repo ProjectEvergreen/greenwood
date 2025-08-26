@@ -360,12 +360,39 @@ async function getHybridServer(compilation) {
   app.use(async (ctx) => {
     try {
       const url = new URL(`http://localhost:${config.port}${ctx.url}`);
+      const { pathname } = url;
       const matchingRoute = graph.find((node) => node.route === url.pathname) || { data: {} };
       const isApiRoute = manifest.apis.has(url.pathname);
       const request = transformKoaRequestIntoStandardRequest(url, ctx.request);
+      const matchingRouteWithSegment =
+        compilation.graph.find((node) => {
+          return (
+            pathname !== "/404/" &&
+            node.segment &&
+            new URLPattern({ pathname: node.segment.pathname }).test(
+              `https://example.com${pathname}`,
+            )
+          );
+        }) || {};
 
-      if (!config.prerender && matchingRoute.isSSR && !matchingRoute.prerender) {
-        const entryPointUrl = new URL(matchingRoute.outputHref);
+      if (
+        !config.prerender &&
+        (matchingRoute.isSSR || matchingRouteWithSegment.isSSR) &&
+        !matchingRoute.prerender
+      ) {
+        console.log("SERVE", { matchingRouteWithSegment });
+        const entryPointUrl = new URL(
+          matchingRoute?.outputHref ?? matchingRouteWithSegment.outputHref,
+        );
+        // TODO shouldn't we be able to get this from segment.key?
+        const props =
+          matchingRouteWithSegment && matchingRouteWithSegment.segment
+            ? new URLPattern({ pathname: matchingRouteWithSegment.segment.pathname }).exec(
+                `https://example.com${pathname}`,
+              ).pathname.groups
+            : undefined;
+
+        console.log("PROPS to send", { props });
         let html;
 
         if (matchingRoute.isolation || isolationMode) {
@@ -393,12 +420,16 @@ async function getHybridServer(compilation) {
               routeModuleUrl: entryPointUrl.href,
               request,
               compilation: JSON.stringify(compilation),
+              props,
             });
           });
         } else {
           // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
           const { handler } = await import(entryPointUrl);
-          const response = await handler(request, compilation);
+          // we used to pass compilation here???
+          // TODO we used to pass compilation here???
+          // const response = await handler(request, compilation);
+          const response = await handler(request, props);
 
           html = Readable.from(response.body);
         }
