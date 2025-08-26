@@ -59,7 +59,6 @@ class StandardTypeScriptResource {
     }
 
     return new Response(code, {
-      statusText: "OK",
       headers: {
         "Content-Type": this.contentType,
       },

@@ -43,7 +43,7 @@ class DevProxyResource {
       }
     });
 
-    return new Response(response.body, { statusText: "OK", headers: filteredResponseHeaders });
+    return new Response(response.body, { headers: filteredResponseHeaders });
   }
 }
 

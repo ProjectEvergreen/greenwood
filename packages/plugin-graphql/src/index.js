@@ -35,7 +35,6 @@ class GraphQLResource {
     `;
 
     return new Response(body, {
-      statusText: "OK",
       headers: new Headers({
         "Content-Type": this.contentType[0],
       }),
