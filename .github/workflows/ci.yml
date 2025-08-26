@@ -39,4 +39,5 @@ jobs:
         run: |
           yarn clean && yarn build
       - name: CLI arg parsing tests
-        run: yarn test:bin
+        run: |
+          yarn test:bin
