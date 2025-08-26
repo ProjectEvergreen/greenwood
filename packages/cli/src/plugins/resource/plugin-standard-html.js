@@ -28,7 +28,7 @@ class StandardHtmlResource {
     );
   }
 
-  async serve(url, request, response) {
+  async serve(url, request) {
     const { config, context } = this.compilation;
     const { userWorkspace } = context;
     const { pathname } = url;
@@ -39,18 +39,13 @@ class StandardHtmlResource {
       !matchingRoute.external && pageHref
         ? new URL(pageHref).pathname.replace(userWorkspace.pathname, "./")
         : "";
-    const t = await response.clone()?.text();
-    const initContents = t ?? "";
     const isHtmlContent = (filePath || "").split(".").pop() === "html";
     let body = "";
     let ssrBody;
     // final contents to return from the plugin
     let html = "";
 
-    // TODO better way to uniquely check for initContents
-    if (!isHtmlContent && !matchingRoute.isSSR && !matchingRoute.servePage && initContents) {
-      body = initContents;
-    } else if (isHtmlContent) {
+    if (isHtmlContent) {
       body = await fs.readFile(new URL(pageHref), "utf-8");
     } else if (matchingRoute.servePage === "static") {
       const customStaticPageFormatPlugins = config.plugins
