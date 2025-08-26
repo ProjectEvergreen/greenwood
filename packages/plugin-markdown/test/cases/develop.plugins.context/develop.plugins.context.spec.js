@@ -94,14 +94,12 @@ describe("Develop Greenwood With: ", function () {
         done();
       });
 
-      it("should have expected text from user workspace pages/index.html", function (done) {
+      it("should have expected text from user workspace pages/index.md", function (done) {
         const pageHeadingPrimary = dom.window.document.querySelectorAll("body h3")[0];
         const pageHeadingSecondary = dom.window.document.querySelectorAll("body h4")[0];
 
         expect(pageHeadingPrimary.textContent).to.be.equal("Context Plugin Theme Pack Test");
-        expect(pageHeadingSecondary.textContent).to.be.equal(
-          "From user workspace pages/index.html",
-        );
+        expect(pageHeadingSecondary.textContent).to.be.equal("From user workspace pages/index.md");
         done();
       });
     });
@@ -167,6 +165,6 @@ describe("Develop Greenwood With: ", function () {
 
   after(function () {
     runner.stopCommand();
-    runner.teardown([path.join(outputPath, ".greenwood")]);
+    // runner.teardown([path.join(outputPath, ".greenwood")]);
   });
 });

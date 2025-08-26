@@ -47,24 +47,26 @@ class StandardHtmlResource {
     // final contents to return from the plugin
     let html = "";
 
-    const customPageFormatPlugins = config.plugins
-      .filter((plugin) => plugin.type === "resource" && !plugin.isGreenwoodDefaultPlugin)
-      .map((plugin) => plugin.provider(this.compilation));
-    const isCustomStaticPage =
-      customPageFormatPlugins[0] &&
-      customPageFormatPlugins[0].servePage === "static" &&
-      customPageFormatPlugins[0].shouldServe &&
-      (await customPageFormatPlugins[0].shouldServe(new URL(pageHref)));
-
     // TODO better way to uniquely check for initContents
-    if (!isHtmlContent && !matchingRoute.isSSR && !isCustomStaticPage && initContents) {
+    if (!isHtmlContent && !matchingRoute.isSSR && !matchingRoute.servePage && initContents) {
       body = initContents;
     } else if (isHtmlContent) {
       body = await fs.readFile(new URL(pageHref), "utf-8");
-    } else if (isCustomStaticPage) {
-      const transformed = await customPageFormatPlugins[0].serve(new URL(pageHref));
+    } else if (matchingRoute.servePage === "static") {
+      const customStaticPageFormatPlugins = config.plugins
+        .filter((plugin) => plugin.type === "resource" && !plugin.isGreenwoodDefaultPlugin)
+        .map((plugin) => plugin.provider(this.compilation))
+        .filter((plugin) => plugin.servePage === "static");
 
-      body = await transformed.text();
+      for (const plugin of customStaticPageFormatPlugins) {
+        if (await plugin.shouldServe(url, request)) {
+          const response = await plugin.serve(url, request);
+
+          body = await response.text();
+
+          break;
+        }
+      }
     } else if (matchingRoute.isSSR) {
       const routeModuleLocationUrl = new URL(pageHref);
       const routeWorkerUrl = this.compilation.config.plugins

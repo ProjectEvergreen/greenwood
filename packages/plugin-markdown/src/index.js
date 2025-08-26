@@ -55,7 +55,7 @@ class MarkdownResource {
     this.options = options;
   }
 
-  async shouldPreServe(url) {
+  async shouldServe(url) {
     const { protocol, pathname } = url;
     const hasMatchingPageRoute = this.compilation.graph.find((node) => node.route === pathname);
 
@@ -67,7 +67,7 @@ class MarkdownResource {
     );
   }
 
-  async preServe(url) {
+  async serve(url) {
     const { pathname } = url;
     const matchingPageRoute = this.compilation.graph.find((node) => node.route === pathname);
     const markdownContents = await fs.readFile(new URL(matchingPageRoute.pageHref), "utf-8");
