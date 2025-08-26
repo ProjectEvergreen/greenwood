@@ -121,7 +121,6 @@ class StandardHtmlResource {
     html = await getGreenwoodScripts(html, this.compilation);
 
     return new Response(html, {
-      statusText: "OK",
       headers: new Headers({
         "Content-Type": this.contentType,
       }),

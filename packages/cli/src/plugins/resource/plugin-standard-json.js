@@ -26,7 +26,6 @@ class StandardJsonResource {
     const contents = await fs.readFile(url, "utf-8");
 
     return new Response(contents, {
-      statusText: "OK",
       headers: new Headers({
         "Content-Type": this.contentType,
       }),

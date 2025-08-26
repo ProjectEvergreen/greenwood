@@ -64,7 +64,6 @@ class ContentAsDataResource {
 
     return new Response(JSON.stringify(pruneGraph(body)), {
       status,
-      statusText: "OK",
       headers: new Headers({
         "Content-Type": "application/json",
       }),
