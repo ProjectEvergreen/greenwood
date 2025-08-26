@@ -26,7 +26,6 @@ class StandardFontResource {
     const body = await fs.readFile(url);
 
     return new Response(body, {
-      statusText: "OK",
       headers: new Headers({
         "Content-Type": contentType,
       }),

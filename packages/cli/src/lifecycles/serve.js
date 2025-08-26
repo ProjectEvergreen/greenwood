@@ -53,14 +53,10 @@ async function getDevServer(compilation) {
   app.use(async (ctx, next) => {
     try {
       const url = new URL(ctx.url);
-      const { header, status, message } = ctx.response;
+      const { status } = ctx.response;
       const request = transformKoaRequestIntoStandardRequest(url, ctx.request);
       // intentionally ignore initial statusText to avoid false positives from 404s
-      let response = new Response(status === 204 ? null : ctx.body, {
-        statusText: message,
-        status,
-        headers: new Headers(header),
-      }).clone();
+      let response = new Response(null, { status });
 
       for (const plugin of resourcePlugins) {
         // ignore plugins that serve pages, as those will be handled by Greenwood's standard HTML plugin

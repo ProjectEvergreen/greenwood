@@ -19,7 +19,6 @@ class FooResource {
     body = body.replace(/interface (.*){(.*)}/s, "");
 
     return new Response(body, {
-      statusText: "OK",
       headers: new Headers({
         "Content-Type": this.contentType,
       }),
