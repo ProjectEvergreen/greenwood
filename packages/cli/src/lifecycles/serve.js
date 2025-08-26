@@ -49,46 +49,6 @@ async function getDevServer(compilation) {
     await next();
   });
 
-  // allow pre-serving of userland plugins _before_ Greenwood "standardizes" the transformation
-  app.use(async (ctx, next) => {
-    try {
-      const url = new URL(ctx.url);
-      const { header, status, message } = ctx.response;
-      const request = transformKoaRequestIntoStandardRequest(url, ctx.request);
-      let response = new Response(ctx.body, {
-        statusText: message,
-        status,
-        headers: new Headers(header),
-      });
-
-      for (const plugin of resourcePlugins) {
-        if (plugin.shouldPreServe && (await plugin.shouldPreServe(url, request))) {
-          const current = await plugin.preServe(url, request);
-          const merged = mergeResponse(response.clone(), current.clone());
-
-          response = merged.clone();
-        }
-      }
-
-      ctx.body = response.body ? Readable.from(response.body) : null;
-      ctx.status = response.status;
-      ctx.message = response.status === 404 ? "Not Found" : response.statusText;
-      response.headers.forEach((value, key) => {
-        ctx.set(key, value);
-      });
-
-      // for some reason Koa is overriding this to be application/json
-      if (response.status === 404) {
-        ctx.set("Content-Type", "text/plain; charset=utf-8");
-      }
-    } catch (e) {
-      ctx.status = 500;
-      console.error(e);
-    }
-
-    await next();
-  });
-
   // handle serving responses from urls
   app.use(async (ctx, next) => {
     try {
@@ -103,7 +63,12 @@ async function getDevServer(compilation) {
       });
 
       for (const plugin of resourcePlugins) {
-        if (plugin.shouldServe && (await plugin.shouldServe(url, request, response.clone()))) {
+        // ignore plugins that serve pages, as those will be handled by Greenwood's standard HTML plugin
+        if (
+          !plugin.servePage &&
+          plugin.shouldServe &&
+          (await plugin.shouldServe(url, request, response.clone()))
+        ) {
           const current = await plugin.serve(url, request, response.clone());
           const merged = mergeResponse(response.clone(), current.clone());
 

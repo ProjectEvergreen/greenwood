@@ -84,7 +84,7 @@ const generateGraph = async (compilation) => {
         let isCustom = null;
 
         for (const plugin of customPageFormatPlugins) {
-          if (plugin.servePage) {
+          if (plugin?.servePage) {
             isCustom = plugin.servePage;
             break;
           }
