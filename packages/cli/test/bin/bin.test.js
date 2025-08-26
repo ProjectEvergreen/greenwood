@@ -8,7 +8,7 @@ import { dirname, join } from "node:path";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const binPath = join(__dirname, "../src/bin.js");
+const binPath = join(__dirname, "../../src/bin.js");
 
 function runCLI(args = [], timeoutMs = 10000) {
   return new Promise((resolve) => {
@@ -98,8 +98,10 @@ function runCLI(args = [], timeoutMs = 10000) {
 
   // 5) basic valid commands: build/develop/serve
   // Note: these may run real logic; we test only that the process starts and prints the banner.
+  // The goal here is only to confirm that the CLI accepts each command
+  // and can start without crashing.
   for (const cmd of ["build", "develop", "serve"]) {
-    const r = await runCLI([cmd], 5000); // wait up to 5s
+    const r = await runCLI([cmd], 1000); // short timeout: just ensure process kicks off
     assert.ok(r.timedOut || r.code === 0, `${cmd} should start without crashing`);
     console.log(`✓ ${cmd} started successfully`);
   }

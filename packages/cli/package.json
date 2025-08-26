@@ -46,9 +46,6 @@
   "publishConfig": {
     "access": "public"
   },
-  "scripts": {
-    "test:cli": "node ./test/bin.parseargs.test.js"
-  },
   "dependencies": {
     "@rollup/plugin-commonjs": "^28.0.0",
     "@rollup/plugin-node-resolve": "^15.0.0",

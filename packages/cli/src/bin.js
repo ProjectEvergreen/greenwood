@@ -14,16 +14,16 @@ const banner = () => {
 };
 
 const helpText = `
-Usage: bin <script-mode> [options]
+Usage: greenwood <command>
 
 Options:
-  -V, --version    output the version number
-  -h, --help       output usage information
+  -h, --help       Show help information
+  -V, --version    Show version number
 
 Commands:
-  build            Build a static site for production.
+  build            Generate a production build.
   develop          Start a local development server.
-  serve            View a production build locally with a basic web server.
+  serve            Start a production server.
 `;
 
 const options = {
@@ -72,4 +72,4 @@ if (!Object.values(CommandsEnum).includes(command)) {
 }
 
 // valid command
-await run(command);
+run(command);
