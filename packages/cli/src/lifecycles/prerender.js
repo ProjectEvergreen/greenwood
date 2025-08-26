@@ -17,21 +17,8 @@ async function createOutputDirectory(outputDir) {
   }
 }
 
-async function preServePage(url, request, plugins) {
+async function servePage(url, request, plugins) {
   let response = new Response("");
-
-  for (const plugin of plugins) {
-    if (plugin.shouldPreServe && (await plugin.shouldPreServe(url, request))) {
-      response = await plugin.preServe(url, request);
-      break;
-    }
-  }
-
-  return response;
-}
-
-async function servePage(url, request, plugins, body = "") {
-  let response = new Response(body);
 
   for (const plugin of plugins) {
     if (plugin.shouldServe && (await plugin.shouldServe(url, request, response))) {
@@ -103,8 +90,7 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
     let ssrContents;
 
     // do we negate the worker pool by also running this, outside the pool?
-    let body = await (await preServePage(url, request, plugins)).text();
-    body = await (await servePage(url, request, plugins, body)).text();
+    let body = await (await servePage(url, request, plugins)).text();
     body = await (await interceptPage(url, request, plugins, body)).text();
 
     // hack to avoid over-rendering SSR content
