@@ -8,6 +8,7 @@ async function executeRouteModule({
   htmlContents = null,
   scripts = [],
   request,
+  props,
   contentOptions = {},
 }) {
   const data = {
@@ -23,6 +24,7 @@ async function executeRouteModule({
 
     data.html = html;
   } else {
+    console.log({ props });
     const module = await import(moduleUrl).then((module) => module);
     const { body, layout, frontmatter } = contentOptions;
     const {
@@ -35,10 +37,15 @@ async function executeRouteModule({
 
     if (body) {
       if (module.default) {
-        const { html } = await renderToString(new URL(moduleUrl), false, { request, compilation });
+        const { html } = await renderToString(new URL(moduleUrl), false, {
+          request,
+          compilation,
+          props,
+        });
 
         data.body = html;
       } else if (getBody) {
+        // TODO do we need to pass props here too?
         data.body = await getBody(compilation, page, request);
       }
     }
