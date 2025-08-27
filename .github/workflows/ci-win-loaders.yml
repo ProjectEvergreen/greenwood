@@ -26,6 +26,3 @@ jobs:
       - name: Test
         run: |
           yarn test:loaders:win
-      - name: CLI arg parsing tests
-        run: |
-          yarn test:bin

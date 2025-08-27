@@ -7,11 +7,9 @@ const greenwoodPackageJson = (
   await import(new URL("../package.json", import.meta.url), { with: { type: "json" } })
 ).default;
 
-const banner = () => {
-  console.info("-------------------------------------------------------");
-  console.info(`Welcome to Greenwood (v${greenwoodPackageJson.version}) ♻️`);
-  console.info("-------------------------------------------------------");
-};
+console.info("-------------------------------------------------------");
+console.info(`Welcome to Greenwood (v${greenwoodPackageJson.version}) ♻️`);
+console.info("-------------------------------------------------------");
 
 const helpText = `
 Usage: greenwood <command>
@@ -26,50 +24,36 @@ Commands:
   serve            Start a production server.
 `;
 
-const options = {
+const config = {
   options: {
     help: { type: "boolean", short: "h" },
     version: { type: "boolean", short: "V" },
   },
   allowPositionals: true,
-  stopAtPositional: true,
 };
 
-const CommandsEnum = {
-  BUILD: "build",
-  DEVELOP: "develop",
-  SERVE: "serve",
-};
-
-banner();
-
-const { values, positionals } = parseArgs(options);
+const { values, positionals } = parseArgs(config);
 const command = positionals[0];
 
-// --help
 if (values.help) {
   console.log(helpText);
   process.exit(0);
 }
 
-// --version
 if (values.version) {
   console.log(greenwoodPackageJson.version);
   process.exit(0);
 }
 
-// no command -> show help
 if (!command) {
   console.log(helpText);
   process.exit(0);
 }
 
-// unknown command
-if (!Object.values(CommandsEnum).includes(command)) {
+if (!["build", "develop", "serve"].includes(command)) {
   console.error(`Unknown command: ${command}`);
   console.log(helpText);
   process.exit(1);
 }
 
-// valid command
 run(command);
