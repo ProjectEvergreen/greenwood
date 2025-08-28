@@ -1,56 +1,59 @@
 #!/usr/bin/env node
 
-import program from "commander";
+import { parseArgs } from "node:util";
 import { run } from "./index.js";
 
 const greenwoodPackageJson = (
   await import(new URL("../package.json", import.meta.url), { with: { type: "json" } })
 ).default;
 
-let command = "";
-
 console.info("-------------------------------------------------------");
 console.info(`Welcome to Greenwood (v${greenwoodPackageJson.version}) ♻️`);
 console.info("-------------------------------------------------------");
 
-program
-  .version(greenwoodPackageJson.version)
-  .arguments("<script-mode>")
-  .usage("<script-mode> [options]");
+const helpText = `
+Usage: greenwood <command>
 
-program
-  .command("build")
-  .description("Build a static site for production.")
-  .action((cmd) => {
-    command = cmd._name;
-  });
+Options:
+  -h, --help       Show help information
+  -V, --version    Show version number
 
-program
-  .command("develop")
-  .description("Start a local development server.")
-  .action((cmd) => {
-    command = cmd._name;
-  });
+Commands:
+  build            Generate a production build.
+  develop          Start a local development server.
+  serve            Start a production server.
+`;
 
-program
-  .command("serve")
-  .description("View a production build locally with a basic web server.")
-  .action((cmd) => {
-    command = cmd._name;
-  });
+const config = {
+  options: {
+    help: { type: "boolean", short: "h" },
+    version: { type: "boolean", short: "V" },
+  },
+  allowPositionals: true,
+};
 
-program
-  .command("eject")
-  .option("-a, --all", "eject all configurations including babel, postcss, browserslistrc")
-  .description("Eject greenwood configurations.")
-  .action((cmd) => {
-    command = cmd._name;
-  });
+const { values, positionals } = parseArgs(config);
+const command = positionals[0];
 
-program.parse(process.argv);
+if (values.help) {
+  console.log(helpText);
+  process.exit(0);
+}
 
-if (program.parse.length === 0) {
-  program.help();
+if (values.version) {
+  console.log(greenwoodPackageJson.version);
+  process.exit(0);
+}
+
+if (!command) {
+  console.log(helpText);
+  process.exit(0);
+}
+
+if (!["build", "develop", "serve", "eject"].includes(command)) {
+  console.error(`Unknown command: ${command}`);
+  console.log(helpText);
+  process.exit(1);
 }
 
 run(command);
