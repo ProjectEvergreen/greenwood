@@ -185,15 +185,15 @@ describe("Initialize a new Greenwood project: ", function () {
 
       it("should have the expected getting started prompt", function () {
         expect(pageContents).to.contain(
-          "<h1>Edit <code>src/pages/index.html</code> to start making changes</h1>",
+          "<h2>Edit <code>src/pages/index.html</code> to start making changes</h2>",
         );
       });
 
       it("should have the card headings for src/pages/index.html", function () {
-        expect(pageContents).to.contain("<h2>Getting Started</h2>");
-        expect(pageContents).to.contain("<h2>Docs</h2>");
-        expect(pageContents).to.contain("<h2>Guides</h2>");
-        expect(pageContents).to.contain("<h2>Community</h2>");
+        expect(pageContents).to.contain("<h3>Getting Started</h3>");
+        expect(pageContents).to.contain("<h3>Docs</h3>");
+        expect(pageContents).to.contain("<h3>Guides</h3>");
+        expect(pageContents).to.contain("<h3>Community</h3>");
       });
 
       it("should have a <script> tag to the logo component", function () {
