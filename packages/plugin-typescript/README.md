@@ -1,5 +1,7 @@
 # @greenwood/plugin-typescript
 
+> _**THIS PACKAGE HAS BEEN DEPRECATED**.  Greenwood now has [built-in support for TypeScript](https://greenwoodjs.dev/docs/resources/typescript/).
+
 ## Overview
 
 A Greenwood plugin for writing [**TypeScript**](https://www.typescriptlang.org/). For more information and complete docs on Greenwood, please visit [our website](https://www.greenwoodjs.dev).
