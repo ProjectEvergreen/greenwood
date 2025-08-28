@@ -50,7 +50,7 @@ if (!command) {
   process.exit(0);
 }
 
-if (!["build", "develop", "serve"].includes(command)) {
+if (!["build", "develop", "serve", "eject"].includes(command)) {
   console.error(`Unknown command: ${command}`);
   console.log(helpText);
   process.exit(1);
