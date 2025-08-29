@@ -1,12 +1,9 @@
 // https://gist.github.com/hyamamoto/fd435505d29ebfa3d9716fd2be8d42f0#gistcomment-2775538
-function hashString(inputString) {
-  let h = 0;
+import { createHash } from "node:crypto";
 
-  for (let i = 0; i < inputString.length; i += 1) {
-    h = (Math.imul(31, h) + inputString.charCodeAt(i)) | 0;
-  }
-
-  return Math.abs(h).toString();
+function hashString(inputString, length = 8) {
+  const hash = createHash("md5").update(inputString).digest("hex");
+  return hash.length <= length ? hash : hash.slice(0, length);
 }
 
 export { hashString };

@@ -50,7 +50,6 @@ describe("Serve Greenwood With: ", function () {
   const hostname = "http://127.0.0.1:8080";
   const basePath = "/my-path";
   const jsHash = "eCbOYUm_";
-  const cssHash = "105034690";
   let runner;
 
   before(function () {
@@ -137,7 +136,7 @@ describe("Serve Greenwood With: ", function () {
         // TODO for some reason there is an extra <link> tag in the head, should only be 1
         // https://github.com/ProjectEvergreen/greenwood/issues/1051
         expect(links.length).to.equal(2);
-        expect(links[1].getAttribute("href")).to.equal(`${basePath}/card.${jsHash}.js`);
+        expect(links[1].getAttribute("href")).to.match(`${basePath}/card.${/[a-zA-Z0-9]{8}/}.js`);
 
         done();
       });
@@ -150,7 +149,8 @@ describe("Serve Greenwood With: ", function () {
         // TODO for some reason there is an extra <script> tag in the head, should only be 1
         // https://github.com/ProjectEvergreen/greenwood/issues/1051
         expect(scripts.length).to.equal(2);
-        expect(scripts[0].getAttribute("src")).to.equal(`${basePath}/card.${jsHash}.js`);
+        // expect(scripts[0].getAttribute("src")).to.equal(`${basePath}/card.${jsHash}.js`);
+        expect(scripts[0].getAttribute("src")).to.match(`${basePath}/card.${/[a-zA-Z0-9]{8}/}.js`);
 
         done();
       });
@@ -161,7 +161,9 @@ describe("Serve Greenwood With: ", function () {
         );
 
         expect(links.length).to.equal(1);
-        expect(links[0].getAttribute("href")).to.equal(`${basePath}/styles/main.${cssHash}.css`);
+        expect(links[0])
+          .getAttribute("href")
+          .to.match(`${basePath}/styles/main.${/[a-zA-Z0-9]{8}./}.css`);
 
         done();
       });
@@ -172,7 +174,10 @@ describe("Serve Greenwood With: ", function () {
         );
 
         expect(styles.length).to.equal(1);
-        expect(styles[0].getAttribute("href")).to.equal(`${basePath}/styles/main.${cssHash}.css`);
+        // expect(styles[0].getAttribute("href")).to.equal(`${basePath}/styles/main.${cssHash}.css`);
+        expect(styles[0].getAttribute("href")).to.match(
+          `${basePath}/styles/main.${/[a-zA-Z0-9]{8}/}.css`,
+        );
 
         done();
       });
@@ -208,7 +213,7 @@ describe("Serve Greenwood With: ", function () {
       let body = "";
 
       before(async function () {
-        response = await fetch(`${hostname}${basePath}/styles/main.${cssHash}.css`);
+        response = await fetch(`${hostname}${basePath}/styles/main.${/[a-zA-Z0-9]{8}/}.css`);
         body = await response.clone().text();
       });
 

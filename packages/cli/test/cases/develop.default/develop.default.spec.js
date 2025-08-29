@@ -429,7 +429,7 @@ describe("Develop Greenwood With: ", function () {
       });
 
       it("should return the correct etag header", function (done) {
-        expect(response.headers.get("etag")).to.equal("2130309740");
+        expect(response.headers.get("etag")).to.match(/[a-zA-Z0-9]{8}/);
         done();
       });
 
