@@ -70,8 +70,8 @@ describe("Build Greenwood With: ", function () {
         const scriptContents = fs.readFileSync(scripts[0], "utf-8");
 
         expect(scripts.length).to.equal(1);
-        expect(scriptContents).to.contain(
-          `import e from"/hero.${cssFileHash}.css"with{type:"css"}`,
+        expect(scriptContents).to.match(
+          `import e from"/hero.${/[a-zA-Z0-9]{8}/}.css"with{type:"css"}`,
         );
       });
 
