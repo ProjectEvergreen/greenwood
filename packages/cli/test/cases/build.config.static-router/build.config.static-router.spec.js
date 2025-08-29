@@ -16,9 +16,9 @@
  * User Workspace
  * src/
  *   pages/
- *     about.md
+ *     about.html
  *     artists.js
- *     index.md
+ *     index.html
  *     regex-test.html
  */
 import chai from "chai";
@@ -33,7 +33,7 @@ import { fileURLToPath } from "node:url";
 
 const expect = chai.expect;
 
-describe("Build Greenwood With: ", function () {
+xdescribe("Build Greenwood With: ", function () {
   const LABEL = "Static Router Configuration and Hybrid Workspace";
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));

@@ -16,21 +16,13 @@ async function getDevServer(compilation) {
   const app = new Koa();
   const compilationCopy = Object.assign({}, compilation);
   const resourcePlugins = [
-    // Greenwood default standard resource and import plugins
     ...compilation.config.plugins
       .filter((plugin) => {
-        return plugin.type === "resource" && plugin.isGreenwoodDefaultPlugin;
+        return plugin.type === "resource";
       })
       .map((plugin) => {
         return plugin.provider(compilationCopy);
       }),
-
-    // custom user resource plugins
-    ...compilation.config.plugins
-      .filter((plugin) => {
-        return plugin.type === "resource" && !plugin.isGreenwoodDefaultPlugin;
-      })
-      .map((plugin) => plugin.provider(compilationCopy)),
   ];
 
   app.use(koaBody());
@@ -57,7 +49,7 @@ async function getDevServer(compilation) {
     await next();
   });
 
-  // handle creating responses from urls
+  // handle serving responses from urls
   app.use(async (ctx, next) => {
     try {
       const url = new URL(ctx.url);
@@ -67,8 +59,13 @@ async function getDevServer(compilation) {
       let response = new Response(null, { status });
 
       for (const plugin of resourcePlugins) {
-        if (plugin.shouldServe && (await plugin.shouldServe(url, request))) {
-          const current = await plugin.serve(url, request);
+        // ignore plugins that serve pages, as those will be handled by Greenwood's standard HTML plugin
+        if (
+          !plugin.servePage &&
+          plugin.shouldServe &&
+          (await plugin.shouldServe(url, request, response.clone()))
+        ) {
+          const current = await plugin.serve(url, request, response.clone());
           const merged = mergeResponse(response.clone(), current.clone());
 
           response = merged.clone();
@@ -177,7 +174,7 @@ async function getDevServer(compilation) {
         statusText: message,
         status,
         headers: new Headers(header),
-      }).clone();
+      });
       const splitResponse = response.clone();
       const contents = await splitResponse.text();
       const inm = ctx.headers["if-none-match"];
@@ -250,6 +247,7 @@ async function getStaticServer(compilation, composable) {
         }
       } else {
         ctx.body = "Not Found";
+        ctx.message = "Not Found";
         ctx.status = 404;
         ctx.set("Content-Type", "text/plain");
       }
@@ -323,6 +321,7 @@ async function getStaticServer(compilation, composable) {
 
         ctx.body = body;
         ctx.status = 200;
+        ctx.message = "OK";
         ctx.set("Content-Type", "text/html");
       }
     } catch (e) {
@@ -392,6 +391,7 @@ async function getHybridServer(compilation) {
         }
 
         ctx.body = html;
+        ctx.message = "OK";
         ctx.set("Content-Type", "text/html");
         ctx.status = 200;
       } else if (isApiRoute) {

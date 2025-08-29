@@ -23,7 +23,7 @@
  *   components/
  *     footer.jsx
  *   pages/
- *     index.md
+ *     index.html
  *   layouts/
  *     app.html
  */

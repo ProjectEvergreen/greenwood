@@ -25,7 +25,7 @@
  *     one/
  *       two/
  *         three/
- *           index.md
+ *           index.html
  *     index.html
  *   layouts/
  *     app.html

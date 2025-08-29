@@ -10,6 +10,7 @@ import { greenwoodPluginImportCommonJs } from "@greenwood/plugin-import-commonjs
 import { greenwoodPluginImportJsx } from "@greenwood/plugin-import-jsx";
 import { greenwoodPluginImportRaw } from "@greenwood/plugin-import-raw";
 import { greenwoodPluginIncludeHTML } from "@greenwood/plugin-include-html";
+import { greenwoodPluginMarkdown } from "@greenwood/plugin-markdown";
 import { greenwoodPluginPolyfills } from "@greenwood/plugin-polyfills";
 import { greenwoodPluginPostCss } from "@greenwood/plugin-postcss";
 import { greenwoodPluginRendererLit } from "@greenwood/plugin-renderer-lit";
@@ -46,15 +47,6 @@ const config: Config = {
   isolation: true,
   layoutsDirectory: "/my-layouts",
   optimization: "default",
-  markdown: {
-    plugins: [
-      "@mapbox/rehype-prism",
-      {
-        name: "rehype-autolink-headings",
-        options: { behavior: "append" },
-      },
-    ],
-  },
   pagesDirectory: "/my-pages",
   plugins: [
     greenwoodPluginAdapterAws(),
@@ -68,6 +60,15 @@ const config: Config = {
     greenwoodPluginImportJsx(),
     greenwoodPluginImportRaw,
     greenwoodPluginIncludeHTML(),
+    greenwoodPluginMarkdown({
+      plugins: [
+        "@mapbox/rehype-prism",
+        {
+          name: "rehype-autolink-headings",
+          options: { behavior: "append" },
+        },
+      ],
+    }),
     greenwoodPluginPolyfills(),
     greenwoodPluginPostCss(),
     greenwoodPluginRendererLit(),

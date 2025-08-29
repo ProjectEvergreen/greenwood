@@ -16,8 +16,8 @@
  * User Workspace
  * www/
  *   pages/
- *     about.md
- *     index.md
+ *     about.html
+ *     index.html
  */
 import chai from "chai";
 import fs from "node:fs";
@@ -66,7 +66,7 @@ describe("Build Greenwood With: ", function () {
       it("should have the expected heading text within the custom about page in the about directory", function () {
         const heading = dom.window.document.querySelector("h3").textContent;
 
-        expect(heading).to.equal("Nested Custom About Page");
+        expect(heading).to.equal("Custom About Page");
       });
 
       it("should have the expected paragraph text within the custom about page in the about directory", function () {

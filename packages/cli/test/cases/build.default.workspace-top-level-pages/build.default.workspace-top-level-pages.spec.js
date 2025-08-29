@@ -15,7 +15,7 @@
  * src/
  *   pages/
  *     about.html
- *     contact.md
+ *     contact.html
  *     index.html
  */
 import chai from "chai";
