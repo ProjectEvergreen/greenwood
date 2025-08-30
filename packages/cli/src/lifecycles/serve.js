@@ -59,13 +59,8 @@ async function getDevServer(compilation) {
       let response = new Response(null, { status });
 
       for (const plugin of resourcePlugins) {
-        // ignore plugins that serve pages, as those will be handled by Greenwood's standard HTML plugin
-        if (
-          !plugin.servePage &&
-          plugin.shouldServe &&
-          (await plugin.shouldServe(url, request, response.clone()))
-        ) {
-          const current = await plugin.serve(url, request, response.clone());
+        if (!plugin.servePage && plugin.shouldServe && (await plugin.shouldServe(url, request))) {
+          const current = await plugin.serve(url, request);
           const merged = mergeResponse(response.clone(), current.clone());
 
           response = merged.clone();
@@ -98,17 +93,26 @@ async function getDevServer(compilation) {
         headers: new Headers(header),
       });
 
-      let response = initResponse;
-      for (const plugin of resourcePlugins) {
+      // we explicitly use "async" reduce here to avoid race conditions / Body consumed errors
+      // when looping through and sharing responses between plugins
+      const response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
+        const intermediateResponse = await responsePromise;
         if (
           plugin.shouldPreIntercept &&
-          (await plugin.shouldPreIntercept(url, request, response.clone()))
+          (await plugin.shouldPreIntercept(url, request, intermediateResponse.clone()))
         ) {
-          const current = await plugin.preIntercept(url, request, response.clone());
+          const current = await plugin.preIntercept(
+            url,
+            request,
+            await intermediateResponse.clone(),
+          );
+          const merged = mergeResponse(intermediateResponse.clone(), current);
 
-          response = mergeResponse(response.clone(), current.clone());
+          return Promise.resolve(merged);
+        } else {
+          return Promise.resolve(await responsePromise);
         }
-      }
+      }, Promise.resolve(initResponse.clone()));
 
       ctx.body = response.body ? Readable.from(response.body) : "";
       ctx.message = response.statusText;
@@ -135,17 +139,22 @@ async function getDevServer(compilation) {
         headers: new Headers(header),
       });
 
-      let response = initResponse;
-      for (const plugin of resourcePlugins) {
+      // we explicitly use "async" reduce here to avoid race conditions / Body consumed errors
+      // when looping through and sharing responses between plugins
+      const response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
+        const intermediateResponse = await responsePromise;
         if (
           plugin.shouldIntercept &&
-          (await plugin.shouldIntercept(url, request, response.clone()))
+          (await plugin.shouldIntercept(url, request, intermediateResponse.clone()))
         ) {
-          const current = await plugin.intercept(url, request, response.clone());
+          const current = await plugin.intercept(url, request, await intermediateResponse.clone());
+          const merged = mergeResponse(intermediateResponse.clone(), current);
 
-          response = mergeResponse(response.clone(), current.clone());
+          return Promise.resolve(merged);
+        } else {
+          return Promise.resolve(await responsePromise);
         }
-      }
+      }, Promise.resolve(initResponse.clone()));
 
       ctx.body = response.body ? Readable.from(response.body) : "";
       ctx.message = response.statusText;
@@ -174,7 +183,7 @@ async function getDevServer(compilation) {
         statusText: message,
         status,
         headers: new Headers(header),
-      });
+      }).clone();
       const splitResponse = response.clone();
       const contents = await splitResponse.text();
       const inm = ctx.headers["if-none-match"];
