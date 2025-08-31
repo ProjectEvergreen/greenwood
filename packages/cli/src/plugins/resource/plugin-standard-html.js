@@ -47,6 +47,12 @@ class StandardHtmlResource {
 
     if (isHtmlContent) {
       body = await fs.readFile(new URL(pageHref), "utf-8");
+
+      // purge frontmatter data from HTML files that only have a `<body>` tag
+      // frontmatter outside of an <html> tag will get ignored by node-html-parser
+      if(body.trim().startsWith('---')) {
+        body = body.replace(/---(.*)---/s, '');
+      }
     } else if (matchingRoute.servePage === "static") {
       const customStaticPageFormatPlugins = config.plugins
         .filter((plugin) => plugin.type === "resource" && !plugin.isGreenwoodDefaultPlugin)
