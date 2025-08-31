@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood with staticRouter setting in Greenwood to enable SPA like routing.
+ * Run Greenwood with staticRouter setting in Greenwood to enable SPA like routing with markdown pages.
  *
  * User Result
  * Should generate a bare bones Greenwood build with support for static router navigation.
@@ -16,10 +16,8 @@
  * User Workspace
  * src/
  *   pages/
- *     about.html
- *     artists.js
- *     index.html
- *     regex-test.html
+ *     about.md
+ *     index.md
  */
 import chai from "chai";
 import fs from "node:fs";
@@ -34,7 +32,7 @@ import { fileURLToPath } from "node:url";
 const expect = chai.expect;
 
 describe("Build Greenwood With: ", function () {
-  const LABEL = "Static Router Configuration and Hybrid Workspace";
+  const LABEL = "Static Router Configuration and Markdown pages";
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
   let runner;
@@ -104,7 +102,7 @@ describe("Build Greenwood With: ", function () {
       it("should have expected <greenwood-route> tags in the <body> for each page", function () {
         const routeTags = dom.window.document.querySelectorAll("body > greenwood-route");
 
-        expect(routeTags.length).to.be.equal(3);
+        expect(routeTags.length).to.be.equal(2);
       });
 
       it("should have the expected properties for each <greenwood-route> tag for the about page", function () {
@@ -135,7 +133,7 @@ describe("Build Greenwood With: ", function () {
       });
 
       it("should have the expected number of _route partials in the output directory for each page", function () {
-        expect(partials.length).to.be.equal(3);
+        expect(partials.length).to.be.equal(2);
       });
 
       it("should have the expected partial output to match the contents of the home page in the <router-outlet> tag in the <body>", function () {
@@ -161,33 +159,6 @@ describe("Build Greenwood With: ", function () {
         expect(homeRouterOutlet.innerHTML.replace(/\n/g, "").trim()).to.contain(
           homePartial.replace("<body>", "").replace("</body>", "").replace(/\n/g, "").trim(),
         );
-      });
-    });
-
-    // https://github.com/ProjectEvergreen/greenwood/pull/743
-    describe("MPA (Multi Page Application) Regex <body> Test", function () {
-      let dom;
-
-      before(async function () {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "regex-test/index.html"));
-      });
-
-      it("should not have duplicate <app-footer> custom elements", function () {
-        const footer = dom.window.document.querySelectorAll("body footer");
-
-        expect(footer.length).to.be.equal(1);
-      });
-
-      it("should not have duplicate <app-header> custom elements", function () {
-        const header = dom.window.document.querySelectorAll("body header");
-
-        expect(header.length).to.be.equal(1);
-      });
-
-      it("should only have three cards", function () {
-        const cards = dom.window.document.querySelectorAll("body app-card");
-
-        expect(cards.length).to.be.equal(3);
       });
     });
   });

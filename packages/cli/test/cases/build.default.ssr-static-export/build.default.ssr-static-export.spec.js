@@ -33,7 +33,7 @@ import { fileURLToPath } from "node:url";
 
 const expect = chai.expect;
 
-xdescribe("Build Greenwood With: ", function () {
+describe("Build Greenwood With: ", function () {
   const LABEL = "A Server Rendered Application (SSR) that is statically exported";
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));

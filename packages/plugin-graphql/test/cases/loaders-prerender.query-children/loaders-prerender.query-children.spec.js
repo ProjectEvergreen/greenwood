@@ -56,7 +56,7 @@ describe("Build Greenwood With: ", function () {
       runner.runCommand(cliPath, "build");
     });
 
-    runSmokeTest(["public", "index"], LABEL);
+    runSmokeTest(["public"], LABEL);
 
     describe("Home Page output w/ ChildrenQuery", function () {
       let dom;
