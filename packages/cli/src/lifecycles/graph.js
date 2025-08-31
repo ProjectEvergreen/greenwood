@@ -26,7 +26,7 @@ function getLabelFromRoute(_route) {
 }
 
 function getIdFromRelativePathPath(relativePathPath, extension) {
-  return relativePathPath.replace(extension, "").replace("./", "").replace(/\//g, "-");
+  return relativePathPath.replace(`.${extension}`, "").replace("./", "").replace(/\//g, "-");
 }
 
 function trackCollectionsForPage(page, collections) {
@@ -78,26 +78,26 @@ const generateGraph = async (compilation) => {
         pages = nextPages.pages;
         apiRoutes = nextPages.apiRoutes;
       } else {
-        const extension = `.${filenameUrl.pathname.split(".").pop()}`;
+        const extension = `${filenameUrl.pathname.split(".").pop()}`;
         const relativePagePath = filenameUrl.pathname.replace(pagesDir.pathname, "./");
         const isApiRoute = relativePagePath.startsWith("./api");
         let isCustom = null;
 
         for (const plugin of customPageFormatPlugins) {
-          if (plugin?.servePage) {
+          if (plugin.servePage && plugin.extensions.includes(extension)) {
             isCustom = plugin.servePage;
             break;
           }
         }
 
-        const isStatic = isCustom === "static" || extension === ".html";
-        const isDynamic = isCustom === "dynamic" || extension === ".js" || extension === ".ts";
+        const isStatic = isCustom === "static" || extension === "html";
+        const isDynamic = isCustom === "dynamic" || extension === "js" || extension === "ts";
         const isPage = isStatic || isDynamic;
-        let route = `${relativePagePath.replace(".", "").replace(`${extension}`, "")}`;
+        let route = `${relativePagePath.replace(".", "").replace(`.${extension}`, "")}`;
         let fileContents;
 
         if (isApiRoute) {
-          if (extension !== ".js" && extension !== ".ts" && !isCustom) {
+          if (extension !== "js" && extension !== "ts" && !isCustom) {
             console.warn(`${filenameUrl} is not a supported API file extension, skipping...`);
             return;
           }
@@ -119,12 +119,14 @@ const generateGraph = async (compilation) => {
               getIdFromRelativePathPath(relativePagePath, extension).replace("api-", ""),
             ),
             pageHref: new URL(relativePagePath, pagesDir).href,
-            outputHref: new URL(relativePagePath, outputDir).href.replace(extension, ".js"),
+            outputHref: new URL(relativePagePath, outputDir).href.replace(`.${extension}`, ".js"),
             route: `${basePath}${route}`,
             isolation,
           });
         } else if (isPage) {
-          let root = filename.split("/")[filename.split("/").length - 1].replace(extension, "");
+          let root = filename
+            .split("/")
+            [filename.split("/").length - 1].replace(`.${extension}`, "");
           // should we even have a default page layout?
           // https://github.com/ProjectEvergreen/greenwood/issues/1271
           let layout = "page";

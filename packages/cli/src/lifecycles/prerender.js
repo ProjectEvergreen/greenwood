@@ -21,8 +21,8 @@ async function servePage(url, request, plugins) {
   let response = new Response("");
 
   for (const plugin of plugins) {
-    if (plugin.shouldServe && (await plugin.shouldServe(url, request, response))) {
-      response = await plugin.serve(url, request, response);
+    if (plugin.shouldServe && (await plugin.shouldServe(url, request))) {
+      response = await plugin.serve(url, request);
       break;
     }
   }

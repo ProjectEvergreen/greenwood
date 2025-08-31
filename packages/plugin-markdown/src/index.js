@@ -11,7 +11,7 @@ import { unified } from "unified";
 // https://github.com/ProjectEvergreen/greenwood/issues/1278
 let allHeadingsTracked = false;
 
-const PLUGIN_EXTENSION = ".md";
+const PLUGIN_EXTENSION = "md";
 
 async function trackAllTocHeadings(compilation) {
   for (const idx in compilation.graph) {
@@ -56,15 +56,10 @@ class MarkdownResource {
   }
 
   async shouldServe(url) {
-    const { protocol, pathname } = url;
+    const { pathname } = url;
     const hasMatchingPageRoute = this.compilation.graph.find((node) => node.route === pathname);
 
-    return (
-      protocol.startsWith("http") &&
-      hasMatchingPageRoute &&
-      hasMatchingPageRoute.pageHref &&
-      hasMatchingPageRoute.pageHref.endsWith(this.extensions[0])
-    );
+    return hasMatchingPageRoute?.pageHref?.endsWith(`.${PLUGIN_EXTENSION}`);
   }
 
   async serve(url) {
