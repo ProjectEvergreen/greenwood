@@ -2,6 +2,7 @@ import fs from "node:fs/promises";
 import toc from "markdown-toc";
 import rehypeStringify from "rehype-stringify";
 import rehypeRaw from "rehype-raw";
+import remarkFrontmatter from "remark-frontmatter";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
@@ -85,6 +86,7 @@ class MarkdownResource {
 
     processedMarkdown = await unified()
       .use(remarkParse) // parse markdown into AST
+      .use(remarkFrontmatter) // extract frontmatter out of the AST
       .use(remarkPlugins) // apply userland remark plugins
       .use(remarkRehype, { allowDangerousHtml: true }) // convert from markdown to HTML AST
       .use(rehypeRaw) // support mixed HTML in markdown
