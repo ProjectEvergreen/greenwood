@@ -87,9 +87,7 @@ class StaticRouterResource {
       .map((page) => {
         const { layout, route } = page;
         const key =
-          route === "/"
-            ? ""
-            : route.slice(0, route.lastIndexOf("/")).replace(basePath, "");
+          route === "/" ? "" : route.slice(0, route.lastIndexOf("/")).replace(basePath, "");
 
         if (pathname === route) {
           currentLayout = layout;

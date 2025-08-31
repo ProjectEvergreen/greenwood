@@ -11,7 +11,12 @@
  * User Config
  * devServer: {
  *   basePath: '/my-path',
- *   staticRouter: true
+ *   staticRouter: true,
+ *   devServer: {
+ *     proxy: {
+ *       "/posts": "https://jsonplaceholder.typicode.com",
+ *     },
+ *   },
  * }
  *
  * User Workspace
@@ -42,7 +47,7 @@ import { fileURLToPath } from "node:url";
 
 const expect = chai.expect;
 
-xdescribe("Serve Greenwood With: ", function () {
+describe("Serve Greenwood With: ", function () {
   const LABEL = "Base Path Configuration";
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
@@ -292,7 +297,7 @@ xdescribe("Serve Greenwood With: ", function () {
 
         expect(routerScriptTags.length).to.be.equal(1);
         expect(routerScriptTags[0].textContent.replace(/ /g, "").replace(/\n/g, "")).to.contain(
-          `window.__greenwood=window.__greenwood||{};window.__greenwood.currentLayout="${basePath}/"`,
+          `window.__greenwood=window.__greenwood||{};window.__greenwood.currentLayout="page"`,
         );
       });
 
@@ -326,7 +331,7 @@ xdescribe("Serve Greenwood With: ", function () {
         const dataset = aboutRouteTag[0].dataset;
 
         expect(aboutRouteTag.length).to.be.equal(1);
-        expect(dataset.layout).to.be.equal(`${basePath}/`);
+        expect(dataset.layout).to.be.equal("page");
         expect(dataset.key).to.be.equal(`${basePath}/_routes/index.html`);
       });
 
