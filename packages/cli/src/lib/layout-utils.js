@@ -229,7 +229,9 @@ async function mergeContentIntoLayout(
             : childRoot.querySelector("html") && childBody
               ? childBody
               : !childRoot.querySelector("html")
-                ? childContents
+                ? childRoot.querySelector("body")
+                  ? childBody
+                  : childContents
                 : "";
 
     // we wrap SSR content in comments so we can extract it during prerendering to avoid double pre-rendering

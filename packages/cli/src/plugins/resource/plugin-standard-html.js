@@ -50,8 +50,8 @@ class StandardHtmlResource {
 
       // purge frontmatter data from HTML files that only have a `<body>` tag
       // frontmatter outside of an <html> tag will get ignored by node-html-parser
-      if(body.trim().startsWith('---')) {
-        body = body.replace(/---(.*)---/s, '');
+      if (body.trim().startsWith("---")) {
+        body = body.replace(/---(.*)---/s, "");
       }
     } else if (matchingRoute.servePage === "static") {
       const customStaticPageFormatPlugins = config.plugins
