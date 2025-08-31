@@ -2,7 +2,6 @@ import fs from "node:fs/promises";
 import toc from "markdown-toc";
 import rehypeStringify from "rehype-stringify";
 import rehypeRaw from "rehype-raw";
-import remarkFrontmatter from "remark-frontmatter";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
@@ -86,8 +85,6 @@ class MarkdownResource {
 
     processedMarkdown = await unified()
       .use(remarkParse) // parse markdown into AST
-      // TODO do we even need this plugin anymore?
-      .use(remarkFrontmatter) // extract frontmatter from AST
       .use(remarkPlugins) // apply userland remark plugins
       .use(remarkRehype, { allowDangerousHtml: true }) // convert from markdown to HTML AST
       .use(rehypeRaw) // support mixed HTML in markdown
