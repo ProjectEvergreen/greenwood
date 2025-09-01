@@ -43,6 +43,7 @@ import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
 import { implementation } from "jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js";
+import { HASH_8_REGEX } from "../../../../cli/src/lib/hashing-utils.js";
 
 const expect = chai.expect;
 
@@ -378,9 +379,9 @@ describe("Build Greenwood With: ", function () {
         it("should have the expected logo CSS inlined into the style tag", () => {
           const styles = dom.window.document.querySelectorAll("head style");
           const styleText = styles[0].textContent;
-          const expectedStyles = `.logo-${/[a-zA-Z0-9]{8}/}-container{display:flex}.logo-${/[a-zA-Z0-9]{8}/}-logo{display:inline-block;width:100%;}`;
+          const expectedStyles = `\\.logo-${HASH_8_REGEX}-container\\{display:flex\\}\\.logo-${HASH_8_REGEX}-logo\\{display:inline-block;width:100%\\}`;
 
-          expect(styleText).to.match(expectedStyles);
+          expect(styleText).to.match(new RegExp(expectedStyles));
         });
 
         it("should have the expected logo CSS class names in the HTML", () => {

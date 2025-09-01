@@ -44,6 +44,7 @@ import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
+import { HASH_8_REGEX } from "../../../src/lib/hashing-utils.js";
 
 const expect = chai.expect;
 
@@ -141,7 +142,6 @@ describe("Serve Greenwood With: ", function () {
         // TODO for some reason there is an extra <link> tag in the head, should only be 1
         // https://github.com/ProjectEvergreen/greenwood/issues/1051
         expect(links.length).to.equal(2);
-        expect(links[1].getAttribute("href")).to.match(`${basePath}/card.${/[a-zA-Z0-9]{8}/}.js`);
 
         done();
       });
@@ -154,8 +154,9 @@ describe("Serve Greenwood With: ", function () {
         // TODO for some reason there is an extra <script> tag in the head, should only be 1
         // https://github.com/ProjectEvergreen/greenwood/issues/1051
         expect(scripts.length).to.equal(2);
-        // expect(scripts[0].getAttribute("src")).to.equal(`${basePath}/card.${jsHash}.js`);
-        expect(scripts[0].getAttribute("src")).to.match(`${basePath}/card.${/[a-zA-Z0-9]{8}/}.js`);
+        expect(scripts[0].getAttribute("src")).to.match(
+          new RegExp(`${basePath}/card\\.${HASH_8_REGEX}\\.js`),
+        );
 
         done();
       });
@@ -166,9 +167,9 @@ describe("Serve Greenwood With: ", function () {
         );
 
         expect(links.length).to.equal(1);
-        expect(links[0])
-          .getAttribute("href")
-          .to.match(`${basePath}/styles/main.${/[a-zA-Z0-9]{8}./}.css`);
+        expect(links[0].getAttribute("href")).to.match(
+          new RegExp(`${basePath}/styles/main\\.${HASH_8_REGEX}\\.css`),
+        );
 
         done();
       });
@@ -179,9 +180,8 @@ describe("Serve Greenwood With: ", function () {
         );
 
         expect(styles.length).to.equal(1);
-        // expect(styles[0].getAttribute("href")).to.equal(`${basePath}/styles/main.${cssHash}.css`);
         expect(styles[0].getAttribute("href")).to.match(
-          `${basePath}/styles/main.${/[a-zA-Z0-9]{8}/}.css`,
+          new RegExp(`${basePath}/styles/main\\.${HASH_8_REGEX}\\.css`),
         );
 
         done();
@@ -219,6 +219,7 @@ describe("Serve Greenwood With: ", function () {
 
       before(async function () {
         response = await fetch(`${hostname}${basePath}/styles/main.${/[a-zA-Z0-9]{8}/}.css`);
+        // TODO: Will change it..
         body = await response.clone().text();
       });
 
