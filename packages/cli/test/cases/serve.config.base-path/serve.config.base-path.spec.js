@@ -214,7 +214,6 @@ describe("Serve Greenwood With: ", function () {
 
       before(async function () {
         response = await fetch(`${hostname}${basePath}/styles/main.${/[a-zA-Z0-9]{8}/}.css`);
-        // TODO: Will change it..
         body = await response.clone().text();
       });
 

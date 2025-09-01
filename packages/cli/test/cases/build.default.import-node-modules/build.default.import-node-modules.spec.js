@@ -121,7 +121,7 @@ describe("Build Greenwood With: ", function () {
 
         expect(inlineScriptTag.textContent.replace(/\n/g, "")).to.match(
           new RegExp(
-            `import"/\\d{9}\\.${HASH_8_REGEX}\\.js";import"/lit-html\\.${HASH_8_REGEX}\\.js";//# sourceMappingURL=\\d{9}\\.${HASH_8_REGEX}\\.js\\.map`,
+            `import"/\\${HASH_8_REGEX}\\.${HASH_8_REGEX}\\.js";import"/lit-html\\.${HASH_8_REGEX}\\.js";//# sourceMappingURL=\\${HASH_8_REGEX}\\.${HASH_8_REGEX}\\.js\\.map`,
           ),
         );
       });
