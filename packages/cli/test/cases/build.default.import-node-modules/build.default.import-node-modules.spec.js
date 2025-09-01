@@ -29,6 +29,7 @@ import path from "node:path";
 import { getOutputTeardownFiles, getDependencyFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
+import { HASH_8_REGEX } from "../../../src/lib/hashing-utils.js";
 
 const expect = chai.expect;
 
@@ -119,7 +120,9 @@ describe("Build Greenwood With: ", function () {
         ).filter((tag) => !tag.getAttribute("data-gwd"))[0];
 
         expect(inlineScriptTag.textContent.replace(/\n/g, "")).to.match(
-          `import"/${/[a-zA-Z0-9]{8}/}.dlaVsmnb.js";import"/lit-html.CYd3Xodq.js";//# sourceMappingURL=${/[a-zA-Z0-9]{8}/}.BFJXtrkH.js.map`,
+          new RegExp(
+            `import"/\\d{9}\\.${HASH_8_REGEX}\\.js";import"/lit-html\\.${HASH_8_REGEX}\\.js";//# sourceMappingURL=\\d{9}\\.${HASH_8_REGEX}\\.js\\.map`,
+          ),
         );
       });
     });

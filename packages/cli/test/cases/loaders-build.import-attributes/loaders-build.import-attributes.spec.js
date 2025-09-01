@@ -29,6 +29,7 @@ import path from "node:path";
 import { Runner } from "gallinago";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { fileURLToPath } from "node:url";
+import { HASH_8_REGEX } from "../../../src/lib/hashing-utils.js";
 
 const expect = chai.expect;
 
@@ -66,7 +67,7 @@ describe("Build Greenwood With: ", function () {
 
         expect(scripts.length).to.equal(1);
         expect(scriptContents).to.match(
-          /import r from"\/styles\/theme\.([a-zA-Z0-9]{8}.)\.css"with{type:"css"};/,
+          new RegExp(`import r from"/styles/theme\\.${HASH_8_REGEX}\\.css"with\\{type:"css"\\};`),
         );
       });
 
@@ -75,7 +76,7 @@ describe("Build Greenwood With: ", function () {
 
         expect(scripts.length).to.equal(1);
         expect(scriptContents).to.match(
-          /import a from"\/card\.([a-zA-Z0-9-]{8})\.css"with{type:"css"};/,
+          new RegExp(`import a from"/card\\.${HASH_8_REGEX}\\.css"with\\{type:"css"\\};`),
         );
       });
 
