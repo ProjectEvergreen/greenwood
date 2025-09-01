@@ -106,7 +106,7 @@ async function getDevServer(compilation) {
         ) {
           const current = await plugin.preIntercept(url, request, response.clone());
 
-          response = mergeResponse(response.clone(), current.clone());
+          response = mergeResponse(response.clone(), current.clone()).clone();
         }
       }
 
@@ -143,7 +143,7 @@ async function getDevServer(compilation) {
         ) {
           const current = await plugin.intercept(url, request, response.clone());
 
-          response = mergeResponse(response.clone(), current.clone());
+          response = mergeResponse(response.clone(), current.clone()).clone();
         }
       }
 

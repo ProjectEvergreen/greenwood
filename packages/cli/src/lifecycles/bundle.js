@@ -43,7 +43,10 @@ async function optimizePage(url, plugins, body) {
 
   for (const plugin of plugins) {
     if (plugin.shouldOptimize && (await plugin.shouldOptimize(url, response.clone()))) {
-      response = mergeResponse(response.clone(), await plugin.optimize(url, response.clone()));
+      response = mergeResponse(
+        response.clone(),
+        (await plugin.optimize(url, response.clone())).clone(),
+      ).clone();
     }
   }
 
@@ -142,7 +145,7 @@ async function optimizeStaticPages(compilation, plugins) {
       if (plugin.shouldOptimize && (await plugin.shouldOptimize(url, response.clone()))) {
         const currentResponse = await plugin.optimize(url, response.clone());
 
-        response = mergeResponse(response.clone(), currentResponse.clone());
+        response = mergeResponse(response.clone(), currentResponse.clone()).clone();
       }
     }
 
@@ -206,7 +209,7 @@ async function bundleStyleResources(compilation, resourcePlugins) {
 
         if (shouldServe) {
           const currentResponse = await plugin.serve(url, request);
-          const mergedResponse = mergeResponse(response.clone(), currentResponse.clone());
+          const mergedResponse = mergeResponse(response.clone(), currentResponse.clone()).clone();
 
           if (mergedResponse.headers.get("Content-Type").indexOf(contentType) >= 0) {
             response = mergedResponse.clone();
@@ -221,7 +224,7 @@ async function bundleStyleResources(compilation, resourcePlugins) {
 
         if (shouldPreIntercept) {
           const currentResponse = await plugin.preIntercept(url, request, response.clone());
-          const mergedResponse = mergeResponse(response.clone(), currentResponse.clone());
+          const mergedResponse = mergeResponse(response.clone(), currentResponse.clone()).clone();
 
           if (mergedResponse.headers.get("Content-Type").indexOf(contentType) >= 0) {
             response = mergedResponse.clone();

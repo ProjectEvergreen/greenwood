@@ -48,7 +48,10 @@ async function getCustomLoaderResponse(initUrl, checkOnly = false) {
       shouldHandle = true;
 
       if (!checkOnly) {
-        response = mergeResponse(response, await plugin.serve(initUrl, request));
+        response = mergeResponse(
+          response.clone(),
+          (await plugin.serve(initUrl, request)).clone(),
+        ).clone();
       }
     }
   }
@@ -56,23 +59,29 @@ async function getCustomLoaderResponse(initUrl, checkOnly = false) {
   for (const plugin of resourcePlugins) {
     if (
       plugin.shouldPreIntercept &&
-      (await plugin.shouldPreIntercept(url, request, response.clone()))
+      (await plugin.shouldPreIntercept(url, request.clone(), response.clone()))
     ) {
       shouldHandle = true;
 
       if (!checkOnly) {
         response = mergeResponse(
-          response,
-          await plugin.preIntercept(url, request, response.clone()),
-        );
+          response.clone(),
+          (await plugin.preIntercept(url, request.clone(), response.clone())).clone(),
+        ).clone();
       }
     }
 
-    if (plugin.shouldIntercept && (await plugin.shouldIntercept(url, request, response.clone()))) {
+    if (
+      plugin.shouldIntercept &&
+      (await plugin.shouldIntercept(url, request.clone(), response.clone()))
+    ) {
       shouldHandle = true;
 
       if (!checkOnly) {
-        response = mergeResponse(response, await plugin.intercept(url, request, response.clone()));
+        response = mergeResponse(
+          response.clone(),
+          (await plugin.intercept(url, request.clone(), response.clone())).clone(),
+        ).clone();
       }
     }
   }
