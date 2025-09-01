@@ -59,6 +59,7 @@ async function getDevServer(compilation) {
       let response = new Response(null, { status });
 
       const pluginNames = [];
+      const wasUsed = [];
 
       for (const plugin of resourcePlugins) {
         // ignore plugins that serve pages, as those will be handled by Greenwood's standard HTML plugin
@@ -68,13 +69,14 @@ async function getDevServer(compilation) {
           (await plugin.shouldServe(url, request, response.clone()))
         ) {
           pluginNames.push(plugin.constructor.name);
+          wasUsed.push(response.wasUsed);
           try {
             const current = await plugin.serve(url, request, response.clone());
             const merged = mergeResponse(response.clone(), current.clone());
 
             response = merged.clone();
           } catch (err) {
-            console.log("Error!", pluginNames, ctx.body, err);
+            console.log("Error!", pluginNames, wasUsed, err);
             throw err;
           }
         }
