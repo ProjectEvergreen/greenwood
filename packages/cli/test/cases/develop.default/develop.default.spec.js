@@ -56,8 +56,7 @@ import { fileURLToPath } from "node:url";
 
 const expect = chai.expect;
 
-// eslint-disable-next-line no-only-tests/no-only-tests
-describe.only("Develop Greenwood With: ", function () {
+describe("Develop Greenwood With: ", function () {
   const LABEL = "Default Greenwood Configuration and Workspace";
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
