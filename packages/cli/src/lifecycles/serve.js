@@ -71,7 +71,9 @@ async function getDevServer(compilation) {
           pluginNames.push(plugin.constructor.name);
           wasUsed.push(response.bodyUsed);
           try {
-            const current = await plugin.serve(url, request, await response.clone());
+            const newLocal = response.clone();
+            wasUsed.push(response.bodyUsed);
+            const current = await plugin.serve(url, request, newLocal);
             wasUsed.push(response.bodyUsed);
             const merged = mergeResponse(response.clone(), current.clone());
 
