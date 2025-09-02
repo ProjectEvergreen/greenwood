@@ -85,6 +85,8 @@ async function getDevServer(compilation) {
         }
       }
 
+      console.log("No error!", pluginNames, wasUsed);
+
       ctx.body = response.body ? Readable.from(response.body) : "";
       ctx.status = response.status;
       ctx.message = response.statusText;
