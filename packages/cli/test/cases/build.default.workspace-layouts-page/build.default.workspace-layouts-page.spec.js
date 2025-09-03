@@ -29,7 +29,7 @@ import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
-import { HASH_8_REGEX } from "../../../src/lib/hashing-utils.js";
+import { HASH_REGEX } from "../../../src/lib/hashing-utils.js";
 
 const expect = chai.expect;
 
@@ -102,7 +102,7 @@ describe("Build Greenwood With: ", function () {
 
         it("should add one page layout <link> tag", function () {
           expect(linkTags[0].rel).to.equal("stylesheet");
-          expect(linkTags[0].href).to.match(new RegExp(`/styles/theme.${HASH_8_REGEX}.css/`));
+          expect(linkTags[0].href).to.match(new RegExp(`/styles/theme.${HASH_REGEX}.css`));
         });
 
         it("should add one page layout <style> tag", function () {

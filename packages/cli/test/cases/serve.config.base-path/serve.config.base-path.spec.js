@@ -44,7 +44,7 @@ import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
-import { HASH_8_REGEX } from "../../../src/lib/hashing-utils.js";
+import { HASH_REGEX } from "../../../src/lib/hashing-utils.js";
 
 const expect = chai.expect;
 
@@ -155,7 +155,7 @@ describe("Serve Greenwood With: ", function () {
         // https://github.com/ProjectEvergreen/greenwood/issues/1051
         expect(scripts.length).to.equal(2);
         expect(scripts[0].getAttribute("src")).to.match(
-          new RegExp(`${basePath}/card\\.${HASH_8_REGEX}\\.js`),
+          new RegExp(`${basePath}/card\\.${HASH_REGEX}\\.js`),
         );
 
         done();
@@ -168,7 +168,7 @@ describe("Serve Greenwood With: ", function () {
 
         expect(links.length).to.equal(1);
         expect(links[0].getAttribute("href")).to.match(
-          new RegExp(`${basePath}/styles/main\\.${HASH_8_REGEX}\\.css`),
+          new RegExp(`${basePath}/styles/main\\.${HASH_REGEX}\\.css`),
         );
 
         done();
@@ -181,7 +181,7 @@ describe("Serve Greenwood With: ", function () {
 
         expect(styles.length).to.equal(1);
         expect(styles[0].getAttribute("href")).to.match(
-          new RegExp(`${basePath}/styles/main\\.${HASH_8_REGEX}\\.css`),
+          new RegExp(`${basePath}/styles/main\\.${HASH_REGEX}\\.css`),
         );
 
         done();
@@ -218,7 +218,7 @@ describe("Serve Greenwood With: ", function () {
       let body = "";
 
       before(async function () {
-        response = await fetch(`${hostname}${basePath}/styles/main.${/[a-zA-Z0-9]{8}/}.css`);
+        response = await fetch(`${hostname}${basePath}/styles/main.06cdf64c.css`);
         body = await response.clone().text();
       });
 
@@ -233,8 +233,10 @@ describe("Serve Greenwood With: ", function () {
       });
 
       it("should return the correct response body", function (done) {
-        expect(body).to.contain(
-          "*{color:blue;background-image:url('/my-path/images/webcomponents.1079385342.jpg');}",
+        expect(body).to.match(
+          new RegExp(
+            `\\*\\{color:blue;background-image:url\\('/my-path/images/webcomponents\\.${HASH_REGEX}\\.jpg'\\);\\}`,
+          ),
         );
         done();
       });

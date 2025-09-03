@@ -29,7 +29,7 @@ import path from "node:path";
 import { getOutputTeardownFiles, getDependencyFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
-import { HASH_8_REGEX } from "../../../src/lib/hashing-utils.js";
+import { HASH_REGEX } from "../../../src/lib/hashing-utils.js";
 
 const expect = chai.expect;
 
@@ -121,7 +121,7 @@ describe("Build Greenwood With: ", function () {
 
         expect(inlineScriptTag.textContent.replace(/\n/g, "")).to.match(
           new RegExp(
-            `import"/\\${HASH_8_REGEX}\\.${HASH_8_REGEX}\\.js";import"/lit-html\\.${HASH_8_REGEX}\\.js";//# sourceMappingURL=\\${HASH_8_REGEX}\\.${HASH_8_REGEX}\\.js\\.map`,
+            `import"\\/${HASH_REGEX}\\.${HASH_REGEX}\\.js";import"\\/lit-html\\.${HASH_REGEX}\\.js";\\/\\/# sourceMappingURL=${HASH_REGEX}\\.${HASH_REGEX}\\.js\\.map`,
           ),
         );
       });

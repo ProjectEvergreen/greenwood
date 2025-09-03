@@ -1,6 +1,6 @@
 import chai from "chai";
 import { getQueryHash } from "../../src/core/common.js";
-import { HASH_8_REGEX } from "@greenwood/cli/src/lib/hashing-utils.js";
+import { HASH_REGEX } from "@greenwood/cli/src/lib/hashing-utils.js";
 
 const expect = chai.expect;
 
@@ -22,7 +22,7 @@ describe("Unit Test: Data", function () {
         `;
         const hash = getQueryHash(query);
 
-        expect(hash).to.match(new RegExp(HASH_8_REGEX));
+        expect(hash).to.match(new RegExp(HASH_REGEX));
       });
 
       it("should return the expected hash for a custom graph query with custom data", function () {
@@ -40,7 +40,7 @@ describe("Unit Test: Data", function () {
         `;
         const hash = getQueryHash(query);
 
-        expect(hash).to.match(new RegExp(HASH_8_REGEX));
+        expect(hash).to.match(new RegExp(HASH_REGEX));
       });
 
       it("should return the expected hash for a children query with a variable", function () {
@@ -58,7 +58,7 @@ describe("Unit Test: Data", function () {
           parent: "/docs/",
         });
 
-        expect(hash).to.match(new RegExp(HASH_8_REGEX));
+        expect(hash).to.match(new RegExp(HASH_REGEX));
       });
     });
   });
