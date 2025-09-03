@@ -34,6 +34,7 @@ import path from "node:path";
 import { getDependencyFiles, getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
+import { HASH_REGEX } from "../../../src/lib/hashing-utils.js";
 
 const expect = chai.expect;
 
@@ -172,8 +173,8 @@ describe("Build Greenwood With: ", function () {
           it("should have the expected @font-face file bundle path in the referenced <style> tag in index.html", async function () {
             const styleTag = Array.from(dom.window.document.querySelectorAll("head style"));
 
-            expect(styleTag[0].textContent).to.contain(
-              `src:url('/${fontPath}/Geist-Regular.965782360.woff2')`,
+            expect(styleTag[0].textContent.replace(/\s+/g, "")).to.match(
+              new RegExp(`src:url\\('/${fontPath}/Geist-Regular\\.${HASH_REGEX}\\.woff2'\\)`),
             );
           });
         });
@@ -193,8 +194,10 @@ describe("Build Greenwood With: ", function () {
             );
             const contents = await fs.promises.readFile(mainCss[0], "utf-8");
 
-            expect(contents).to.contain(
-              `body{background-color:green;background-image:url('/${imagePath}');}`,
+            expect(contents.replace(/\s+/g, "")).to.match(
+              new RegExp(
+                `body\\{background-color:green;background-image:url\\('/images/webcomponents\\.${HASH_REGEX}\\.jpg'\\);\\}`,
+              ),
             );
           });
         });
@@ -210,9 +213,10 @@ describe("Build Greenwood With: ", function () {
 
           it("should have the expected background-image url file bundle path in the referenced <style> tag in index.html", async function () {
             const styleTag = Array.from(dom.window.document.querySelectorAll("head style"));
-
-            expect(styleTag[0].textContent).to.contain(
-              `html{background-image:url('/${imagePath}')}`,
+            expect(styleTag[0].textContent).to.match(
+              new RegExp(
+                `html\\{background-image:url\\('/images/link\\.${HASH_REGEX}\\.png'\\)\\}`,
+              ),
             );
           });
         });

@@ -53,7 +53,7 @@ import path from "node:path";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
-import { HASH_8_REGEX } from "../../../src/lib/hashing-utils.js";
+import { HASH_REGEX } from "../../../src/lib/hashing-utils.js";
 
 const expect = chai.expect;
 
@@ -430,7 +430,7 @@ describe("Develop Greenwood With: ", function () {
       });
 
       it("should return the correct etag header", function (done) {
-        expect(response.headers.get("etag")).to.match(new RegExp(HASH_8_REGEX));
+        expect(response.headers.get("etag")).to.match(new RegExp(HASH_REGEX));
         done();
       });
 
