@@ -76,7 +76,11 @@ async function getDevServer(compilation) {
             const current = await plugin.serve(
               url,
               request,
-              plugin.constructor.name === "StandardAudioResource" ? newLocal : response.clone(),
+              ["StandardAudioResource", "StandardJavaScriptResource"].includes(
+                plugin.constructor.name,
+              )
+                ? newLocal
+                : response.clone(),
             );
             wasUsed.push(response.bodyUsed);
             const merged = mergeResponse(response.clone(), current.clone());
