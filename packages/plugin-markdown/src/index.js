@@ -46,6 +46,58 @@ async function trackAllTocHeadings(compilation) {
   allHeadingsTracked = true;
 }
 
+// extracted for standalone usage
+// https://github.com/ProjectEvergreen/greenwood/issues/1247#issuecomment-2721881358
+async function processMarkdown(contents, plugins = []) {
+  const rehypePlugins = [];
+  const remarkPlugins = [];
+  let processedMarkdown;
+  let html = "";
+
+  for (const plugin of plugins || []) {
+    const name = typeof plugin === "string" ? plugin : plugin.name;
+    const options = plugin?.options ?? null;
+    const pluginTypeArray = name.indexOf("rehype-") >= 0 ? rehypePlugins : remarkPlugins;
+    const pluginImport = (await import(name)).default;
+
+    if (options) {
+      pluginTypeArray.push([pluginImport, options]);
+    } else {
+      pluginTypeArray.push(pluginImport);
+    }
+  }
+
+  processedMarkdown = await unified()
+    .use(remarkParse) // parse markdown into AST
+    .use(remarkFrontmatter) // extract frontmatter out of the AST
+    .use(remarkPlugins) // apply userland remark plugins
+    .use(remarkRehype, { allowDangerousHtml: true }) // convert from markdown to HTML AST
+    .use(rehypeRaw) // support mixed HTML in markdown
+    .use(rehypePlugins) // apply userland rehype plugins
+    .use(rehypeStringify) // convert AST to HTML string
+    .process(contents);
+
+  html = String(processedMarkdown);
+
+  // remove markdown wrapping custom elements in <p></p> tags
+  // https://github.com/ProjectEvergreen/greenwood/discussions/1267
+  const wrappedCustomElementRegex =
+    /<p><[a-zA-Z]*-[a-zA-Z](.*)>(.*)<\/[a-zA-Z]*-[a-zA-Z](.*)><\/p>/g;
+  const ceTest = wrappedCustomElementRegex.test(html);
+
+  if (ceTest) {
+    const ceMatches = html.match(wrappedCustomElementRegex);
+
+    ceMatches.forEach((match) => {
+      const stripWrappingTags = match.replace("<p>", "").replace("</p>", "");
+
+      html = html.replace(match, stripWrappingTags);
+    });
+  }
+
+  return html;
+}
+
 class MarkdownResource {
   constructor(compilation, options = {}) {
     this.compilation = compilation;
@@ -66,56 +118,13 @@ class MarkdownResource {
     const { pathname } = url;
     const matchingPageRoute = this.compilation.graph.find((node) => node.route === pathname);
     const markdownContents = await fs.readFile(new URL(matchingPageRoute.pageHref), "utf-8");
-    const rehypePlugins = [];
-    const remarkPlugins = [];
-    let processedMarkdown = "";
-    let html = "";
-
-    for (const plugin of this.options?.plugins || []) {
-      const name = typeof plugin === "string" ? plugin : plugin.name;
-      const options = plugin?.options ?? null;
-      const pluginTypeArray = name.indexOf("rehype-") >= 0 ? rehypePlugins : remarkPlugins;
-      const pluginImport = (await import(name)).default;
-
-      if (options) {
-        pluginTypeArray.push([pluginImport, options]);
-      } else {
-        pluginTypeArray.push(pluginImport);
-      }
-    }
-
-    processedMarkdown = await unified()
-      .use(remarkParse) // parse markdown into AST
-      .use(remarkFrontmatter) // extract frontmatter out of the AST
-      .use(remarkPlugins) // apply userland remark plugins
-      .use(remarkRehype, { allowDangerousHtml: true }) // convert from markdown to HTML AST
-      .use(rehypeRaw) // support mixed HTML in markdown
-      .use(rehypePlugins) // apply userland rehype plugins
-      .use(rehypeStringify) // convert AST to HTML string
-      .process(markdownContents);
 
     // would be nice if there was a cleaner way to hook into Greenwood's "graph" lifecycle
     if (!allHeadingsTracked) {
       await trackAllTocHeadings(this.compilation);
     }
 
-    html = String(processedMarkdown);
-
-    // remove markdown wrapping custom elements in <p></p> tags
-    // https://github.com/ProjectEvergreen/greenwood/discussions/1267
-    const wrappedCustomElementRegex =
-      /<p><[a-zA-Z]*-[a-zA-Z](.*)>(.*)<\/[a-zA-Z]*-[a-zA-Z](.*)><\/p>/g;
-    const ceTest = wrappedCustomElementRegex.test(html);
-
-    if (ceTest) {
-      const ceMatches = html.match(wrappedCustomElementRegex);
-
-      ceMatches.forEach((match) => {
-        const stripWrappingTags = match.replace("<p>", "").replace("</p>", "");
-
-        html = html.replace(match, stripWrappingTags);
-      });
-    }
+    const html = await processMarkdown(markdownContents, this?.options?.plugins);
 
     return new Response(html, {
       headers: new Headers({
@@ -134,4 +143,4 @@ const greenwoodPluginMarkdown = (options = {}) => [
   },
 ];
 
-export { greenwoodPluginMarkdown };
+export { greenwoodPluginMarkdown, processMarkdown };
