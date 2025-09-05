@@ -142,6 +142,9 @@ describe("Serve Greenwood With: ", function () {
         // TODO for some reason there is an extra <link> tag in the head, should only be 1
         // https://github.com/ProjectEvergreen/greenwood/issues/1051
         expect(links.length).to.equal(2);
+        expect(links[1].getAttribute("href")).to.match(
+          new RegExp(`${basePath}/card.${HASH_REGEX}.js`),
+        );
 
         done();
       });
