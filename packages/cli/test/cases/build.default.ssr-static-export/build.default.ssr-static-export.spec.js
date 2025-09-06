@@ -18,6 +18,7 @@
  *     footer.js
  *   pages/
  *     artists.js
+ *     index.html
  *   layouts/
  *     app.html
  */

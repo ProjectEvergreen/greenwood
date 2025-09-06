@@ -15,8 +15,8 @@
  * src/
  *   pages/
  *     slides/
- *       index.md
- *     index.md
+ *       index.html
+ *     index.html
  */
 import chai from "chai";
 import fs from "node:fs";
@@ -94,12 +94,14 @@ describe("Develop Greenwood With: ", function () {
         done();
       });
 
-      it("should have expected text from user workspace pages/index.md", function (done) {
+      it("should have expected text from user workspace pages/index.html", function (done) {
         const pageHeadingPrimary = dom.window.document.querySelectorAll("body h3")[0];
         const pageHeadingSecondary = dom.window.document.querySelectorAll("body h4")[0];
 
         expect(pageHeadingPrimary.textContent).to.be.equal("Context Plugin Theme Pack Test");
-        expect(pageHeadingSecondary.textContent).to.be.equal("From user workspace pages/index.md");
+        expect(pageHeadingSecondary.textContent).to.be.equal(
+          "From user workspace pages/index.html",
+        );
         done();
       });
     });

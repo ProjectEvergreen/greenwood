@@ -16,9 +16,9 @@
  * User Workspace
  * src/
  *   pages/
- *     about.md
+ *     about.html
  *     artists.js
- *     index.md
+ *     index.html
  *     regex-test.html
  */
 import chai from "chai";
@@ -146,7 +146,9 @@ describe("Build Greenwood With: ", function () {
         const aboutRouterOutlet =
           aboutDom.window.document.querySelectorAll("body > router-outlet")[0];
 
-        expect(aboutRouterOutlet.innerHTML).to.contain(aboutPartial);
+        expect(aboutRouterOutlet.innerHTML.replace(/\n/g, "").trim()).to.contain(
+          aboutPartial.replace("<body>", "").replace("</body>", "").replace(/\n/g, "").trim(),
+        );
       });
 
       it("should have the expected partial output to match the contents of the about page in the <router-outlet> tag in the <body>", function () {
@@ -156,7 +158,9 @@ describe("Build Greenwood With: ", function () {
         );
         const homeRouterOutlet = dom.window.document.querySelectorAll("body > router-outlet")[0];
 
-        expect(homeRouterOutlet.innerHTML).to.contain(homePartial);
+        expect(homeRouterOutlet.innerHTML.replace(/\n/g, "").trim()).to.contain(
+          homePartial.replace("<body>", "").replace("</body>", "").replace(/\n/g, "").trim(),
+        );
       });
     });
 

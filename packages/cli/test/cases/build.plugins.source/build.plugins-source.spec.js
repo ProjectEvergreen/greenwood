@@ -27,8 +27,8 @@
  * Custom Workspace
  * src/
  *   pages/
- *     about.md
- *     index.md
+ *     about.html
+ *     index.html
  *     404.html
  *   layouts/
  *     app.html

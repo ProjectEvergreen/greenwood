@@ -12,6 +12,8 @@ As of now, this plugin requires some form of [prerendering](https://www.greenwoo
 1. Enabling [custom imports](https://www.greenwoodjs.dev/docs/pages/server-rendering/#custom-imports), or
 1. Installing the [Puppeteer renderer plugin](https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-renderer-puppeteer)
 
+It will also require setting [`activeContent`](https://greenwoodjs.dev/docs/reference/configuration/#active-content) to `true`.
+
 ## Installation
 
 You can use your favorite JavaScript package manager to install this package.
@@ -36,6 +38,7 @@ import { greenwoodPluginGraphQL } from '@greenwood/plugin-graphql';
 import { greenwoodPluginRendererPuppeteer } from '@greenwood/plugin-renderer-puppeteer';
 
 export default {
+  activeContent: true,
   prerender: true,
   plugins: [
     greenwoodPluginGraphQL(),

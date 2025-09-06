@@ -160,7 +160,7 @@ describe("Initialize a new Greenwood project: ", function () {
         const { erasableSyntaxOnly, verbatimModuleSyntax, lib } = compilerOptions;
 
         expect(erasableSyntaxOnly).to.equal(true);
-        expect(verbatimModuleSyntax).to.equal(false);
+        expect(verbatimModuleSyntax).to.equal(true);
 
         expect(lib).to.contain(target.toUpperCase()); // should match compilerOptions.target
         expect(lib).to.contain("DOM");
@@ -201,6 +201,12 @@ describe("Initialize a new Greenwood project: ", function () {
           '<script type="module" src="../components/logo/logo.ts"></script>',
         );
         expect(pageContents).to.contain("<x-logo></x-logo>");
+      });
+    });
+
+    describe("Default Types", function () {
+      it("should generate a types.d.ts file", function () {
+        expect(fs.existsSync(path.join(initOutputPath, "types.d.ts"))).to.be.true;
       });
     });
   });

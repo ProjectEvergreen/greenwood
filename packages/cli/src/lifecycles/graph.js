@@ -3,7 +3,6 @@ import fs from "node:fs/promises";
 import fm from "front-matter";
 import { checkResourceExists, requestAsObject } from "../lib/resource-utils.js";
 import { activeFrontmatterKeys } from "../lib/content-utils.js";
-import toc from "markdown-toc";
 import { Worker } from "node:worker_threads";
 
 function getLabelFromRoute(_route) {
@@ -27,7 +26,7 @@ function getLabelFromRoute(_route) {
 }
 
 function getIdFromRelativePathPath(relativePathPath, extension) {
-  return relativePathPath.replace(extension, "").replace("./", "").replace(/\//g, "-");
+  return relativePathPath.replace(`.${extension}`, "").replace("./", "").replace(/\//g, "-");
 }
 
 function trackCollectionsForPage(page, collections) {
@@ -79,29 +78,26 @@ const generateGraph = async (compilation) => {
         pages = nextPages.pages;
         apiRoutes = nextPages.apiRoutes;
       } else {
-        const extension = `.${filenameUrl.pathname.split(".").pop()}`;
+        const extension = `${filenameUrl.pathname.split(".").pop()}`;
         const relativePagePath = filenameUrl.pathname.replace(pagesDir.pathname, "./");
         const isApiRoute = relativePagePath.startsWith("./api");
-        const req = isApiRoute
-          ? new Request(filenameUrl, { headers: { Accept: "text/javascript" } })
-          : new Request(filenameUrl, { headers: { Accept: "text/html" } });
         let isCustom = null;
 
         for (const plugin of customPageFormatPlugins) {
-          if (plugin.shouldServe && (await plugin.shouldServe(filenameUrl, req))) {
+          if (plugin.servePage && plugin.extensions.includes(extension)) {
             isCustom = plugin.servePage;
             break;
           }
         }
 
-        const isStatic = isCustom === "static" || extension === ".md" || extension === ".html";
-        const isDynamic = isCustom === "dynamic" || extension === ".js" || extension === ".ts";
+        const isStatic = isCustom === "static" || extension === "html";
+        const isDynamic = isCustom === "dynamic" || extension === "js" || extension === "ts";
         const isPage = isStatic || isDynamic;
-        let route = `${relativePagePath.replace(".", "").replace(`${extension}`, "")}`;
+        let route = `${relativePagePath.replace(".", "").replace(`.${extension}`, "")}`;
         let fileContents;
 
         if (isApiRoute) {
-          if (extension !== ".js" && extension !== ".ts" && !isCustom) {
+          if (extension !== "js" && extension !== "ts" && !isCustom) {
             console.warn(`${filenameUrl} is not a supported API file extension, skipping...`);
             return;
           }
@@ -123,12 +119,14 @@ const generateGraph = async (compilation) => {
               getIdFromRelativePathPath(relativePagePath, extension).replace("api-", ""),
             ),
             pageHref: new URL(relativePagePath, pagesDir).href,
-            outputHref: new URL(relativePagePath, outputDir).href.replace(extension, ".js"),
+            outputHref: new URL(relativePagePath, outputDir).href.replace(`.${extension}`, ".js"),
             route: `${basePath}${route}`,
             isolation,
           });
         } else if (isPage) {
-          let root = filename.split("/")[filename.split("/").length - 1].replace(extension, "");
+          let root = filename
+            .split("/")
+            [filename.split("/").length - 1].replace(`.${extension}`, "");
           // should we even have a default page layout?
           // https://github.com/ProjectEvergreen/greenwood/issues/1271
           let layout = "page";
@@ -223,35 +221,10 @@ const generateGraph = async (compilation) => {
             }
           }
 
-          /*
-           * Custom front matter - Variable Definitions
-           * --------------------------------------------------
-           * collection: the name of the collection for the page (as a string or array)
-           * order: the order of this item within the collection
-           * tocHeading: heading size to use a Table of Contents for a page
-           * tableOfContents: json object containing page's table of contents (list of headings)
-           */
-
-          // prune "reserved" attributes that are supported by Greenwood
+          // prune "reserved" frontmatter that are supported by Greenwood
           [...activeFrontmatterKeys, "layout"].forEach((key) => {
             delete customData[key];
           });
-
-          // set flag whether to gather a list of headings on a page as menu items
-          customData.tocHeading = customData.tocHeading || 0;
-          customData.tableOfContents = [];
-
-          if (fileContents && customData.tocHeading > 0 && customData.tocHeading <= 6) {
-            // parse markdown for table of contents and output to json
-            customData.tableOfContents = toc(fileContents).json;
-
-            // parse table of contents for only the pages user wants linked
-            if (customData.tableOfContents.length > 0 && customData.tocHeading > 0) {
-              customData.tableOfContents = customData.tableOfContents.filter(
-                (item) => item.lvl === customData.tocHeading,
-              );
-            }
-          }
 
           /*
            * Page Properties

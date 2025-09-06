@@ -85,20 +85,15 @@ class StaticRouterResource {
     const routeTags = this.compilation.graph
       .filter((page) => !page.isSSR && !page.route.endsWith("/404/"))
       .map((page) => {
-        const layout =
-          page.pageHref && page.pageHref.split(".").pop() === this.extensions[0]
-            ? page.route
-            : page.layout;
+        const { layout, route } = page;
         const key =
-          page.route === "/"
-            ? ""
-            : page.route.slice(0, page.route.lastIndexOf("/")).replace(basePath, "");
+          route === "/" ? "" : route.slice(0, route.lastIndexOf("/")).replace(basePath, "");
 
-        if (pathname === page.route) {
+        if (pathname === route) {
           currentLayout = layout;
         }
         return `
-          <greenwood-route data-route="${page.route}" data-layout="${layout}" data-key="${basePath}/_routes${key}/index.html"></greenwood-route>
+          <greenwood-route data-route="${route}" data-layout="${layout}" data-key="${basePath}/_routes${key}/index.html"></greenwood-route>
         `;
       });
 

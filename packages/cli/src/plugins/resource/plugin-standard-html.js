@@ -5,21 +5,15 @@
  *
  */
 import fs from "node:fs/promises";
-import rehypeStringify from "rehype-stringify";
-import rehypeRaw from "rehype-raw";
-import remarkFrontmatter from "remark-frontmatter";
-import remarkParse from "remark-parse";
-import remarkRehype from "remark-rehype";
 import { getPageLayout, getAppLayout, getGreenwoodScripts } from "../../lib/layout-utils.js";
 import { requestAsObject } from "../../lib/resource-utils.js";
-import { unified } from "unified";
 import { Worker } from "node:worker_threads";
 import { parse } from "node-html-parser";
 
 class StandardHtmlResource {
   constructor(compilation) {
     this.compilation = compilation;
-    this.extensions = [".html", ".md"];
+    this.extensions = [".html"];
     this.contentType = "text/html";
   }
 
@@ -45,56 +39,35 @@ class StandardHtmlResource {
       !matchingRoute.external && pageHref
         ? new URL(pageHref).pathname.replace(userWorkspace.pathname, "./")
         : "";
-    const isMarkdownContent = (filePath || "").split(".").pop() === "md";
     const isHtmlContent = (filePath || "").split(".").pop() === "html";
     let body = "";
     let ssrBody;
-    let processedMarkdown = null;
     // final contents to return from the plugin
     let html = "";
 
-    const customPageFormatPlugins = config.plugins
-      .filter((plugin) => plugin.type === "resource" && !plugin.isGreenwoodDefaultPlugin)
-      .map((plugin) => plugin.provider(this.compilation));
-    const isCustomStaticPage =
-      customPageFormatPlugins[0] &&
-      customPageFormatPlugins[0].servePage === "static" &&
-      customPageFormatPlugins[0].shouldServe &&
-      (await customPageFormatPlugins[0].shouldServe(new URL(pageHref)));
+    if (isHtmlContent) {
+      body = await fs.readFile(new URL(pageHref), "utf-8");
 
-    if (isMarkdownContent) {
-      const markdownContents = await fs.readFile(new URL(pageHref), "utf-8");
-      const rehypePlugins = [];
-      const remarkPlugins = [];
+      // purge frontmatter data from HTML files that only have a `<body>` tag
+      // frontmatter outside of an <html> tag will get ignored by node-html-parser
+      if (body.trim().startsWith("---")) {
+        body = body.replace(/---(.*)---/s, "");
+      }
+    } else if (matchingRoute.servePage === "static") {
+      const customStaticPageFormatPlugins = config.plugins
+        .filter((plugin) => plugin.type === "resource" && !plugin.isGreenwoodDefaultPlugin)
+        .map((plugin) => plugin.provider(this.compilation))
+        .filter((plugin) => plugin.servePage === "static");
 
-      for (const plugin of config.markdown.plugins) {
-        const name = typeof plugin === "string" ? plugin : plugin.name;
-        const options = plugin?.options ?? null;
-        const pluginTypeArray = name.indexOf("rehype-") >= 0 ? rehypePlugins : remarkPlugins;
-        const pluginImport = (await import(name)).default;
+      for (const plugin of customStaticPageFormatPlugins) {
+        if (await plugin.shouldServe(url, request)) {
+          const response = await plugin.serve(url, request);
 
-        if (options) {
-          pluginTypeArray.push([pluginImport, options]);
-        } else {
-          pluginTypeArray.push(pluginImport);
+          body = await response.text();
+
+          break;
         }
       }
-
-      processedMarkdown = await unified()
-        .use(remarkParse) // parse markdown into AST
-        .use(remarkFrontmatter) // extract frontmatter from AST
-        .use(remarkPlugins) // apply userland remark plugins
-        .use(remarkRehype, { allowDangerousHtml: true }) // convert from markdown to HTML AST
-        .use(rehypeRaw) // support mixed HTML in markdown
-        .use(rehypePlugins) // apply userland rehype plugins
-        .use(rehypeStringify) // convert AST to HTML string
-        .process(markdownContents);
-    } else if (isHtmlContent) {
-      body = await fs.readFile(new URL(pageHref), "utf-8");
-    } else if (isCustomStaticPage) {
-      const transformed = await customPageFormatPlugins[0].serve(new URL(pageHref));
-
-      body = await transformed.text();
     } else if (matchingRoute.isSSR) {
       const routeModuleLocationUrl = new URL(pageHref);
       const routeWorkerUrl = this.compilation.config.plugins
@@ -132,24 +105,7 @@ class StandardHtmlResource {
       });
     }
 
-    if (processedMarkdown) {
-      const wrappedCustomElementRegex =
-        /<p><[a-zA-Z]*-[a-zA-Z](.*)>(.*)<\/[a-zA-Z]*-[a-zA-Z](.*)><\/p>/g;
-      const ceTest = wrappedCustomElementRegex.test(processedMarkdown.value);
-
-      if (ceTest) {
-        const ceMatches = processedMarkdown.value.match(wrappedCustomElementRegex);
-
-        ceMatches.forEach((match) => {
-          const stripWrappingTags = match.replace("<p>", "").replace("</p>", "");
-
-          processedMarkdown.value = processedMarkdown.value.replace(match, stripWrappingTags);
-        });
-      }
-
-      // https://github.com/ProjectEvergreen/greenwood/issues/1126
-      body = processedMarkdown.value.replace(/\$/g, "$$$");
-    } else if (matchingRoute.external) {
+    if (matchingRoute.external) {
       body = matchingRoute.body;
     } else if (ssrBody) {
       body = ssrBody;
