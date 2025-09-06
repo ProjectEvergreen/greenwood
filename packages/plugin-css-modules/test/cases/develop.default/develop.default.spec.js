@@ -37,6 +37,7 @@ import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
 import { implementation } from "jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js";
+import { HASH_REGEX } from "@greenwood/cli/src/lib/hashing-utils.js";
 
 const expect = chai.expect;
 
@@ -136,7 +137,10 @@ describe("Develop Greenwood With: ", function () {
             enter: function (node, item) {
               const { type, name } = node;
               if (type === "ClassSelector" && item.prev === null) {
-                const scopedClassNameRegex = new RegExp(String.raw`.header-\d+-${name}`, "g");
+                const scopedClassNameRegex = new RegExp(
+                  String.raw`\.header-${HASH_REGEX}-${name}`,
+                  "g",
+                );
 
                 classes.push(name);
                 expect(styleText).to.match(scopedClassNameRegex);
@@ -238,13 +242,11 @@ describe("Develop Greenwood With: ", function () {
       describe("Logo component nested in <app-header> component", () => {
         it("should have the expected logo CSS inlined into the style tag", () => {
           const styles = dom.window.document.querySelectorAll("head style");
-          const styleText = styles[0].textContent;
-          const expectedStyles =
-            ".logo-695811019-container{display:flex}.logo-695811019-logo{display:inline-block;width:100%;}";
-
-          expect(styleText.replace(/ /g, "").replace(/\n/g, "").replace(/;/g, "")).to.contain(
-            expectedStyles.replace(/;/g, ""),
+          const styleText = styles[0].textContent.replace(/\s+/g, "").replace(/;/g, "");
+          const expectedStyles = new RegExp(
+            String.raw`.logo-${HASH_REGEX}-container{display:flex}.logo-${HASH_REGEX}-logo{display:inline-blockwidth:100%`,
           );
+          expect(styleText).to.match(expectedStyles);
         });
       });
     });

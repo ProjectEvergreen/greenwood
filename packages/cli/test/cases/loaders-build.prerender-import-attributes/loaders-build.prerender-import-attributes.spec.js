@@ -32,6 +32,7 @@ import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
+import { HASH_REGEX } from "../../../src/lib/hashing-utils.js";
 
 const expect = chai.expect;
 
@@ -70,8 +71,8 @@ describe("Build Greenwood With: ", function () {
         const scriptContents = fs.readFileSync(scripts[0], "utf-8");
 
         expect(scripts.length).to.equal(1);
-        expect(scriptContents).to.contain(
-          `import e from"/hero.${cssFileHash}.css"with{type:"css"}`,
+        expect(scriptContents).to.match(
+          new RegExp(`import e from"/hero\\.${HASH_REGEX}\\.css"with\\{type:"css"\\};`),
         );
       });
 

@@ -1,12 +1,20 @@
-// https://gist.github.com/hyamamoto/fd435505d29ebfa3d9716fd2be8d42f0#gistcomment-2775538
-function hashString(inputString) {
-  let h = 0;
+import { createHash } from "node:crypto";
 
-  for (let i = 0; i < inputString.length; i += 1) {
-    h = (Math.imul(31, h) + inputString.charCodeAt(i)) | 0;
+function hashString(inputString, length = 8) {
+  const bytes = Math.ceil(length / 2);
+  const hash = createHash("shake256", { outputLength: bytes })
+    .update(inputString)
+    .digest("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=/g, "_");
+
+  if (length % 2 == 0) {
+    return hash;
   }
-
-  return Math.abs(h).toString();
+  return hash.slice(0, length);
 }
 
-export { hashString };
+const HASH_REGEX = "[a-zA-Z0-9-_]{8}";
+
+export { hashString, HASH_REGEX };

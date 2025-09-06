@@ -43,6 +43,7 @@ import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
 import { implementation } from "jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js";
+import { HASH_REGEX } from "../../../../cli/src/lib/hashing-utils.js";
 
 const expect = chai.expect;
 
@@ -144,7 +145,10 @@ describe("Build Greenwood With: ", function () {
             enter: function (node, item) {
               const { type, name } = node;
               if (type === "ClassSelector" && item.prev === null) {
-                const scopedClassNameRegex = new RegExp(String.raw`.header-\d+-${name}`, "g");
+                const scopedClassNameRegex = new RegExp(
+                  String.raw`.header-${HASH_REGEX}-${name}`,
+                  "g",
+                );
 
                 classes.push(name);
                 expect(styleText).to.match(scopedClassNameRegex);
@@ -170,7 +174,10 @@ describe("Build Greenwood With: ", function () {
             enter: function (node) {
               const { type, name } = node;
               if (type === "ClassSelector") {
-                const scopedClassNameRegex = new RegExp(String.raw`.header-\d+-${name}`, "g");
+                const scopedClassNameRegex = new RegExp(
+                  String.raw`.header-${HASH_REGEX}-${name}`,
+                  "g",
+                );
 
                 classes.push(name);
                 expect(bodyHtml).to.match(scopedClassNameRegex);
@@ -279,7 +286,10 @@ describe("Build Greenwood With: ", function () {
             enter: function (node, item) {
               const { type, name } = node;
               if (type === "ClassSelector" && item.prev === null) {
-                const scopedClassNameRegex = new RegExp(String.raw`.footer-\d+-${name}`, "g");
+                const scopedClassNameRegex = new RegExp(
+                  String.raw`.footer-${HASH_REGEX}-${name}`,
+                  "g",
+                );
 
                 classes.push(name);
                 expect(styleText).to.match(scopedClassNameRegex);
@@ -305,7 +315,10 @@ describe("Build Greenwood With: ", function () {
             enter: function (node, item) {
               const { type, name } = node;
               if (type === "ClassSelector" && item.prev === null) {
-                const scopedClassNameRegex = new RegExp(String.raw`.footer-\d+-${name}`, "g");
+                const scopedClassNameRegex = new RegExp(
+                  String.raw`.footer-${HASH_REGEX}-${name}`,
+                  "g",
+                );
 
                 classes.push(name);
                 expect(bodyHtml).to.match(scopedClassNameRegex);
@@ -373,22 +386,23 @@ describe("Build Greenwood With: ", function () {
       });
 
       describe("Logo component nested in <app-header> component", () => {
-        const scopedHash = 695811019;
-
         it("should have the expected logo CSS inlined into the style tag", () => {
           const styles = dom.window.document.querySelectorAll("head style");
-          const styleText = styles[0].textContent;
-          const expectedStyles = `.logo-${scopedHash}-container{display:flex}.logo-${scopedHash}-logo{display:inline-block;width:100%;}`;
+          const styleText = styles[0].textContent.replace(/\s+/g, "").replace(/;/g, "");
+          const expectedStyles = `.logo-${HASH_REGEX}-container{display:flex}.logo-${HASH_REGEX}-logo{display:inline-blockwidth:100%`;
 
-          expect(styleText).to.contain(expectedStyles);
+          expect(styleText).to.match(new RegExp(expectedStyles));
         });
 
         it("should have the expected logo CSS class names in the HTML", () => {
-          const classNames = [`logo-${scopedHash}-container`, `logo-${scopedHash}-logo`];
+          const classNames = [
+            new RegExp(`class="logo-${HASH_REGEX}-container"`),
+            new RegExp(`class="logo-${HASH_REGEX}-logo"`),
+          ];
           const bodyHtml = dom.window.document.querySelector("body").innerHTML;
 
           classNames.forEach((name) => {
-            expect(bodyHtml).to.contain(`class="${name}"`);
+            expect(bodyHtml).to.match(name);
           });
         });
       });
