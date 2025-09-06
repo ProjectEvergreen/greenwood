@@ -103,6 +103,7 @@ To verify compliance with coverage and watermark thresholds (what CI server runs
 
 ```shell
 $ yarn test
+$ yarn test:loaders
 ```
 
 Below are some tips to help with running / debugging tests:
@@ -282,10 +283,10 @@ Our standard issue template requests some of the following information to be pre
 Pull requests are the best!  To best help facilitate contributions to the project, here are some requests:
 
 - We generally prefer an issue be opened first, to help facilitate general discussion outside of the code review process itself and align on the ask and any expectations.  However, for typos in docs and minor "chore" like tasks a PR is usually sufficient.
-- For bugs, please consider reviewing the issue tracker first.
-- For branching, we generally follow the convention `<issue-label>/issue-<number>-<issue-title>`, e.g. _bug/issue-12-fixed-bug-with-yada-yada-yada_
+- For PR titles, we follow a conventional commit style format of `type(area): #<issue-number> <summary of change>`, e.g. _bug(cli): #128 fixed bug with the thing_
+    - where `type` generally follows the issue labels, like _feat_, _enhancement_, _bug_, _chore_, _docs_
+    - where `area` generally follows package structure labels, like _cli_, _init_, _adapters_, _plugins_, etc
 - To test the CI build scripts locally, run the `yarn` commands mentioned in the section in the Continuous Integration section of this document.  (basically just make sure linting, formatting, and test tasks are all passing)
-
 
 ## Release Management
 
