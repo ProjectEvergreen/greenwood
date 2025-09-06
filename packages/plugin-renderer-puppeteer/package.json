@@ -35,7 +35,7 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@greenwood/cli": "^0.32.0"
+    "@greenwood/cli": "^0.33.0"
   },
   "dependencies": {
     "@webcomponents/webcomponentsjs": "^2.6.0",
