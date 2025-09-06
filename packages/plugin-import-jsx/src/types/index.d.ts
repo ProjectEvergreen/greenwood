@@ -1,6 +1,6 @@
 import type { ResourcePlugin } from "@greenwood/cli";
 
-export type ImportJsxPlugin = () => Array<PlugResourcePluginn>;
+export type ImportJsxPlugin = () => Array<ResourcePlugin>;
 
 declare module "@greenwood/plugin-import-jsx" {
   export const greenwoodPluginImportJsx: ImportJsxPlugin;
