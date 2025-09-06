@@ -106,7 +106,6 @@ const readAndMergeConfig = async () => {
     const {
       workspace,
       devServer,
-      markdown,
       optimization,
       plugins,
       port,
@@ -232,11 +231,6 @@ const readAndMergeConfig = async () => {
           );
         }
       }
-    }
-
-    if (markdown && Object.keys(markdown).length > 0) {
-      customConfig.markdown.plugins =
-        markdown.plugins && markdown.plugins.length > 0 ? markdown.plugins : [];
     }
 
     if (port) {
