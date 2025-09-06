@@ -689,7 +689,13 @@ describe("Build Greenwood With: ", function () {
 / /.netlify/functions/index 200
 /post/ /.netlify/functions/post 200
 /users/ /.netlify/functions/users 200
-/api/* /.netlify/functions/api-:splat 200`,
+/api/fragment /.netlify/functions/api-fragment 200
+/api/greeting /.netlify/functions/api-greeting 200
+/api/nested/endpoint /.netlify/functions/api-nested-endpoint 200
+/api/search /.netlify/functions/api-search 200
+/api/submit-form-data /.netlify/functions/api-submit-form-data 200
+/api/submit-json /.netlify/functions/api-submit-json 200
+`,
         );
       });
     });

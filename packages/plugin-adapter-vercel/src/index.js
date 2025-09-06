@@ -76,7 +76,6 @@ async function setupFunctionBuildFolder(id, outputType, outputRoot, runtime) {
 async function vercelAdapter(compilation, options) {
   const { runtime = DEFAULT_RUNTIME } = options;
   const { outputDir, projectDirectory } = compilation.context;
-  const { basePath } = compilation.config;
   const adapterOutputUrl = new URL("./.vercel/output/functions/", projectDirectory);
   const ssrPages = compilation.graph.filter((page) => page.isSSR);
   const apiRoutes = compilation.manifest.apis;
@@ -95,8 +94,10 @@ async function vercelAdapter(compilation, options) {
 
   for (const page of ssrPages) {
     const outputType = "page";
-    const { id, outputHref } = page;
-    const outputRoot = new URL(`./${basePath}/${id}.func/`, adapterOutputUrl);
+    const { id, outputHref, route } = page;
+    // chop off the last / in route, and just use the id if the index route
+    const name = id === "index" ? id : `.${route.slice(0, -1)}`;
+    const outputRoot = new URL(`${name}.func/`, adapterOutputUrl);
     const chunks = (await fs.readdir(outputDir)).filter(
       (file) => file.startsWith(`${id}.route.chunk`) && file.endsWith(".js"),
     );
@@ -120,8 +121,8 @@ async function vercelAdapter(compilation, options) {
 
   for (const [key, value] of apiRoutes.entries()) {
     const outputType = "api";
-    const { id, outputHref } = apiRoutes.get(key);
-    const outputRoot = new URL(`.${basePath}/api/${id}.func/`, adapterOutputUrl);
+    const { id, outputHref, route } = apiRoutes.get(key);
+    const outputRoot = new URL(`.${route}.func/`, adapterOutputUrl);
     const { assets = [] } = value;
 
     await setupFunctionBuildFolder(id, outputType, outputRoot, runtime);
