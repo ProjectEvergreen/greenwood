@@ -17,7 +17,7 @@
  * Greenwood default
  *  src/
  *   docs/
- *     index.md
+ *     index.html
  */
 import fs from "node:fs";
 import { JSDOM } from "jsdom";

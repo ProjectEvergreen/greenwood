@@ -131,6 +131,15 @@ function commonIndexSpecs(dom, html, label) {
       it("should not have any sourcemap inlining for Rollup HTML entry points", function () {
         expect(html).not.to.contain(/\/\/# sourceMappingURL=(.*)\.html\.map/);
       });
+
+      it("should not have any frontmatter fence blocks", function () {
+        const body = dom.window.document.querySelectorAll("body");
+        // make sure we also ignore SSR comment markers, e.g. <!----><!---->
+        const frontmatterFenceBlockRegex = /---/g;
+        const matches = body[0].innerHTML.match(frontmatterFenceBlockRegex);
+
+        expect(matches).to.be.equal(null);
+      });
     });
   });
 }

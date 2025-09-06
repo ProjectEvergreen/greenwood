@@ -11,11 +11,16 @@ class FooResource {
   }
 
   async shouldServe(url) {
-    return url.pathname.split(".").pop() === this.extensions[0] && this.servePage;
+    const { pathname } = url;
+    const hasMatchingPageRoute = this.compilation.graph.find((node) => node.route === pathname);
+
+    return hasMatchingPageRoute?.pageHref?.endsWith(this.extensions[0]);
   }
 
   async serve(url) {
-    const body = await fs.readFile(url, "utf-8");
+    const { pathname } = url;
+    const matchingPageRoute = this.compilation.graph.find((node) => node.route === pathname);
+    const body = await fs.readFile(new URL(matchingPageRoute.pageHref), "utf-8");
 
     return new Response(body, {
       headers: new Headers({
@@ -40,7 +45,12 @@ class BarResource {
   }
 
   async serve(url) {
-    let body = await fs.readFile(url, "utf-8");
+    const { pathname } = url;
+    const matchingPageRoute = this.compilation.graph.find((node) => node.route === pathname);
+    // handle as page file being used as a page vs being imported using ESM or as an API route
+    let body = matchingPageRoute
+      ? await fs.readFile(new URL(matchingPageRoute.pageHref), "utf-8")
+      : await fs.readFile(url, "utf-8");
 
     body = body.replace(/interface (.*){(.*)}/, "");
 

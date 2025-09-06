@@ -1,3 +1,0 @@
-# First Post
-
-Lorum Ipsum

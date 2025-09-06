@@ -23,6 +23,8 @@
  *     counter/
  *       counter.js
  *       counter.css
+ *     multi-hyphen/
+ *       multi-hyphen.js
  *   scripts/
  *     frontmatter-standard.js
  *     frontmatter-typescript.ts
@@ -31,8 +33,8 @@
  *     frontmatter-custom.scss
  *   pages/
  *     examples/
- *       counter.md
- *     index.md
+ *       demo.html
+ *     index.html
  */
 import chai from "chai";
 import fs from "node:fs";

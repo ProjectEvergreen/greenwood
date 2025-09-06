@@ -21,7 +21,7 @@
  *   images/
  *     logo.svg
  *   pages/
- *     about.md
+ *     about.html
  *     artists.js
  *     blog/
  *       first-post.js
