@@ -133,7 +133,19 @@ describe("Build Greenwood With: ", function () {
           const customCss = await fs.promises.readFile(cssFiles[0], "utf-8");
 
           expect(cssFiles.length).to.be.equal(1);
-          expect(customCss).to.be.equal(expectedCss);
+          const regex = HASH_REGEX.replace("{8}", "{8,10}");
+          const normalizeCss = (css) =>
+            css
+              .replace(
+                new RegExp(`webcomponents\\.${regex}\\.jpg`, "g"),
+                "webcomponents.[HASH].jpg",
+              )
+              .replace(new RegExp(`bar\\.${regex}\\.baz`, "g"), "bar.[HASH].baz");
+
+          const normalizedCustomCss = normalizeCss(customCss);
+          const normalizedExpectedCss = normalizeCss(expectedCss);
+
+          expect(normalizedCustomCss).to.be.equal(normalizedExpectedCss);
         });
       });
 
@@ -180,7 +192,7 @@ describe("Build Greenwood With: ", function () {
         });
 
         describe("user workspace reference", () => {
-          const imagePath = "images/webcomponents.1079385342.jpg";
+          const imagePath = `images/webcomponents.*.jpg`;
 
           it("should have the expected background image from the user's workspace the output directory", async function () {
             expect(
@@ -203,7 +215,7 @@ describe("Build Greenwood With: ", function () {
         });
 
         describe("inline scratch dir workspace reference", () => {
-          const imagePath = "images/link.1200825667.png";
+          const imagePath = `images/link.*.png`;
 
           it("should have the expected background image from the user's workspace the output directory", async function () {
             expect(
@@ -222,7 +234,7 @@ describe("Build Greenwood With: ", function () {
         });
 
         describe("absolute user workspace reference", () => {
-          const resourcePath = "foo/bar.642520792.baz";
+          const resourcePath = `foo/bar.*.baz`;
 
           it("should have the expected resource reference from the user's workspace in the output directory", async function () {
             expect(

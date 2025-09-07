@@ -39,6 +39,7 @@ import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
+import { HASH_REGEX } from "../../../../cli/src/lib/hashing-utils.js";
 
 const expect = chai.expect;
 
@@ -122,10 +123,9 @@ describe("Build Greenwood With: ", function () {
         });
 
         it("should have expected attributes on the `<link>` tag from frontmatter imports", async function () {
+          const regex = new RegExp(`/components/counter/counter.${HASH_REGEX}.css`);
           const link = Array.from(dom.window.document.querySelectorAll("head link")).find(
-            (link) =>
-              link.getAttribute("href") === "/components/counter/counter.1173776585.css" &&
-              link.rel !== "preload",
+            (link) => regex.test(link.getAttribute("href")) && link.rel !== "preload",
           );
 
           expect(link.getAttribute("data-gwd-opt")).to.equal(null);
