@@ -446,7 +446,7 @@ describe("Develop Greenwood With: ", function () {
 
       before(async function () {
         response = await fetch(`${hostname}:${port}/assets/splash-clip.mp4`, {
-          headers: new Headers({ "if-none-match": "2130309740" }),
+          headers: new Headers({ "if-none-match": "QgHxJA__" }),
         });
         body = await response.clone().text();
       });
