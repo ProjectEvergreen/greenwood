@@ -201,14 +201,9 @@ describe("Build Greenwood With: ", function () {
         );
         const contents = fs.readFileSync(themeFile[0], "utf-8");
         const contentsRegex = new RegExp(
-          `"@font-face {font-family:'FontAwesome';src:url('/node-modules/font-awesome/fonts/fontawesome-webfont.${HASH_REGEX}.eot?v=4.7.0');`,
+          `@font-face\\s*\\{font-family:'FontAwesome';src:url\\('/node-modules/font-awesome/fonts/fontawesome-webfont\\.${HASH_REGEX}\\.eot\\?v=4\\.7\\.0'\\);`,
         );
         expect(contents).to.match(contentsRegex);
-        // expect(
-        //   contents.indexOf(
-        //     "@font-face {font-family:'FontAwesome';src:url('/node-modules/font-awesome/fonts/fontawesome-webfont",
-        //   ) > 0,
-        // ).to.equal(true);
       });
     });
   });
