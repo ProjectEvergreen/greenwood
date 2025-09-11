@@ -30,10 +30,9 @@ import glob from "glob-promise";
 import { JSDOM } from "jsdom";
 import path from "node:path";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
-import { getOutputTeardownFiles } from "../../../../../test/utils.js";
+import { getOutputTeardownFiles, HASH_REGEX } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
-import { HASH_REGEX } from "../../../../cli/src/lib/hashing-utils.js";
 
 const expect = chai.expect;
 
