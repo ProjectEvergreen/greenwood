@@ -31,10 +31,13 @@ import fs from "node:fs";
 import glob from "glob-promise";
 import { JSDOM } from "jsdom";
 import path from "node:path";
-import { getDependencyFiles, getOutputTeardownFiles } from "../../../../../test/utils.js";
+import {
+  getDependencyFiles,
+  getOutputTeardownFiles,
+  HASH_REGEX,
+} from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
-import { HASH_REGEX } from "../../../src/lib/hashing-utils.js";
 
 const expect = chai.expect;
 

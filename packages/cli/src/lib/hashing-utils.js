@@ -15,6 +15,4 @@ function hashString(inputString, length = 8) {
   return hash.slice(0, length);
 }
 
-const HASH_REGEX = "[a-zA-Z0-9-_]{8}";
-
-export { hashString, HASH_REGEX };
+export { hashString };

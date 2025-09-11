@@ -1,6 +1,6 @@
 import chai from "chai";
 import { getQueryHash } from "../../src/core/common.js";
-import { HASH_REGEX } from "@greenwood/cli/src/lib/hashing-utils.js";
+import { HASH_REGEX } from "../../../../test/utils.js";
 
 const expect = chai.expect;
 

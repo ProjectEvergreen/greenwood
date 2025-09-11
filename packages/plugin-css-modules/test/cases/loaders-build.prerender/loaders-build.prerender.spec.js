@@ -39,11 +39,10 @@ import glob from "glob-promise";
 import path from "node:path";
 import { parse, walk } from "css-tree";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
-import { getOutputTeardownFiles } from "../../../../../test/utils.js";
+import { getOutputTeardownFiles, HASH_REGEX } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
 import { implementation } from "jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js";
-import { HASH_REGEX } from "../../../../cli/src/lib/hashing-utils.js";
 
 const expect = chai.expect;
 

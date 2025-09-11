@@ -27,9 +27,8 @@ import fs from "node:fs";
 import glob from "glob-promise";
 import path from "node:path";
 import { Runner } from "gallinago";
-import { getOutputTeardownFiles } from "../../../../../test/utils.js";
+import { getOutputTeardownFiles, HASH_REGEX } from "../../../../../test/utils.js";
 import { fileURLToPath } from "node:url";
-import { HASH_REGEX } from "../../../src/lib/hashing-utils.js";
 
 const expect = chai.expect;
 
