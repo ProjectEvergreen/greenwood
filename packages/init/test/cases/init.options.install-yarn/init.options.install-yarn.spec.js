@@ -36,17 +36,20 @@ describe("Initialize a new Greenwood project: ", function () {
   });
 
   describe(LABEL, function () {
-    before(function () {
+    before(async function () {
       runner.setup(outputPath);
-      runner.runCommand(initPath, ["--name", APP_NAME, "--install", "yarn", "--ts", "no"]);
+      // ignore error since install logs get pretty noisy
+      await runner.runCommand(initPath, ["--name", APP_NAME, "--install", "yarn", "--ts", "no"], {
+        ignoreErrors: true,
+      });
     });
 
     describe("should install with Yarn", function () {
       const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
 
-      before(function () {
+      before(async function () {
         runner.setup(initOutputPath);
-        runner.runCommand(cliPath, "build");
+        await runner.runCommand(cliPath, "build");
       });
 
       runSmokeTest(["public", "index"], LABEL);

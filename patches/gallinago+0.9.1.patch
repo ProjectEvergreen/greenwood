@@ -1,0 +1,47 @@
+diff --git a/node_modules/gallinago/src/lib/runner.js b/node_modules/gallinago/src/lib/runner.js
+index 325969f..1a28f5a 100644
+--- a/node_modules/gallinago/src/lib/runner.js
++++ b/node_modules/gallinago/src/lib/runner.js
+@@ -36,14 +36,14 @@ class Runner {
+     });
+   }
+ 
+-  runCommand(binPath, args, options = {}) {
++  runCommand(binPath, args, options = { ignoreErrors: false }) {
+     return new Promise((resolve, reject) => {
+       const executable = 'node';
+       const isWindows = os.platform() === 'win32';
+       const cliPath = binPath;
+       const forwardArgs = this.forwardParentArgs ? process.execArgv : [];
+       const finalArgs = [...forwardArgs, cliPath];
+-      const spawnAction = options.async ? spawn : spawnSync;
++      // const spawnAction = options.async ? spawn : spawnSync;
+       let err = '';
+ 
+       if (Array.isArray(args)) {
+@@ -56,11 +56,11 @@ class Runner {
+         reject(`Error: Cannot find path ${binPath}`);
+       }
+ 
+-      this.childProcess = spawnAction(executable, finalArgs, {
++      this.childProcess = spawn(executable, finalArgs, {
+         cwd: this.rootDir,
+         shell: false,
+         detached: !isWindows,
+-        stdio: this.enableStdOut ? 'inherit' : null
++        // stdio: this.enableStdOut ? 'inherit' : null
+       });
+ 
+       this.childProcess.on('close', code => {
+@@ -76,7 +76,10 @@ class Runner {
+         if (this.enableStdOut) {
+           console.error(err);
+         }
+-        reject(err);
++
++        if(!options?.ignoreErrors) {
++          reject(err);
++        }
+       });
+ 
+       this.childProcess.stdout.on('data', (data) => {

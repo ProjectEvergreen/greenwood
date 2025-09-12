@@ -14,12 +14,15 @@
  * }
  *
  * User Workspace
- * Greenwood default
+ * N / A
  */
 import chai from "chai";
+import chaiAsPromised from "chai-as-promised";
 import path from "node:path";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
+
+chai.use(chaiAsPromised);
 
 const expect = chai.expect;
 
@@ -37,14 +40,11 @@ describe("Build Greenwood With: ", function () {
 
   describe("Custom Configuration with a bad value for layoutsDirectory", function () {
     it("should throw an error that layoutsDirectory must be a string", async function () {
-      try {
-        runner.setup(outputPath);
-        runner.runCommand(cliPath, "build");
-      } catch (err) {
-        expect(err).to.contain(
-          "Error: provided layoutsDirectory \"[object Object]\" is not supported.  Please make sure to pass something like 'layouts/'",
-        );
-      }
+      await runner.setup(outputPath);
+
+      await expect(runner.runCommand(cliPath, "build")).to.be.rejectedWith(
+        'Configuration error: provided layoutsDirectory "[object Object]" is not supported.  Please make sure to pass something like \'layouts/',
+      );
     });
   });
 });

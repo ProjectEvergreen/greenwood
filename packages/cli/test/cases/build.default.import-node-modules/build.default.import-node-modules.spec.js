@@ -72,7 +72,7 @@ describe("Build Greenwood With: ", function () {
         ...fontAwesomeCssFiles,
         ...fontAwesomeFontFiles,
       ]);
-      runner.runCommand(cliPath, "build");
+      await runner.runCommand(cliPath, "build");
 
       dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "index.html"));
     });

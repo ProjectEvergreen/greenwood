@@ -59,9 +59,9 @@ describe("Build Greenwood With: ", function () {
   });
 
   describe(LABEL, function () {
-    before(function () {
+    before(async function () {
       runner.setup(outputPath);
-      runner.runCommand(cliPath, "build");
+      await runner.runCommand(cliPath, "build");
     });
 
     describe("Adapting an SSR Page", function () {

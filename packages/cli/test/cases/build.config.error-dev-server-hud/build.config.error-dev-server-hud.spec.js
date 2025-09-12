@@ -16,12 +16,15 @@
  * }
  *
  * User Workspace
- * Greenwood default
+ * N / A
  */
 import chai from "chai";
+import chaiAsPromised from "chai-as-promised";
 import path from "node:path";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
+
+chai.use(chaiAsPromised);
 
 const expect = chai.expect;
 
@@ -38,15 +41,12 @@ describe("Build Greenwood With: ", function () {
   });
 
   describe("Custom Configuration with a bad value for devServer.hud", function () {
-    it("should throw an error that provided extensions is not valid", function () {
-      try {
-        runner.setup(outputPath);
-        runner.runCommand(cliPath, "build");
-      } catch (err) {
-        expect(err).to.contain(
-          "Error: greenwood.config.js devServer hud options must be a boolean.  Passed value was: 1234",
-        );
-      }
+    it("should throw an error that provided extensions is not valid", async function () {
+      await runner.setup(outputPath);
+
+      await expect(runner.runCommand(cliPath, "build")).to.be.rejectedWith(
+        "Configuration error: devServer hud options must be a boolean.  Passed value was: 1234",
+      );
     });
   });
 });

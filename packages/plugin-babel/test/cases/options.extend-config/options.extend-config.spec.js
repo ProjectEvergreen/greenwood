@@ -63,9 +63,9 @@ describe("Build Greenwood With: ", function () {
   describe(LABEL, function () {
     let jsFiles;
 
-    before(function () {
+    before(async function () {
       runner.setup(outputPath);
-      runner.runCommand(cliPath, "build");
+      await runner.runCommand(cliPath, "build");
 
       jsFiles = glob.sync(path.join(this.context.publicDir, "*.js"));
     });

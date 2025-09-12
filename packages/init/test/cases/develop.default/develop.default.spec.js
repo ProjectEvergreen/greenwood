@@ -38,9 +38,9 @@ describe("Initialize a new Greenwood project: ", function () {
   });
 
   describe(LABEL, function () {
-    before(function () {
+    before(async function () {
       runner.setup(outputPath);
-      runner.runCommand(initPath, ["--name", APP_NAME, "--ts", "no", "--install", "no"]);
+      await runner.runCommand(initPath, ["--name", APP_NAME, "--ts", "no", "--install", "no"]);
     });
 
     describe("should run the Greenwood dev server", function () {
@@ -54,7 +54,7 @@ describe("Initialize a new Greenwood project: ", function () {
             resolve();
           }, 5000);
 
-          runner.runCommand(cliPath, "develop", { async: true });
+          runner.runCommand(cliPath, "develop");
         });
       });
 

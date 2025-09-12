@@ -58,14 +58,14 @@ describe("Serve Greenwood With: ", function () {
   describe(LABEL, function () {
     before(async function () {
       runner.setup(outputPath);
-      runner.runCommand(cliPath, "build");
+      await runner.runCommand(cliPath, "build");
 
       return new Promise((resolve) => {
         setTimeout(() => {
           resolve();
         }, 10000);
 
-        runner.runCommand(cliPath, "serve", { async: true });
+        runner.runCommand(cliPath, "serve");
       });
     });
 

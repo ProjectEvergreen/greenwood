@@ -14,12 +14,15 @@
  * }
  *
  * User Workspace
- * Greenwood default
+ * N / A
  */
 import chai from "chai";
+import chaiAsPromised from "chai-as-promised";
 import path from "node:path";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
+
+chai.use(chaiAsPromised);
 
 const expect = chai.expect;
 
@@ -36,15 +39,12 @@ describe("Build Greenwood With: ", function () {
   });
 
   describe("Custom Configuration with a bad value for pagesDirectory", function () {
-    it("should throw an error that pagesDirectory must be a string", function () {
-      try {
-        runner.setup(outputPath);
-        runner.runCommand(cliPath, "build");
-      } catch (err) {
-        expect(err).to.contain(
-          "Error: provided pagesDirectory \"[object Object]\" is not supported.  Please make sure to pass something like 'docs/'",
-        );
-      }
+    it("should throw an error that pagesDirectory must be a string", async function () {
+      await runner.setup(outputPath);
+
+      await expect(runner.runCommand(cliPath, "build")).to.be.rejectedWith(
+        "Configuration error: provided pagesDirectory \"[object Object]\" is not supported.  Please make sure to pass something like 'docs/'",
+      );
     });
   });
 });

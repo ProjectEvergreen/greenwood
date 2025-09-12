@@ -66,7 +66,7 @@ describe("Develop Greenwood With: ", function () {
           resolve();
         }, 5000);
 
-        runner.runCommand(cliPath, "develop", { async: true });
+        runner.runCommand(cliPath, "develop");
       });
     });
 

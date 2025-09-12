@@ -72,9 +72,9 @@ describe("Build Greenwood With Markdown Plugin: ", function () {
   });
 
   describe(LABEL, function () {
-    before(function () {
+    before(async function () {
       runner.setup(outputPath);
-      runner.runCommand(cliPath, "build");
+      await runner.runCommand(cliPath, "build");
     });
 
     runSmokeTest(["public", "index"], LABEL);

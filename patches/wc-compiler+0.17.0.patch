@@ -1,0 +1,17 @@
+diff --git a/node_modules/wc-compiler/src/wcc.js b/node_modules/wc-compiler/src/wcc.js
+index b1217dd..e342a76 100644
+--- a/node_modules/wc-compiler/src/wcc.js
++++ b/node_modules/wc-compiler/src/wcc.js
+@@ -33,10 +33,10 @@ async function renderComponentRoots(tree, definitions) {
+             ? [...elementInstance.shadowRoot.childNodes, ...node.childNodes]
+             : elementInstance.childNodes;
+         } else {
+-          console.warn(`WARNING: customElement <${tagName}> detected but not serialized.  You may not have exported it.`);
++          console.log(`WARNING: customElement <${tagName}> detected but not serialized.  You may not have exported it.`);
+         }
+       } else {
+-        console.warn(`WARNING: customElement <${tagName}> is not defined.  You may not have imported it.`);
++        console.log(`WARNING: customElement <${tagName}> is not defined.  You may not have imported it.`);
+       }
+ 
+       attrs.forEach((attr) => {

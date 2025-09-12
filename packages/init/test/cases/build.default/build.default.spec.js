@@ -37,17 +37,17 @@ describe("Initialize a new Greenwood project: ", function () {
   });
 
   describe(LABEL, function () {
-    before(function () {
+    before(async function () {
       runner.setup(outputPath);
-      runner.runCommand(initPath, ["--name", APP_NAME, "--ts", "no", "--install", "no"]);
+      await runner.runCommand(initPath, ["--name", APP_NAME, "--ts", "no", "--install", "no"]);
     });
 
     describe(`should build with the Greenwood CLI and have all standard build output files`, function () {
       const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
 
-      before(function () {
+      before(async function () {
         runner.setup(initOutputPath);
-        runner.runCommand(cliPath, ["build"]);
+        await runner.runCommand(cliPath, ["build"]);
       });
 
       runSmokeTest(["public", "index"], LABEL);
