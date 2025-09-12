@@ -18,14 +18,16 @@
  * }
  *
  * User Workspace
- * Greenwood default (src/)
+ * N / A
  *
  */
-
 import chai from "chai";
+import chaiAsPromised from "chai-as-promised";
 import path from "node:path";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
+
+chai.use(chaiAsPromised);
 
 const expect = chai.expect;
 
@@ -42,15 +44,12 @@ describe("Build Greenwood With: ", function () {
   });
 
   describe("Custom Configuration with a bad provider value for a plugin", function () {
-    it("should throw an error that plugin.provider is not a function", function () {
-      try {
-        runner.setup(outputPath);
-        runner.runCommand(cliPath, "build");
-      } catch (err) {
-        expect(err).to.contain(
-          "Error: greenwood.config.js plugins provider must be a function. got object instead.",
-        );
-      }
+    it("should throw an error that plugin.provider is not a function", async function () {
+      await runner.setup(outputPath);
+
+      await expect(runner.runCommand(cliPath, "build")).to.be.rejectedWith(
+        `Configuration error: plugins provider must be a function. got object instead.`,
+      );
     });
   });
 });

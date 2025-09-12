@@ -44,7 +44,7 @@ describe("Build Greenwood With: ", function () {
   describe(LABEL, function () {
     before(async function () {
       runner.setup(outputPath);
-      runner.runCommand(cliPath, "build");
+      await runner.runCommand(cliPath, "build");
     });
 
     runSmokeTest(["public", "index"], LABEL);

@@ -57,14 +57,14 @@ describe("Build Greenwood With: ", function () {
   });
 
   describe(LABEL, function () {
-    before(function () {
+    before(async function () {
       // JSDOM doesn't support CSS nesting and kind of blows up in the console as it tries to parse it automatically
       // https://github.com/jsdom/jsdom/issues/2005#issuecomment-2397495853
       updateAStyleBlockRef = implementation.prototype._updateAStyleBlock;
       implementation.prototype._updateAStyleBlock = () => {};
 
       runner.setup(outputPath);
-      runner.runCommand(cliPath, "build");
+      await runner.runCommand(cliPath, "build");
     });
 
     runSmokeTest(["public"], LABEL);

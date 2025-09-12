@@ -34,9 +34,9 @@ describe("Initialize a new Greenwood project: ", function () {
   });
 
   describe("Scaffolding a new project with TypeScript option", function () {
-    before(function () {
+    before(async function () {
       runner.setup(outputPath);
-      runner.runCommand(initPath, ["--name", APP_NAME, "--ts", "--install", "no"]);
+      await runner.runCommand(initPath, ["--name", APP_NAME, "--ts", "--install", "no"]);
     });
 
     describe("project files and folders", () => {

@@ -51,9 +51,10 @@ describe("Build Greenwood With: ", async function () {
   });
 
   describe(LABEL, function () {
-    before(function () {
+    before(async function () {
       runner.setup(outputPath);
-      runner.runCommand(cliPath, "build");
+      // ignore import map / import.meta.resolve warnings
+      await runner.runCommand(cliPath, "build", { ignoreErrors: true });
     });
 
     runSmokeTest(["public"], LABEL);
