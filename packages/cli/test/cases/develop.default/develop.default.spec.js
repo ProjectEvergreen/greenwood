@@ -72,7 +72,7 @@ describe("Develop Greenwood With: ", function () {
   });
 
   describe(LABEL, function () {
-    before(async function () {
+    before(function () {
       runner.setup(outputPath);
 
       return new Promise((resolve) => {
@@ -80,7 +80,7 @@ describe("Develop Greenwood With: ", function () {
           resolve();
         }, 5000);
 
-        runner.runCommand(cliPath, "develop", { async: true });
+        runner.runCommand(cliPath, "develop");
       });
     });
 

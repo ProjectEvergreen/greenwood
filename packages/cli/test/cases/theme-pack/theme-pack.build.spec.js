@@ -65,7 +65,7 @@ describe("Build Greenwood With: ", function () {
       );
 
       runner.setup(outputPath, [...themePackLayouts, ...themePackStyles, ...themePackComponents]);
-      runner.runCommand(cliPath, "build");
+      await runner.runCommand(cliPath, "build");
     });
 
     runSmokeTest(["public", "index"], LABEL);
