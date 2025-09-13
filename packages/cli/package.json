@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/cli",
-  "version": "0.33.0-alpha.9",
+  "version": "0.33.0",
   "description": "Greenwood CLI.",
   "type": "module",
   "repository": {
