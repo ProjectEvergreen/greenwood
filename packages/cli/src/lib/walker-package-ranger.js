@@ -9,7 +9,7 @@ const diagnostics = new Map();
 
 function updateImportMap(key, value, resolvedRoot) {
   importMap.set(
-    key.replace("./", "").replace(/\/\//g, "/"),
+    key.replace("./", "").replace(/\/\//g, "/").replace(/\\/g, "/"),
     `${IMPORT_MAP_RESOLVED_PREFIX}${resolvedRoot.replace("file://", "")}${value.replace("./", "")}`,
   );
 }
@@ -92,7 +92,7 @@ async function walkExportPatterns(dependency, condition, resolvedRoot) {
   // https://app.unpkg.com/three@0.180.0/files/package.json
   const needle = condition.endsWith("/*") ? `${condition}*` : condition;
   const matches = fs.promises.glob(needle.startsWith("/") ? needle.replace("/", "") : needle, {
-    cwd: new URL(resolvedRoot).pathname,
+    cwd: new URL(resolvedRoot),
   });
 
   for await (const match of matches) {
