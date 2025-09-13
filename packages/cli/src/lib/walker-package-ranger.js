@@ -86,17 +86,23 @@ function derivePackageRoot(resolved) {
  * "./src/components/*": "./src/components/* /index.js - https://unpkg.com/browse/@uswds/web-components@0.0.1-alpha/package.json
  *  "./*": { "default": "./dist/*.ts.js" } - https://unpkg.com/browse/signal-utils@0.21.1/package.json
  */
-async function walkExportPatterns(dependency, sub, subValue, resolvedRoot) {
-  const matches = fs.promises.glob(
-    subValue.startsWith("/") ? subValue.replace("/", "") : subValue,
-    { cwd: new URL(resolvedRoot).pathname },
-  );
+async function walkExportPatterns(dependency, condition, resolvedRoot) {
+  // automatically deep glob, e.g. **
+  // https://app.unpkg.com/@shoelace-style/shoelace@2.20.1/files/package.json#L24
+  // https://app.unpkg.com/three@0.180.0/files/package.json
+  const needle = condition.endsWith("/*") ? `${condition}*` : condition;
+  const matches = fs.promises.glob(needle.startsWith("/") ? needle.replace("/", "") : needle, {
+    cwd: new URL(resolvedRoot).pathname,
+  });
 
   for await (const match of matches) {
     const filePathUrl = new URL(`./${match}`, resolvedRoot);
     const relativePath = filePathUrl.href.replace(resolvedRoot, "");
+    // trim matches that are just a .
+    // https://app.unpkg.com/tslib@2.8.1/files/package.json#L45
+    const subKey = match === "." ? "" : match;
 
-    updateImportMap(`${dependency}/${match}`, relativePath, resolvedRoot);
+    updateImportMap(`${dependency}/${subKey}`, relativePath, resolvedRoot);
   }
 }
 
@@ -172,7 +178,7 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
           if (exports[sub][condition]) {
             matched = true;
             if (sub.indexOf("*") >= 0) {
-              await walkExportPatterns(dependency, sub, exports[sub][condition], resolvedRoot);
+              await walkExportPatterns(dependency, exports[sub][condition], resolvedRoot);
             } else {
               trackExportConditions(dependency, exports, sub, condition, resolvedRoot);
             }
@@ -192,7 +198,7 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
         if (sub === ".") {
           updateImportMap(dependency, `${exports[sub]}`, resolvedRoot);
         } else if (sub.indexOf("*") >= 0) {
-          await walkExportPatterns(dependency, sub, exports[sub], resolvedRoot);
+          await walkExportPatterns(dependency, exports[sub], resolvedRoot);
         } else if (SUPPORTED_EXPORT_CONDITIONS.includes(sub)) {
           // filter out for just supported top level conditions
           // https://unpkg.com/browse/d3@7.9.0/package.json
