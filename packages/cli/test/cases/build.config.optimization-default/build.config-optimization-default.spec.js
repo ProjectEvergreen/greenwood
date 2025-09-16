@@ -50,7 +50,7 @@ describe("Build Greenwood With: ", function () {
     this.context = {
       publicDir: path.join(outputPath, "public"),
     };
-    runner = new Runner();
+    runner = new Runner(true);
   });
 
   describe(LABEL, function () {
@@ -173,7 +173,7 @@ describe("Build Greenwood With: ", function () {
             const styleTag = Array.from(dom.window.document.querySelectorAll("head style"));
 
             expect(styleTag[0].textContent).to.contain(
-              `src:url('/${fontPath}/Geist-Regular.965782360.woff2')`,
+              `src:url('/${fontPath}/Geist-Regular.789506797.woff2')`,
             );
           });
         });

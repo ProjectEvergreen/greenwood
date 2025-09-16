@@ -118,7 +118,7 @@ describe("Serve Greenwood With: ", function () {
       it("should have a bundled script for the footer component", function () {
         const footerScript = Array.from(
           dom.window.document.querySelectorAll("head > script[type]"),
-        ).filter((script) => /footer.*[a-z0-9].js/.test(script.src));
+        ).filter((script) => /footer.*[a-zA-Z0-9].js/.test(script.src));
 
         expect(footerScript.length).to.be.equal(1);
         expect(footerScript[0].type).to.be.equal("module");
