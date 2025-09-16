@@ -220,7 +220,7 @@ describe("Serve Greenwood With: ", function () {
       let body = "";
 
       before(async function () {
-        response = await fetch(`${hostname}${basePath}/styles/main.Bs32TA__.css`);
+        response = await fetch(`${hostname}${basePath}/styles/main.Bs32TLjt.css`);
         body = await response.clone().text();
       });
 
