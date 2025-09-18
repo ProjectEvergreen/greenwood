@@ -38,10 +38,8 @@ describe("Initialize a new Greenwood project: ", function () {
   describe(LABEL, function () {
     before(async function () {
       runner.setup(outputPath);
-      // ignore error since install logs get pretty noisy
-      await runner.runCommand(initPath, ["--name", APP_NAME, "--install", "yarn", "--ts", "no"], {
-        ignoreErrors: true,
-      });
+
+      await runner.runCommand(initPath, ["--name", APP_NAME, "--install", "yarn", "--ts", "no"]);
     });
 
     describe("should install with Yarn", function () {
