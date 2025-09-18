@@ -1,5 +1,5 @@
 diff --git a/node_modules/gallinago/src/lib/runner.js b/node_modules/gallinago/src/lib/runner.js
-index 325969f..1a28f5a 100644
+index 325969f..3457582 100644
 --- a/node_modules/gallinago/src/lib/runner.js
 +++ b/node_modules/gallinago/src/lib/runner.js
 @@ -36,14 +36,14 @@ class Runner {
@@ -7,7 +7,7 @@ index 325969f..1a28f5a 100644
    }
  
 -  runCommand(binPath, args, options = {}) {
-+  runCommand(binPath, args, options = { ignoreErrors: false }) {
++  runCommand(binPath, args) {
      return new Promise((resolve, reject) => {
        const executable = 'node';
        const isWindows = os.platform() === 'win32';
@@ -33,15 +33,11 @@ index 325969f..1a28f5a 100644
        });
  
        this.childProcess.on('close', code => {
-@@ -76,7 +76,10 @@ class Runner {
+@@ -76,7 +76,6 @@ class Runner {
          if (this.enableStdOut) {
            console.error(err);
          }
 -        reject(err);
-+
-+        if(!options?.ignoreErrors) {
-+          reject(err);
-+        }
        });
  
        this.childProcess.stdout.on('data', (data) => {
