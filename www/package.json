@@ -1,5 +1,5 @@
 {
-  "name": "@greenwood/www",
+  "name": "www",
   "version": "0.33.3",
   "private": true,
   "type": "module",
@@ -7,6 +7,11 @@
   "repository": "https://github.com/ProjectEvergreen/greenwood",
   "author": "Owen Buckley <owen@thegreenhouse.io>",
   "license": "MIT",
+  "scripts": {
+    "build": "cross-env __GWD_ROLLUP_MODE__=strict greenwood build",
+    "serve": "greenwood serve",
+    "dev": "greenwood develop"
+  },
   "dependencies": {
     "@evergreen-wc/eve-button": "^0.1.1",
     "@evergreen-wc/eve-container": "^0.1.1",
@@ -14,6 +19,13 @@
     "prismjs": "^1.21.0"
   },
   "devDependencies": {
+    "@greenwood/cli": "^0.33.0",
+    "@greenwood/plugin-graphql": "^0.33.0",
+    "@greenwood/plugin-import-raw": "^0.33.0",
+    "@greenwood/plugin-markdown": "^0.33.0",
+    "@greenwood/plugin-polyfills": "^0.33.0",
+    "@greenwood/plugin-postcss": "^0.33.0",
+    "@greenwood/plugin-renderer-puppeteer": "^0.33.0",
     "@mapbox/rehype-prism": "^0.5.0",
     "postcss-nested": "^4.1.2",
     "rehype-autolink-headings": "^4.0.0",
