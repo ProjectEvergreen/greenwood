@@ -40,7 +40,7 @@ const getTemplate = async (data) => {
 
 const getData = async () => {
   const version = JSON.parse(
-    await fs.readFile(new URL("../package.json", import.meta.url), "utf-8"),
+    await fs.readFile(new URL("../../package.json", import.meta.url), "utf-8"),
   ).version;
 
   return { version };

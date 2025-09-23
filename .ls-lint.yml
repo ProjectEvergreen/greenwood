@@ -13,7 +13,7 @@ ls:
 
 ignore:
   - .git
-  - public
+  - www/public
   - node_modules
   - packages/cli/node_modules
   - packages/plugin-postcss/node_modules
