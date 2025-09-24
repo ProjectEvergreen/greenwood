@@ -16,18 +16,23 @@ const defaultCompilerOptions = {
   allowImportingTsExtensions: true,
   erasableSyntaxOnly: true,
   noEmit: true,
-  verbatimModuleSyntax: false,
+  verbatimModuleSyntax: true,
 };
 
-async function getCompilerOptions(projectDirectory) {
+async function getCompilerOptions(projectDirectory, tsc) {
   const userConfigUrl = new URL("./tsconfig.json", projectDirectory);
   let options = defaultCompilerOptions;
 
   if (await checkResourceExists(userConfigUrl)) {
     // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
-    const userConfig = (await import(userConfigUrl, { with: { type: "json" } })).default;
+    const text = await fs.readFile(userConfigUrl, "utf-8");
+    const { config, error } = tsc.parseConfigFileTextToJson(projectDirectory.pathname, text);
 
-    options = userConfig.compilerOptions;
+    if (error) {
+      console.error("ERROR parsing tsconfig.json", error);
+    } else {
+      options = config.compilerOptions;
+    }
   }
 
   return options;
@@ -50,8 +55,11 @@ class StandardTypeScriptResource {
     let code = "";
 
     if (useTsc) {
-      const compilerOptions = await getCompilerOptions(this.compilation.context.projectDirectory);
       const tsc = (await import("typescript").then((mod) => mod)).default;
+      const compilerOptions = await getCompilerOptions(
+        this.compilation.context.projectDirectory,
+        tsc,
+      );
 
       code = tsc.transpileModule(body, { compilerOptions }).outputText;
     } else {
