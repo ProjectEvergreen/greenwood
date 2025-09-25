@@ -61,7 +61,7 @@
     "livereload": "^0.9.1",
     "node-html-parser": "^7.0.1",
     "rollup": "^4.26.0",
-    "wc-compiler": "~0.17.0"
+    "wc-compiler": "~0.17.1"
   },
   "devDependencies": {
     "@aws-sdk/client-cloudfront": "^3.726.0",
