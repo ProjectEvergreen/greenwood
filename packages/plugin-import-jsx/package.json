@@ -39,7 +39,7 @@
     "@greenwood/cli": "^0.33.0"
   },
   "dependencies": {
-    "wc-compiler": "~0.17.0"
+    "wc-compiler": "~0.17.1"
   },
   "devDependencies": {
     "@greenwood/cli": "^0.33.0"

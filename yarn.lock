@@ -20155,10 +20155,10 @@ wait-port@1.0.4:
     commander "^9.3.0"
     debug "^4.3.4"
 
-wc-compiler@~0.17.0:
-  version "0.17.0"
-  resolved "https://registry.yarnpkg.com/wc-compiler/-/wc-compiler-0.17.0.tgz#f1faf7773f69ca4255c580c604f90ff030482660"
-  integrity sha512-08d31qhYjlJiTEfTEW3kpSdcNnx0j0eGaUIA1/+oyczJCxya7+tvbQ/Tz3wbS2kzd/t8iSxNYdfhpf43o6RVuA==
+wc-compiler@~0.17.1:
+  version "0.17.1"
+  resolved "https://registry.yarnpkg.com/wc-compiler/-/wc-compiler-0.17.1.tgz#91e4dbfb06848afbc8f75fc4e22d6ef798df2c68"
+  integrity sha512-VnZe5NZFS29W1SygfSIX01lNq7iGr0jRXf6RX/ZG3YXFf8QSDYKqtAXniaMS7jOZEQHiA7Co1iAXCpYc6B5eMA==
   dependencies:
     "@projectevergreen/acorn-jsx-esm" "~0.1.0"
     acorn "^8.14.0"
