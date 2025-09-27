@@ -6,9 +6,7 @@ type PolyfillsPluginOptions = {
   lit?: boolean;
 };
 
-export type PolyfillsPlugin = (
-  options?: PolyfillsPluginOptions,
-) => Array<ResourcePlugin, CopyPlugin>;
+export type PolyfillsPlugin = (options?: PolyfillsPluginOptions) => [ResourcePlugin, CopyPlugin];
 
 declare module "@greenwood/plugin-polyfills" {
   export const greenwoodPluginPolyfills: PolyfillsPlugin;

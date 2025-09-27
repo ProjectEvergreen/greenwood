@@ -4,7 +4,7 @@ type PostCssPluginOptions = {
   extendConfig?: boolean;
 };
 
-export type PostCssPlugin = (options?: PostCssPluginOptions) => Array<ResourcePlugin>;
+export type PostCssPlugin = (options?: PostCssPluginOptions) => [ResourcePlugin];
 
 declare module "@greenwood/plugin-postcss" {
   export const greenwoodPluginPostCss: PostCssPlugin;

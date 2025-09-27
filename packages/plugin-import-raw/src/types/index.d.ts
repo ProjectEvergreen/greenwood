@@ -6,7 +6,7 @@ type ImportRawPluginOptions = {
   matches?: string[];
 };
 
-export type ImportRawPlugin = (options?: ImportRawPluginOptions) => Array<ResourcePlugin>;
+export type ImportRawPlugin = (options?: ImportRawPluginOptions) => [ResourcePlugin];
 
 declare module "@greenwood/plugin-import-raw" {
   export const greenwoodPluginImportRaw: ImportRawPlugin;

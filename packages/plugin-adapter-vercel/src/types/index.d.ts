@@ -6,7 +6,7 @@ type VercelAdapterOptions = {
   runtime?: SUPPORTED_NODE_VERSIONS;
 };
 
-export type VercelAdapter = (options?: VercelAdapterOptions) => Array<AdapterPlugin>;
+export type VercelAdapter = (options?: VercelAdapterOptions) => [AdapterPlugin];
 
 declare module "@greenwood/plugin-adapter-vercel" {
   export const greenwoodPluginAdapterVercel: VercelAdapter;
