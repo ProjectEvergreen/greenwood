@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/init",
-  "version": "0.33.1",
+  "version": "0.33.2",
   "description": "A package for scaffolding a new Greenwood project.",
   "repository": {
     "type": "git",
