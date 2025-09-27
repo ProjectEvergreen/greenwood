@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/plugin-graphql",
-  "version": "0.33.0",
+  "version": "0.33.1",
   "description": "A plugin for using GraphQL for querying your content.",
   "repository": {
     "type": "git",
@@ -51,6 +51,6 @@
     "graphql-tag": "^2.10.1"
   },
   "devDependencies": {
-    "@greenwood/cli": "^0.33.0"
+    "@greenwood/cli": "^0.33.1"
   }
 }
