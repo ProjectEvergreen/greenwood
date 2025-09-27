@@ -6,7 +6,7 @@ export type MarkdownPluginOptions = {
   plugins?: MarkdownPluginItem[];
 };
 
-export type MarkdownPlugin = (options?: MarkdownPluginOptions) => Array<ResourcePlugin>;
+export type MarkdownPlugin = (options?: MarkdownPluginOptions) => [ResourcePlugin];
 
 declare module "@greenwood/plugin-markdown" {
   export const greenwoodPluginMarkdown: MarkdownPlugin;
