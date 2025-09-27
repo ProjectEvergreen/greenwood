@@ -17,8 +17,8 @@ export default [
       "public/*",
       "reports/*",
       "coverage/*",
-      // 'packages/plugin-graphql/README.md',
       "www/**",
+      "packages/cli/test/cases/build.config.typescript/tsconfig.json",
     ],
   },
   {
