@@ -13,7 +13,7 @@ import { parse } from "node-html-parser";
 class StandardHtmlResource {
   constructor(compilation) {
     this.compilation = compilation;
-    this.extensions = [".html"];
+    this.extensions = ["html"];
     this.contentType = "text/html";
   }
 
