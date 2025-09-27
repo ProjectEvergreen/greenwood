@@ -38,7 +38,7 @@ describe("Serve Greenwood With: ", function () {
     it("should throw an error that no build output was detected", function () {
       try {
         runner.setup(outputPath);
-        runner.runCommand(cliPath, "serve", { async: true });
+        runner.runCommand(cliPath, "serve");
       } catch (err) {
         expect(err).to.contain("No build output detected.  Make sure you have run greenwood build");
       }

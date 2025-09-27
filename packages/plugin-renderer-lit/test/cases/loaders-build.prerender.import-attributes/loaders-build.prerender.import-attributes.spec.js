@@ -54,9 +54,9 @@ xdescribe("Build Greenwood With Custom Lit Renderer for SSG prerendering: ", fun
   });
 
   describe(LABEL, function () {
-    before(function () {
+    before(async function () {
       runner.setup(outputPath);
-      runner.runCommand(cliPath, "build");
+      await runner.runCommand(cliPath, "build");
     });
 
     runSmokeTest(["public", "index"], LABEL);

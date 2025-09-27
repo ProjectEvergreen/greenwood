@@ -49,7 +49,7 @@ describe("Build Greenwood With: ", function () {
   describe(LABEL, function () {
     before(async function () {
       runner.setup(outputPath);
-      runner.runCommand(cliPath, "build");
+      await runner.runCommand(cliPath, "build");
     });
 
     describe("Custom Element Importing CSS w/ Constructable Stylesheet", function () {
