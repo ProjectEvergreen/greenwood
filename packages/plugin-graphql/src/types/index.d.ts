@@ -2,7 +2,7 @@ import type { ResourcePlugin, ServerPlugin } from "@greenwood/cli";
 import "../queries/queries.d.ts";
 import "../core/client.d.ts";
 
-export type GraphQLPlugin = () => [ResourcePlugin, ServerPlugin];
+export type GraphQLPlugin = () => [ServerPlugin, ResourcePlugin];
 
 export type CollectionVariables = {
   name: string;
