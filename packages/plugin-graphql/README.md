@@ -153,7 +153,7 @@ customElements.define('x-component', SomeComponent);
 
 ### Collections
 
-Based on [our Collections feature](http://www.greenwoodjs.dev/docs/content-as-data/collections/) for querying based on collections.
+Based on [our Collections feature](https://www.greenwoodjs.dev/docs/content-as-data/collections/) for querying based on collections.
 
 ```js
 import client from '@greenwood/plugin-graphql/src/core/client.js';
@@ -178,7 +178,7 @@ customElements.define('x-component', SomeComponent);
 
 ### Children 
 
-This will return a set of pages under a specific route and is akin to using [`getContentByRoute`](http://www.greenwoodjs.dev/docs/content-as-data/data-client/#content-by-route).
+This will return a set of pages under a specific route and is akin to using [`getContentByRoute`](https://www.greenwoodjs.dev/docs/content-as-data/data-client/#content-by-route).
 
 ```js
 import client from '@greenwood/plugin-graphql/src/core/client.js';

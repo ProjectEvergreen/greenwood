@@ -20,7 +20,7 @@ All in all, that refreshing of our mindset was just the motivation we needed to 
 
 ### Theme Packs
 
-With Greenwood [_**Theme Packs**_](https://www.greenwoodjs.io/guides/theme-packs/), now you can create and share reusable HTML / CSS / JS as npm packages that yourself or other Greenwood users can pull into their Greenwood project as easily as a plugin.  It was inspired by [**CSS Zen Garden**](http://www.csszengarden.com/), which is a site aimed at showcasing the power of CSS through static HTML.
+With Greenwood [_**Theme Packs**_](https://www.greenwoodjs.dev/guides/theme-packs/), now you can create and share reusable HTML / CSS / JS as npm packages that yourself or other Greenwood users can pull into their Greenwood project as easily as a plugin.  It was inspired by [**CSS Zen Garden**](http://www.csszengarden.com/), which is a site aimed at showcasing the power of CSS through static HTML.
 
 > _The HTML remains the same, the only thing that has changed is the contents of the CSS._
 

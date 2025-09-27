@@ -22,7 +22,7 @@ Features:
 
 ## Getting Started
 
-Our website has a complete [Getting Started](http://www.greenwoodjs.dev/guides/getting-started/) guide that will walk you through creating a Greenwood project from scratch.
+Our website has a complete [Getting Started](https://www.greenwoodjs.dev/guides/getting-started/) guide that will walk you through creating a Greenwood project from scratch.
 
 You can follow along with, or clone and go, the [companion repo](https://github.com/ProjectEvergreen/greenwood-getting-started) or try it out live on [Stackblitz](https://stackblitz.com/github/projectevergreen/greenwood-getting-started).
 
