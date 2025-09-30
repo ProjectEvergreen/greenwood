@@ -25,7 +25,7 @@ jobs:
           version: latest
       - name: Installing project dependencies
         run: |
-          yarn install --frozen-lockfile && yarn lerna bootstrap
+          yarn install --frozen-lockfile
       - name: Lint
         run: |
           yarn lint
