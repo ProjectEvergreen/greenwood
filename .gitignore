@@ -15,3 +15,4 @@ packages/**/test/**/.vercel
 public/
 adapter-output/
 .aws-output/
+/.nx/workspace-data
