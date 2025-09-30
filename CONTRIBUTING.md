@@ -311,3 +311,14 @@ For a normal release (e.g. "latest") the following command can be run from the m
 # from the root of the repo
 $ yarn lerna publish --force-publish
 ```
+
+### Dry Run
+
+To test Lerna's publishing and see what changes it would make, you can run Lerna in "dry run" mode using the following command:
+
+> 🚨 !!! Make sure to cancel (Ctr+C) in the terminal when prompted with the OTP prompt for npm publishing !!!
+
+```sh
+# from the root of the repo
+$ yarn lerna publish --force-publish --no-git-tag-version --no-push
+```
