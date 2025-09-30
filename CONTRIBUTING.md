@@ -11,11 +11,10 @@ We're excited for your interest in Greenwood, and maybe even your contribution!
 To develop for the project, you'll want to follow these steps:
 
 1. Install [NodeJS LTS](https://nodejs.org) or [NVM](https://github.com/nvm-sh/nvm) (recommended)
-1. Have [Yarn](https://yarnpkg.com/) installed
+1. Have [Yarn 1.x](https://yarnpkg.com/) installed
 1. Clone the repository
 1. For NVM users, run `nvm use`
 1. Run `yarn install`
-1. Run `yarn lerna bootstrap`
 
 ## Feature Development
 
