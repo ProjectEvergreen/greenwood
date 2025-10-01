@@ -26,7 +26,11 @@ import fs from "node:fs";
 import glob from "glob-promise";
 import { JSDOM } from "jsdom";
 import path from "node:path";
-import { getOutputTeardownFiles, getDependencyFiles } from "../../../../../test/utils.js";
+import {
+  getOutputTeardownFiles,
+  getDependencyFiles,
+  HASH_REGEX,
+} from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
 
@@ -118,8 +122,10 @@ describe("Build Greenwood With: ", function () {
           dom.window.document.querySelectorAll("head > script:not([src])"),
         ).filter((tag) => !tag.getAttribute("data-gwd"))[0];
 
-        expect(inlineScriptTag.textContent.replace(/\n/g, "")).to.equal(
-          'import"/368592136.dlaVsmnb.js";import"/lit-html.CYd3Xodq.js";//# sourceMappingURL=368592136.BFJXtrkH.js.map',
+        expect(inlineScriptTag.textContent.replace(/\n/g, "")).to.match(
+          new RegExp(
+            `import"\\/${HASH_REGEX}\\.${HASH_REGEX}\\.js";import"\\/lit-html\\.${HASH_REGEX}\\.js";\\/\\/# sourceMappingURL=${HASH_REGEX}\\.${HASH_REGEX}\\.js\\.map`,
+          ),
         );
       });
     });
@@ -197,12 +203,10 @@ describe("Build Greenwood With: ", function () {
           path.join(this.context.publicDir, "styles/theme.*.css"),
         );
         const contents = fs.readFileSync(themeFile[0], "utf-8");
-
-        expect(
-          contents.indexOf(
-            "@font-face {font-family:'FontAwesome';src:url('/node-modules/font-awesome/fonts/fontawesome-webfont.139345087.eot?v=4.7.0');",
-          ) > 0,
-        ).to.equal(true);
+        const contentsRegex = new RegExp(
+          `@font-face\\s*\\{font-family:'FontAwesome';src:url\\('/node-modules/font-awesome/fonts/fontawesome-webfont\\.${HASH_REGEX}\\.eot\\?v=4\\.7\\.0'\\);`,
+        );
+        expect(contents).to.match(contentsRegex);
       });
     });
   });

@@ -53,6 +53,7 @@ import path from "node:path";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
+import { HASH_REGEX } from "../../../../../test/utils.js";
 
 const expect = chai.expect;
 
@@ -429,7 +430,7 @@ describe("Develop Greenwood With: ", function () {
       });
 
       it("should return the correct etag header", function (done) {
-        expect(response.headers.get("etag")).to.equal("2130309740");
+        expect(response.headers.get("etag")).to.match(new RegExp(HASH_REGEX));
         done();
       });
 
@@ -445,7 +446,7 @@ describe("Develop Greenwood With: ", function () {
 
       before(async function () {
         response = await fetch(`${hostname}:${port}/assets/splash-clip.mp4`, {
-          headers: new Headers({ "if-none-match": "2130309740" }),
+          headers: new Headers({ "if-none-match": "QgHxJEgC" }),
         });
         body = await response.clone().text();
       });
