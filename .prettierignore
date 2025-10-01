@@ -6,3 +6,4 @@ packages/cli/test/cases/develop.default.hud-disabled/src/pages/index.html
 packages/cli/test/cases/develop.default.hud/src/pages/index.html
 packages/cli/test/cases/develop.config.polyfills-import-attributes/src/components/hero.js
 packages/cli/test/cases/develop.plugins.context/fixtures/my-layouts/app.html
+/.nx/workspace-data
