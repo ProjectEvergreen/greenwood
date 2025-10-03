@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import { checkResourceExists } from "../lib/resource-utils.js";
 import { asyncForEach } from "../lib/async-utils.js";
+import { copyFileWithRetry } from "../lib/fs-utils.js";
 
 async function rreaddir(dir, allFiles = []) {
   const files = (await fs.readdir(dir)).map((f) => new URL(`./${f}`, dir));
@@ -20,10 +21,9 @@ async function rreaddir(dir, allFiles = []) {
 async function copyFile(source, target, projectDirectory) {
   try {
     console.info(`copying file... ${source.pathname.replace(projectDirectory.pathname, "")}`);
-
-    await fs.copyFile(source, target);
+    await copyFileWithRetry(source, target);
   } catch (error) {
-    console.error("ERROR", error);
+    console.error("ERROR copying file", source.href, "->", target.href, error);
   }
 }
 
