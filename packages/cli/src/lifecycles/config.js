@@ -323,7 +323,7 @@ const readAndMergeConfig = async () => {
         if (Array.isArray(importAttributes)) {
           customConfig.polyfills.importAttributes = importAttributes;
         } else {
-          Promise.reject(
+          return Promise.reject(
             `Configuration error: polyfills.importAttributes must be an array of types; ['css', 'json'].  Passed value was typeof: ${typeof importAttributes}`,
           );
         }

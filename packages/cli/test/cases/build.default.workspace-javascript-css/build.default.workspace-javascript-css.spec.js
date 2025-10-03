@@ -49,7 +49,7 @@ describe("Build Greenwood With: ", function () {
 
     before(async function () {
       runner.setup(outputPath);
-      runner.runCommand(cliPath, "build");
+      await runner.runCommand(cliPath, "build");
 
       dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "index.html"));
     });

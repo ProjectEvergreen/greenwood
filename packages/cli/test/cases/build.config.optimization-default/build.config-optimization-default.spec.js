@@ -68,7 +68,7 @@ describe("Build Greenwood With: ", function () {
       );
 
       runner.setup(outputPath, [...geistPackageJson, ...geistFonts]);
-      runner.runCommand(cliPath, "build");
+      await runner.runCommand(cliPath, "build");
     });
 
     describe("Output for JavaScript / CSS tags and files", function () {
