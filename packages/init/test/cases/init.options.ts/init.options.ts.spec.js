@@ -206,7 +206,7 @@ describe("Initialize a new Greenwood project: ", function () {
 
     describe("Default Types", function () {
       it("should generate a types.d.ts file", function () {
-        expect(fs.existsSync(path.join(initOutputPath, "types.d.ts"))).to.be.true;
+        expect(fs.existsSync(path.join(initOutputPath, "src/types.d.ts"))).to.be.true;
       });
     });
   });
