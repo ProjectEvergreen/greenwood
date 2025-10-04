@@ -66,6 +66,7 @@
   "devDependencies": {
     "@aws-sdk/client-cloudfront": "^3.726.0",
     "@beforesemicolon/markup": "^1.14.1",
+    "@jridgewell/gen-mapping": "^0.3.13",
     "@shoelace-style/shoelace": "^2.18.0",
     "@spectrum-css/card": "^9.3.0",
     "@spectrum-web-components/action-menu": "^1.0.1",
