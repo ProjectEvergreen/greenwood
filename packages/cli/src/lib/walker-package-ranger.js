@@ -176,16 +176,18 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
       // https://app.unpkg.com/@jridgewell/gen-mapping@0.3.13/files/package.json#L18
       if (Array.isArray(exports[sub])) {
         for (const item of exports[sub]) {
-          // TODO if string, just check it in...
-          if (typeof item === "object") {
+          if (typeof item === "string") {
+            // basic support, not properly tested
+            updateImportMap(`${dependency}/${item}`, item, resolvedRoot);
+          } else if (typeof item === "object") {
             let matched = false;
 
             for (const condition of SUPPORTED_EXPORT_CONDITIONS) {
               if (item[condition]) {
                 matched = true;
                 if (sub.indexOf("*") >= 0) {
-                  // TODO: could there be wildcards here too?
-                  // await walkExportPatterns(dependency, sub, item[condition], resolvedRoot);
+                  // basic support, not properly tested
+                  await walkExportPatterns(dependency, sub, exports[sub][condition], resolvedRoot);
                 } else {
                   // could there be more sub conditions here?  Going with default for now
                   updateImportMap(
