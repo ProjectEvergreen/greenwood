@@ -46,6 +46,7 @@
   "dependencies": {
     "@apollo/client": "^4.0.7",
     "@apollo/server": "^5.0.0",
+    "@graphql-tools/schema": "^10.0.25",
     "graphql": "^16.11.0",
     "graphql-tag": "^2.11.0",
     "rxjs": "^7.8.2"
