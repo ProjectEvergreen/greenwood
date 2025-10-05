@@ -1,10 +1,10 @@
 // we "deep" link into the Apollo package to avoid pulling in React
 // https://www.apollographql.com/docs/react/migrating/apollo-client-3-migration/#using-apollo-client-without-react
 // @ts-nocheck
-import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client/core/index.js";
+import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client";
 import { checkResourceExists } from "@greenwood/cli/src/lib/resource-utils.js";
 import fs from "node:fs/promises";
-import { gql } from "apollo-server";
+import gql from "graphql-tag";
 import { getQueryHash } from "./common.js";
 
 /* Extract cache server-side */

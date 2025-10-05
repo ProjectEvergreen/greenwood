@@ -1,6 +1,8 @@
 import fs from "node:fs/promises";
 import { graphqlServer } from "./core/server.js";
 import { mergeImportMap } from "@greenwood/cli/src/lib/node-modules-utils.js";
+import { startStandaloneServer } from "@apollo/server/standalone";
+import { createCache } from "./core/cache.js";
 
 const importMap = {
   "@greenwood/plugin-graphql/src/core/client.js":
@@ -81,9 +83,31 @@ class GraphQLServer {
   }
 
   async start() {
-    return (await graphqlServer(this.compilation)).listen().then((server) => {
-      console.log(`GraphQLServer started at ${server.url}`);
+    // https://www.apollographql.com/docs/apollo-server/api/standalone
+    const { url } = await startStandaloneServer(await graphqlServer(this.compilation), {
+      listen: { port: 4000 },
+      context: async (integrationContext) => {
+        const { req } = integrationContext;
+        const { config, graph, context } = this.compilation;
+
+        // make sure to ignore introspection requests from being generated as an output cache file
+        // https://stackoverflow.com/a/58040379/417806
+        if (
+          process.env.__GWD_COMMAND__ === "build" &&
+          !req?.url.endsWith("?q=internal") &&
+          req?.body?.operationName !== "IntrospectionQuery"
+        ) {
+          await createCache(req, context);
+        }
+
+        return {
+          config,
+          graph,
+        };
+      },
     });
+
+    console.log(`GraphQLServer started at ${url}`);
   }
 }
 
