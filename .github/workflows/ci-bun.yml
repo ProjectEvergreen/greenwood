@@ -15,6 +15,10 @@ jobs:
         uses: oven-sh/setup-bun@v2
 
       # still using Yarn since we specifically rely on Yarn workspaces
+      - name: Disable Strict SSL
+        run: yarn config set strict-ssl false
+
+      # still using Yarn since we specifically rely on Yarn workspaces
       - name: Install Dependencies
         run: yarn install --frozen-lockfile && yarn lerna bootstrap
 
