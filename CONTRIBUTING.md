@@ -197,6 +197,7 @@ Additionally, Greenwood leverages [exports maps](https://nodejs.org/api/packages
 Each plugin will also need to have an _index.d.ts_ file that exports types and a module definition for itself, like so:
 
 ```ts
+// import the most specific plugin type relative to what your plugin uses
 import type { Plugin } from "@greenwood/cli";
 
 type SUPPORTED_THING = "A" | "B" | "C";
@@ -205,7 +206,7 @@ type FooPluginOptions = {
   bar?: SUPPORTED_THING
 };
 
-export type FooPlugin = (options?: FooPluginOptions) => Array<Plugin>;
+export type FooPlugin = (options?: FooPluginOptions) => [Plugin];
 
 declare module "@greenwood/plugin-foo" {
   export const greenwoodPluginFoo: FooPlugin;
