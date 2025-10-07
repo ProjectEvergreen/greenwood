@@ -9,7 +9,6 @@ import rollupPluginAnalyzer from "rollup-plugin-analyzer";
 
 /** @type {import('@greenwood/cli').Config} */
 export default {
-  workspace: new URL("./www/", import.meta.url),
   optimization: "inline",
   staticRouter: true,
   activeContent: true,
