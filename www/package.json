@@ -22,6 +22,7 @@
     "@greenwood/cli": "^0.33.0",
     "@greenwood/plugin-graphql": "^0.33.0",
     "@greenwood/plugin-import-raw": "^0.33.0",
+    "@greenwood/plugin-include-html": "^0.33.0",
     "@greenwood/plugin-markdown": "^0.33.0",
     "@greenwood/plugin-polyfills": "^0.33.0",
     "@greenwood/plugin-postcss": "^0.33.0",
