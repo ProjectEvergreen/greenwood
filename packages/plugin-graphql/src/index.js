@@ -3,8 +3,6 @@ import { graphqlServer } from "./core/server.js";
 import { mergeImportMap } from "@greenwood/cli/src/lib/node-modules-utils.js";
 
 const importMap = {
-  "@greenwood/cli/src/lib/hashing-utils.js":
-    "/node_modules/@greenwood/cli/src/lib/hashing-utils.js",
   "@greenwood/plugin-graphql/src/core/client.js":
     "/node_modules/@greenwood/plugin-graphql/src/core/client.js",
   "@greenwood/plugin-graphql/src/core/common.js":

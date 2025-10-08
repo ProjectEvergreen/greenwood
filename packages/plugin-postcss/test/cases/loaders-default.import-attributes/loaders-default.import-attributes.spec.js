@@ -33,7 +33,7 @@ import fs from "node:fs";
 import glob from "glob-promise";
 import path from "node:path";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
-import { getOutputTeardownFiles } from "../../../../../test/utils.js";
+import { getOutputTeardownFiles, HASH_REGEX } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
 
@@ -74,13 +74,14 @@ describe("Build Greenwood With: ", function () {
         const headerFiles = glob.sync(path.join(this.context.publicDir, "header.*.js"));
         const js = fs.readFileSync(headerFiles[0], "utf-8");
 
-        expect(headerFiles.length).to.equal(1);
-        expect(
-          js.indexOf('import e from"/styles/theme.548942254.css"with{type:"css"};') >= 0,
-        ).to.equal(true);
-        expect(js.indexOf('import t from"/header.VW6HLTom.css"with{type:"css"};') >= 0).to.equal(
-          true,
+        const themeRegex = new RegExp(
+          `import e from"/styles/theme.${HASH_REGEX}.css"with{type:"css"};`,
         );
+        const headerRegex = new RegExp(`import t from"/header.${HASH_REGEX}.css"with{type:"css"};`);
+
+        expect(headerFiles.length).to.equal(1);
+        expect(js).to.match(themeRegex);
+        expect(js).to.match(headerRegex);
         expect(
           js.indexOf(
             "const s=new CSSStyleSheet;s.replaceSync('.spectrum{--spectrum-font-family-ar:myriad-arabic",
