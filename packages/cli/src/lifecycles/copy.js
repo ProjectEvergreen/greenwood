@@ -3,6 +3,22 @@ import { checkResourceExists } from "../lib/resource-utils.js";
 import { asyncForEach } from "../lib/async-utils.js";
 import { copyFileWithRetry } from "../lib/fs-utils.js";
 
+// simple concurrency-limited mapper using chunked batches
+async function mapWithConcurrency(items, mapper, concurrency = 8) {
+  const results = [];
+
+  for (let i = 0; i < items.length; i += concurrency) {
+    const chunk = items.slice(i, i + concurrency);
+    const chunkPromises = chunk.map((item) => mapper(item));
+    // wait for this batch to finish before continuing to the next
+    // preserve individual rejections
+    const chunkResults = await Promise.all(chunkPromises);
+    results.push(...chunkResults);
+  }
+
+  return results;
+}
+
 async function rreaddir(dir, allFiles = []) {
   const files = (await fs.readdir(dir)).map((f) => new URL(`./${f}`, dir));
 
@@ -39,7 +55,7 @@ async function copyDirectory(fromUrl, toUrl, projectDirectory) {
         });
       }
 
-      await asyncForEach(files, async (fileUrl) => {
+      await mapWithConcurrency(files, async (fileUrl) => {
         const targetUrl = new URL(
           `file://${fileUrl.pathname.replace(fromUrl.pathname, toUrl.pathname)}`,
         );
@@ -60,7 +76,7 @@ async function copyDirectory(fromUrl, toUrl, projectDirectory) {
         }
 
         await copyFile(fileUrl, targetUrl, projectDirectory);
-      });
+      }, 8);
     }
   } catch (e) {
     console.error("ERROR", e);
@@ -71,10 +87,10 @@ const copyAssets = async (compilation) => {
   const copyPlugins = compilation.config.plugins.filter((plugin) => plugin.type === "copy");
   const { projectDirectory } = compilation.context;
 
-  await asyncForEach(copyPlugins, async (plugin) => {
+  await mapWithConcurrency(copyPlugins, async (plugin) => {
     const locations = await plugin.provider(compilation);
 
-    await asyncForEach(locations, async (location) => {
+    await mapWithConcurrency(locations, async (location) => {
       const { from, to } = location;
 
       if (from.pathname.endsWith("/")) {
@@ -82,8 +98,8 @@ const copyAssets = async (compilation) => {
       } else {
         await copyFile(from, to, projectDirectory);
       }
-    });
-  });
+    }, 4);
+  }, 2);
 };
 
 export { copyAssets };

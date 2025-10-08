@@ -3,31 +3,6 @@ import os from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 
-// synchronous copy with simple retry/backoff for Windows transient EBUSY
-function copyFileSyncWithRetry(src, dest, attempts = 5, baseDelay = 50) {
-  let lastErr;
-
-  for (let i = 0; i < attempts; i++) {
-    try {
-      return fs.copyFileSync(src, dest);
-    } catch (err) {
-      lastErr = err;
-      if ((err.code === 'EBUSY' || err.code === 'EPERM' || err.code === 'EACCES') && i < attempts - 1) {
-        const delay = baseDelay * Math.pow(2, i);
-        const waitUntil = Date.now() + delay + Math.floor(Math.random() * baseDelay);
-        while (Date.now() < waitUntil) {
-          // busy wait — this is synchronous intentionally
-        }
-        continue;
-      }
-
-      throw err;
-    }
-  }
-
-  throw lastErr;
-}
-
 function copyTemplate(templateDirUrl, outputDirUrl) {
   console.log("copying project files to => ", outputDirUrl.pathname);
 
@@ -41,7 +16,7 @@ function copyTemplate(templateDirUrl, outputDirUrl) {
     if (isDir && !fs.existsSync(outputFileUrl)) {
       fs.mkdirSync(outputFileUrl);
     } else if (!isDir) {
-      copyFileSyncWithRetry(templateFileUrl, outputFileUrl);
+      fs.copyFileSync(templateFileUrl, outputFileUrl);
     }
   });
 }
