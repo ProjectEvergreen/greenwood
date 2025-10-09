@@ -60,7 +60,7 @@ describe('Build Greenwood With: ', function() {
   describe(LABEL, function() {
 
     before(async function() {
-      runner.setup(outputPath);
+      await runner.setup(outputPath);
       await runner.runCommand(cliPath, 'build');
     });
 
@@ -85,8 +85,8 @@ describe('Build Greenwood With: ', function() {
     });
   });
 
-  after(function() {
-    runner.teardown(getOutputTeardownFiles(outputPath));
+  after(async function() {
+    await runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });
 ```
@@ -109,7 +109,7 @@ $ yarn test:loaders
 Below are some tips to help with running / debugging tests:
 - `describe.only` / `it.only`: only runs this block
 - `xdescribe` / `xit`: don't run this block
-- Uncomment `runner.teardown()` in a case to see the build output without it getting cleaned up post test run
+- Uncomment `await runner.teardown()` in a case to see the build output without it getting cleaned up post test run
 - Use `new Runner(true)` get debug output from Greenwood when running tests
 
 > **PLEASE DO NOT COMMIT ANY OF THESE ABOVE CHANGES THOUGH**
@@ -146,7 +146,7 @@ Test cases that exercise custom loaders (like TypeScript, JSX plugins) for SSR a
       runner = new Runner(false, true);
     });
 
-    runner.runCommand(/* ... */);
+    await runner.runCommand(/* ... */);
     ```
 1. Use the `yarn test:loaders` npm script
 

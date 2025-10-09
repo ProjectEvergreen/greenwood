@@ -35,7 +35,7 @@ describe("Initialize a new Greenwood project: ", function () {
 
   describe("Scaffolding a new project accepting all default options", function () {
     before(async function () {
-      runner.setup(outputPath);
+      await runner.setup(outputPath);
       await runner.runCommand(initPath, ["-y"]);
     });
 
@@ -141,7 +141,7 @@ describe("Initialize a new Greenwood project: ", function () {
     });
   });
 
-  after(function () {
-    runner.teardown([initOutputPath]);
+  after(async function () {
+    await runner.teardown([initOutputPath]);
   });
 });

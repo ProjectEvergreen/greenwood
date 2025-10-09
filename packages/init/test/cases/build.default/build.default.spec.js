@@ -38,7 +38,7 @@ describe("Initialize a new Greenwood project: ", function () {
 
   describe(LABEL, function () {
     before(async function () {
-      runner.setup(outputPath);
+      await runner.setup(outputPath);
       await runner.runCommand(initPath, ["--name", APP_NAME, "--ts", "no", "--install", "no"]);
     });
 
@@ -46,7 +46,7 @@ describe("Initialize a new Greenwood project: ", function () {
       const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
 
       before(async function () {
-        runner.setup(initOutputPath);
+        await runner.setup(initOutputPath);
         await runner.runCommand(cliPath, ["build"]);
       });
 
@@ -90,7 +90,7 @@ describe("Initialize a new Greenwood project: ", function () {
     });
   });
 
-  after(function () {
-    runner.teardown([initOutputPath]);
+  after(async function () {
+    await runner.teardown([initOutputPath]);
   });
 });

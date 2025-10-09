@@ -47,7 +47,7 @@ describe("Develop Greenwood With: ", function () {
 
   describe(LABEL, function () {
     before(async function () {
-      runner.setup(outputPath);
+      await runner.setup(outputPath);
 
       return new Promise((resolve) => {
         setTimeout(() => {
@@ -126,8 +126,8 @@ describe("Develop Greenwood With: ", function () {
     });
   });
 
-  after(function () {
-    runner.teardown(getOutputTeardownFiles(outputPath));
-    runner.stopCommand();
+  after(async function () {
+    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.stopCommand();
   });
 });
