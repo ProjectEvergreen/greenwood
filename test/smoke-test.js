@@ -252,3 +252,23 @@ async function runSmokeTest(testCases, label) {
 }
 
 export { runSmokeTest };
+
+// Shared helper for tests to teardown runner paths safely with retries on transient Windows file locks
+async function safeTeardown(runner, paths = [], attempts = 5, baseDelay = 100) {
+  for (let i = 0; i < attempts; i++) {
+    try {
+      runner.teardown(paths);
+      return;
+    } catch (err) {
+      if ((err.code === "EBUSY" || err.code === "EPERM" || err.code === "EACCES") && i < attempts - 1) {
+        const delay = baseDelay * Math.pow(2, i);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        continue;
+      }
+
+      throw err;
+    }
+  }
+}
+
+export { safeTeardown };

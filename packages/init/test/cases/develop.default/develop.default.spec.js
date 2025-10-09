@@ -15,7 +15,7 @@ import chai from "chai";
 import { JSDOM } from "jsdom";
 import path from "node:path";
 import { Runner } from "gallinago";
-import { runSmokeTest } from "../../../../../test/smoke-test.js";
+import { runSmokeTest, safeTeardown } from "../../../../../test/smoke-test.js";
 import { fileURLToPath } from "node:url";
 
 const expect = chai.expect;
@@ -93,8 +93,8 @@ describe("Initialize a new Greenwood project: ", function () {
     });
   });
 
-  after(function () {
+  after(async function () {
     runner.stopCommand();
-    runner.teardown([initOutputPath]);
+    await safeTeardown(runner, [initOutputPath]);
   });
 });

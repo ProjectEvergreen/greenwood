@@ -3,6 +3,55 @@ import os from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 
+// synchronous sleep that avoids busy-looping:
+// - prefer Atomics.wait on a SharedArrayBuffer (low-overhead block)
+// - fallback to spawning a short-lived node child (execSync/spawnSync) when Atomics.wait isn't available
+function sleepSync(ms) {
+  try {
+    if (typeof Atomics !== "undefined" && typeof Atomics.wait === "function") {
+      const sab = new SharedArrayBuffer(4);
+      const ia = new Int32Array(sab);
+      // Atomics.wait blocks the current thread
+      Atomics.wait(ia, 0, 0, ms);
+      return;
+    }
+  } catch (e) {
+    // fall through to spawnSync fallback
+  }
+
+  // fallback: spawn a short node process that exits after ms
+  try {
+    spawnSync(process.execPath, ["-e", `setTimeout(()=>process.exit(0), ${ms})`], {
+      stdio: "ignore",
+      shell: false,
+    });
+  } catch (e) {
+    // last resort: no-op
+  }
+}
+
+// synchronous copy with retry/backoff using low-CPU sleep
+function copyFileSyncWithRetry(src, dest, attempts = 5, baseDelay = 50) {
+  let lastErr;
+
+  for (let i = 0; i < attempts; i++) {
+    try {
+      return fs.copyFileSync(src, dest);
+    } catch (err) {
+      lastErr = err;
+      if ((err.code === "EBUSY" || err.code === "EPERM" || err.code === "EACCES") && i < attempts - 1) {
+        const delay = baseDelay * Math.pow(2, i);
+        sleepSync(delay + Math.floor(Math.random() * baseDelay));
+        continue;
+      }
+
+      throw err;
+    }
+  }
+
+  throw lastErr;
+}
+
 function copyTemplate(templateDirUrl, outputDirUrl) {
   console.log("copying project files to => ", outputDirUrl.pathname);
 
@@ -16,7 +65,8 @@ function copyTemplate(templateDirUrl, outputDirUrl) {
     if (isDir && !fs.existsSync(outputFileUrl)) {
       fs.mkdirSync(outputFileUrl);
     } else if (!isDir) {
-      fs.copyFileSync(templateFileUrl, outputFileUrl);
+      // Use a sync copy with retry that uses a low-CPU blocking sleep to avoid busy-looping
+      copyFileSyncWithRetry(templateFileUrl, outputFileUrl);
     }
   });
 }
