@@ -55,7 +55,7 @@ async function copyDirectory(fromUrl, toUrl, projectDirectory) {
         });
       }
 
-      await mapWithConcurrency(files, async (fileUrl) => {
+  await mapWithConcurrency(files, async (fileUrl) => {
         const targetUrl = new URL(
           `file://${fileUrl.pathname.replace(fromUrl.pathname, toUrl.pathname)}`,
         );
@@ -76,7 +76,7 @@ async function copyDirectory(fromUrl, toUrl, projectDirectory) {
         }
 
         await copyFile(fileUrl, targetUrl, projectDirectory);
-      }, 8);
+  }, 8);
     }
   } catch (e) {
     console.error("ERROR", e);
@@ -90,7 +90,7 @@ const copyAssets = async (compilation) => {
   await mapWithConcurrency(copyPlugins, async (plugin) => {
     const locations = await plugin.provider(compilation);
 
-    await mapWithConcurrency(locations, async (location) => {
+  await mapWithConcurrency(locations, async (location) => {
       const { from, to } = location;
 
       if (from.pathname.endsWith("/")) {

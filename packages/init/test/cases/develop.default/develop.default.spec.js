@@ -95,6 +95,9 @@ describe("Initialize a new Greenwood project: ", function () {
 
   after(async function () {
     runner.stopCommand();
-    await safeTeardown(runner, [initOutputPath]);
+    // give the process a moment to release file handles (helps on Windows)
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    // increase attempts and baseDelay for teardown to be more resilient on CI
+    await safeTeardown(runner, [initOutputPath], 6, 200);
   });
 });
