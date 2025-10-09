@@ -252,3 +252,71 @@ async function runSmokeTest(testCases, label) {
 }
 
 export { runSmokeTest };
+
+// Shared helper for tests to teardown runner paths safely with retries on transient Windows file locks
+import fsPromises from 'node:fs/promises';
+
+async function safeRmPath(pathStr, attempts = 5, baseDelay = 100, verbose = false) {
+  for (let i = 0; i < attempts; i++) {
+    try {
+      if (verbose) console.info(`[safeRmPath] rm attempt ${i + 1}/${attempts} ${pathStr}`);
+      // Node 14+ supports fs.promises.rm with recursive and force options
+      await fsPromises.rm(pathStr, { recursive: true, force: false });
+      if (verbose) console.info(`[safeRmPath] rm succeeded ${pathStr}`);
+      return;
+    } catch (err) {
+      if (verbose) console.warn(`[safeRmPath] rm attempt ${i + 1} failed for ${pathStr}:`, err && err.code ? err.code : err);
+
+      if ((err.code === 'EBUSY' || err.code === 'EPERM' || err.code === 'EACCES') && i < attempts - 1) {
+        const delay = baseDelay * Math.pow(2, i);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        continue;
+      }
+
+      // rethrow if non-retryable or last attempt
+      throw err;
+    }
+  }
+}
+
+async function safeTeardown(runner, paths = [], attempts = 5, baseDelay = 100) {
+  const verbose = process.env.GWD_RETRY_VERBOSE === 'true';
+
+  for (let i = 0; i < attempts; i++) {
+    try {
+      if (verbose) console.info(`[safeTeardown] attempt ${i + 1}/${attempts} teardown paths=${JSON.stringify(paths)}`);
+      runner.teardown(paths);
+      if (verbose) console.info(`[safeTeardown] teardown succeeded`);
+      return;
+    } catch (err) {
+      if (verbose) console.warn(`[safeTeardown] attempt ${i + 1} failed:`, err && err.code ? err.code : err);
+
+      if ((err.code === 'EBUSY' || err.code === 'EPERM' || err.code === 'EACCES') && i < attempts - 1) {
+        const delay = baseDelay * Math.pow(2, i);
+        if (verbose) console.info(`[safeTeardown] retrying in ${delay}ms`);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        continue;
+      }
+
+      // If runner.teardown failed and we've exhausted retries, attempt per-path removal as fallback
+      if (err.code === 'EBUSY' || err.code === 'EPERM' || err.code === 'EACCES') {
+        if (verbose) console.info('[safeTeardown] falling back to per-path rm');
+        for (const p of paths) {
+          try {
+            await safeRmPath(p, attempts, baseDelay, verbose);
+          } catch (rmErr) {
+            // if fallback removal fails, surface original error for debugging
+            if (verbose) console.error('[safeTeardown] fallback rm failed for', p, rmErr);
+            throw rmErr;
+          }
+        }
+
+        return;
+      }
+
+      throw err;
+    }
+  }
+}
+
+export { safeTeardown };

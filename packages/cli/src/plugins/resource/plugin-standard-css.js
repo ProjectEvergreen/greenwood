@@ -5,6 +5,7 @@
  *
  */
 import fs from "node:fs";
+import { copyFileWithRetry } from "../../lib/fs-utils.js";
 import path from "node:path";
 import { parse, walk } from "css-tree";
 import { hashString } from "../../lib/hashing-utils.js";
@@ -134,7 +135,11 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
               recursive: true,
             });
 
-            fs.promises.copyFile(resolvedUrl, new URL(`.${finalValue}`, outputDir));
+            // Use copy helper with retry to avoid intermittent EBUSY on Windows CI
+            // bundleCss is synchronous, so we don't await here; log any copy errors.
+            copyFileWithRetry(resolvedUrl, new URL(`.${finalValue}`, outputDir)).catch((err) =>
+              console.error('ERROR copying asset during CSS bundling', resolvedUrl.href, err),
+            );
           }
 
           optimizedCss += `url('${basePath}${finalValue}')`;
