@@ -53,7 +53,7 @@ describe("Build Greenwood With: ", function () {
     });
   });
 
-  after(function () {
-    runner.teardown();
+  after(async function () {
+    await runner.teardown();
   });
 });

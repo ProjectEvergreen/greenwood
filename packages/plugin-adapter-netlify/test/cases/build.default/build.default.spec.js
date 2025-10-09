@@ -72,7 +72,7 @@ describe("Build Greenwood With: ", function () {
 
   describe(LABEL, function () {
     before(async function () {
-      runner.setup(outputPath);
+      await runner.setup(outputPath);
       await runner.runCommand(cliPath, "build");
     });
 
@@ -701,7 +701,10 @@ describe("Build Greenwood With: ", function () {
     });
   });
 
-  after(function () {
-    runner.teardown([path.join(outputPath, "netlify"), ...getOutputTeardownFiles(outputPath)]);
+  after(async function () {
+    await runner.teardown([
+      path.join(outputPath, "netlify"),
+      ...getOutputTeardownFiles(outputPath),
+    ]);
   });
 });

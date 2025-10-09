@@ -63,7 +63,7 @@ describe("Build Greenwood With: ", function () {
       updateAStyleBlockRef = implementation.prototype._updateAStyleBlock;
       implementation.prototype._updateAStyleBlock = () => {};
 
-      runner.setup(outputPath);
+      await runner.setup(outputPath);
       await runner.runCommand(cliPath, "build");
     });
 
@@ -209,9 +209,9 @@ describe("Build Greenwood With: ", function () {
     });
   });
 
-  after(function () {
+  after(async function () {
     implementation.prototype._updateAStyleBlock = updateAStyleBlockRef;
 
-    runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });

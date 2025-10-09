@@ -45,7 +45,7 @@ describe("Build Greenwood With: ", function () {
 
   describe(LABEL, function () {
     before(async function () {
-      runner.setup(outputPath);
+      await runner.setup(outputPath);
       await runner.runCommand(cliPath, "build");
     });
 
@@ -76,7 +76,7 @@ describe("Build Greenwood With: ", function () {
     });
   });
 
-  after(function () {
-    runner.teardown(getOutputTeardownFiles(outputPath));
+  after(async function () {
+    await runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });

@@ -35,7 +35,7 @@ describe("Initialize a new Greenwood project: ", function () {
 
   describe("Scaffolding a new project with custom project name", function () {
     before(async function () {
-      runner.setup(outputPath);
+      await runner.setup(outputPath);
       await runner.runCommand(initPath, ["--name", APP_NAME, "--ts", "no", "--install", "no"]);
     });
 
@@ -131,7 +131,7 @@ describe("Initialize a new Greenwood project: ", function () {
     });
   });
 
-  after(function () {
-    runner.teardown([initOutputPath]);
+  after(async function () {
+    await runner.teardown([initOutputPath]);
   });
 });

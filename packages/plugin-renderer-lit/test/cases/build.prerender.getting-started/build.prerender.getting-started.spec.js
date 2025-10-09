@@ -63,7 +63,7 @@ describe("Build Greenwood With Custom Lit Renderer for SSG prerendering: ", func
 
   describe(LABEL, function () {
     before(async function () {
-      runner.setup(outputPath);
+      await runner.setup(outputPath);
       await runner.runCommand(cliPath, "build");
     });
 
@@ -127,7 +127,7 @@ describe("Build Greenwood With Custom Lit Renderer for SSG prerendering: ", func
     });
   });
 
-  after(function () {
-    runner.teardown(getOutputTeardownFiles(outputPath));
+  after(async function () {
+    await runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });

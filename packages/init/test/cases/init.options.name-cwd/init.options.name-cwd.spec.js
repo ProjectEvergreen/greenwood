@@ -35,7 +35,7 @@ describe("Initialize a new Greenwood project: ", function () {
 
   describe("Scaffolding a new project in the current directory", function () {
     before(async function () {
-      runner.setup(outputPath);
+      await runner.setup(outputPath);
       await runner.runCommand(initPath, ["--name", APP_NAME, "--ts", "no", "--install", "no"]);
     });
 
@@ -131,8 +131,8 @@ describe("Initialize a new Greenwood project: ", function () {
     });
   });
 
-  after(function () {
-    runner.teardown([
+  after(async function () {
+    await runner.teardown([
       path.join(initOutputPath, ".gitignore"),
       path.join(initOutputPath, "package.json"),
       path.join(initOutputPath, "src/"),
