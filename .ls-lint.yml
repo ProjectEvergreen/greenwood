@@ -16,8 +16,9 @@ ignore:
   - www/public
   - node_modules
   - packages/cli/node_modules
-  - packages/plugin-postcss/node_modules
-  - packages/plugin-babel/node_modules
   - packages/init/node_modules
+  - packages/plugin-babel/node_modules
+  - packages/plugin-graphql/node_modules
+  - packages/plugin-postcss/node_modules
   - packages/plugin-typescript/node_modules
   - packages/cli/test/cases/build.default.workspace-special-characters/src/pages
