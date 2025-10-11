@@ -1,13 +1,22 @@
 diff --git a/node_modules/gallinago/src/lib/runner.js b/node_modules/gallinago/src/lib/runner.js
-index b57fb8b..75e3d40 100644
+index b57fb8b..4e81611 100644
 --- a/node_modules/gallinago/src/lib/runner.js
 +++ b/node_modules/gallinago/src/lib/runner.js
-@@ -105,7 +105,7 @@ class Runner {
- 
-           if (fs.existsSync(deletePath)) {
-             if (fs.lstatSync(deletePath).isDirectory()) {
--              fs.rmSync(deletePath, { recursive: true });
-+              fs.rmSync(deletePath, { recursive: true, maxRetries: 5 });
-             } else {
-               fs.unlinkSync(deletePath);
-             }
+@@ -87,8 +87,16 @@ class Runner {
+   stopCommand() {
+     return new Promise((resolve) => {
+       if (this.childProcess) {
++        let interval;
++
+         this.childProcess.kill();
+-        resolve();
++        
++        interval = setInterval(() => {
++          if(this.childProcess.killed) {
++            clearInterval(interval);
++            resolve();
++          }
++        }, 50);
+       } else {
+         resolve()
+       }
