@@ -29,7 +29,8 @@
     "lint:types": "tsc --project ./tsconfig.json",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
-    "prepare": "husky"
+    "prepare": "husky",
+    "postinstall": "patch-package"
   },
   "devDependencies": {
     "@babel/core": "^7.24.4",
