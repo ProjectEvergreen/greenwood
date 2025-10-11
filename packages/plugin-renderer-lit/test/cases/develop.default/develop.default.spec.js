@@ -139,7 +139,7 @@ describe("Develop Greenwood With: ", function () {
       );
 
       // would be nice to figure out why this test case still requires manually copying in dependencies
-      runner.setup(outputPath, [
+      await runner.setup(outputPath, [
         ...lit,
         ...litPackageJson,
         ...litDirectives,
@@ -169,7 +169,7 @@ describe("Develop Greenwood With: ", function () {
           resolve();
         }, 10000);
 
-        runner.runCommand(cliPath, "develop", { async: true });
+        runner.runCommand(cliPath, "develop");
       });
     });
 
@@ -225,8 +225,8 @@ describe("Develop Greenwood With: ", function () {
     });
   });
 
-  after(function () {
-    runner.teardown(getOutputTeardownFiles(outputPath));
-    runner.stopCommand();
+  after(async function () {
+    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.stopCommand();
   });
 });

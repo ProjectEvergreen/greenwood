@@ -35,17 +35,19 @@ describe("Serve Greenwood With: ", function () {
   });
 
   describe("Running the serve command without running the build command first", function () {
-    it("should throw an error that no build output was detected", function () {
+    it("should throw an error that no build output was detected", async function () {
       try {
-        runner.setup(outputPath);
-        runner.runCommand(cliPath, "serve", { async: true });
+        await runner.setup(outputPath);
+        await runner.runCommand(cliPath, "serve");
       } catch (err) {
-        expect(err).to.contain("No build output detected.  Make sure you have run greenwood build");
+        expect(err).to.contain(
+          "Error: No build output detected. Make sure you have run greenwood build",
+        );
       }
     });
   });
 
-  after(function () {
-    runner.teardown(getOutputTeardownFiles(outputPath));
+  after(async function () {
+    await runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });
