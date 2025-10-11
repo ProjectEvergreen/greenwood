@@ -26,27 +26,36 @@ describe("Initialize a new Greenwood project: ", function () {
   const initPath = path.join(process.cwd(), "packages/init/src/index.js");
   const outputPath = path.dirname(fileURLToPath(new URL(import.meta.url)));
   const initOutputPath = path.join(outputPath, `/${APP_NAME}`);
-  let runner;
+  let initRunner;
+  let greenwoodRunner;
 
   before(function () {
     this.context = {
       publicDir: path.join(initOutputPath, "public"),
     };
-    runner = new Runner();
+    initRunner = new Runner();
+    greenwoodRunner = new Runner();
   });
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(initPath, ["--name", APP_NAME, "--install", "pnpm", "--ts", "no"]);
+      await initRunner.setup(outputPath, [], { create: false });
+      await initRunner.runCommand(initPath, [
+        "--name",
+        APP_NAME,
+        "--install",
+        "pnpm",
+        "--ts",
+        "no",
+      ]);
     });
 
     describe("should install with pnpm", function () {
       const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
 
       before(async function () {
-        await runner.setup(initOutputPath);
-        await runner.runCommand(cliPath, "build");
+        await greenwoodRunner.setup(initOutputPath);
+        await greenwoodRunner.runCommand(cliPath, "build");
       });
 
       runSmokeTest(["public", "index"], LABEL);
@@ -66,6 +75,6 @@ describe("Initialize a new Greenwood project: ", function () {
   });
 
   after(async function () {
-    await runner.teardown([initOutputPath]);
+    await initRunner.teardown([initOutputPath]);
   });
 });

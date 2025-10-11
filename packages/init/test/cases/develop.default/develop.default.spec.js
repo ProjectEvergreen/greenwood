@@ -28,33 +28,35 @@ describe("Initialize a new Greenwood project: ", function () {
   const initOutputPath = path.join(outputPath, `/${APP_NAME}`);
   const hostname = "http://localhost";
   const port = 1984;
-  let runner;
+  let initRunner;
+  let greenwoodRunner;
 
   before(function () {
     this.context = {
       hostname: `${hostname}:${port}`,
     };
-    runner = new Runner();
+    initRunner = new Runner();
+    greenwoodRunner = new Runner();
   });
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(initPath, ["--name", APP_NAME, "--ts", "no", "--install", "no"]);
+      await initRunner.setup(outputPath, [], { create: false });
+      await initRunner.runCommand(initPath, ["--name", APP_NAME, "--ts", "no", "--install", "no"]);
     });
 
     describe("should run the Greenwood dev server", function () {
       const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
 
       before(async function () {
-        await runner.setup(initOutputPath);
+        await greenwoodRunner.setup(initOutputPath);
 
         return new Promise((resolve) => {
           setTimeout(() => {
             resolve();
           }, 5000);
 
-          runner.runCommand(cliPath, "develop");
+          greenwoodRunner.runCommand(cliPath, "develop");
         });
       });
 
@@ -94,7 +96,7 @@ describe("Initialize a new Greenwood project: ", function () {
   });
 
   after(async function () {
-    await runner.stopCommand();
-    await runner.teardown([initOutputPath]);
+    await greenwoodRunner.stopCommand();
+    await initRunner.teardown([initOutputPath]);
   });
 });
