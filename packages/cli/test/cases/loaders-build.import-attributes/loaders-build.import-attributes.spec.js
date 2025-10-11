@@ -97,7 +97,6 @@ describe("Build Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.stopCommand();
     await runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });
