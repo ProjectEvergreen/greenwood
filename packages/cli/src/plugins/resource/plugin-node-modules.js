@@ -50,12 +50,13 @@ class NodeModulesResource {
     );
   }
 
-  async serve(url) {
+  async serve(url, request) {
     const body = await fs.readFile(url, "utf-8");
+    const contentType = request.headers.get("content-type") ?? this.contentType;
 
     return new Response(body, {
       headers: new Headers({
-        "Content-Type": this.contentType,
+        "Content-Type": contentType,
       }),
     });
   }
