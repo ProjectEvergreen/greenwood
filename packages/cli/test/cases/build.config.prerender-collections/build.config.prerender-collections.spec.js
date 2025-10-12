@@ -166,30 +166,38 @@ describe("Build Greenwood With: ", function () {
           expect(linkItems.length).to.equal(2);
         });
 
+        // we _technically_ can't assume the order of pages but we can at least make sure all the files are there
+        // this could easily be solved by adding an `order` property to the page's frontmatter
+        // https://github.com/ProjectEvergreen/greenwood/pull/1308#issuecomment-3368603613
         it("should have the expected link content from all pages in the collection", function () {
-          expect(linkItems[0].getAttribute("href")).to.equal("/blog/");
-          expect(linkItems[0].getAttribute("title")).to.equal("Blog");
-          expect(linkItems[0].textContent).to.equal("Blog");
+          const blogLink = Array.from(linkItems).find(
+            (link) => link.getAttribute("href") === "/blog/",
+          );
+          const tocLink = Array.from(linkItems).find(
+            (link) => link.getAttribute("href") === "/toc/",
+          );
 
-          expect(linkItems[1].getAttribute("href")).to.equal("/toc/");
-          expect(linkItems[1].getAttribute("title")).to.equal("Table of Contents");
-          expect(linkItems[1].textContent).to.equal("Table of Contents");
+          expect(blogLink.getAttribute("title")).to.equal("Blog");
+          expect(blogLink.textContent).to.equal("Blog");
+
+          expect(tocLink.getAttribute("title")).to.equal("Table of Contents");
+          expect(tocLink.textContent).to.equal("Table of Contents");
         });
 
         it("should have the expected inline active frontmatter collection data", function () {
           const collection = JSON.parse(
             dom.window.document.querySelector("body span#footer").textContent,
           );
+          const blogItem = collection.find((page) => page.route === "/blog/");
+          const tocItem = collection.find((page) => page.route === "/toc/");
 
-          expect(collection[0].route).to.equal("/blog/");
-          expect(collection[0].title).to.equal("Blog");
-          expect(collection[0].label).to.equal(collection[0].title);
-          expect(collection[0].id).to.equal("blog-index");
+          expect(blogItem.title).to.equal("Blog");
+          expect(blogItem.label).to.equal("Blog");
+          expect(blogItem.id).to.equal("blog-index");
 
-          expect(collection[1].route).to.equal("/toc/");
-          expect(collection[1].title).to.equal("Table of Contents");
-          expect(collection[1].label).to.equal(collection[1].title);
-          expect(collection[1].id).to.equal("toc");
+          expect(tocItem.title).to.equal("Table of Contents");
+          expect(tocItem.label).to.equal("Table of Contents");
+          expect(tocItem.id).to.equal("toc");
         });
       });
     });
@@ -212,14 +220,22 @@ describe("Build Greenwood With: ", function () {
           expect(postLinks.length).to.equal(2);
         });
 
+        // we _technically_ can't assume the order of pages but we can at least make sure all the files are there
+        // this could easily be solved by adding an `order` property to the page's frontmatter
+        // https://github.com/ProjectEvergreen/greenwood/pull/1308#issuecomment-3368603613
         it("should have the expected link content from all pages in the collection", function () {
-          expect(postLinks[0].getAttribute("href")).to.equal("/blog/first-post/");
-          expect(postLinks[0].getAttribute("title")).to.equal("First Post");
-          expect(postLinks[0].textContent).to.equal("First Post");
+          const firstPostLink = Array.from(postLinks).find(
+            (link) => link.getAttribute("href") === "/blog/first-post/",
+          );
+          const secondPostLink = Array.from(postLinks).find(
+            (link) => link.getAttribute("href") === "/blog/second-post/",
+          );
 
-          expect(postLinks[1].getAttribute("href")).to.equal("/blog/second-post/");
-          expect(postLinks[1].getAttribute("title")).to.equal("Second Post");
-          expect(postLinks[1].textContent).to.equal("Second Post");
+          expect(firstPostLink.getAttribute("title")).to.equal("First Post");
+          expect(firstPostLink.textContent).to.equal("First Post");
+
+          expect(secondPostLink.getAttribute("title")).to.equal("Second Post");
+          expect(secondPostLink.textContent).to.equal("Second Post");
         });
       });
     });
