@@ -183,6 +183,9 @@ describe("Serve Greenwood With: ", function () {
       before(async function () {
         response = await fetch(`${hostname}/api/submit-json`, {
           method: "POST",
+          headers: {
+            "Content-Type": "application/json", // Essential for JSON bodies
+          },
           body: JSON.stringify({ name: param }),
         });
         data = await response.clone().json();
