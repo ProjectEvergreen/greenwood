@@ -35,7 +35,7 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@greenwood/cli": "^0.33.0"
+    "@greenwood/cli": "workspace:^"
   },
   "dependencies": {
     "@rollup/plugin-commonjs": "^28.0.0",
@@ -43,7 +43,7 @@
     "cjs-module-lexer": "^1.0.0"
   },
   "devDependencies": {
-    "@greenwood/cli": "^0.34.0-alpha.0",
+    "@greenwood/cli": "workspace:^",
     "lodash": "^4.17.20"
   }
 }
