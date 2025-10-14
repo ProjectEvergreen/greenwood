@@ -4,6 +4,6 @@
     "packages/*",
     "www"
   ],
-  "npmClient": "yarn",
+  "npmClient": "npm",
   "useWorkspaces": true
 }
