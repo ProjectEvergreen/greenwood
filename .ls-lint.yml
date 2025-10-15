@@ -21,4 +21,3 @@ ignore:
   - packages/init/node_modules
   - packages/plugin-typescript/node_modules
   - packages/cli/test/cases/build.default.workspace-special-characters/src/pages
-  - www/public
