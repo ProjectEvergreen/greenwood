@@ -232,7 +232,7 @@ function serve(label) {
   });
 }
 
-async function runSmokeTest(testCases, label) {
+function runSmokeTest(testCases, label) {
   testCases.forEach((testCase) => {
     switch (testCase) {
       case "index":

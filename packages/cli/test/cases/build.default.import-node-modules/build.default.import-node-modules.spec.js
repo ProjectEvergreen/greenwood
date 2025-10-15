@@ -67,12 +67,12 @@ describe("Build Greenwood With: ", function () {
         `${outputPath}/node_modules/font-awesome/fonts/`,
       );
 
-      runner.setup(outputPath, [
+      await runner.setup(outputPath, [
         ...fontAwesomePackageJson,
         ...fontAwesomeCssFiles,
         ...fontAwesomeFontFiles,
       ]);
-      runner.runCommand(cliPath, "build");
+      await runner.runCommand(cliPath, "build");
 
       dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "index.html"));
     });
@@ -207,7 +207,7 @@ describe("Build Greenwood With: ", function () {
     });
   });
 
-  after(function () {
-    runner.teardown(getOutputTeardownFiles(outputPath));
+  after(async function () {
+    await runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });

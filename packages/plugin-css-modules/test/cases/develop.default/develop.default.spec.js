@@ -57,20 +57,20 @@ describe("Develop Greenwood With: ", function () {
   });
 
   describe(LABEL, function () {
-    before(function () {
+    before(async function () {
       // JSDOM doesn't support CSS nesting and kind of blows up in the console as it tries to parse it automatically
       // https://github.com/jsdom/jsdom/issues/2005#issuecomment-2397495853
       updateAStyleBlockRef = implementation.prototype._updateAStyleBlock;
       implementation.prototype._updateAStyleBlock = () => {};
 
-      runner.setup(outputPath);
+      await runner.setup(outputPath);
 
       return new Promise((resolve) => {
         setTimeout(() => {
           resolve();
         }, 5000);
 
-        runner.runCommand(cliPath, "develop", { async: true });
+        runner.runCommand(cliPath, "develop");
       });
     });
 
@@ -250,10 +250,10 @@ describe("Develop Greenwood With: ", function () {
     });
   });
 
-  after(function () {
+  after(async function () {
     implementation.prototype._updateAStyleBlock = updateAStyleBlockRef;
 
-    runner.stopCommand();
-    runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.stopCommand();
+    await runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });

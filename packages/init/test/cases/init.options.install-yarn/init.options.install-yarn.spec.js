@@ -26,27 +26,36 @@ describe("Initialize a new Greenwood project: ", function () {
   const initPath = path.join(process.cwd(), "packages/init/src/index.js");
   const outputPath = path.dirname(fileURLToPath(new URL(import.meta.url)));
   const initOutputPath = path.join(outputPath, `/${APP_NAME}`);
-  let runner;
+  let initRunner;
+  let greenwoodRunner;
 
   before(function () {
     this.context = {
       publicDir: path.join(initOutputPath, "public"),
     };
-    runner = new Runner();
+    initRunner = new Runner();
+    greenwoodRunner = new Runner();
   });
 
   describe(LABEL, function () {
-    before(function () {
-      runner.setup(outputPath);
-      runner.runCommand(initPath, ["--name", APP_NAME, "--install", "yarn", "--ts", "no"]);
+    before(async function () {
+      await initRunner.setup(outputPath, [], { create: false });
+      await initRunner.runCommand(initPath, [
+        "--name",
+        APP_NAME,
+        "--install",
+        "yarn",
+        "--ts",
+        "no",
+      ]);
     });
 
     describe("should install with Yarn", function () {
       const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
 
-      before(function () {
-        runner.setup(initOutputPath);
-        runner.runCommand(cliPath, "build");
+      before(async function () {
+        await greenwoodRunner.setup(initOutputPath);
+        await greenwoodRunner.runCommand(cliPath, "build");
       });
 
       runSmokeTest(["public", "index"], LABEL);
@@ -63,7 +72,7 @@ describe("Initialize a new Greenwood project: ", function () {
     });
   });
 
-  after(function () {
-    runner.teardown([initOutputPath]);
+  after(async function () {
+    await greenwoodRunner.teardown([initOutputPath]);
   });
 });

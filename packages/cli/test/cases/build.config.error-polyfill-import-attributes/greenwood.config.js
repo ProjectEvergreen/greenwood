@@ -1,5 +1,5 @@
 export default {
   polyfills: {
-    importAttributes: null,
+    importAttributes: {},
   },
 };

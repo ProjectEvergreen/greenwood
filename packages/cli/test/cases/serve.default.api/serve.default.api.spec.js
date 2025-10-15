@@ -50,15 +50,15 @@ describe("Serve Greenwood With: ", function () {
 
   describe(LABEL, function () {
     before(async function () {
-      runner.setup(outputPath);
-      runner.runCommand(cliPath, "build");
+      await runner.setup(outputPath);
+      await runner.runCommand(cliPath, "build");
 
       return new Promise((resolve) => {
         setTimeout(() => {
           resolve();
         }, 10000);
 
-        runner.runCommand(cliPath, "serve", { async: true });
+        runner.runCommand(cliPath, "serve");
       });
     });
 
@@ -265,8 +265,8 @@ describe("Serve Greenwood With: ", function () {
     });
   });
 
-  after(function () {
-    runner.stopCommand();
-    runner.teardown(getOutputTeardownFiles(outputPath));
+  after(async function () {
+    await runner.stopCommand();
+    await runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });

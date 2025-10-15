@@ -7373,6 +7373,13 @@ ccount@^2.0.0:
   resolved "https://registry.yarnpkg.com/ccount/-/ccount-2.0.1.tgz#17a3bf82302e0870d6da43a01311a8bc02a3ecf5"
   integrity sha512-eyrF0jiFpY+3drT6383f1qhkbGsLSifNAjA61IUjZjmLCWjItY6LB9ft9YhoDgwfmclB2zhu51Lc7+95b8NRAg==
 
+chai-as-promised@^8.0.1:
+  version "8.0.2"
+  resolved "https://registry.yarnpkg.com/chai-as-promised/-/chai-as-promised-8.0.2.tgz#cd9b77afaa976383eb4cbef9463ac5230f7a1cba"
+  integrity sha512-1GadL+sEJVLzDjcawPM4kjfnL+p/9vrxiEUonowKOAzvVg0PixJUdtuDzdkDeQhK3zfOE76GqGkZIQ7/Adcrqw==
+  dependencies:
+    check-error "^2.1.1"
+
 chai@^4.2.0:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/chai/-/chai-4.2.0.tgz#760aa72cf20e3795e84b12877ce0e83737aa29e5"
@@ -7467,6 +7474,11 @@ check-error@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/check-error/-/check-error-1.0.2.tgz#574d312edd88bb5dd8912e9286dd6c0aed4aac82"
   integrity sha1-V00xLt2Iu13YkS6Sht1sCu1KrII=
+
+check-error@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/check-error/-/check-error-2.1.1.tgz#87eb876ae71ee388fa0471fe423f494be1d96ccc"
+  integrity sha512-OAlb+T7V4Op9OwdkjmguYRqncdlx5JiofwOAUkmTF+jNdHwzTaTs4sRAGpzLF3oOz5xAyDGrPgeIDFQmDOTiJw==
 
 chokidar@3.5.2:
   version "3.5.2"
@@ -10736,10 +10748,10 @@ fuzzy@0.1.3:
   resolved "https://registry.yarnpkg.com/fuzzy/-/fuzzy-0.1.3.tgz#4c76ec2ff0ac1a36a9dccf9a00df8623078d4ed8"
   integrity sha512-/gZffu4ykarLrCiP3Ygsa86UAo1E5vEVlvTrpkKywXSbP9Xhln3oSp9QSV57gEq3JFFpGJ4GZ+5zdEp3FcUh4w==
 
-gallinago@^0.9.0:
-  version "0.9.1"
-  resolved "https://registry.yarnpkg.com/gallinago/-/gallinago-0.9.1.tgz#3d7830593762d4fbc45dc4ea46c0e07b8971b19e"
-  integrity sha512-3Lly4lE4Hn7FOH4Mr7WDuYG7bhCx/+P9UA+C8NFGZdqy/2O8EmX5cI7on7y/Rzk/0oW1TgOxxBIwV7Qv0rREYQ==
+gallinago@^0.10.1:
+  version "0.10.1"
+  resolved "https://registry.yarnpkg.com/gallinago/-/gallinago-0.10.1.tgz#de6f25868231ea951393bb2f344302f27c3f327c"
+  integrity sha512-HDj+c7XBMcmrV0ESQrc7wa4TQvt/rYwofbXCz9JlEBPfk0xqALww5L4LGj3IspgrRjZTrHSzM+7aL3pNS1FP2Q==
 
 gauge@^3.0.0:
   version "3.0.2"

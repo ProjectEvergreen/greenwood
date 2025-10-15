@@ -51,9 +51,10 @@ describe("Build Greenwood With: ", async function () {
   });
 
   describe(LABEL, function () {
-    before(function () {
-      runner.setup(outputPath);
-      runner.runCommand(cliPath, "build");
+    before(async function () {
+      await runner.setup(outputPath);
+
+      await runner.runCommand(cliPath, "build");
     });
 
     runSmokeTest(["public"], LABEL);
@@ -116,7 +117,7 @@ describe("Build Greenwood With: ", async function () {
     });
   });
 
-  after(function () {
-    runner.teardown(getOutputTeardownFiles(outputPath));
+  after(async function () {
+    await runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });

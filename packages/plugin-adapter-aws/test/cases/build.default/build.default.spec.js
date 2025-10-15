@@ -72,9 +72,9 @@ describe("Build Greenwood With: ", function () {
   });
 
   describe(LABEL, function () {
-    before(function () {
-      runner.setup(outputPath);
-      runner.runCommand(cliPath, "build");
+    before(async function () {
+      await runner.setup(outputPath);
+      await runner.runCommand(cliPath, "build");
     });
 
     describe("Default Output", function () {
@@ -435,7 +435,10 @@ describe("Build Greenwood With: ", function () {
     });
   });
 
-  after(function () {
-    runner.teardown([path.join(outputPath, ".aws-output"), ...getOutputTeardownFiles(outputPath)]);
+  after(async function () {
+    await runner.teardown([
+      path.join(outputPath, ".aws-output"),
+      ...getOutputTeardownFiles(outputPath),
+    ]);
   });
 });

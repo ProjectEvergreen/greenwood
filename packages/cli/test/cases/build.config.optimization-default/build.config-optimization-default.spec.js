@@ -67,8 +67,8 @@ describe("Build Greenwood With: ", function () {
         `${outputPath}/node_modules/geist/dist/fonts/geist-sans/`,
       );
 
-      runner.setup(outputPath, [...geistPackageJson, ...geistFonts]);
-      runner.runCommand(cliPath, "build");
+      await runner.setup(outputPath, [...geistPackageJson, ...geistFonts]);
+      await runner.runCommand(cliPath, "build");
     });
 
     describe("Output for JavaScript / CSS tags and files", function () {
@@ -230,7 +230,7 @@ describe("Build Greenwood With: ", function () {
     });
   });
 
-  after(function () {
-    runner.teardown(getOutputTeardownFiles(outputPath));
+  after(async function () {
+    await runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });

@@ -60,8 +60,12 @@ describe("Build Greenwood With: ", function () {
         `${outputPath}/node_modules/my-theme-pack/dist/components`,
       );
 
-      runner.setup(outputPath, [...themePackLayouts, ...themePackStyles, ...themePackComponents]);
-      runner.runCommand(cliPath, "build");
+      await runner.setup(outputPath, [
+        ...themePackLayouts,
+        ...themePackStyles,
+        ...themePackComponents,
+      ]);
+      await runner.runCommand(cliPath, "build");
     });
 
     runSmokeTest(["public", "index"], LABEL);
@@ -227,7 +231,7 @@ describe("Build Greenwood With: ", function () {
     });
   });
 
-  after(function () {
-    runner.teardown(getOutputTeardownFiles(outputPath));
+  after(async function () {
+    await runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });

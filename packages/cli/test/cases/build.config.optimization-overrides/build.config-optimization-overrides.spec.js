@@ -45,9 +45,9 @@ describe("Build Greenwood With: ", function () {
   });
 
   describe(LABEL, function () {
-    before(function () {
-      runner.setup(outputPath);
-      runner.runCommand(cliPath, "build");
+    before(async function () {
+      await runner.setup(outputPath);
+      await runner.runCommand(cliPath, "build");
     });
 
     describe("Cumulative output based on all override settings", function () {
@@ -172,7 +172,7 @@ describe("Build Greenwood With: ", function () {
     });
   });
 
-  after(function () {
-    runner.teardown(getOutputTeardownFiles(outputPath));
+  after(async function () {
+    await runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });

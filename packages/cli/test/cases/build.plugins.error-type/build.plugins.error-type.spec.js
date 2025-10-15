@@ -18,14 +18,16 @@
  * }
  *
  * User Workspace
- * Greenwood default (src/)
+ * N / A
  *
  */
-
 import chai from "chai";
+import chaiAsPromised from "chai-as-promised";
 import path from "node:path";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
+
+chai.use(chaiAsPromised);
 
 const expect = chai.expect;
 
@@ -42,7 +44,7 @@ describe("Build Greenwood With: ", function () {
   });
 
   describe("Custom Configuration with a bad value for plugin type", function () {
-    it("should throw an error that plugin.type is not a valid value", function () {
+    it("should throw an error that plugin.type is not a valid value", async function () {
       const pluginTypes = [
         "copy",
         "context",
@@ -54,14 +56,11 @@ describe("Build Greenwood With: ", function () {
         "adapter",
       ];
 
-      try {
-        runner.setup(outputPath);
-        runner.runCommand(cliPath, "build");
-      } catch (err) {
-        expect(err).to.contain(
-          `Error: greenwood.config.js plugins must be one of type "${pluginTypes.join(", ")}". got "indexxx" instead.`,
-        );
-      }
+      await runner.setup(outputPath);
+
+      await expect(runner.runCommand(cliPath, "build")).to.be.rejectedWith(
+        `Configuration error: plugins must be one of type "${pluginTypes.join(", ")}". got "indexxx" instead.`,
+      );
     });
   });
 });
