@@ -1,10 +1,8 @@
-import { ApolloServer } from "apollo-server";
+import { ApolloServer } from "@apollo/server";
+import { createSchema } from "../schema/schema.js";
 
 const graphqlServer = async (compilation) => {
-  const { config, graph, context } = compilation;
   const isDev = process.env.__GWD_COMMAND__ === "develop";
-  const { createSchema } = await import("../schema/schema.js");
-  const { createCache } = await import("./cache.js");
   // disable playground for production builds
   const playground = isDev
     ? {
@@ -17,24 +15,6 @@ const graphqlServer = async (compilation) => {
   let serverConfig = {
     schema: await createSchema(compilation),
     introspection: isDev,
-    context: async (integrationContext) => {
-      const { req } = integrationContext;
-
-      // make sure to ignore introspection requests from being generated as an output cache file
-      // https://stackoverflow.com/a/58040379/417806
-      if (
-        process.env.__GWD_COMMAND__ === "build" &&
-        req.query.q !== "internal" &&
-        req.body.operationName !== "IntrospectionQuery"
-      ) {
-        await createCache(req, context);
-      }
-
-      return {
-        config,
-        graph,
-      };
-    },
   };
 
   if (playground) {

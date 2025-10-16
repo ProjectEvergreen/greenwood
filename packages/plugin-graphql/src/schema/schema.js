@@ -1,5 +1,5 @@
 import { checkResourceExists } from "@greenwood/cli/src/lib/resource-utils.js";
-import { makeExecutableSchema } from "apollo-server-express";
+import { makeExecutableSchema } from "@graphql-tools/schema";
 import { graphTypeDefs, graphResolvers } from "./graph.js";
 import fs from "node:fs/promises";
 import gql from "graphql-tag";
