@@ -26,7 +26,7 @@ import chai from "chai";
 import { JSDOM } from "jsdom";
 import path from "node:path";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
-import { getOutputTeardownFiles } from "../../../../../test/utils.js";
+import { getOutputTeardownFiles, HASH_REGEX } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
 
@@ -101,7 +101,7 @@ describe("Build Greenwood With: ", function () {
 
         it("should add one page layout <link> tag", function () {
           expect(linkTags[0].rel).to.equal("stylesheet");
-          expect(linkTags[0].href).to.match(/styles\/theme.[a-z0-9]{10}.css/);
+          expect(linkTags[0].href).to.match(new RegExp(`/styles/theme.${HASH_REGEX}.css`));
         });
 
         it("should add one page layout <style> tag", function () {

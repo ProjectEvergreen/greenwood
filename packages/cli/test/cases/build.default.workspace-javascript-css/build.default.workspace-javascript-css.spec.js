@@ -224,13 +224,13 @@ describe("Build Greenwood With: ", function () {
 
       it("should have the expected main.css file in the output directory", async function () {
         expect(
-          await glob.promise(path.join(this.context.publicDir, "styles", "main.*[a-z0-9].css")),
+          await glob.promise(path.join(this.context.publicDir, "styles", "main.*.css")),
         ).to.have.lengthOf(1);
       });
 
       it("should have the expected other.css file in the output directory", async function () {
         expect(
-          await glob.promise(path.join(this.context.publicDir, "styles", "other.*[a-z0-9].css")),
+          await glob.promise(path.join(this.context.publicDir, "styles", "other.*.css")),
         ).to.have.lengthOf(1);
       });
 

@@ -31,7 +31,11 @@ import fs from "node:fs";
 import glob from "glob-promise";
 import { JSDOM } from "jsdom";
 import path from "node:path";
-import { getDependencyFiles, getOutputTeardownFiles } from "../../../../../test/utils.js";
+import {
+  getDependencyFiles,
+  getOutputTeardownFiles,
+  HASH_REGEX,
+} from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
 
@@ -132,7 +136,19 @@ describe("Build Greenwood With: ", function () {
           const customCss = await fs.promises.readFile(cssFiles[0], "utf-8");
 
           expect(cssFiles.length).to.be.equal(1);
-          expect(customCss).to.be.equal(expectedCss);
+          const regex = HASH_REGEX.replace("{8}", "{8,10}");
+          const normalizeCss = (css) =>
+            css
+              .replace(
+                new RegExp(`webcomponents\\.${regex}\\.jpg`, "g"),
+                "webcomponents.[HASH].jpg",
+              )
+              .replace(new RegExp(`bar\\.${regex}\\.baz`, "g"), "bar.[HASH].baz");
+
+          const normalizedCustomCss = normalizeCss(customCss);
+          const normalizedExpectedCss = normalizeCss(expectedCss);
+
+          expect(normalizedCustomCss).to.be.equal(normalizedExpectedCss);
         });
       });
 
@@ -172,14 +188,14 @@ describe("Build Greenwood With: ", function () {
           it("should have the expected @font-face file bundle path in the referenced <style> tag in index.html", async function () {
             const styleTag = Array.from(dom.window.document.querySelectorAll("head style"));
 
-            expect(styleTag[0].textContent).to.contain(
-              `src:url('/${fontPath}/Geist-Regular.965782360.woff2')`,
+            expect(styleTag[0].textContent.replace(/\s+/g, "")).to.match(
+              new RegExp(`src:url\\('/${fontPath}/Geist-Regular\\.${HASH_REGEX}\\.woff2'\\)`),
             );
           });
         });
 
         describe("user workspace reference", () => {
-          const imagePath = "images/webcomponents.1079385342.jpg";
+          const imagePath = `images/webcomponents.*.jpg`;
 
           it("should have the expected background image from the user's workspace the output directory", async function () {
             expect(
@@ -193,14 +209,16 @@ describe("Build Greenwood With: ", function () {
             );
             const contents = await fs.promises.readFile(mainCss[0], "utf-8");
 
-            expect(contents).to.contain(
-              `body{background-color:green;background-image:url('/${imagePath}');}`,
+            expect(contents.replace(/\s+/g, "")).to.match(
+              new RegExp(
+                `body\\{background-color:green;background-image:url\\('/images/webcomponents\\.${HASH_REGEX}\\.jpg'\\);\\}`,
+              ),
             );
           });
         });
 
         describe("inline scratch dir workspace reference", () => {
-          const imagePath = "images/link.1200825667.png";
+          const imagePath = `images/link.*.png`;
 
           it("should have the expected background image from the user's workspace the output directory", async function () {
             expect(
@@ -210,15 +228,16 @@ describe("Build Greenwood With: ", function () {
 
           it("should have the expected background-image url file bundle path in the referenced <style> tag in index.html", async function () {
             const styleTag = Array.from(dom.window.document.querySelectorAll("head style"));
-
-            expect(styleTag[0].textContent).to.contain(
-              `html{background-image:url('/${imagePath}')}`,
+            expect(styleTag[0].textContent).to.match(
+              new RegExp(
+                `html\\{background-image:url\\('/images/link\\.${HASH_REGEX}\\.png'\\)\\}`,
+              ),
             );
           });
         });
 
         describe("absolute user workspace reference", () => {
-          const resourcePath = "foo/bar.642520792.baz";
+          const resourcePath = `foo/bar.*.baz`;
 
           it("should have the expected resource reference from the user's workspace in the output directory", async function () {
             expect(

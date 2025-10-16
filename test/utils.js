@@ -30,4 +30,6 @@ async function getDependencyFiles(sourcePath, outputPath) {
   });
 }
 
-export { getDependencyFiles, getOutputTeardownFiles, tagsMatch };
+const HASH_REGEX = "[a-zA-Z0-9-_]{8}";
+
+export { getDependencyFiles, getOutputTeardownFiles, tagsMatch, HASH_REGEX };

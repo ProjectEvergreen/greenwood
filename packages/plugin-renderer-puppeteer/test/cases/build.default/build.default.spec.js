@@ -30,7 +30,7 @@ import glob from "glob-promise";
 import { JSDOM } from "jsdom";
 import path from "node:path";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
-import { getOutputTeardownFiles } from "../../../../../test/utils.js";
+import { getOutputTeardownFiles, HASH_REGEX } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
 
@@ -137,10 +137,10 @@ describe("Build Greenwood With: ", function () {
         const inlineScriptTag = Array.from(
           dom.window.document.querySelectorAll("head > script:not([src])"),
         ).filter((tag) => !tag.getAttribute("data-gwd"))[0];
-
-        expect(inlineScriptTag.textContent.replace("\n", "")).to.contain(
-          'import"/lit-element.5o_Y6C1Q.js";document.getElementsByClassName("output-script-inline")[0].innerHTML="script tag module inline";//# sourceMappingURL=1644043439.CKFVi45M.js.map',
+        const regex = new RegExp(
+          `import"/lit-element\\.${HASH_REGEX}\\.js";document\\.getElementsByClassName\\("output-script-inline"\\)\\[0\\]\\.innerHTML="script tag module inline";//# sourceMappingURL=${HASH_REGEX}\\.${HASH_REGEX}\\.js\\.map`,
         );
+        expect(inlineScriptTag.textContent.replace("\n", "")).to.match(regex);
       });
 
       it("should have prerendered content from <app-header> component", function () {
