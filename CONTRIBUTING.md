@@ -11,11 +11,10 @@ We're excited for your interest in Greenwood, and maybe even your contribution!
 To develop for the project, you'll want to follow these steps:
 
 1. Install [NodeJS LTS](https://nodejs.org) or [NVM](https://github.com/nvm-sh/nvm) (recommended)
-1. Have [Yarn](https://yarnpkg.com/) installed
+1. Have [Yarn 1.x](https://yarnpkg.com/) installed
 1. Clone the repository
 1. For NVM users, run `nvm use`
 1. Run `yarn install`
-1. Run `yarn lerna bootstrap`
 
 ## Feature Development
 
@@ -198,6 +197,7 @@ Additionally, Greenwood leverages [exports maps](https://nodejs.org/api/packages
 Each plugin will also need to have an _index.d.ts_ file that exports types and a module definition for itself, like so:
 
 ```ts
+// import the most specific plugin type relative to what your plugin uses
 import type { Plugin } from "@greenwood/cli";
 
 type SUPPORTED_THING = "A" | "B" | "C";
@@ -206,7 +206,7 @@ type FooPluginOptions = {
   bar?: SUPPORTED_THING
 };
 
-export type FooPlugin = (options?: FooPluginOptions) => Array<Plugin>;
+export type FooPlugin = (options?: FooPluginOptions) => [Plugin];
 
 declare module "@greenwood/plugin-foo" {
   export const greenwoodPluginFoo: FooPlugin;
@@ -290,25 +290,39 @@ Pull requests are the best!  To best help facilitate contributions to the projec
 
 ## Release Management
 
-Lerna (specifically `lerna publish`) will be used to release all packages under a single version.  Lerna configuration can be found in _lerna.json_.
+Lerna (specifically `lerna publish`) will be used to release all packages under a single version bump.  Lerna configuration can be found in _lerna.json_ at the root of the repo.  All packages are managed using [Yarn (1.x) workspaces](https://classic.yarnpkg.com/lang/en/docs/workspaces/).
 
 Assuming you are logged into **npm** locally and have 2FA access to publish, the following workflows should be used.  Lerna should then prompt you through the steps to pick the version and all packages that will get updated.
 
-### Alpha Release
+### Dry Run
 
-Greenwood typically works on new minor versions in a dedicated branch and release line called "alpha".  This leverages NPM's concept of dist tags.  While on a release branch, run the following to publish a new _alpha_ release.
+To test Lerna's publishing output to see what changes it would make, you can run Lerna in "dry run" mode using the following command:
+
+> 🚨 !!! Make sure to cancel (Ctr+C) in the terminal when prompted with the OTP prompt for npm publishing !!!
+
+```sh
+# from the root of the repo
+$ yarn lerna publish --force-publish --no-git-tag-version --no-push
+```
+
+### Alpha (Pre) Release
+
+When working on a new minor release line, releases will be cut with an **-alpha.N** suffix / tag, e.g. **v0.33.0-alpha.1**.  This ensures that new release lines can be tested without impacting what is tagged as **latest** in NPM, leveraging NPM's concept of [dist tags](https://docs.npmjs.com/cli/v8/commands/npm-dist-tag).
+
+To generate an alpha release, run:
 
 ```sh
 # from the root of the repo
 $ yarn lerna publish --force-publish --dist-tag alpha
 ```
 
-> Typically you will want to select the _Custom Preminor_ option from the list, which Lerna should appropriately yield the expected version.
+> Typically you will want to select the _Custom Preminor_ option from the list, which Lerna should appropriately yield the expected version.  But double check and make sure the version bump is correct.
 
 ### Standard Release
 
-For a normal release (e.g. "latest") the following command can be run from the mainline branch of the repo.
+For a formal release, e.g. **latest**, run the following command:
 ```sh
 # from the root of the repo
 $ yarn lerna publish --force-publish
 ```
+
