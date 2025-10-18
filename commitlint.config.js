@@ -11,7 +11,8 @@ export default {
     "body-case": [2, "always", "lower-case"],
     "header-case": [2, "always", "lower-case"],
   },
-  // TODO: get commitizen fancy prompts working
+  // emojis don't actually work
+  // https://github.com/conventional-changelog/commitlint/issues/4534
   prompt: {
     settings: {
       enableMultipleScopes: true,
