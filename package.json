@@ -12,11 +12,6 @@
       "www"
     ]
   },
-  "config": {
-    "commitizen": {
-      "path": "@commitlint/cz-commitlint"
-    }
-  },
   "scripts": {
     "lerna": "lerna",
     "clean": "rimraf --glob ./packages/**/.greenwood/** ./packages/**/public/** ./coverage",
