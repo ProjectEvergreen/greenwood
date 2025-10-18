@@ -7,12 +7,9 @@ export default {
     "scope-case": [2, "always", "lower-case"],
     "scope-enum": [2, "always", ["cli", "init", "plugins", "adapters", "types", "workspace"]],
     "scope-empty": [2, "never"],
-
     "subject-case": [2, "always", "lower-case"],
-
     "body-case": [2, "always", "lower-case"],
-
-    "footer-empty": [2, "always"],
+    "header-case": [2, "always", "lower-case"],
   },
   // TODO: get commitizen fancy prompts working
   prompt: {
