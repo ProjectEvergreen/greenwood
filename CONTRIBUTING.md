@@ -288,6 +288,8 @@ After staging the files you ready to commit with `git add`, you can initiate the
 $ yarn commit
 ```
 
+The PR title should match the conventional commits format as well.  If you make the PR after one commit, GitHub will [automatically use the first commit as the](https://www.reddit.com/r/github/comments/uqxjlc/always_use_first_commit_as_pr_titledescription/).
+
 > _To test the CI build scripts locally, run the `yarn` commands mentioned in the section in the Continuous Integration section of this document.  (basically just make sure linting, formatting, and test tasks are all passing)._
 
 ## Release Management
