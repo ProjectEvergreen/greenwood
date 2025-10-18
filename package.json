@@ -29,6 +29,7 @@
     "lint:types": "tsc --project ./tsconfig.json",
     "commit": "cz",
     "commit:lint": "commitlint --last --verbose",
+    "commit:edit": "commitlint --edit $1",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
     "prepare": "husky"
