@@ -164,14 +164,52 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
     // https://unpkg.com/browse/robust-predicates@3.0.2/package.json
     updateImportMap(dependency, exports, resolvedRoot);
   } else if (typeof exports === "object") {
+    /*
+     * test for conditional subpath exports
+     * 1. import
+     * 2. module-sync
+     * 3. default
+     */
     for (const sub in exports) {
-      /*
-       * test for conditional subpath exports
-       * 1. import
-       * 2. module-sync
-       * 3. default
-       */
-      if (typeof exports[sub] === "object") {
+      // although not widely used and is generally discouraged / deprecated
+      // some export maps have an array
+      // https://app.unpkg.com/@jridgewell/gen-mapping@0.3.13/files/package.json#L18
+      if (Array.isArray(exports[sub])) {
+        for (const item of exports[sub]) {
+          if (typeof item === "string") {
+            // basic support, not properly tested
+            updateImportMap(`${dependency}/${item}`, item, resolvedRoot);
+          } else if (typeof item === "object") {
+            let matched = false;
+
+            for (const condition of SUPPORTED_EXPORT_CONDITIONS) {
+              if (item[condition]) {
+                matched = true;
+                if (sub.indexOf("*") >= 0) {
+                  // basic support, not properly tested
+                  await walkExportPatterns(dependency, sub, exports[sub][condition], resolvedRoot);
+                } else {
+                  // could there be more sub conditions here?  Going with default for now
+                  updateImportMap(
+                    dependency,
+                    item[condition].default ?? item[condition],
+                    resolvedRoot,
+                  );
+                }
+                break;
+              }
+            }
+
+            if (!matched) {
+              // ex. https://unpkg.com/browse/matches-selector@1.2.0/package.json
+              diagnostics.set(
+                dependency,
+                `no supported export conditions (\`${SUPPORTED_EXPORT_CONDITIONS.join(", ")}\`) for dependency => \`${dependency}\``,
+              );
+            }
+          }
+        }
+      } else if (typeof exports[sub] === "object") {
         let matched = false;
 
         for (const condition of SUPPORTED_EXPORT_CONDITIONS) {
