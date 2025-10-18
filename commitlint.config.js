@@ -101,7 +101,10 @@ export default {
       breaking: {
         description: "Describe the breaking changes",
       },
-      references: {
+      isIssueAffected: {
+        description: "Does this change affect any open issues?",
+      },
+      issues: {
         description: 'Add issue references (e.g. "#123")',
       },
     },
