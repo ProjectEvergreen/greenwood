@@ -280,13 +280,15 @@ Our standard issue template requests some of the following information to be pre
 
 ### Pull Requests
 
-Pull requests are the best!  To best help facilitate contributions to the project, here are some requests:
+Pull requests are the best!  To best help facilitate contributions to the project, we have [**Conventional Commits**](https://www.conventionalcommits.org/) configured for the project to walk you through preparing commits in the format of `type(area): #<issue-number> <summary of change>`, e.g. _bug(cli): #128 fixed bug with the thing_.  This workflow will also run your files through [**Prettier**](https://prettier.io/).
 
-- We generally prefer an issue be opened first, to help facilitate general discussion outside of the code review process itself and align on the ask and any expectations.  However, for typos in docs and minor "chore" like tasks a PR is usually sufficient.
-- For PR titles, we follow a conventional commit style format of `type(area): #<issue-number> <summary of change>`, e.g. _bug(cli): #128 fixed bug with the thing_
-    - where `type` generally follows the issue labels, like _feat_, _enhancement_, _bug_, _chore_, _docs_
-    - where `area` generally follows package structure labels, like _cli_, _init_, _adapters_, _plugins_, etc
-- To test the CI build scripts locally, run the `yarn` commands mentioned in the section in the Continuous Integration section of this document.  (basically just make sure linting, formatting, and test tasks are all passing)
+After staging the files you ready to commit with `git add`, you can initiate the commit "wizard" by running:
+
+```sh
+$ yarn commit
+```
+
+> _To test the CI build scripts locally, run the `yarn` commands mentioned in the section in the Continuous Integration section of this document.  (basically just make sure linting, formatting, and test tasks are all passing)._
 
 ## Release Management
 
