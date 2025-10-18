@@ -1,6 +1,9 @@
 {
-  "version": "0.33.3",
-  "packages": ["packages/*", "www"],
+  "version": "0.34.0-alpha.0",
+  "packages": [
+    "packages/*",
+    "www"
+  ],
   "npmClient": "yarn",
   "$schema": "node_modules/lerna/schemas/lerna-schema.json"
 }
