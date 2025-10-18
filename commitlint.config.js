@@ -1,23 +1,24 @@
 // https://commitlint.js.org/reference/rules.html
 export default {
   rules: {
-    "scope-case": [2, "always", "lower-case"],
     "type-case": [2, "always", "lower-case"],
+    "type-enum": [2, "always", ["feat", "enhancement", "fix", "chore", "docs", "revert"]],
+    "type-empty": [2, "never"],
+    "scope-case": [2, "always", "lower-case"],
+    "scope-enum": [2, "always", ["cli", "init", "plugins", "adapters", "types", "workspace"]],
+    "scope-empty": [2, "never"],
+
     "subject-case": [2, "always", "lower-case"],
+
     "body-case": [2, "always", "lower-case"],
+
+    "footer-empty": [2, "always"],
   },
+  // TODO: get commitizen fancy prompts working
   prompt: {
     settings: {
       enableMultipleScopes: true,
       scopeEnumSeparator: ",",
-    },
-    messages: {
-      skip: ":skip",
-      max: "upper %d chars",
-      min: "%d chars at least",
-      emptyWarning: "can not be empty",
-      upperLimitWarning: "over limit",
-      lowerLimitWarning: "below limit",
     },
     questions: {
       type: {
@@ -31,7 +32,7 @@ export default {
           enhancement: {
             description: "A code change that neither fixes a bug nor adds a feature",
             title: "Code Refactoring",
-            emoji: "📦",
+            emoji: "💪",
           },
           fix: {
             description: "A bug fix",
@@ -73,6 +74,11 @@ export default {
             title: "Changes to any plugins",
             emoji: "📦",
           },
+          adapters: {
+            description: "Adapters",
+            title: "Changes to any plugins",
+            emoji: "⏩",
+          },
           types: {
             description: "Types",
             title: "Type or TypeScript specific fixes",
@@ -98,7 +104,7 @@ export default {
       breaking: {
         description: "Describe the breaking changes",
       },
-      issues: {
+      reference: {
         description: 'Add issue references (e.g. "#123")',
       },
     },
