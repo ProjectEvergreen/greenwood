@@ -101,7 +101,7 @@ export default {
       breaking: {
         description: "Describe the breaking changes",
       },
-      reference: {
+      references: {
         description: 'Add issue references (e.g. "#123")',
       },
     },
