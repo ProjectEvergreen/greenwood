@@ -10,7 +10,6 @@ export default {
     "subject-case": [2, "always", "lower-case"],
     "body-case": [2, "always", "lower-case"],
     "header-case": [2, "always", "lower-case"],
-    "references-empty": [1, "never"],
   },
   // TODO: get commitizen fancy prompts working
   prompt: {
