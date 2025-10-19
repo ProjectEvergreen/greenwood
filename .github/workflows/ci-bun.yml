@@ -28,7 +28,7 @@ jobs:
         run: yarn config set strict-ssl false
 
       - name: Install Dependencies
-        run: yarn install --frozen-lockfile && yarn lerna bootstrap
+        run: yarn install --frozen-lockfile
 
       - name: Test
         run: bun run --bun test:bun
