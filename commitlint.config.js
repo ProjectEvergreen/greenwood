@@ -5,7 +5,11 @@ export default {
     "type-enum": [2, "always", ["feat", "enhancement", "fix", "chore", "docs", "revert"]],
     "type-empty": [2, "never"],
     "scope-case": [2, "always", "lower-case"],
-    "scope-enum": [2, "always", ["cli", "init", "plugins", "adapters", "types", "workspace"]],
+    "scope-enum": [
+      2,
+      "always",
+      ["cli", "init", "plugins", "adapters", "runtimes", "types", "workspace"],
+    ],
     "scope-empty": [2, "never"],
     "subject-case": [2, "always", "lower-case"],
     "body-case": [2, "always", "lower-case"],
@@ -15,8 +19,7 @@ export default {
   // https://github.com/conventional-changelog/commitlint/issues/4534
   prompt: {
     settings: {
-      enableMultipleScopes: true,
-      scopeEnumSeparator: ",",
+      enableMultipleScopes: false,
     },
     questions: {
       type: {
@@ -76,6 +79,11 @@ export default {
             description: "Adapters",
             title: "Changes to any plugins",
             emoji: "⏩",
+          },
+          runtimes: {
+            description: "Runtimes",
+            title: "Changes related to supporting runtimes",
+            emoji: "🏃",
           },
           types: {
             description: "Types",
