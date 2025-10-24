@@ -23,7 +23,7 @@ async function getLayout(compilation, { route }) {
       </head>
       <body>
         <h1>This heading was rendered server side!</h1>
-        <content-outlet></content-outlet>
+        <outlet for="content"></outlet>
       </body>
     </html>
   `;
