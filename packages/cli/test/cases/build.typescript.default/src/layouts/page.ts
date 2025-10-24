@@ -3,7 +3,7 @@ const html: string = `
 <html lang="en" prefix="og:http://ogp.me/ns#">
   <body>
     <h2>Default Page Layout</h2>
-    <content-outlet></content-outlet>
+    <output for="content"></output>
   </body>
 </html>
 `;

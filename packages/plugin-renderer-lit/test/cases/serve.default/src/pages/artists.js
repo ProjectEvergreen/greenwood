@@ -3,6 +3,8 @@ import { html } from "lit";
 import { unsafeHTML } from "lit-html/directives/unsafe-html.js";
 import "../components/greeting.js";
 
+// prettier-ignore
+// ignore this to keep the single quotes for output tag
 async function getLayout(compilation, { route }) {
   return html`
     <html>
@@ -23,7 +25,7 @@ async function getLayout(compilation, { route }) {
       </head>
       <body>
         <h1>This heading was rendered server side!</h1>
-        <content-outlet></content-outlet>
+        <output for='content'></output>
       </body>
     </html>
   `;

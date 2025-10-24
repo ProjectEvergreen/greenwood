@@ -298,7 +298,7 @@ async function bundleSsrPages(compilation, optimizePlugins) {
     // would be nice to see if this can be done in a single pass though...
     await asyncForEach(ssrPages, async (page) => {
       const { route } = page;
-      let staticHtml = "<content-outlet></content-outlet>";
+      let staticHtml = `<output for="content"></output>`;
 
       staticHtml = await getPageLayout(staticHtml, compilation, page);
       staticHtml = await getAppLayout(staticHtml, compilation, page);
@@ -375,7 +375,7 @@ async function bundleSsrPages(compilation, optimizePlugins) {
           let staticHtml = \`${staticHtml}\`;
 
           if (data.body) {
-            staticHtml = staticHtml.replace(\/\<content-outlet>(.*)<\\/content-outlet>\/s, data.body);
+            staticHtml = staticHtml.replace(\/\<output for="content">(.*)<\\/output>\/s, data.body);
           }
 
           return new Response(staticHtml, {
