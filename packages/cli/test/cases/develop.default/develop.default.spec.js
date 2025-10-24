@@ -527,7 +527,11 @@ describe("Develop Greenwood With: ", function () {
       let body;
 
       before(async function () {
-        response = await fetch(`${hostname}:${port}/node_modules/lit-html/lit-html.js.map`);
+        response = await fetch(`${hostname}:${port}/node_modules/lit-html/lit-html.js.map`, {
+          headers: {
+            "Content-Type": "application/json", // Essential for JSON bodies
+          },
+        });
         body = await response.clone().text();
       });
 
@@ -795,6 +799,9 @@ describe("Develop Greenwood With: ", function () {
         response = await fetch(`${hostname}:${port}/api/submit-json`, {
           method: "POST",
           body: JSON.stringify({ name: param }),
+          headers: {
+            "Content-Type": "application/json", // Essential for JSON bodies
+          },
         });
         data = await response.json();
       });
