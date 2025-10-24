@@ -8,7 +8,7 @@ export default class AppLayout extends HTMLElement {
         </head>
         <body>
           <h1>TypeScript App Layout</h1>
-          <page-outlet></page-outlet>
+          <outlet for="page"></outlet>
         </body>
       </html>
     `;

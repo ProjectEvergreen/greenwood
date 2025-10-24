@@ -6,7 +6,7 @@ const html: string = `
   </head>
   <body>
     <h2>TypeScript Blog Page Layout</h2>
-    <content-outlet></content-outlet>
+    <outlet for="content"></outlet>
   </body>
 </html>
 `;
