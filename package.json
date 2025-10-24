@@ -6,24 +6,18 @@
   "author": "Owen Buckley <owen@thegreenhouse.io>",
   "license": "MIT",
   "type": "module",
-  "workspaces": {
-    "packages": [
-      "packages/*",
-      "www"
-    ]
-  },
   "scripts": {
     "lerna": "lerna",
     "clean": "rimraf --glob ./packages/**/.greenwood/** ./packages/**/public/** ./coverage",
     "clean:deps": "rimraf **/node_modules/**",
-    "build": "yarn workspace www build",
-    "serve": "yarn workspace www serve",
-    "dev": "yarn workspace www dev",
+    "build": "pnpm --filter www build",
+    "serve": "pnpm --filter www serve",
+    "dev": "pnpm --filter www dev",
     "test": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true __GWD_ROLLUP_MODE__=strict NODE_NO_WARNINGS=1 c8 mocha --exclude \"./packages/**/test/cases/loaders-*/**\" \"./packages/**/**/*.spec.js\"",
     "test:loaders": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true __GWD_ROLLUP_MODE__=strict NODE_NO_WARNINGS=1 node --import $(pwd)/test/test-register.js ./node_modules/mocha/bin/mocha \"./packages/**/**/*.spec.js\"",
     "test:loaders:win": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true __GWD_ROLLUP_MODE__=strict NODE_NO_WARNINGS=1 node --import file:\\\\%cd%\\test\\test-register.js ./node_modules/mocha/bin/mocha --exclude \"./packages/init/test/cases/**\" \"./packages/**/**/*.spec.js\"",
-    "test:tdd": "yarn test --watch",
-    "lint": "yarn run lint:ls && yarn run lint:js && yarn run lint:types",
+    "test:tdd": "pnpm run test --watch",
+    "lint": "pnpm run lint:ls && pnpm run lint:js && pnpm run lint:types",
     "lint:js": "eslint",
     "lint:ls": "ls-lint",
     "lint:types": "tsc --project ./tsconfig.json",
@@ -58,7 +52,7 @@
     "jsdom": "^16.5.0",
     "lerna": "^8.2.4",
     "lint-staged": "^15.4.3",
-    "mocha": "^9.1.3",
+    "mocha": "^11.7.4",
     "prettier": "^3.4.2",
     "rimraf": "^5.0.10",
     "typescript": "^5.8.2"

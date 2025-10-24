@@ -35,12 +35,12 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@greenwood/cli": "^0.33.0"
+    "@greenwood/cli": "workspace:^"
   },
   "dependencies": {
     "@webcomponents/webcomponentsjs": "^2.6.0"
   },
   "devDependencies": {
-    "@greenwood/cli": "^0.34.0-alpha.0"
+    "@greenwood/cli": "workspace:^"
   }
 }
