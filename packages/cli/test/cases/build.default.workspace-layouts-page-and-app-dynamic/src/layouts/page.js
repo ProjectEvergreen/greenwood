@@ -11,7 +11,7 @@ export default class PageLayout extends HTMLElement {
         <body>
           <h2>Page Layout for ${this.route}</h2>
           <span>Number of pages ${this.numPages}</span>
-          <outlet for="content"></outlet>
+          <output for="content"></output>
         </body>
       </html>
     `;
