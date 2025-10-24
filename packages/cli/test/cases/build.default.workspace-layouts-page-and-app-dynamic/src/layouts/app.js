@@ -11,7 +11,7 @@ export default class AppLayout extends HTMLElement {
 
         <body>
           <h1>App Layout</h1>
-          <outlet for="page"></outlet>
+          <output for="page"></output>
           <footer>${year}</footer>
         </body>
       </html>
