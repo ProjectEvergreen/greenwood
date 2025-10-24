@@ -14,6 +14,7 @@ ls:
 ignore:
   - .git
   - www/public
+  - www/.greenwood
   - node_modules
   - packages/cli/node_modules
   - packages/init/node_modules
