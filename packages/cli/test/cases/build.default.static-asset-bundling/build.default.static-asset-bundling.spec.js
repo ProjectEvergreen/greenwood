@@ -59,7 +59,7 @@ describe("Build Greenwood With: ", function () {
 
       before(async function () {
         const headerScripts = await Array.fromAsync(
-          fs.glob("header.*.js", { cwd: new URL("./public/", import.meta.url) }),
+          fs.glob("header.*.js", { cwd: new URL("./public/", import.meta.url).pathname }),
         );
 
         headerContents = await fs.readFile(
@@ -87,7 +87,7 @@ describe("Build Greenwood With: ", function () {
       before(async function () {
         assets = (
           await Array.fromAsync(
-            fs.glob("**", { cwd: new URL("./public/assets/", import.meta.url) }),
+            fs.glob("**", { cwd: new URL("./public/assets/", import.meta.url).pathname }),
           )
         ).filter((assets) => assets.indexOf(".") > 0);
       });
