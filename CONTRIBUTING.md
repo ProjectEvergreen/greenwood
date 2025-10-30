@@ -280,9 +280,11 @@ Our standard issue template requests some of the following information to be pre
 
 ### Pull Requests
 
-Pull requests are the best!  To best help facilitate contributions to the project, we have [**Conventional Commits**](https://www.conventionalcommits.org/) configured for the project to walk you through preparing commits in the format of `<type>(<scope>): <summary of change>`, e.g. _bug(cli): fixed bug with the thing_.  This workflow will also run your files through [**Prettier**](https://prettier.io/).
+Pull requests are the best!  To best help facilitate contributions to the project, we have [**Conventional Commits**](https://www.conventionalcommits.org/) configured for the project to walk you through preparing commits in the format of `<type>(<scope>): #<issue> <summary of change>`, e.g. _bug(cli): #123 fixed bug with the thing_.
 
-After staging the files you ready to commit with `git add`, you can initiate the commit "wizard" by running:
+Make sure you have run `yarn lint`, `yarn format` and `yarn test` to prepare your commit.
+
+Then, after staging your files with `git add`, you can initiate the commit "wizard" by running:
 
 ```sh
 $ yarn commit
@@ -292,8 +294,6 @@ The following will be required:
 - **type**
 - **scope**
 - **issue reference** (can technically be empty)
-
-The PR title should match the conventional commits format as well.  If you make the PR after one commit, GitHub will [automatically use the first commit as the](https://www.reddit.com/r/github/comments/uqxjlc/always_use_first_commit_as_pr_titledescription/).
 
 > _To test the CI build scripts locally, run the commands mentioned in the Continuous Integration section of this document.  (basically just make sure linting, formatting, and test tasks are all passing)._
 
