@@ -27,11 +27,11 @@ const scopes = [
   },
   {
     value: "adapters",
-    name: "adapters:     🤝  Changes to any adapters",
+    name: "adapters:     🔋  Changes to any adapters",
   },
   {
     value: "runtimes",
-    name: "runtimes:     🏃  Changes related to supporting runtimes",
+    name: "runtimes:     ❄️   Changes related to supporting runtimes",
   },
   {
     value: "types",
@@ -87,7 +87,7 @@ export default {
         type: "list",
         name: "breaking",
         message: "Is this a breaking change?",
-        choices: ["Yes", "No"],
+        choices: ["No", "Yes"],
       },
     ]);
 
