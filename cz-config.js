@@ -1,49 +1,49 @@
 // NOTE: need to keep types and scope consistent with commitlint.config.js
 // https://commitizen.github.io/cz-cli/
 const types = [
-  { value: "feature", name: "feature:         ✨ A new feature" },
+  { value: "feature", name: "feature:         ✨  A new feature" },
   {
     value: "enhancement",
-    name: 'enhancement:     💪" A code change that neither fixes a bug nor adds a feature',
+    name: "enhancement:     💪  A code change that neither fixes a bug nor adds a feature",
   },
-  { value: "fix", name: "fix:             🐛 A bug fix" },
-  { value: "chore", name: "chore:           🛠 Other changes that don't modify src files" },
-  { value: "docs", name: "docs:            📚 Documentation only changes" },
-  { value: "revert", name: "revert:          🗑 Reverts a previous commit" },
+  { value: "fix", name: "fix:             🐛  A bug fix" },
+  { value: "chore", name: "chore:           🛠   Other changes that don't modify src files" },
+  { value: "docs", name: "docs:            📚  Documentation only changes" },
+  { value: "revert", name: "revert:          🗑   Reverts a previous commit" },
 ];
 
 const scopes = [
   {
     value: "cli",
-    name: "cli:          ♻️ Changes to the core CLI",
+    name: "cli:          ♻️   Changes to the core CLI",
   },
   {
     value: "init",
-    name: "init:         ⚡ Changes to the init CLI",
+    name: "init:         ⚡  Changes to the init CLI",
   },
   {
     value: "plugins",
-    name: "plugins:      🔌 Changes to any plugins",
+    name: "plugins:      🔌  Changes to any plugins",
   },
   {
     value: "adapters",
-    name: "adapters:     🤝 Changes to any adapters",
+    name: "adapters:     🤝  Changes to any adapters",
   },
   {
     value: "runtimes",
-    name: "runtimes:     🏃 Changes related to supporting runtimes",
+    name: "runtimes:     🏃  Changes related to supporting runtimes",
   },
   {
     value: "types",
-    name: "types:        🤓 Type or TypeScript specific changes",
+    name: "types:        🤓  Type or TypeScript specific changes",
   },
   {
     value: "deps",
-    name: "deps:         📦 Updating dependencies (for renovate)",
+    name: "deps:         📦  Updating dependencies (for renovate)",
   },
   {
     value: "workspace",
-    name: "workspace:    🏗️  Changes to the monorepo or CI",
+    name: "workspace:    🏗️   Changes to the monorepo or CI",
   },
 ];
 
