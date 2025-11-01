@@ -32,7 +32,8 @@
     "commit:edit": "commitlint --edit $1",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
-    "prepare": "husky"
+    "prepare": "husky",
+    "postinstall": "patch-package"
   },
   "devDependencies": {
     "@babel/core": "^7.24.4",
@@ -64,6 +65,7 @@
     "lerna": "^8.2.4",
     "lint-staged": "^15.4.3",
     "mocha": "^9.1.3",
+    "patch-package": "^8.0.1",
     "prettier": "^3.4.2",
     "rimraf": "^5.0.10",
     "typescript": "^5.8.2"

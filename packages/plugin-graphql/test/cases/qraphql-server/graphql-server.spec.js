@@ -37,17 +37,22 @@ describe("Develop Greenwood With: ", function () {
     before(async function () {
       await runner.setup(outputPath);
 
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve();
-        }, 5000);
-
-        runner.runCommand(cliPath, "develop");
+      await new Promise((resolve, reject) => {
+        runner
+          .runCommand(cliPath, "develop", {
+            onStdOut: (message) => {
+              // here we are waiting for the _GraphQL_ server to be started
+              if (message.includes(`GraphQLServer started at http://${hostname}:${port}/`)) {
+                resolve();
+              }
+            },
+          })
+          .catch(reject);
       });
     });
 
     // ping the graphql server
-    describe("Develop command with GraphQL server / playground running", function () {
+    describe("GraphQL server / playground running", function () {
       let response = {
         body: "",
         code: 0,
