@@ -18,7 +18,7 @@ export default [
       "reports/*",
       "coverage/*",
       "www/**",
-      "packages/cli/test/cases/build.config.typescript/tsconfig.json",
+      "packages/cli/test/cases/serve.config.typescript/tsconfig.json",
     ],
   },
   {
