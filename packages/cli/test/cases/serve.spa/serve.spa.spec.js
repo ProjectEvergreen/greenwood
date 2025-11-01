@@ -59,12 +59,16 @@ describe("Serve Greenwood With: ", function () {
       await runner.setup(outputPath);
       await runner.runCommand(cliPath, "build");
 
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve();
-        }, 5000);
-
-        runner.runCommand(cliPath, "serve");
+      await new Promise((resolve, reject) => {
+        runner
+          .runCommand(cliPath, "serve", {
+            onStdOut: (message) => {
+              if (message.includes("Started server at http://localhost:8080")) {
+                resolve();
+              }
+            },
+          })
+          .catch(reject);
       });
     });
 
