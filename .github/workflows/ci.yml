@@ -38,3 +38,6 @@ jobs:
       - name: Build
         run: |
           yarn clean && yarn build
+      - name: Commitlint Check
+        if: github.event_name == 'push'
+        run: yarn commit:lint
