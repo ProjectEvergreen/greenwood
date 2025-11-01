@@ -251,8 +251,15 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
         }
       }
     }
-  } else if (module || main) {
-    updateImportMap(dependency, `${module ?? main}`, resolvedRoot);
+  } else if (module) {
+    updateImportMap(dependency, module, resolvedRoot);
+  } else if (main) {
+    // support packages that assume "deep" main imports
+    // https://github.com/ProjectEvergreen/greenwood/issues/1602
+    const root = main.split("/").slice(0, -1).join("/");
+
+    updateImportMap(dependency, main, resolvedRoot);
+    await walkExportPatterns(dependency, `${root}/*`, resolvedRoot);
   } else if (fs.existsSync(new URL("./index.js", resolvedRoot))) {
     // if an index.js file exists but with no main entry point, then it should count as a main entry point
     // https://docs.npmjs.com/cli/v7/configuring-npm/package-json#main
