@@ -363,6 +363,18 @@ async function getHybridServer(compilation) {
       const { pathname } = url;
       const matchingRoute = graph.find((node) => node.route === url.pathname) || { data: {} };
       const isApiRoute = manifest.apis.has(url.pathname);
+      const matchingApiRouteWithSegment = Array.from(compilation.manifest.apis.keys()).find(
+        (key) => {
+          const route = compilation.manifest.apis.get(key);
+          return (
+            route.segment &&
+            new URLPattern({ pathname: `${route.segment.pathname}*` }).test(
+              `https://example.com${pathname}`,
+            )
+          );
+        },
+      );
+
       const request = transformKoaRequestIntoStandardRequest(url, ctx.request);
       const matchingRouteWithSegment =
         compilation.graph.find((node) => {
@@ -380,7 +392,6 @@ async function getHybridServer(compilation) {
         (matchingRoute.isSSR || matchingRouteWithSegment.isSSR) &&
         !matchingRoute.prerender
       ) {
-        console.log("SERVE", { matchingRouteWithSegment });
         const entryPointUrl = new URL(
           matchingRoute?.outputHref ?? matchingRouteWithSegment.outputHref,
         );
@@ -438,8 +449,16 @@ async function getHybridServer(compilation) {
         ctx.message = "OK";
         ctx.set("Content-Type", "text/html");
         ctx.status = 200;
-      } else if (isApiRoute) {
-        const apiRoute = manifest.apis.get(url.pathname);
+      } else if (isApiRoute || matchingApiRouteWithSegment) {
+        const apiRoute = manifest.apis.get(matchingApiRouteWithSegment ?? pathname);
+        const props =
+          matchingRouteWithSegment && apiRoute.segment
+            ? new URLPattern({ pathname: apiRoute.segment.pathname }).exec(
+                `https://example.com${pathname}`,
+              ).pathname.groups
+            : undefined;
+        console.log("API Plugin PROPS to send $$$$$", { props });
+
         const entryPointUrl = new URL(apiRoute.outputHref);
         let body, status, headers, statusText;
 
@@ -470,12 +489,13 @@ async function getHybridServer(compilation) {
             worker.postMessage({
               href: entryPointUrl.href,
               request: req,
+              props,
             });
           });
         } else {
           // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
           const { handler } = await import(entryPointUrl);
-          const response = await handler(request);
+          const response = await handler(request, { props });
 
           body = response.body;
           status = response.status;

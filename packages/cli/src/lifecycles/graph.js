@@ -105,6 +105,21 @@ const generateGraph = async (compilation) => {
           // TODO should API routes be run in isolation mode like SSR pages?
           const { isolation } = await import(filenameUrl).then((module) => module);
 
+          // TODO: extract this logic across SSR pages + API routes
+          // TODO would be nice to use new URLPattern({ pathname: route }); // /users/[id]/
+          // TODO how to handle brackets for thing like generated IDs and whatnot for page metadata
+          const pattern = new URLPattern({ pathname: route.replace("[", ":").replace("]", "") });
+          // console.log({ pattern });
+          // console.log({ route, relativePagePath }, pattern.test("https://example.com/users/123/")); // true
+          const dynamicSegments = pattern.test(`https://example.com${basePath}${route}`);
+          // console.log({ dynamicSegments });
+          // console.log('segments', pattern.exec("https://example.com/users/123/"))
+          const segmentKey = relativePagePath
+            .split("/")
+            [relativePagePath.split("/").length - 1].replace(extension, "")
+            .replace("[", "")
+            .replace("]", "");
+
           /*
            * API Properties (per route)
            *----------------------
@@ -117,11 +132,16 @@ const generateGraph = async (compilation) => {
           apiRoutes.set(`${basePath}${route}`, {
             id: decodeURIComponent(
               getIdFromRelativePathPath(relativePagePath, extension).replace("api-", ""),
-            ),
+            )
+              .replace("[", "-")
+              .replace("]", "-"),
             pageHref: new URL(relativePagePath, pagesDir).href,
             outputHref: new URL(relativePagePath, outputDir).href.replace(`.${extension}`, ".js"),
             route: `${basePath}${route}`,
             isolation,
+            segment: dynamicSegments
+              ? { key: segmentKey, pathname: route.replace("[", ":").replace("]", "") }
+              : null,
           });
         } else if (isPage) {
           let root = filename

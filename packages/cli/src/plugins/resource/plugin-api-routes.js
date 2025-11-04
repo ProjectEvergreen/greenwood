@@ -13,15 +13,51 @@ class ApiRoutesResource {
   }
 
   async shouldServe(url) {
+    const { basePath } = this.compilation.config;
     const { protocol, pathname } = url;
 
-    return protocol.startsWith("http") && this.compilation.manifest.apis.has(pathname);
+    if (!protocol.startsWith("http") || !pathname.startsWith(`${basePath}/api/`)) {
+      return;
+    }
+
+    const matchingRouteWithSegment = Array.from(this.compilation.manifest.apis.keys()).find(
+      (key) => {
+        const route = this.compilation.manifest.apis.get(key);
+        return (
+          route.segment &&
+          new URLPattern({ pathname: `${route.segment.pathname}*` }).test(
+            `https://example.com${pathname}`,
+          )
+        );
+      },
+    );
+
+    return matchingRouteWithSegment || this.compilation.manifest.apis.has(pathname);
   }
 
   async serve(url, request) {
-    const api = this.compilation.manifest.apis.get(url.pathname);
+    // TODO: this could all probably get refactored...
+    const { pathname } = url;
+    const matchingRouteWithSegment = Array.from(this.compilation.manifest.apis.keys()).find(
+      (key) => {
+        const route = this.compilation.manifest.apis.get(key);
+        return (
+          route.segment &&
+          new URLPattern({ pathname: route.segment.pathname }).test(
+            `https://example.com${pathname}`,
+          )
+        );
+      },
+    );
+    const api = this.compilation.manifest.apis.get(matchingRouteWithSegment ?? pathname);
     const apiUrl = new URL(api.pageHref);
     const href = apiUrl.href;
+    const props =
+      matchingRouteWithSegment && api.segment
+        ? new URLPattern({ pathname: api.segment.pathname }).exec(`https://example.com${pathname}`)
+            .pathname.groups
+        : undefined;
+    console.log("API Plugin PROPS to send", { props });
 
     if (process.env.__GWD_COMMAND__ === "develop") {
       const workerUrl = new URL("../../lib/api-route-worker.js", import.meta.url);
@@ -40,7 +76,7 @@ class ApiRoutesResource {
           }
         });
 
-        worker.postMessage({ href, request: req });
+        worker.postMessage({ href, request: req, props });
       });
       const { headers, body, status, statusText } = response;
 
@@ -52,7 +88,7 @@ class ApiRoutesResource {
     } else {
       const { handler } = await import(href);
 
-      return await handler(request);
+      return await handler(request, props);
     }
   }
 }
