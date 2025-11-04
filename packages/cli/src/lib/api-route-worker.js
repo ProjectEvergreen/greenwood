@@ -29,7 +29,7 @@ async function responseAsObject(response) {
   };
 }
 
-async function executeRouteModule({ href, request }) {
+async function executeRouteModule({ href, request, props }) {
   const { body, headers = {}, method, url } = request;
   const contentType = headers["content-type"] || "";
   // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
@@ -47,11 +47,16 @@ async function executeRouteModule({ href, request }) {
       header: headers,
       body: format,
     }),
+    {
+      props: {
+        ...props,
+      },
+    },
   );
 
   parentPort.postMessage(await responseAsObject(response));
 }
 
-parentPort.on("message", async (task) => {
-  await executeRouteModule(task);
+parentPort.on("message", async (task, props) => {
+  await executeRouteModule(task, props);
 });

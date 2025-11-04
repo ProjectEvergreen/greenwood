@@ -3,10 +3,10 @@
  * Run Greenwood with SSR routes and API route that use dynamic file-based routing.
  *
  * User Result
- * Should serve a Greenwood project that can handle dynamic segments in page and API routes.
+ * Should run the Greenwood dev server can handle dynamic segments in page and API routes.
  *
  * User Command
- * greenwood serve
+ * greenwood develop
  *
  * User Config
  * {}
@@ -29,11 +29,11 @@ import { fileURLToPath } from "node:url";
 
 const expect = chai.expect;
 
-describe("Serve Greenwood With: ", function () {
+describe("Develop Greenwood With: ", function () {
   const LABEL = "Dynamic Routing";
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
-  const hostname = "http://127.0.0.1:8080";
+  const hostname = "http://localhost:1984";
   let runner;
 
   before(function () {
@@ -47,14 +47,13 @@ describe("Serve Greenwood With: ", function () {
   describe(LABEL, function () {
     before(async function () {
       await runner.setup(outputPath);
-      await runner.runCommand(cliPath, "build");
 
       return new Promise((resolve) => {
         setTimeout(() => {
           resolve();
         }, 10000);
 
-        runner.runCommand(cliPath, "serve");
+        runner.runCommand(cliPath, "develop");
       });
     });
 
