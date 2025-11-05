@@ -13,6 +13,6 @@ export default {
     "scope-empty": [2, "never"],
     "subject-case": [2, "always", "lower-case"],
     "body-case": [2, "always", "lower-case"],
-    "header-case": [2, "always", "lower-case"],
+    "header-case": [0, "always", "lower-case"],
   },
 };
