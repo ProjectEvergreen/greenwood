@@ -32,8 +32,7 @@
     "commit:edit": "commitlint --edit $1",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
-    "prepare": "husky",
-    "postinstall": "patch-package"
+    "prepare": "husky"
   },
   "devDependencies": {
     "@babel/core": "^7.24.4",
@@ -56,7 +55,7 @@
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-no-only-tests": "^2.6.0",
-    "gallinago": "^0.10.1",
+    "gallinago": "^0.11.0",
     "glob": "^7.1.7",
     "glob-promise": "^3.4.0",
     "globals": "^15.10.0",
@@ -65,7 +64,6 @@
     "lerna": "^8.2.4",
     "lint-staged": "^15.4.3",
     "mocha": "^9.1.3",
-    "patch-package": "^8.0.1",
     "prettier": "^3.4.2",
     "rimraf": "^5.0.10",
     "typescript": "^5.8.2"
