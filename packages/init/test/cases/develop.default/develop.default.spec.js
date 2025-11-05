@@ -51,12 +51,16 @@ describe("Initialize a new Greenwood project: ", function () {
       before(async function () {
         await greenwoodRunner.setup(initOutputPath);
 
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            resolve();
-          }, 5000);
-
-          greenwoodRunner.runCommand(cliPath, "develop");
+        await new Promise((resolve, reject) => {
+          greenwoodRunner
+            .runCommand(cliPath, "develop", {
+              onStdOut: (message) => {
+                if (message.includes(`Started local development server at http://localhost:1984`)) {
+                  resolve();
+                }
+              },
+            })
+            .catch(reject);
         });
       });
 

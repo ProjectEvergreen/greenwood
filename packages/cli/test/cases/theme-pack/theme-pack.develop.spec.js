@@ -57,12 +57,16 @@ describe("Develop Greenwood With: ", function () {
     before(async function () {
       await runner.setup(outputPath);
 
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve();
-        }, 5000);
-
-        runner.runCommand(cliPath, "develop");
+      await new Promise((resolve, reject) => {
+        runner
+          .runCommand(cliPath, "develop", {
+            onStdOut: (message) => {
+              if (message.includes(`Started local development server at http://localhost:1984`)) {
+                resolve();
+              }
+            },
+          })
+          .catch(reject);
       });
     });
 

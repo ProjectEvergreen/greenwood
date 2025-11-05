@@ -10457,10 +10457,10 @@ fuzzy@0.1.3:
   resolved "https://registry.npmjs.org/fuzzy/-/fuzzy-0.1.3.tgz"
   integrity sha512-/gZffu4ykarLrCiP3Ygsa86UAo1E5vEVlvTrpkKywXSbP9Xhln3oSp9QSV57gEq3JFFpGJ4GZ+5zdEp3FcUh4w==
 
-gallinago@^0.10.1:
-  version "0.10.1"
-  resolved "https://registry.yarnpkg.com/gallinago/-/gallinago-0.10.1.tgz#de6f25868231ea951393bb2f344302f27c3f327c"
-  integrity sha512-HDj+c7XBMcmrV0ESQrc7wa4TQvt/rYwofbXCz9JlEBPfk0xqALww5L4LGj3IspgrRjZTrHSzM+7aL3pNS1FP2Q==
+gallinago@^0.11.0:
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/gallinago/-/gallinago-0.11.0.tgz#45d2662961b0be9d3ea9c3c397d9b233f756b15c"
+  integrity sha512-mrb2Vl85he1xmsclycN1UcihSSApCrI53ad1V5Wo7aNuz+I0MnrI/u2NbFqv9SfUvZ5ezAp0r3LQnZgY5JeEZA==
 
 gauge@^3.0.0:
   version "3.0.2"
