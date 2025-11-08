@@ -64,6 +64,7 @@
     "wc-compiler": "~0.17.1"
   },
   "devDependencies": {
+    "@awesome.me/webawesome": "3.0.0",
     "@aws-sdk/client-cloudfront": "^3.726.0",
     "@beforesemicolon/markup": "^1.14.1",
     "@jridgewell/gen-mapping": "^0.3.13",
