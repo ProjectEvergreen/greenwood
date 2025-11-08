@@ -30,7 +30,7 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Test
-        run: bun run --bun test:bun
+        run: bun run --bun test:bun:loaders
 
       - name: Build
         run: bun run --bun build
