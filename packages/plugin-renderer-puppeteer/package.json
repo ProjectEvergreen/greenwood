@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/plugin-renderer-puppeteer",
-  "version": "0.34.0-alpha.0",
+  "version": "0.34.0-alpha.1",
   "description": "A Greenwood plugin to allow headless browser rendering with Puppeteer.",
   "repository": {
     "type": "git",
@@ -42,6 +42,6 @@
     "puppeteer": "^24.0.0"
   },
   "devDependencies": {
-    "@greenwood/cli": "^0.34.0-alpha.0"
+    "@greenwood/cli": "^0.34.0-alpha.1"
   }
 }

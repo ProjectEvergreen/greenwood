@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/plugin-postcss",
-  "version": "0.34.0-alpha.0",
+  "version": "0.34.0-alpha.1",
   "description": "A Greenwood plugin for loading PostCSS configuration and applying it to your CSS.",
   "repository": {
     "type": "git",
@@ -43,7 +43,7 @@
     "postcss-preset-env": "^7.0.1"
   },
   "devDependencies": {
-    "@greenwood/cli": "^0.34.0-alpha.0",
+    "@greenwood/cli": "^0.34.0-alpha.1",
     "@spectrum-css/typography": "^6.2.0"
   }
 }
