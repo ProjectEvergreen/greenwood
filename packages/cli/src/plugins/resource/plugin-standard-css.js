@@ -183,6 +183,10 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
           case "highlight":
           case "part":
           case "slotted":
+          case "view-transition-group":
+          case "view-transition-image-pair":
+          case "view-transition-old":
+          case "view-transition-new":
             optimizedCss += "(";
             break;
           default:
@@ -319,6 +323,10 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
             case "highlight":
             case "part":
             case "slotted":
+            case "view-transition-group":
+            case "view-transition-image-pair":
+            case "view-transition-old":
+            case "view-transition-new":
               optimizedCss += ")";
               break;
             default:

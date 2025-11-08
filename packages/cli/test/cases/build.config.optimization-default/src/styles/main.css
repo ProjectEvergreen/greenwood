@@ -188,3 +188,33 @@ h2 {
     text-align: center;
   }
 }
+
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-group(root) {
+  position: absolute;
+}
+
+::view-transition-image-pair(root) {
+  position: absolute;
+}
+
+@keyframes slide-from-right {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0%);
+  }
+}
+
+::view-transition-old(root) {
+  animation: none;
+}
+
+::view-transition-new(root) {
+  animation: slide-from-right 0.3s ease-out;
+}
