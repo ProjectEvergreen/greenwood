@@ -116,14 +116,14 @@ function commonIndexSpecs(dom, html, label) {
         expect(bodyMetas.length).to.be.equal(0);
       });
 
-      it("should have no <content-outlet> tags in the <body>", function () {
-        const contentOutlet = dom.window.document.querySelectorAll("body content-outlet");
+      it("should have no content <output> tags in the <body>", function () {
+        const contentOutlet = dom.window.document.querySelectorAll('body output[for="content"]');
 
         expect(contentOutlet.length).to.be.equal(0);
       });
 
-      it("should have no <page-outlet> tags in the <body>", function () {
-        const pageOutlet = dom.window.document.querySelectorAll("body page-outlet");
+      it("should have no page <output> tags in the <body>", function () {
+        const pageOutlet = dom.window.document.querySelectorAll('body output[for="page"]');
 
         expect(pageOutlet.length).to.be.equal(0);
       });

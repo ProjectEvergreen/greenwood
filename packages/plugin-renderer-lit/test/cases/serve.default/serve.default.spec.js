@@ -73,7 +73,8 @@ describe("Serve Greenwood With: ", function () {
       });
     });
 
-    let response = {};
+    let artistsResponse = {};
+    let usersResponse = {};
     let artists = [];
     let data;
     let dom;
@@ -91,22 +92,22 @@ describe("Serve Greenwood With: ", function () {
 
       artistsPageGraphData = graph.filter((page) => page.route === "/artists/")[0];
 
-      response = await fetch(`${hostname}/artists/`);
-      data = await response.text();
+      artistsResponse = await fetch(`${hostname}/artists/`);
+      data = await artistsResponse.text();
       dom = new JSDOM(data);
 
-      response = await fetch(`${hostname}/users/`);
-      usersPageHtml = await response.text();
+      usersResponse = await fetch(`${hostname}/users/`);
+      usersPageHtml = await usersResponse.text();
       usersPageDom = new JSDOM(usersPageHtml);
     });
 
     describe("Serve command with HTML route response using getBody, getLayout and getFrontmatter for the artists page", function () {
       it("should return a 200 status", function () {
-        expect(response.status).to.equal(200);
+        expect(artistsResponse.status).to.equal(200);
       });
 
       it("should return the correct content type", function () {
-        expect(response.headers.get("content-type")).to.equal("text/html");
+        expect(artistsResponse.headers.get("content-type")).to.equal("text/html");
       });
 
       it("should return a response body", function () {
@@ -238,7 +239,7 @@ describe("Serve Greenwood With: ", function () {
       });
 
       it("should have a Content-Type header of text/html", function (done) {
-        const type = response.headers.get("Content-Type");
+        const type = resp.headers.get("Content-Type");
 
         expect(type).to.equal("text/html");
 
