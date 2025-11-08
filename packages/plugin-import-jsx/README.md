@@ -3,7 +3,7 @@
 ## Overview
 Enables usage of `import` syntax for loading [JSX rendering Web Components](https://merry-caramel-524e61.netlify.app/docs/#jsx) compatible with [**WCC**](https://github.com/ProjectEvergreen/wcc). For more information and complete docs on Greenwood, please visit [our website](https://www.greenwoodjs.dev).
 
-_Note: This is _**not**_ React JSX!_
+_Note: This is _**not**_ React JSX!_.  See a demonstration repo [here](https://github.com/thescientist13/greenwood-jsx).
 
 > This package assumes you already have `@greenwood/cli` installed.
 
@@ -56,7 +56,7 @@ export default class FooterComponent extends HTMLElement {
 customElements.define('app-footer', FooterComponent);
 ```
 
-> For TSX support, make sure you follow the instructions in the above linked page for configuring _tsconfig.json_.
+> For TSX support, make sure you follow the instructions in the above linked page for configuring your _tsconfig.json_.
 
 ## Types
 
