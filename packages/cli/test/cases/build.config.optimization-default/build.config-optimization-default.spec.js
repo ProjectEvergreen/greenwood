@@ -117,17 +117,21 @@ describe("Build Greenwood With: ", function () {
             dom.window.document.querySelectorAll('head link[rel="preload"]'),
           ).filter((tag) => tag.getAttribute("as") === "style");
 
-          expect(linkTags.length).to.be.equal(1);
+          expect(linkTags.length).to.be.equal(2);
         });
 
-        it("should have the expect preload <link> tag for the same <link> tag href in the <head>", function () {
+        it("should have the expected preload <link> tag for the same <link> tags in the <head>", function () {
           const preloadLinkTags = Array.from(
             dom.window.document.querySelectorAll('head link[rel="preload"]'),
           ).filter((link) => link.getAttribute("as") === "style");
 
-          expect(preloadLinkTags.length).to.be.equal(1);
-          expect(preloadLinkTags[0].href).to.match(/\/styles\/main.*.css/);
+          expect(preloadLinkTags.length).to.be.equal(2);
+
+          expect(preloadLinkTags[0].href).to.match(/\/default.*.css/);
           expect(preloadLinkTags[0].getAttribute("crossorigin")).to.equal("anonymous");
+
+          expect(preloadLinkTags[1].href).to.match(/\/styles\/main.*.css/);
+          expect(preloadLinkTags[1].getAttribute("crossorigin")).to.equal("anonymous");
         });
 
         // test custom CSS bundling
