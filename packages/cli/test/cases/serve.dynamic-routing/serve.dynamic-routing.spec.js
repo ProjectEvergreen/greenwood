@@ -33,7 +33,7 @@ describe("Serve Greenwood With: ", function () {
   const LABEL = "Dynamic Routing";
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
-  const hostname = "http://127.0.0.1:8080";
+  const hostname = "http://localhost:8080";
   let runner;
 
   before(function () {
@@ -49,12 +49,16 @@ describe("Serve Greenwood With: ", function () {
       await runner.setup(outputPath);
       await runner.runCommand(cliPath, "build");
 
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve();
-        }, 10000);
-
-        runner.runCommand(cliPath, "serve");
+      await new Promise((resolve, reject) => {
+        runner
+          .runCommand(cliPath, "serve", {
+            onStdOut: (message) => {
+              if (message.includes(`Started server at ${hostname}`)) {
+                resolve();
+              }
+            },
+          })
+          .catch(reject);
       });
     });
 
