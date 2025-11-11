@@ -4,6 +4,7 @@
  *
  */
 import { requestAsObject } from "../../lib/resource-utils.js";
+import { getMatchingDynamicApiRoute, getPropsFromSegment } from "../../lib/url-utils.js";
 import { Worker } from "node:worker_threads";
 
 class ApiRoutesResource {
@@ -20,44 +21,27 @@ class ApiRoutesResource {
       return;
     }
 
-    const matchingRouteWithSegment = Array.from(this.compilation.manifest.apis.keys()).find(
-      (key) => {
-        const route = this.compilation.manifest.apis.get(key);
-        return (
-          route.segment &&
-          new URLPattern({ pathname: `${route.segment.pathname}*` }).test(
-            `https://example.com${pathname}`,
-          )
-        );
-      },
+    const matchingRouteWithSegment = getMatchingDynamicApiRoute(
+      this.compilation.manifest.apis,
+      pathname,
     );
 
     return matchingRouteWithSegment || this.compilation.manifest.apis.has(pathname);
   }
 
   async serve(url, request) {
-    // TODO: this could all probably get refactored...
     const { pathname } = url;
-    const matchingRouteWithSegment = Array.from(this.compilation.manifest.apis.keys()).find(
-      (key) => {
-        const route = this.compilation.manifest.apis.get(key);
-        return (
-          route.segment &&
-          new URLPattern({ pathname: route.segment.pathname }).test(
-            `https://example.com${pathname}`,
-          )
-        );
-      },
+    const matchingRouteWithSegment = getMatchingDynamicApiRoute(
+      this.compilation.manifest.apis,
+      pathname,
     );
     const api = this.compilation.manifest.apis.get(matchingRouteWithSegment ?? pathname);
     const apiUrl = new URL(api.pageHref);
     const href = apiUrl.href;
     const props =
       matchingRouteWithSegment && api.segment
-        ? new URLPattern({ pathname: api.segment.pathname }).exec(`https://example.com${pathname}`)
-            .pathname.groups
+        ? getPropsFromSegment(api.segment, pathname)
         : undefined;
-    console.log("API Plugin PROPS to send", { props });
 
     if (process.env.__GWD_COMMAND__ === "develop") {
       const workerUrl = new URL("../../lib/api-route-worker.js", import.meta.url);

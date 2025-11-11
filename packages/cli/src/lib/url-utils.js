@@ -1,0 +1,46 @@
+function getDynamicSegmentsFromRoute({ route, relativePagePath, extension, basePath }) {
+  const dynamicRoute = route.replace("[", ":").replace("]", "");
+  const pattern = new URLPattern({ pathname: route.replace("[", ":").replace("]", "") });
+  const dynamicSegments = pattern.test(`https://example.com${basePath}${route}`);
+  const segmentKey = relativePagePath
+    .split("/")
+    [relativePagePath.split("/").length - 1].replace(extension, "")
+    .replace("[", "")
+    .replace("]", "");
+
+  return { dynamicSegments, segmentKey, dynamicRoute };
+}
+
+function getMatchingDynamicApiRoute(apis, pathname) {
+  return Array.from(apis.keys()).find((key) => {
+    const route = apis.get(key);
+    return (
+      route.segment &&
+      new URLPattern({ pathname: `${route.segment.pathname}*` }).test(
+        `https://example.com${pathname}`,
+      )
+    );
+  });
+}
+
+function getMatchingDynamicSsrRoute(graph, pathname) {
+  return graph.find((node) => {
+    return (
+      (pathname !== "/404/") !== "/404/" &&
+      node.segment &&
+      new URLPattern({ pathname: node.segment.pathname }).test(`https://example.com${pathname}`)
+    );
+  });
+}
+
+function getPropsFromSegment(segment, pathname) {
+  return new URLPattern({ pathname: segment.pathname }).exec(`https://example.com${pathname}`)
+    .pathname.groups;
+}
+
+export {
+  getDynamicSegmentsFromRoute,
+  getMatchingDynamicApiRoute,
+  getPropsFromSegment,
+  getMatchingDynamicSsrRoute,
+};

@@ -9,6 +9,11 @@ import {
   transformKoaRequestIntoStandardRequest,
   requestAsObject,
 } from "../lib/resource-utils.js";
+import {
+  getMatchingDynamicApiRoute,
+  getMatchingDynamicSsrRoute,
+  getPropsFromSegment,
+} from "../lib/url-utils.js";
 import { Readable } from "node:stream";
 import { Worker } from "node:worker_threads";
 
@@ -363,29 +368,13 @@ async function getHybridServer(compilation) {
       const { pathname } = url;
       const matchingRoute = graph.find((node) => node.route === url.pathname) || { data: {} };
       const isApiRoute = manifest.apis.has(url.pathname);
-      const matchingApiRouteWithSegment = Array.from(compilation.manifest.apis.keys()).find(
-        (key) => {
-          const route = compilation.manifest.apis.get(key);
-          return (
-            route.segment &&
-            new URLPattern({ pathname: `${route.segment.pathname}*` }).test(
-              `https://example.com${pathname}`,
-            )
-          );
-        },
-      );
-
       const request = transformKoaRequestIntoStandardRequest(url, ctx.request);
+      const matchingApiRouteWithSegment = getMatchingDynamicApiRoute(
+        compilation.manifest.apis,
+        pathname,
+      );
       const matchingRouteWithSegment =
-        compilation.graph.find((node) => {
-          return (
-            pathname !== "/404/" &&
-            node.segment &&
-            new URLPattern({ pathname: node.segment.pathname }).test(
-              `https://example.com${pathname}`,
-            )
-          );
-        }) || {};
+        getMatchingDynamicSsrRoute(compilation.graph, pathname) || {};
 
       if (
         !config.prerender &&
@@ -395,15 +384,11 @@ async function getHybridServer(compilation) {
         const entryPointUrl = new URL(
           matchingRoute?.outputHref ?? matchingRouteWithSegment.outputHref,
         );
-        // TODO shouldn't we be able to get this from segment.key?
         const props =
           matchingRouteWithSegment && matchingRouteWithSegment.segment
-            ? new URLPattern({ pathname: matchingRouteWithSegment.segment.pathname }).exec(
-                `https://example.com${pathname}`,
-              ).pathname.groups
+            ? getPropsFromSegment(matchingRouteWithSegment.segment, pathname)
             : undefined;
 
-        console.log("PROPS to send", { props });
         let html;
 
         if (matchingRoute.isolation || isolationMode) {
@@ -437,9 +422,6 @@ async function getHybridServer(compilation) {
         } else {
           // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
           const { handler } = await import(entryPointUrl);
-          // we used to pass compilation here???
-          // TODO we used to pass compilation here???
-          // const response = await handler(request, compilation);
           const response = await handler(request, props);
 
           html = Readable.from(response.body);
@@ -453,11 +435,8 @@ async function getHybridServer(compilation) {
         const apiRoute = manifest.apis.get(matchingApiRouteWithSegment ?? pathname);
         const props =
           matchingRouteWithSegment && apiRoute.segment
-            ? new URLPattern({ pathname: apiRoute.segment.pathname }).exec(
-                `https://example.com${pathname}`,
-              ).pathname.groups
+            ? getPropsFromSegment(apiRoute.segment, pathname)
             : undefined;
-        console.log("API Plugin PROPS to send $$$$$", { props });
 
         const entryPointUrl = new URL(apiRoute.outputHref);
         let body, status, headers, statusText;
