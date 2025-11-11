@@ -9,6 +9,11 @@ import {
   transformKoaRequestIntoStandardRequest,
   requestAsObject,
 } from "../lib/resource-utils.js";
+import {
+  getMatchingDynamicApiRoute,
+  getMatchingDynamicSsrRoute,
+  getPropsFromSegment,
+} from "../lib/url-utils.js";
 import { Readable } from "node:stream";
 import { Worker } from "node:worker_threads";
 
@@ -360,12 +365,30 @@ async function getHybridServer(compilation) {
   app.use(async (ctx) => {
     try {
       const url = new URL(`http://localhost:${config.port}${ctx.url}`);
+      const { pathname } = url;
       const matchingRoute = graph.find((node) => node.route === url.pathname) || { data: {} };
       const isApiRoute = manifest.apis.has(url.pathname);
       const request = transformKoaRequestIntoStandardRequest(url, ctx.request);
+      const matchingApiRouteWithSegment = getMatchingDynamicApiRoute(
+        compilation.manifest.apis,
+        pathname,
+      );
+      const matchingRouteWithSegment =
+        getMatchingDynamicSsrRoute(compilation.graph, pathname) || {};
 
-      if (!config.prerender && matchingRoute.isSSR && !matchingRoute.prerender) {
-        const entryPointUrl = new URL(matchingRoute.outputHref);
+      if (
+        !config.prerender &&
+        (matchingRoute.isSSR || matchingRouteWithSegment.isSSR) &&
+        !matchingRoute.prerender
+      ) {
+        const entryPointUrl = new URL(
+          matchingRoute?.outputHref ?? matchingRouteWithSegment.outputHref,
+        );
+        const props =
+          matchingRouteWithSegment && matchingRouteWithSegment.segment
+            ? getPropsFromSegment(matchingRouteWithSegment.segment, pathname)
+            : undefined;
+
         let html;
 
         if (matchingRoute.isolation || isolationMode) {
@@ -393,12 +416,13 @@ async function getHybridServer(compilation) {
               routeModuleUrl: entryPointUrl.href,
               request,
               compilation: JSON.stringify(compilation),
+              props,
             });
           });
         } else {
           // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
           const { handler } = await import(entryPointUrl);
-          const response = await handler(request, compilation);
+          const response = await handler(request, props);
 
           html = Readable.from(response.body);
         }
@@ -407,8 +431,13 @@ async function getHybridServer(compilation) {
         ctx.message = "OK";
         ctx.set("Content-Type", "text/html");
         ctx.status = 200;
-      } else if (isApiRoute) {
-        const apiRoute = manifest.apis.get(url.pathname);
+      } else if (isApiRoute || matchingApiRouteWithSegment) {
+        const apiRoute = manifest.apis.get(matchingApiRouteWithSegment ?? pathname);
+        const props =
+          matchingRouteWithSegment && apiRoute.segment
+            ? getPropsFromSegment(apiRoute.segment, pathname)
+            : undefined;
+
         const entryPointUrl = new URL(apiRoute.outputHref);
         let body, status, headers, statusText;
 
@@ -439,12 +468,13 @@ async function getHybridServer(compilation) {
             worker.postMessage({
               href: entryPointUrl.href,
               request: req,
+              props,
             });
           });
         } else {
           // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
           const { handler } = await import(entryPointUrl);
-          const response = await handler(request);
+          const response = await handler(request, { props });
 
           body = response.body;
           status = response.status;
