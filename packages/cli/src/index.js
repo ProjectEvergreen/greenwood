@@ -3,6 +3,10 @@ import { generateCompilation } from "./lifecycles/compile.js";
 async function run(command) {
   process.env.__GWD_COMMAND__ = command;
 
+  if (!globalThis.URLPattern) {
+    await import("urlpattern-polyfill");
+  }
+
   try {
     console.info(`Running Greenwood with the ${command} command.`);
     const compilation = await generateCompilation();
