@@ -3,6 +3,7 @@ import fs from "node:fs/promises";
 import fm from "front-matter";
 import { checkResourceExists, requestAsObject } from "../lib/resource-utils.js";
 import { activeFrontmatterKeys } from "../lib/content-utils.js";
+import { getDynamicSegmentsFromRoute } from "../lib/url-utils.js";
 import { Worker } from "node:worker_threads";
 
 function getLabelFromRoute(_route) {
@@ -26,7 +27,12 @@ function getLabelFromRoute(_route) {
 }
 
 function getIdFromRelativePathPath(relativePathPath, extension) {
-  return relativePathPath.replace(`.${extension}`, "").replace("./", "").replace(/\//g, "-");
+  return relativePathPath
+    .replace(`.${extension}`, "")
+    .replace("./", "")
+    .replace(/\//g, "-")
+    .replace("[", "-")
+    .replace("]", "-");
 }
 
 function trackCollectionsForPage(page, collections) {
@@ -104,21 +110,12 @@ const generateGraph = async (compilation) => {
 
           // TODO should API routes be run in isolation mode like SSR pages?
           const { isolation } = await import(filenameUrl).then((module) => module);
-
-          // TODO: extract this logic across SSR pages + API routes
-          // TODO would be nice to use new URLPattern({ pathname: route }); // /users/[id]/
-          // TODO how to handle brackets for thing like generated IDs and whatnot for page metadata
-          const pattern = new URLPattern({ pathname: route.replace("[", ":").replace("]", "") });
-          // console.log({ pattern });
-          // console.log({ route, relativePagePath }, pattern.test("https://example.com/users/123/")); // true
-          const dynamicSegments = pattern.test(`https://example.com${basePath}${route}`);
-          // console.log({ dynamicSegments });
-          // console.log('segments', pattern.exec("https://example.com/users/123/"))
-          const segmentKey = relativePagePath
-            .split("/")
-            [relativePagePath.split("/").length - 1].replace(extension, "")
-            .replace("[", "")
-            .replace("]", "");
+          const { dynamicSegments, segmentKey, dynamicRoute } = getDynamicSegmentsFromRoute({
+            route,
+            relativePagePath,
+            extension,
+            basePath,
+          });
 
           /*
            * API Properties (per route)
@@ -132,16 +129,12 @@ const generateGraph = async (compilation) => {
           apiRoutes.set(`${basePath}${route}`, {
             id: decodeURIComponent(
               getIdFromRelativePathPath(relativePagePath, extension).replace("api-", ""),
-            )
-              .replace("[", "-")
-              .replace("]", "-"),
+            ),
             pageHref: new URL(relativePagePath, pagesDir).href,
             outputHref: new URL(relativePagePath, outputDir).href.replace(`.${extension}`, ".js"),
             route: `${basePath}${route}`,
             isolation,
-            segment: dynamicSegments
-              ? { key: segmentKey, pathname: route.replace("[", ":").replace("]", "") }
-              : null,
+            segment: dynamicSegments ? { key: segmentKey, pathname: dynamicRoute } : null,
           });
         } else if (isPage) {
           let root = filename
@@ -266,25 +259,15 @@ const generateGraph = async (compilation) => {
            * servePage: signal that this is a custom page file type (static | dynamic)
            */
 
-          // TODO would be nice to use new URLPattern({ pathname: route }); // /users/[id]/
-          // TODO how to handle brackets for thing like generated IDs and whatnot for page metadata
-          const pattern = new URLPattern({ pathname: route.replace("[", ":").replace("]", "") });
-          // console.log({ pattern });
-          // console.log({ route, relativePagePath }, pattern.test("https://example.com/users/123/")); // true
-          const dynamicSegments = pattern.test(`https://example.com${basePath}${route}`);
-          // console.log({ dynamicSegments });
-          // console.log('segments', pattern.exec("https://example.com/users/123/"))
-          const segmentKey = relativePagePath
-            .split("/")
-            [relativePagePath.split("/").length - 1].replace(extension, "")
-            .replace("[", "")
-            .replace("]", "");
+          const { dynamicSegments, segmentKey, dynamicRoute } = getDynamicSegmentsFromRoute({
+            route,
+            relativePagePath,
+            extension,
+            basePath,
+          });
 
-          // TODO figure out best filename output naming convention for these special [id] routes
           const page = {
-            id: decodeURIComponent(getIdFromRelativePathPath(relativePagePath, extension))
-              .replace("[", "-")
-              .replace("]", "-"),
+            id: decodeURIComponent(getIdFromRelativePathPath(relativePagePath, extension)),
             label: decodeURIComponent(label),
             title: title ? decodeURIComponent(title) : title,
             route: `${basePath}${route}`,
@@ -302,9 +285,7 @@ const generateGraph = async (compilation) => {
             isolation,
             hydration,
             servePage: isCustom,
-            segment: dynamicSegments
-              ? { key: segmentKey, pathname: route.replace("[", ":").replace("]", "") }
-              : null,
+            segment: dynamicSegments ? { key: segmentKey, pathname: dynamicRoute } : null,
           };
 
           pages.push(page);

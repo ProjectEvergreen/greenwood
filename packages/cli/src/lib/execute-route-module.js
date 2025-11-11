@@ -24,7 +24,6 @@ async function executeRouteModule({
 
     data.html = html;
   } else {
-    console.log({ props });
     const module = await import(moduleUrl).then((module) => module);
     const { body, layout, frontmatter } = contentOptions;
     const {
