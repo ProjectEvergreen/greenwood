@@ -219,7 +219,7 @@ describe("Develop Greenwood With: ", function () {
             headerModuleText = await response.text();
             modulesMaps = await Array.fromAsync(
               fs.promises.glob("*.map.json", {
-                cwd: new URL("./.greenwood/__css-modules-map/", import.meta.url).pathname,
+                cwd: new URL("./.greenwood/__css-modules-map/", import.meta.url),
               }),
             );
           });
