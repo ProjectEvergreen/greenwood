@@ -87,7 +87,7 @@ describe("Build Greenwood With: ", function () {
         redirectsFile = await glob.promise(path.join(outputPath, "public/_redirects"));
       });
 
-      it("", function () {
+      it("should have the expected number of generated zip files for each function", function () {
         expect(zipFiles.length).to.be.equal(12);
       });
 

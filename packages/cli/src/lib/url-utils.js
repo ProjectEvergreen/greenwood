@@ -1,14 +1,13 @@
-function getDynamicSegmentsFromRoute({ route, relativePagePath, extension, basePath }) {
+function getDynamicSegmentsFromRoute({ route, relativePagePath, extension }) {
   const dynamicRoute = route.replace("[", ":").replace("]", "");
-  const pattern = new URLPattern({ pathname: route.replace("[", ":").replace("]", "") });
-  const dynamicSegments = pattern.test(`https://example.com${basePath}${route}`);
   const segmentKey = relativePagePath
     .split("/")
     [relativePagePath.split("/").length - 1].replace(extension, "")
     .replace("[", "")
-    .replace("]", "");
+    .replace("]", "")
+    .replace(".", "");
 
-  return { dynamicSegments, segmentKey, dynamicRoute };
+  return { segmentKey, dynamicRoute };
 }
 
 function getMatchingDynamicApiRoute(apis, pathname) {

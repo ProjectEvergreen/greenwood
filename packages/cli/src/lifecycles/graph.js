@@ -110,7 +110,7 @@ const generateGraph = async (compilation) => {
 
           // TODO should API routes be run in isolation mode like SSR pages?
           const { isolation } = await import(filenameUrl).then((module) => module);
-          const { dynamicSegments, segmentKey, dynamicRoute } = getDynamicSegmentsFromRoute({
+          const { segmentKey, dynamicRoute } = getDynamicSegmentsFromRoute({
             route,
             relativePagePath,
             extension,
@@ -134,7 +134,8 @@ const generateGraph = async (compilation) => {
             outputHref: new URL(relativePagePath, outputDir).href.replace(`.${extension}`, ".js"),
             route: `${basePath}${route}`,
             isolation,
-            segment: dynamicSegments ? { key: segmentKey, pathname: dynamicRoute } : null,
+            segment:
+              dynamicRoute.indexOf(":") > 0 ? { key: segmentKey, pathname: dynamicRoute } : null,
           });
         } else if (isPage) {
           let root = filename
@@ -259,7 +260,7 @@ const generateGraph = async (compilation) => {
            * servePage: signal that this is a custom page file type (static | dynamic)
            */
 
-          const { dynamicSegments, segmentKey, dynamicRoute } = getDynamicSegmentsFromRoute({
+          const { segmentKey, dynamicRoute } = getDynamicSegmentsFromRoute({
             route,
             relativePagePath,
             extension,
@@ -285,7 +286,8 @@ const generateGraph = async (compilation) => {
             isolation,
             hydration,
             servePage: isCustom,
-            segment: dynamicSegments ? { key: segmentKey, pathname: dynamicRoute } : null,
+            segment:
+              dynamicRoute.indexOf(":") > 0 ? { key: segmentKey, pathname: dynamicRoute } : null,
           };
 
           pages.push(page);
