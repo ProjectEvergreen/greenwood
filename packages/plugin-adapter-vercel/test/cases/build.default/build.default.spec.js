@@ -117,7 +117,7 @@ describe("Build Greenwood With: ", function () {
           );
 
           expect(packageJson).to.be.equal(
-            '{"runtime":"nodejs20.x","handler":"index.js","launcherType":"Nodejs","shouldAddHelpers":true}',
+            '{"runtime":"nodejs24.x","handler":"index.js","launcherType":"Nodejs","shouldAddHelpers":true}',
           );
         });
       });
