@@ -295,6 +295,8 @@ The following will be required:
 - **scope**
 - **issue reference** (can technically be empty)
 
+⚠️ **Note**: The breaking change prompt / option is broken in commitlint; [[1](https://github.com/conventional-changelog/commitlint/issues/4191)], [[2](https://github.com/conventional-changelog/commitlint/issues/4100)].  Please call out breaking changes in your PR.
+
 > _To test the CI build scripts locally, run the commands mentioned in the Continuous Integration section of this document.  (basically just make sure linting, formatting, and test tasks are all passing)._
 
 ## Release Management
