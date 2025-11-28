@@ -36,14 +36,10 @@ describe("Serve Greenwood With: ", function () {
 
   describe("Running the serve command without running the build command first", function () {
     it("should throw an error that no build output was detected", async function () {
-      try {
-        await runner.setup(outputPath);
-        await runner.runCommand(cliPath, "serve");
-      } catch (err) {
-        expect(err).to.contain(
-          "Error: No build output detected. Make sure you have run greenwood build",
-        );
-      }
+      await runner.setup(outputPath);
+      await expect(runner.runCommand(cliPath, "serve")).to.be.rejectedWith(
+        "No build output detected. Make sure you have run greenwood build",
+      );
     });
   });
 
