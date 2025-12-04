@@ -1,6 +1,6 @@
 import type { AdapterPlugin } from "@greenwood/cli";
 
-type SUPPORTED_NODE_VERSIONS = "nodejs22.x" | "nodejs20.x" | "nodejs18.x";
+type SUPPORTED_NODE_VERSIONS = "nodejs24.x" | "nodejs22.x" | "nodejs20.x";
 
 type VercelAdapterOptions = {
   runtime?: SUPPORTED_NODE_VERSIONS;

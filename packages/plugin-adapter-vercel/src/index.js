@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { checkResourceExists } from "@greenwood/cli/src/lib/resource-utils.js";
 
-const DEFAULT_RUNTIME = "nodejs20.x";
+const DEFAULT_RUNTIME = "nodejs24.x";
 
 // https://vercel.com/docs/functions/serverless-functions/runtimes/node-js#node.js-helpers
 function generateOutputFormat(id, type) {
