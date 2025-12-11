@@ -64,7 +64,6 @@ describe("Develop Greenwood With: ", function () {
       });
     });
 
-    // "@spectrum-web-components/styles/all-large-dark.css": "/~/Users/owenbuckley/Workspace/project-evergreen/greenwood/node_modules/@spectrum-web-components/styles/all-large-dark.css",\n' +
     describe("Develop command with importMapExtensions", function () {
       let dom;
 
