@@ -4,6 +4,58 @@
  *
  */
 import { IMPORT_MAP_RESOLVED_PREFIX } from "@greenwood/cli/src/lib/walker-package-ranger.js";
+import { mergeImportMap } from "@greenwood/cli/src/lib/node-modules-utils.js";
+import { parse } from "node-html-parser";
+
+function generateImportMapExtensionsMap(body = "", extensions = []) {
+  const dom = parse(body);
+  const importMap = JSON.parse(
+    dom.querySelector("head > script[type='importmap']").textContent,
+  ).imports;
+
+  for (const entry in importMap) {
+    const ext = entry.split(".").pop().split("?")[0];
+
+    if (extensions.includes(ext)) {
+      importMap[`${entry}?type=raw`] = `${importMap[entry]}?type=raw`;
+    }
+  }
+
+  return importMap;
+}
+
+class ImportMapExtensionsResourcePlugin {
+  compilation;
+  options;
+
+  constructor(compilation, options) {
+    this.compilation = compilation;
+    this.options = options;
+  }
+
+  async shouldIntercept(url, request, response) {
+    const { protocol, pathname } = url;
+    const hasMatchingPageRoute = this.compilation.graph.find((node) => node.route === pathname);
+
+    return (
+      this.options?.importMapExtensions?.length > 0 &&
+      process.env.__GWD_COMMAND__ === "develop" &&
+      protocol.startsWith("http") &&
+      hasMatchingPageRoute &&
+      response.headers.get("content-type")?.indexOf("text/html") >= 0
+    );
+  }
+
+  async intercept(url, request, response) {
+    const body = await response.text();
+    const newBody = mergeImportMap(
+      body,
+      generateImportMapExtensionsMap(body, this.options.importMapExtensions),
+    );
+
+    return new Response(newBody);
+  }
+}
 
 class ImportRawResource {
   constructor(compilation, options) {
@@ -59,8 +111,13 @@ const greenwoodPluginImportRaw = (options = {}) => {
   return [
     {
       type: "resource",
-      name: "plugin-import-raw:resource",
+      name: "plugin-import-raw-transform:resource",
       provider: (compilation) => new ImportRawResource(compilation, options),
+    },
+    {
+      type: "resource",
+      name: "plugin-import-raw-extensions:resource",
+      provider: (compilation) => new ImportMapExtensionsResourcePlugin(compilation, options),
     },
   ];
 };

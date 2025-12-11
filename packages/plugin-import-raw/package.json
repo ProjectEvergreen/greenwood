@@ -37,7 +37,11 @@
   "peerDependencies": {
     "@greenwood/cli": "^0.33.0"
   },
+  "dependencies": {
+    "node-html-parser": "^7.0.1"
+  },
   "devDependencies": {
-    "@greenwood/cli": "^0.34.0-alpha.1"
+    "@greenwood/cli": "^0.34.0-alpha.1",
+    "@spectrum-web-components/styles": "^1.0.1"
   }
 }
