@@ -496,6 +496,18 @@ function greenwoodSyncImportAttributes(compilation) {
                   resource.optimizationAttr === "inline" ||
                   compilation.config.optimization === "inline";
 
+                // TODO: hmmm, seems the `polyfill=type` logic is not needed here and lower in this file?
+                if (importAttributes && importAttributes.includes(extension)) {
+                  importAttributes.forEach((attribute) => {
+                    if (attribute === extension) {
+                      bundles[bundle].code = bundles[bundle].code.replace(
+                        new RegExp(`"with{type:"${attribute}"}`, "g"),
+                        `?polyfill=type-${extension}"`,
+                      );
+                    }
+                  });
+                }
+
                 if (
                   resource.sourcePathURL.pathname ===
                     new URL(value, compilation.context.projectDirectory).pathname &&
