@@ -19,6 +19,8 @@
  *         [id].ts
  *     blog/
  *       [slug].ts
+ *     product/
+ *       [name].js
  */
 import chai from "chai";
 import { JSDOM } from "jsdom";
@@ -61,7 +63,7 @@ describe("Develop Greenwood With: ", function () {
       });
     });
 
-    describe("An SSR page with a dynamic route segment", function () {
+    describe("An SSR page with a dynamic route segment with default export", function () {
       const slug = "my-first-blog-post";
       let response;
       let dom;
@@ -78,6 +80,26 @@ describe("Develop Greenwood With: ", function () {
 
         expect(headings.length).to.equal(1);
         expect(headings[0].textContent).to.equal(slug);
+      });
+    });
+
+    describe("An SSR page with a dynamic route segment with getBody", function () {
+      const name = "my-cool-product";
+      let response;
+      let dom;
+      let body;
+
+      before(async function () {
+        response = await fetch(`${hostname}/product/${name}/`);
+        body = await response.clone().text();
+        dom = new JSDOM(body);
+      });
+
+      it("should have the expected output for the page", function () {
+        const headings = dom.window.document.querySelectorAll("h1");
+
+        expect(headings.length).to.equal(1);
+        expect(headings[0].textContent).to.equal(name);
       });
     });
 
