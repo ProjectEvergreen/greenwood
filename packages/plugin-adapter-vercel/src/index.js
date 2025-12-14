@@ -10,11 +10,11 @@ function generateOutputFormat(id, type, segmentKey) {
   const path = type === "page" ? `${id}.route` : id;
   // TODO: use `URLPattern` for extracting props after we upgrade to Node24
   // https://github.com/ProjectEvergreen/greenwood/issues/1614
-  const extractProps = segmentKey
+  const extractParams = segmentKey
     ? type === "page"
-      ? `const props = { ${segmentKey}: url.split('/')[url.split('/').length - 2] }`
-      : `const props = { ${segmentKey}: url.split('?')[0].split('/').pop() }`
-    : "const props = {}";
+      ? `const params = { ${segmentKey}: url.split('/')[url.split('/').length - 2] }`
+      : `const params = { ${segmentKey}: url.split('?')[0].split('/').pop() }`
+    : "const params = {}";
 
   return `
     import { handler as ${handlerAlias} } from './${path}.js';
@@ -22,7 +22,7 @@ function generateOutputFormat(id, type, segmentKey) {
     export default async function handler (request, response) {
       const { body, url, headers = {}, method, query } = request;
       const contentType = headers['content-type'] || '';
-      ${extractProps}
+      ${extractParams}
       let format = body;
 
       if (['GET', 'HEAD'].includes(method.toUpperCase())) {
@@ -49,8 +49,8 @@ function generateOutputFormat(id, type, segmentKey) {
         method
       });
       const res = '${type}' === 'page'
-        ? await ${handlerAlias}(req, props)
-        : await ${handlerAlias}(req, { props });
+        ? await ${handlerAlias}(req, params)
+        : await ${handlerAlias}(req, { params });
 
       res.headers.forEach((value, key) => {
         response.setHeader(key, value);

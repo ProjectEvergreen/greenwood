@@ -1,9 +1,9 @@
 export default class BlogPostPage extends HTMLElement {
   #slug;
 
-  constructor({ props }) {
+  constructor({ params }) {
     super();
-    this.#slug = props?.slug;
+    this.#slug = params?.slug;
   }
 
   connectedCallback() {

@@ -11,18 +11,18 @@ function generateOutputFormat(id, type, segmentKey) {
   const handlerAlias = "$handler";
   // TODO: use `URLPattern` for extracting props after we upgrade to Node24
   // https://github.com/ProjectEvergreen/greenwood/issues/1614
-  const extractProps = segmentKey
+  const extractParams = segmentKey
     ? type === "page"
-      ? `const props = { ${segmentKey}: rawUrl.split('/')[rawUrl.split('/').length - 2] }`
-      : `const props = { ${segmentKey}: rawUrl.split('?')[0].split('/').pop() }`
-    : "const props = {}";
+      ? `const params = { ${segmentKey}: rawUrl.split('/')[rawUrl.split('/').length - 2] }`
+      : `const params = { ${segmentKey}: rawUrl.split('?')[0].split('/').pop() }`
+    : "const params = {}";
   return `
     import { handler as ${handlerAlias} } from './${id}.js';
 
     export async function handler (event, context = {}) {
       const { rawUrl, body, headers = {}, httpMethod } = event;
       const contentType = headers['content-type'] || '';
-      ${extractProps}
+      ${extractParams}
       let format = body;
 
       if (['GET', 'HEAD'].includes(httpMethod.toUpperCase())) {
@@ -51,8 +51,8 @@ function generateOutputFormat(id, type, segmentKey) {
       // TODO: what to do about context?
       // https://github.com/ProjectEvergreen/greenwood/issues/1141
       const response = '${type}' === 'page'
-        ? await ${handlerAlias}(request, props)
-        : await ${handlerAlias}(request, { props });
+        ? await ${handlerAlias}(request, params)
+        : await ${handlerAlias}(request, { params });
 
       return {
         statusCode: response.status,

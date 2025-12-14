@@ -4,7 +4,7 @@
  *
  */
 import { requestAsObject } from "../../lib/resource-utils.js";
-import { getMatchingDynamicApiRoute, getPropsFromSegment } from "../../lib/url-utils.js";
+import { getMatchingDynamicApiRoute, getParamsFromSegment } from "../../lib/url-utils.js";
 import { Worker } from "node:worker_threads";
 
 class ApiRoutesResource {
@@ -38,9 +38,9 @@ class ApiRoutesResource {
     const api = this.compilation.manifest.apis.get(matchingRouteWithSegment ?? pathname);
     const apiUrl = new URL(api.pageHref);
     const href = apiUrl.href;
-    const props =
+    const params =
       matchingRouteWithSegment && api.segment
-        ? getPropsFromSegment(api.segment, pathname)
+        ? getParamsFromSegment(api.segment, pathname)
         : undefined;
 
     if (process.env.__GWD_COMMAND__ === "develop") {
@@ -60,7 +60,7 @@ class ApiRoutesResource {
           }
         });
 
-        worker.postMessage({ href, request: req, props });
+        worker.postMessage({ href, request: req, params });
       });
       const { headers, body, status, statusText } = response;
 
@@ -72,7 +72,7 @@ class ApiRoutesResource {
     } else {
       const { handler } = await import(href);
 
-      return await handler(request, props);
+      return await handler(request, { params });
     }
   }
 }

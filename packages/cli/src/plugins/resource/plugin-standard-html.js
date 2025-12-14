@@ -7,7 +7,7 @@
 import fs from "node:fs/promises";
 import { getPageLayout, getAppLayout, getGreenwoodScripts } from "../../lib/layout-utils.js";
 import { requestAsObject } from "../../lib/resource-utils.js";
-import { getMatchingDynamicSsrRoute, getPropsFromSegment } from "../../lib/url-utils.js";
+import { getMatchingDynamicSsrRoute, getParamsFromSegment } from "../../lib/url-utils.js";
 import { Worker } from "node:worker_threads";
 import { parse } from "node-html-parser";
 
@@ -80,9 +80,9 @@ class StandardHtmlResource {
         .find((plugin) => plugin.type === "renderer")
         .provider().executeModuleUrl;
       const req = await requestAsObject(request);
-      const props =
+      const params =
         matchingRouteWithSegment && matchingRouteWithSegment.segment
-          ? getPropsFromSegment(matchingRouteWithSegment.segment, pathname)
+          ? getParamsFromSegment(matchingRouteWithSegment.segment, pathname)
           : undefined;
 
       await new Promise((resolve, reject) => {
@@ -111,7 +111,7 @@ class StandardHtmlResource {
           contentOptions: JSON.stringify({
             body: true,
           }),
-          props,
+          params: params ? JSON.stringify(params) : params,
         });
       });
     }

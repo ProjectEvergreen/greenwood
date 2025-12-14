@@ -1,9 +1,9 @@
 type ProductProps = {
-  props: {
+  params: {
     id: string;
   };
 };
 
-export async function handler(request: Request, { props }: ProductProps): Promise<Response> {
-  return new Response(`Product id is => ${props.id}`);
+export async function handler(request: Request, { params }: ProductProps): Promise<Response> {
+  return new Response(`Product id is => ${params.id}`);
 }

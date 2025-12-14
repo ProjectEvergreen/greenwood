@@ -1,5 +1,5 @@
 type BlogPostPageProps = {
-  props: {
+  params: {
     slug: string;
   };
 };
@@ -7,9 +7,9 @@ type BlogPostPageProps = {
 export default class BlogPostPage extends HTMLElement {
   #slug: string;
 
-  constructor({ props }: BlogPostPageProps) {
+  constructor({ params }: BlogPostPageProps) {
     super();
-    this.#slug = props?.slug;
+    this.#slug = params?.slug;
   }
 
   connectedCallback() {

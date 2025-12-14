@@ -12,7 +12,7 @@ import {
 import {
   getMatchingDynamicApiRoute,
   getMatchingDynamicSsrRoute,
-  getPropsFromSegment,
+  getParamsFromSegment,
 } from "../lib/url-utils.js";
 import { Readable } from "node:stream";
 import { Worker } from "node:worker_threads";
@@ -384,11 +384,10 @@ async function getHybridServer(compilation) {
         const entryPointUrl = new URL(
           matchingRoute?.outputHref ?? matchingRouteWithSegment.outputHref,
         );
-        const props =
+        const params =
           matchingRouteWithSegment && matchingRouteWithSegment.segment
-            ? getPropsFromSegment(matchingRouteWithSegment.segment, pathname)
+            ? getParamsFromSegment(matchingRouteWithSegment.segment, pathname)
             : undefined;
-
         let html;
 
         if (matchingRoute.isolation || isolationMode) {
@@ -416,13 +415,13 @@ async function getHybridServer(compilation) {
               routeModuleUrl: entryPointUrl.href,
               request,
               compilation: JSON.stringify(compilation),
-              props,
+              params: params ? JSON.stringify(params) : params,
             });
           });
         } else {
           // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
           const { handler } = await import(entryPointUrl);
-          const response = await handler(request, props);
+          const response = await handler(request, params);
 
           html = Readable.from(response.body);
         }
@@ -433,9 +432,9 @@ async function getHybridServer(compilation) {
         ctx.status = 200;
       } else if (isApiRoute || matchingApiRouteWithSegment) {
         const apiRoute = manifest.apis.get(matchingApiRouteWithSegment ?? pathname);
-        const props =
+        const params =
           matchingRouteWithSegment && apiRoute.segment
-            ? getPropsFromSegment(apiRoute.segment, pathname)
+            ? getParamsFromSegment(apiRoute.segment, pathname)
             : undefined;
 
         const entryPointUrl = new URL(apiRoute.outputHref);
@@ -468,13 +467,13 @@ async function getHybridServer(compilation) {
             worker.postMessage({
               href: entryPointUrl.href,
               request: req,
-              props,
+              params,
             });
           });
         } else {
           // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
           const { handler } = await import(entryPointUrl);
-          const response = await handler(request, { props });
+          const response = await handler(request, { params });
 
           body = response.body;
           status = response.status;

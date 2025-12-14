@@ -32,7 +32,7 @@ function getMatchingDynamicSsrRoute(graph, pathname) {
   });
 }
 
-function getPropsFromSegment(segment, pathname) {
+function getParamsFromSegment(segment, pathname) {
   return new URLPattern({ pathname: segment.pathname }).exec(`https://example.com${pathname}`)
     .pathname.groups;
 }
@@ -40,6 +40,6 @@ function getPropsFromSegment(segment, pathname) {
 export {
   getDynamicSegmentsFromRoute,
   getMatchingDynamicApiRoute,
-  getPropsFromSegment,
+  getParamsFromSegment,
   getMatchingDynamicSsrRoute,
 };

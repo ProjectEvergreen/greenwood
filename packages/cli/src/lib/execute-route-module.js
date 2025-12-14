@@ -8,7 +8,7 @@ async function executeRouteModule({
   htmlContents = null,
   scripts = [],
   request,
-  props,
+  params,
   contentOptions = {},
 }) {
   const data = {
@@ -39,24 +39,27 @@ async function executeRouteModule({
         const { html } = await renderToString(new URL(moduleUrl), false, {
           request,
           compilation,
-          props,
+          params,
         });
 
         data.body = html;
       } else if (getBody) {
-        // TODO do we need to pass props here too?
-        data.body = await getBody(compilation, page, request);
+        data.body = await getBody(compilation, page, request, params);
       }
     }
 
     if (layout) {
       // support dynamic layouts that are just custom elements vs calls to getLayout
       if (!getLayout && !data.body && !page.isSSR && module.default) {
-        const { html } = await renderToString(new URL(moduleUrl), false, { compilation, page });
+        const { html } = await renderToString(new URL(moduleUrl), false, {
+          compilation,
+          page,
+          params,
+        });
 
         data.layout = html;
       } else if (getLayout) {
-        data.layout = await getLayout(compilation, page);
+        data.layout = await getLayout(compilation, page, request, params);
       }
     }
 

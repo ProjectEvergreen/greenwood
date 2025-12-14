@@ -1,3 +1,3 @@
-export async function handler(request, { props }) {
-  return new Response(`Product id is => ${props.id}`);
+export async function handler(request, { params }) {
+  return new Response(`Product id is => ${params.id}`);
 }

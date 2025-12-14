@@ -1,2 +1,6 @@
 // https://greenwoodjs.dev/docs/pages/api-routes/
-export type ApiRouteHandler = (request: Request) => Response;
+type Params = {
+  props: object;
+};
+
+export type ApiRouteHandler = (request: Request, params?: Params) => Response;
