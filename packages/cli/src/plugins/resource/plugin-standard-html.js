@@ -7,6 +7,7 @@
 import fs from "node:fs/promises";
 import { getPageLayout, getAppLayout, getGreenwoodScripts } from "../../lib/layout-utils.js";
 import { requestAsObject } from "../../lib/resource-utils.js";
+import { getMatchingDynamicSsrRoute, getParamsFromSegment } from "../../lib/url-utils.js";
 import { Worker } from "node:worker_threads";
 import { parse } from "node-html-parser";
 
@@ -21,10 +22,13 @@ class StandardHtmlResource {
     const { protocol, pathname } = url;
     const hasMatchingPageRoute = this.compilation.graph.find((node) => node.route === pathname);
     const isSPA = this.compilation.graph.find((node) => node.isSPA) && pathname.indexOf(".") < 0;
+    const matchingRouteWithSegment = getMatchingDynamicSsrRoute(this.compilation.graph, pathname);
 
     return (
       protocol.startsWith("http") &&
-      (hasMatchingPageRoute || (isSPA && request.headers.get("Accept").indexOf("text/html") >= 0))
+      (hasMatchingPageRoute ||
+        matchingRouteWithSegment ||
+        (isSPA && request.headers.get("Accept").indexOf("text/html") >= 0))
     );
   }
 
@@ -34,6 +38,8 @@ class StandardHtmlResource {
     const { pathname } = url;
     const isSpaRoute = this.compilation.graph.find((node) => node.isSPA);
     const matchingRoute = this.compilation.graph.find((node) => node.route === pathname) || {};
+    const matchingRouteWithSegment =
+      getMatchingDynamicSsrRoute(this.compilation.graph, pathname) || {};
     const { pageHref } = matchingRoute;
     const filePath =
       !matchingRoute.external && pageHref
@@ -68,12 +74,16 @@ class StandardHtmlResource {
           break;
         }
       }
-    } else if (matchingRoute.isSSR) {
-      const routeModuleLocationUrl = new URL(pageHref);
+    } else if (matchingRoute.isSSR || matchingRouteWithSegment.isSSR) {
+      const routeModuleLocationUrl = new URL(pageHref ?? matchingRouteWithSegment.pageHref);
       const routeWorkerUrl = this.compilation.config.plugins
         .find((plugin) => plugin.type === "renderer")
         .provider().executeModuleUrl;
       const req = await requestAsObject(request);
+      const params =
+        matchingRouteWithSegment && matchingRouteWithSegment.segment
+          ? getParamsFromSegment(matchingRouteWithSegment.segment, pathname)
+          : undefined;
 
       await new Promise((resolve, reject) => {
         const worker = new Worker(new URL("../../lib/ssr-route-worker.js", import.meta.url));
@@ -101,6 +111,7 @@ class StandardHtmlResource {
           contentOptions: JSON.stringify({
             body: true,
           }),
+          params: params ? JSON.stringify(params) : params,
         });
       });
     }

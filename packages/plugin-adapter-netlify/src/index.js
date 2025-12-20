@@ -7,15 +7,22 @@ import {
 import { zip } from "zip-a-folder";
 
 // https://docs.netlify.com/functions/create/?fn-language=js
-function generateOutputFormat(id) {
+function generateOutputFormat(id, type, segmentKey) {
   const handlerAlias = "$handler";
-
+  // TODO: use `URLPattern` for extracting props after we upgrade to Node24
+  // https://github.com/ProjectEvergreen/greenwood/issues/1614
+  const extractParams = segmentKey
+    ? type === "page"
+      ? `const params = { ${segmentKey}: rawUrl.split('/')[rawUrl.split('/').length - 2] }`
+      : `const params = { ${segmentKey}: rawUrl.split('?')[0].split('/').pop() }`
+    : "const params = {}";
   return `
     import { handler as ${handlerAlias} } from './${id}.js';
 
     export async function handler (event, context = {}) {
       const { rawUrl, body, headers = {}, httpMethod } = event;
       const contentType = headers['content-type'] || '';
+      ${extractParams}
       let format = body;
 
       if (['GET', 'HEAD'].includes(httpMethod.toUpperCase())) {
@@ -41,7 +48,11 @@ function generateOutputFormat(id) {
         method: httpMethod,
         headers: new Headers(headers)
       });
-      const response = await ${handlerAlias}(request, context);
+      // TODO: what to do about context?
+      // https://github.com/ProjectEvergreen/greenwood/issues/1141
+      const response = '${type}' === 'page'
+        ? await ${handlerAlias}(request, params)
+        : await ${handlerAlias}(request, { params });
 
       return {
         statusCode: response.status,
@@ -52,10 +63,10 @@ function generateOutputFormat(id) {
   `;
 }
 
-async function setupOutputDirectory(id, outputRoot, outputType) {
+async function setupOutputDirectory(id, outputRoot, outputType, segmentKey) {
   const entryPoint = outputType === "api" ? id : `${id}.route`;
   const filename = outputType === "api" ? `api-${id}` : id;
-  const outputFormat = generateOutputFormat(entryPoint);
+  const outputFormat = generateOutputFormat(entryPoint, outputType, segmentKey);
 
   await fs.mkdir(outputRoot, { recursive: true });
   await fs.writeFile(new URL(`./${filename}.js`, outputRoot), outputFormat);
@@ -101,14 +112,14 @@ async function netlifyAdapter(compilation) {
   await fs.mkdir(adapterOutputUrl, { recursive: true });
 
   for (const page of ssrPages) {
-    const { id, outputHref, route } = page;
+    const { id, outputHref, route, segment } = page;
     const outputType = "page";
     const chunks = (await fs.readdir(outputDir)).filter(
       (file) => file.startsWith(`${id}.route.chunk`) && file.endsWith(".js"),
     );
     const outputRoot = new URL(`./${id}/`, adapterOutputScratchUrl);
 
-    await setupOutputDirectory(id, outputRoot, outputType);
+    await setupOutputDirectory(id, outputRoot, outputType, segment?.key);
 
     // handle user's actual route entry file
     await fs.cp(
@@ -131,17 +142,20 @@ async function netlifyAdapter(compilation) {
       projectDirectory,
     );
 
-    redirects += `${route} /.netlify/functions/${id} 200
+    redirects += segment
+      ? `${segment.pathname.replace(`/:${segment.key}/`, `/:${segment.key}`)} /.netlify/functions/${id} 200
+`
+      : `${route} /.netlify/functions/${id} 200
 `;
   }
 
   for (const [key, value] of apiRoutes.entries()) {
     const outputType = "api";
-    const { id, outputHref, route } = apiRoutes.get(key);
+    const { id, outputHref, route, segment } = apiRoutes.get(key);
     const outputRoot = new URL(`./api/${id}/`, adapterOutputScratchUrl);
     const { assets = [] } = value;
 
-    await setupOutputDirectory(id, outputRoot, outputType);
+    await setupOutputDirectory(id, outputRoot, outputType, segment?.key);
 
     await fs.cp(new URL(outputHref), new URL(`./${id}.js`, outputRoot), { recursive: true });
 
@@ -155,7 +169,10 @@ async function netlifyAdapter(compilation) {
     // https://github.com/netlify/netlify-lambda/issues/90#issuecomment-486047201
     await createOutputZip(id, outputType, outputRoot, projectDirectory);
 
-    redirects += `${route} /.netlify/functions/api-${id} 200
+    redirects += segment
+      ? `${segment.pathname} /.netlify/functions/api-${id} 200
+`
+      : `${route} /.netlify/functions/api-${id} 200
 `;
   }
 

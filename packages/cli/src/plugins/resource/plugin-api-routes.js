@@ -4,6 +4,7 @@
  *
  */
 import { requestAsObject } from "../../lib/resource-utils.js";
+import { getMatchingDynamicApiRoute, getParamsFromSegment } from "../../lib/url-utils.js";
 import { Worker } from "node:worker_threads";
 
 class ApiRoutesResource {
@@ -13,15 +14,34 @@ class ApiRoutesResource {
   }
 
   async shouldServe(url) {
+    const { basePath } = this.compilation.config;
     const { protocol, pathname } = url;
 
-    return protocol.startsWith("http") && this.compilation.manifest.apis.has(pathname);
+    if (!protocol.startsWith("http") || !pathname.startsWith(`${basePath}/api/`)) {
+      return;
+    }
+
+    const matchingRouteWithSegment = getMatchingDynamicApiRoute(
+      this.compilation.manifest.apis,
+      pathname,
+    );
+
+    return matchingRouteWithSegment || this.compilation.manifest.apis.has(pathname);
   }
 
   async serve(url, request) {
-    const api = this.compilation.manifest.apis.get(url.pathname);
+    const { pathname } = url;
+    const matchingRouteWithSegment = getMatchingDynamicApiRoute(
+      this.compilation.manifest.apis,
+      pathname,
+    );
+    const api = this.compilation.manifest.apis.get(matchingRouteWithSegment ?? pathname);
     const apiUrl = new URL(api.pageHref);
     const href = apiUrl.href;
+    const params =
+      matchingRouteWithSegment && api.segment
+        ? getParamsFromSegment(api.segment, pathname)
+        : undefined;
 
     if (process.env.__GWD_COMMAND__ === "develop") {
       const workerUrl = new URL("../../lib/api-route-worker.js", import.meta.url);
@@ -40,7 +60,7 @@ class ApiRoutesResource {
           }
         });
 
-        worker.postMessage({ href, request: req });
+        worker.postMessage({ href, request: req, params });
       });
       const { headers, body, status, statusText } = response;
 
@@ -52,7 +72,7 @@ class ApiRoutesResource {
     } else {
       const { handler } = await import(href);
 
-      return await handler(request);
+      return await handler(request, { params });
     }
   }
 }

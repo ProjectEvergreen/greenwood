@@ -361,7 +361,7 @@ async function bundleSsrPages(compilation, optimizePlugins) {
 
         const moduleUrl = new URL('${relativeDepth}${pagesPathDiff}${pagePath.replace("./", "")}', import.meta.url);
 
-        export async function handler(request) {
+        export async function handler(request, params) {
           const compilation = JSON.parse(\`${JSON.stringify({
             ...compilation,
             graph: pruneGraph(compilation.graph),
@@ -371,7 +371,7 @@ async function bundleSsrPages(compilation, optimizePlugins) {
           const page = JSON.parse(\`${JSON.stringify(pruneGraph([page])[0])
             .replace(/\\"/g, "&quote")
             .replace(/\\n/g, "")}\`);
-          const data = await executeRouteModule({ moduleUrl, compilation, page, request, contentOptions: { body: true } });
+          const data = await executeRouteModule({ moduleUrl, compilation, page, request, contentOptions: { body: true }, params });
           let staticHtml = \`${staticHtml}\`;
 
           if (data.body) {

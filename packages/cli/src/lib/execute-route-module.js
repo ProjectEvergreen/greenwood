@@ -8,6 +8,7 @@ async function executeRouteModule({
   htmlContents = null,
   scripts = [],
   request,
+  params,
   contentOptions = {},
 }) {
   const data = {
@@ -35,22 +36,30 @@ async function executeRouteModule({
 
     if (body) {
       if (module.default) {
-        const { html } = await renderToString(new URL(moduleUrl), false, { request, compilation });
+        const { html } = await renderToString(new URL(moduleUrl), false, {
+          request,
+          compilation,
+          params,
+        });
 
         data.body = html;
       } else if (getBody) {
-        data.body = await getBody(compilation, page, request);
+        data.body = await getBody(compilation, page, request, params);
       }
     }
 
     if (layout) {
       // support dynamic layouts that are just custom elements vs calls to getLayout
       if (!getLayout && !data.body && !page.isSSR && module.default) {
-        const { html } = await renderToString(new URL(moduleUrl), false, { compilation, page });
+        const { html } = await renderToString(new URL(moduleUrl), false, {
+          compilation,
+          page,
+          params,
+        });
 
         data.layout = html;
       } else if (getLayout) {
-        data.layout = await getLayout(compilation, page);
+        data.layout = await getLayout(compilation, page, request, params);
       }
     }
 

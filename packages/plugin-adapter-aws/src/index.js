@@ -4,9 +4,16 @@ import { checkResourceExists } from "@greenwood/cli/src/lib/resource-utils.js";
 
 // https://docs.aws.amazon.com/lambda/latest/dg/services-apigateway.html#apigateway-example-event
 // https://docs.aws.amazon.com/lambda/latest/dg/urls-invocation.html
-function generateOutputFormat(id, type) {
+function generateOutputFormat(id, type, segmentKey) {
   const handlerAlias = "$handler";
   const path = type === "page" ? `${id}.route` : id;
+  // TODO: use `URLPattern` for extracting props after we upgrade to Node24
+  // https://github.com/ProjectEvergreen/greenwood/issues/1614
+  const extractParams = segmentKey
+    ? type === "page"
+      ? `const params = { ${segmentKey}: rawPath.split('/')[rawPath.split('/').length - 2] }`
+      : `const params = { ${segmentKey}: rawPath.split('?')[0].split('/').pop() }`
+    : "const params = {}";
 
   return `
     import { handler as ${handlerAlias} } from './${path}.js';
@@ -15,6 +22,7 @@ function generateOutputFormat(id, type) {
       const { method = '' } = event?.requestContext?.http;
       const queryParams = rawQueryString === '' ? '' : \`?\${rawQueryString}\`;
       const contentType = headers['content-type'] || '';
+      ${extractParams}
       let format = body;
 
       if (['GET', 'HEAD'].includes(method.toUpperCase())) {
@@ -39,8 +47,9 @@ function generateOutputFormat(id, type) {
         headers: new Headers(headers),
         method
       });
-
-      const res = await $handler(req);
+      const res = '${type}' === 'page'
+        ? await ${handlerAlias}(req, params)
+        : await ${handlerAlias}(req, { params });
 
       return {
         "body": await res.text(),
@@ -51,8 +60,8 @@ function generateOutputFormat(id, type) {
   `;
 }
 
-async function setupFunctionBuildFolder(id, outputType, outputRoot) {
-  const outputFormat = generateOutputFormat(id, outputType);
+async function setupFunctionBuildFolder(id, outputType, outputRoot, segmentKey) {
+  const outputFormat = generateOutputFormat(id, outputType, segmentKey);
 
   await fs.mkdir(outputRoot, { recursive: true });
   await fs.writeFile(new URL("./index.js", outputRoot), outputFormat);
@@ -79,13 +88,13 @@ async function awsAdapter(compilation) {
 
   for (const page of ssrPages) {
     const outputType = "page";
-    const { id, outputHref } = page;
+    const { id, outputHref, segment } = page;
     const outputRoot = new URL(`./routes/${basePath}/${id}/`, adapterOutputUrl);
     const chunks = (await fs.readdir(outputDir)).filter(
       (file) => file.startsWith(`${id}.route.chunk`) && file.endsWith(".js"),
     );
 
-    await setupFunctionBuildFolder(id, outputType, outputRoot);
+    await setupFunctionBuildFolder(id, outputType, outputRoot, segment?.key);
 
     // handle user's actual route entry file
     await fs.cp(
@@ -104,11 +113,11 @@ async function awsAdapter(compilation) {
 
   for (const [key, value] of apiRoutes.entries()) {
     const outputType = "api";
-    const { id, outputHref } = apiRoutes.get(key);
+    const { id, outputHref, segment } = apiRoutes.get(key);
     const outputRoot = new URL(`.${basePath}/api/${id}/`, adapterOutputUrl);
     const { assets = [] } = value;
 
-    await setupFunctionBuildFolder(id, outputType, outputRoot);
+    await setupFunctionBuildFolder(id, outputType, outputRoot, segment?.key);
 
     await fs.cp(new URL(outputHref), new URL(`./${id}.js`, outputRoot), { recursive: true });
 

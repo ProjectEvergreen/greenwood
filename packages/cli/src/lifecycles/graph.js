@@ -3,6 +3,7 @@ import fs from "node:fs/promises";
 import fm from "front-matter";
 import { checkResourceExists, requestAsObject } from "../lib/resource-utils.js";
 import { activeFrontmatterKeys } from "../lib/content-utils.js";
+import { getDynamicSegmentsFromRoute } from "../lib/url-utils.js";
 import { Worker } from "node:worker_threads";
 
 function getLabelFromRoute(_route) {
@@ -26,7 +27,12 @@ function getLabelFromRoute(_route) {
 }
 
 function getIdFromRelativePathPath(relativePathPath, extension) {
-  return relativePathPath.replace(`.${extension}`, "").replace("./", "").replace(/\//g, "-");
+  return relativePathPath
+    .replace(`.${extension}`, "")
+    .replace("./", "")
+    .replace(/\//g, "-")
+    .replace("[", "-")
+    .replace("]", "-");
 }
 
 function trackCollectionsForPage(page, collections) {
@@ -104,6 +110,12 @@ const generateGraph = async (compilation) => {
 
           // TODO should API routes be run in isolation mode like SSR pages?
           const { isolation } = await import(filenameUrl).then((module) => module);
+          const { segmentKey, dynamicRoute } = getDynamicSegmentsFromRoute({
+            route,
+            relativePagePath,
+            extension,
+            basePath,
+          });
 
           /*
            * API Properties (per route)
@@ -122,6 +134,8 @@ const generateGraph = async (compilation) => {
             outputHref: new URL(relativePagePath, outputDir).href.replace(`.${extension}`, ".js"),
             route: `${basePath}${route}`,
             isolation,
+            segment:
+              dynamicRoute.indexOf(":") > 0 ? { key: segmentKey, pathname: dynamicRoute } : null,
           });
         } else if (isPage) {
           let root = filename
@@ -245,6 +259,14 @@ const generateGraph = async (compilation) => {
            * hydration: if this page needs hydration support
            * servePage: signal that this is a custom page file type (static | dynamic)
            */
+
+          const { segmentKey, dynamicRoute } = getDynamicSegmentsFromRoute({
+            route,
+            relativePagePath,
+            extension,
+            basePath,
+          });
+
           const page = {
             id: decodeURIComponent(getIdFromRelativePathPath(relativePagePath, extension)),
             label: decodeURIComponent(label),
@@ -264,6 +286,8 @@ const generateGraph = async (compilation) => {
             isolation,
             hydration,
             servePage: isCustom,
+            segment:
+              dynamicRoute.indexOf(":") > 0 ? { key: segmentKey, pathname: dynamicRoute } : null,
           };
 
           pages.push(page);

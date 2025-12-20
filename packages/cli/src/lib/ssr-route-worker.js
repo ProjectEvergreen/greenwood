@@ -11,6 +11,7 @@ async function executeModule({
   scripts = "[]",
   request,
   contentOptions = "{}",
+  params,
 }) {
   const { executeRouteModule } = await import(executeModuleUrl);
   const data = await executeRouteModule({
@@ -22,6 +23,7 @@ async function executeModule({
     scripts: JSON.parse(scripts),
     request,
     contentOptions: JSON.parse(contentOptions),
+    params: params ? JSON.parse(params) : params,
   });
 
   parentPort.postMessage(data);
