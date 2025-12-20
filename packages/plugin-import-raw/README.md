@@ -86,3 +86,33 @@ export default {
   ]
 }
 ```
+
+### Import Map Extensions
+
+As import maps treat all paths [as unique even for query strings](https://github.com/WICG/import-maps/issues/134#issuecomment-514741651), this import:
+
+<!-- eslint-disable -->
+```js
+import pauseSvg from 'heroicons/24/solid/pause.svg';
+```
+
+is **not** the same as this one:
+
+<!-- eslint-disable -->
+```js
+import pauseSvg from 'heroicons/24/solid/pause.svg?type=raw';
+```
+
+To include entries in an import map for resources imported by this plugin, the `importMapExtensions` option can be used to add query string import map entries for all entries that end with the matching extension(s) provided.
+
+```javascript
+import { greenwoodPluginImportRaw } from '@greenwood/plugin-import-raw';
+
+export default {
+  plugins: [
+    greenwoodPluginImportRaw({
+      importMapExtensions: ['svg']
+    })
+  ]
+}
+```

@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood develop command with no raw plugin.
+ * Run Greenwood develop command with raw plugin.
  *
  * User Result
  * Should start the development server and render a bare bones Greenwood build and return CSS file as a string using ESM.
