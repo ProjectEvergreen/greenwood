@@ -113,7 +113,7 @@ describe("Build Greenwood With: ", function () {
           ).filter((tag) => !tag.getAttribute("data-gwd"))[1];
 
           expect(scriptTag.textContent).to.contain(
-            "class t extends HTMLElement{constructor(){super(),this.list=[]}find(t){this.list.findIndex((e=>new RegExp(`^${t}$`).test(e.route)))}}export{t as Foobar};",
+            "class t extends HTMLElement{constructor(){super(),this.list=[]}find(t){this.list.findIndex(e=>new RegExp(`^${t}$`).test(e.route))}}export{t as Foobar};",
           );
         });
       });
@@ -128,7 +128,7 @@ describe("Build Greenwood With: ", function () {
 
           expect(scriptTag.type).to.be.equal("module");
           expect(scriptTag.textContent).to.contain(
-            "class t extends HTMLElement{constructor(){super(),this.list=[]}find(t){this.list.findIndex((e=>new RegExp(`^${t}$`).test(e.route)))}}export{t as Baz};",
+            "class t extends HTMLElement{constructor(){super(),this.list=[]}find(t){this.list.findIndex(e=>new RegExp(`^${t}$`).test(e.route))}}export{t as Baz};",
           );
         });
       });
