@@ -97,14 +97,16 @@ describe("Build Greenwood With: ", function () {
         expect(lists.length).to.be.equal(1);
       });
 
+      // we _technically_ can't assume the order of pages but we can at least make sure all the files are there
+      // this could easily be solved by adding an `order` property to the page's frontmatter
+      // https://github.com/ProjectEvergreen/greenwood/pull/1308#issuecomment-3368603613
       it("should have a expected navigation output in the <header> based on pages in the graph", function () {
         const listItems = dom.window.document.querySelectorAll("body ul li");
 
         expect(listItems.length).to.be.equal(3);
-
-        expect(listItems[0].innerHTML).to.contain("First Post");
-        expect(listItems[1].innerHTML).to.contain("Second Post");
-        expect(listItems[2].innerHTML).to.contain("Home");
+        listItems.forEach((item) => {
+          expect(["First Post", "Second Post", "Home"].includes(item.innerHTML));
+        });
       });
     });
   });

@@ -41,17 +41,22 @@ class NodeModulesResource {
   }
 
   async shouldServe(url) {
-    const { href, protocol } = url;
+    const { href, protocol, pathname } = url;
 
-    return protocol === "file:" && (await checkResourceExists(new URL(href)));
+    return (
+      protocol === "file:" &&
+      pathname.indexOf("/node_modules/") >= 0 &&
+      (await checkResourceExists(new URL(href)))
+    );
   }
 
-  async serve(url) {
+  async serve(url, request) {
     const body = await fs.readFile(url, "utf-8");
+    const contentType = request.headers.get("content-type") ?? this.contentType;
 
     return new Response(body, {
       headers: new Headers({
-        "Content-Type": this.contentType,
+        "Content-Type": contentType,
       }),
     });
   }
