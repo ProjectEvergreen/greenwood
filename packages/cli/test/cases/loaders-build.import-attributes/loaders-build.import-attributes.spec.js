@@ -83,7 +83,7 @@ describe("Build Greenwood With: ", function () {
         const scriptContents = fs.readFileSync(scripts[0], "utf-8");
 
         expect(scriptContents).to.contain(
-          'const e=new CSSStyleSheet;e.replaceSync(".spectrum-Card{--spectrum-card-background-color',
+          'const d=new CSSStyleSheet;d.replaceSync(".spectrum-Card{--spectrum-card-background-color',
         );
       });
 
