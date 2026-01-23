@@ -20,8 +20,7 @@ class LitHydrationResource {
     const importType = isDevelopment && importMaps ? "module-shim" : "module";
     const importMapType = isDevelopment && importMaps ? "importmap-shim" : "importmap";
     const headSelector = isDevelopment ? `<script type="${importMapType}">` : "<head>";
-    const hydrationSupportScriptPath =
-      "/node_modules/@lit-labs/ssr-client/lit-element-hydrate-support.js";
+    const hydrationSupportScriptBasePath = "@lit-labs/ssr-client/lit-element-hydrate-support.js";
     let body = await response.text();
 
     // this needs to come first before any userland code, but before any import maps
@@ -45,15 +44,21 @@ class LitHydrationResource {
       body = `
         ${body.slice(0, importMapEndPos)}
         </script>
-        <script type="${importType}" src="${hydrationSupportScriptPath}"></script>
+        <script type="${importType}" src="/node_modules/${hydrationSupportScriptBasePath}"></script>
         ${body.slice(importMapEndPos + 9)}
       `;
     } else {
+      // Note: in production builds we have to inline the hydration support script
+      // due to how Rollup bundles dependencies. If we try to load it as an external
+      // module, it leads to this issue in our monorepo tests
+      // https://github.com/ProjectEvergreen/greenwood/issues/1463
       body = body.replace(
         headSelector,
         `
         ${headSelector}
-          <script type="${importType}" src="${hydrationSupportScriptPath}"></script>
+          <script type="module">
+            import '${hydrationSupportScriptBasePath}';
+          </script>
       `,
       );
     }
