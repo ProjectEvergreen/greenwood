@@ -176,7 +176,9 @@ describe("Serve Greenwood With: ", function () {
 
       it("should not have the expected lit hydration script in the <head>", function () {
         const scripts = Array.from(dom.window.document.querySelectorAll("head script")).filter(
-          (script) => script.getAttribute("src")?.indexOf("lit-element-hydrate-support") >= 0,
+          (script) =>
+            !script.getAttribute("src") &&
+            script.textContent?.indexOf("globalThis.litElementHydrateSupport") >= 0,
         );
 
         expect(scripts.length).to.equal(0);
@@ -207,7 +209,9 @@ describe("Serve Greenwood With: ", function () {
         const scripts = Array.from(
           usersPageDom.window.document.querySelectorAll("head script"),
         ).filter(
-          (script) => script.getAttribute("src")?.indexOf("lit-element-hydrate-support") >= 0,
+          (script) =>
+            !script.getAttribute("src") &&
+            script.textContent?.indexOf("globalThis.litElementHydrateSupport") >= 0,
         );
 
         expect(scripts.length).to.equal(1);
