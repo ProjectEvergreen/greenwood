@@ -28,6 +28,14 @@ function greenwoodResourceLoader(compilation, browser = false) {
   return {
     name: "greenwood-resource-loader",
     async resolveId(id, importer, options) {
+      // fix for nested type imports - https://github.com/ProjectEvergreen/greenwood/issues/1576
+      if (id.indexOf("@greenwood") >= 0) {
+        return {
+          id,
+          external: true,
+        };
+      }
+
       const { userWorkspace, scratchDir } = compilation.context;
       const normalizedId = cleanRollupId(id);
       const importerUrl = new URL(`file://${cleanRollupId(importer) ?? ""}`);

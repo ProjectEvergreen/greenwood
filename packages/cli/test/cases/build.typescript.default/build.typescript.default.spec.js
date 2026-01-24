@@ -168,7 +168,7 @@ describe("Build Greenwood With: ", function () {
 
         expect(jsFiles.length).to.equal(1);
         expect(javascript.replace(/\n/g, "")).to.contain(
-          'const o="Angela",l="Davis",s="Professor";console.log(`Hello ${s} ${o} ${l}!`);',
+          'const o="Angela",e="Davis",l="Professor";console.log(`Hello ${l} ${o} ${e}!`);',
         );
       });
     });

@@ -1,3 +1,9 @@
+import { type Page } from "@greenwood/cli";
+
+const pages: Page[] = [];
+
+console.log({ pages });
+
 interface User {
   firstName: string;
   lastName: string;
