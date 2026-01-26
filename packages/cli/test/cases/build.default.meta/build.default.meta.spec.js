@@ -14,6 +14,7 @@
  * User Workspace
  * Greenwood default w/ nested page
  *  src/
+ *   favicon.svg
  *   pages/
  *     about/
  *       index.html
@@ -146,21 +147,29 @@ describe("Build Greenwood With: ", function () {
 
     describe("favicon", function () {
       let dom;
+      let favicons;
 
       before(async function () {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "./index.html"));
+        favicons = await Array.fromAsync(
+          fs.promises.glob("*.svg", { cwd: new URL("./public", import.meta.url) }),
+        );
+      });
+
+      it("should have one favicon.svg file in the output directory", function () {
+        expect(favicons.length).to.equal(1);
       });
 
       it("should have our custom config <link> tag with shortcut icon in the <head> for the index page", function () {
         const linkElement = dom.window.document.querySelector('head link[rel="shortcut icon"]');
 
-        expect(linkElement.getAttribute("href")).to.be.equal("/assets/images/favicon.ico");
+        expect(linkElement.getAttribute("href")).to.be.equal("/favicon.svg");
       });
 
       it("should have our custom config <link> tag with icon in the <head> for the index page", function () {
         const linkElement = dom.window.document.querySelector('head link[rel="icon"]');
 
-        expect(linkElement.getAttribute("href")).to.be.equal("/assets/images/favicon.ico");
+        expect(linkElement.getAttribute("href")).to.be.equal("/favicon.svg");
       });
     });
   });
