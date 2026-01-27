@@ -91,7 +91,10 @@ describe("Build Greenwood With: ", function () {
       it("should have one <script> tag in the <head> for the greeting frontmatter import", function () {
         const scripts = dom.window.document.querySelectorAll('head script[type="module"]');
         const greetingScripts = Array.from(scripts).filter((script) =>
-          script.src.replace("file://", "").startsWith("/greeting"),
+          script.src
+            .replace("file://", "")
+            .replace(/\/[A-Z]:/, "")
+            .startsWith("/greeting"),
         );
 
         expect(greetingScripts.length).to.equal(1);
