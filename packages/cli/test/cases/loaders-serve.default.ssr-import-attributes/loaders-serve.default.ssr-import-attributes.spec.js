@@ -92,9 +92,8 @@ describe("Serve Greenwood With: ", function () {
       it("should return the correct response body", function (done) {
         const dom = new JSDOM(body);
         const card = new JSDOM(
-          dom.window.document.querySelectorAll(
-            'app-card template[shadowrootmode="open"]',
-          )[0].innerHTML,
+          dom.window.document.querySelectorAll('app-card template[shadowrootmode="open"]')[0]
+            .innerHTML,
         );
         const heading = card.window.document.querySelector("h2");
         const image = card.window.document.querySelector("img");
@@ -144,9 +143,8 @@ describe("Serve Greenwood With: ", function () {
       it("should return the correct response body", function (done) {
         const dom = new JSDOM(body);
         const card = new JSDOM(
-          dom.window.document.querySelectorAll(
-            'app-card template[shadowrootmode="open"]',
-          )[0].innerHTML,
+          dom.window.document.querySelectorAll('app-card template[shadowrootmode="open"]')[0]
+            .innerHTML,
         );
         const heading = card.window.document.querySelector("h2");
         const image = card.window.document.querySelector("img");

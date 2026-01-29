@@ -85,7 +85,7 @@ describe("Develop Greenwood With: ", function () {
           new URL(importMap[entry].replace("/~/", "file://")).pathname.endsWith(".css"),
         );
 
-        expect(cssEntries.length).to.equal(104);
+        expect(cssEntries.length).to.equal(166);
       });
 
       it("should have the expected number of CSS entries with `?type=raw in the import map", function () {

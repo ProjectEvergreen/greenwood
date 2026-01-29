@@ -84,9 +84,8 @@ xdescribe("Build Greenwood With Custom Lit Renderer for SSG prerendering: ", fun
 
       it("should have expected header <nav> content in the <body>", function () {
         const wrapper = new JSDOM(
-          dom.window.document.querySelectorAll(
-            'app-header template[shadowrootmode="open"]',
-          )[0].innerHTML,
+          dom.window.document.querySelectorAll('app-header template[shadowrootmode="open"]')[0]
+            .innerHTML,
         );
         const nav = wrapper.window.document.querySelectorAll("header nav ul li");
 
