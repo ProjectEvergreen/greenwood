@@ -70,8 +70,8 @@ describe("Build Greenwood With: ", function () {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "./index.html"));
       });
 
-      it("should contain one bundled output file in the output directory", function () {
-        expect(scripts.length).to.be.equal(0);
+      it("should contain one bundled output file in the output directory for the greeting component", function () {
+        expect(scripts.length).to.be.equal(1);
       });
 
       it("should have the expected content from importing values from package.json in index.html", function () {
@@ -80,6 +80,24 @@ describe("Build Greenwood With: ", function () {
 
         expect(headings.length).to.equal(1);
         expect(headings[0].textContent.trim()).to.equal(`My Blog - ${year}`);
+      });
+
+      it("should have no <style> tags in the <head>", function () {
+        const links = dom.window.document.querySelectorAll('head link[rel="stylesheet"]');
+
+        expect(links.length).to.equal(0);
+      });
+
+      it("should have one <script> tag in the <head> for the greeting frontmatter import", function () {
+        const scripts = dom.window.document.querySelectorAll('head script[type="module"]');
+        const greetingScripts = Array.from(scripts).filter((script) =>
+          script.src
+            .replace("file://", "")
+            .replace(/\/[A-Z]:/, "")
+            .startsWith("/greeting"),
+        );
+
+        expect(greetingScripts.length).to.equal(1);
       });
     });
 

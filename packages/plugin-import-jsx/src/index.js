@@ -14,11 +14,15 @@ class ImportJsxResource {
     this.servePage = options.servePages ? "dynamic" : null;
   }
 
-  async shouldServe(url) {
+  async shouldServe(url, request) {
     const { pathname, protocol } = url;
     const ext = pathname.split(".").pop();
 
-    return protocol === "file:" && this.extensions.includes(ext);
+    return (
+      protocol === "file:" &&
+      this.extensions.includes(ext) &&
+      request.headers?.get("Accept").indexOf(this.contentType) >= 0
+    );
   }
 
   async serve(url) {
