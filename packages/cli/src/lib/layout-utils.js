@@ -157,12 +157,17 @@ async function mergeContentIntoLayout(
             return true;
           }
 
+          const contentType = "text/css";
           const resourceUrl = new URL(`file://${href}`);
-          const request = new Request(resourceUrl, { headers: { Accept: "text/css" } });
+          const request = new Request(resourceUrl, { headers: { Accept: contentType } });
           let isSupportedCustomFormat = false;
 
           for (const plugin of resourcePlugins) {
-            if (plugin.shouldServe && (await plugin.shouldServe(resourceUrl, request))) {
+            if (
+              plugin.contentType === contentType &&
+              plugin.shouldServe &&
+              (await plugin.shouldServe(resourceUrl, request))
+            ) {
               isSupportedCustomFormat = true;
               break;
             }
@@ -190,12 +195,17 @@ async function mergeContentIntoLayout(
             return true;
           }
 
+          const contentType = "text/javascript";
           const resourceUrl = new URL(`file://${src}`);
-          const request = new Request(resourceUrl, { headers: { Accept: "text/javascript" } });
+          const request = new Request(resourceUrl, { headers: { Accept: contentType } });
           let isSupportedCustomFormat = false;
 
           for (const plugin of resourcePlugins) {
-            if (plugin.shouldServe && (await plugin.shouldServe(resourceUrl, request))) {
+            if (
+              plugin.contentType === contentType &&
+              plugin.shouldServe &&
+              (await plugin.shouldServe(resourceUrl, request))
+            ) {
               isSupportedCustomFormat = true;
               break;
             }
