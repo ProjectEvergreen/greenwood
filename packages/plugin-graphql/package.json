@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/plugin-graphql",
-  "version": "0.34.0-alpha.3",
+  "version": "0.34.0-alpha.4",
   "description": "A plugin for using GraphQL for querying your content.",
   "repository": {
     "type": "git",
@@ -52,6 +52,6 @@
     "rxjs": "^7.8.2"
   },
   "devDependencies": {
-    "@greenwood/cli": "^0.34.0-alpha.3"
+    "@greenwood/cli": "^0.34.0-alpha.4"
   }
 }
