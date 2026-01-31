@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/plugin-include-html",
-  "version": "0.34.0-alpha.2",
+  "version": "0.34.0-alpha.3",
   "description": "A Greenwood plugin to let you render server side JS from HTML or JS at build time as HTML.",
   "repository": {
     "type": "git",
@@ -39,6 +39,6 @@
     "@greenwood/cli": "^0.33.0"
   },
   "devDependencies": {
-    "@greenwood/cli": "^0.34.0-alpha.2"
+    "@greenwood/cli": "^0.34.0-alpha.3"
   }
 }

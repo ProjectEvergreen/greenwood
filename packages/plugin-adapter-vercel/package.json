@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/plugin-adapter-vercel",
-  "version": "0.34.0-alpha.2",
+  "version": "0.34.0-alpha.3",
   "description": "A Greenwood plugin for supporting Vercel serverless and edge runtimes.",
   "repository": {
     "type": "git",
@@ -39,6 +39,6 @@
     "@greenwood/cli": "^0.33.0"
   },
   "devDependencies": {
-    "@greenwood/cli": "^0.34.0-alpha.2"
+    "@greenwood/cli": "^0.34.0-alpha.3"
   }
 }
