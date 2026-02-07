@@ -9,7 +9,7 @@
   NODE_VERSION = "12.13.0"
 
 [[redirects]]
-  from = "/"
+  from = "/*"
   to = "https://www.greenwoodjs.dev"
   status = 301
   force = true
