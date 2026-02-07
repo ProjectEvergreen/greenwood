@@ -63,7 +63,7 @@
   force = true
 
 [[redirects]]
-  from = "/getting-started/"
+  from = "/getting-started/*"
   to = "https://www.greenwoodjs.dev/guides/getting-started/"
   status = 301
   force = true
