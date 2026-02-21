@@ -27,6 +27,7 @@
  *     api/
  *       search.js
  *     artists.js
+ *     products.js
  *     users.js (isolation = false)
  *   layouts/
  *     app.html
@@ -75,11 +76,14 @@ describe("Serve Greenwood With: ", function () {
 
     let artistsResponse = {};
     let usersResponse = {};
+    let productsResponse = {};
     let artists = [];
     let data;
     let dom;
     let usersPageDom;
     let usersPageHtml;
+    let productsPageHtml;
+    let productsPageDom;
     let artistsPageGraphData;
 
     before(async function () {
@@ -99,6 +103,10 @@ describe("Serve Greenwood With: ", function () {
       usersResponse = await fetch(`${hostname}/users/`);
       usersPageHtml = await usersResponse.text();
       usersPageDom = new JSDOM(usersPageHtml);
+
+      productsResponse = await fetch(`${hostname}/products/`);
+      productsPageHtml = await productsResponse.text();
+      productsPageDom = new JSDOM(productsPageHtml);
     });
 
     describe("Serve command with HTML route response using getBody, getLayout and getFrontmatter for the artists page", function () {
@@ -208,6 +216,40 @@ describe("Serve Greenwood With: ", function () {
       it("should have the expected lit hydration script in the <head>", function () {
         const scripts = Array.from(
           usersPageDom.window.document.querySelectorAll("head script"),
+        ).filter(
+          (script) =>
+            !script.getAttribute("src") &&
+            script.textContent?.indexOf("globalThis.litElementHydrateSupport") >= 0,
+        );
+
+        expect(scripts.length).to.equal(1);
+      });
+    });
+
+    describe("Serve command with HTML route response using LitElement as a default export for the products page", function () {
+      it("the response body should be valid HTML from JSDOM", function (done) {
+        expect(productsPageDom).to.not.be.undefined;
+        done();
+      });
+
+      it("should have the expected <h1> text in the <body>", function () {
+        const heading = productsPageDom.window.document.querySelectorAll("h1");
+
+        expect(heading.length).to.equal(1);
+        expect(heading[0].textContent).to.equal("Products Page");
+      });
+
+      it("should have the expected products list output", function () {
+        const productsList = productsPageDom.window.document.querySelectorAll("ul li");
+
+        expect(productsList.length).to.equal(2);
+        expect(productsList[0].textContent).to.equal("1) Product 1");
+        expect(productsList[1].textContent).to.equal("2) Product 2");
+      });
+
+      it("should have the expected lit hydration script in the <head>", function () {
+        const scripts = Array.from(
+          productsPageDom.window.document.querySelectorAll("head script"),
         ).filter(
           (script) =>
             !script.getAttribute("src") &&
