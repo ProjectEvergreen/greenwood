@@ -2910,44 +2910,33 @@
     "@lit/reactive-element" "^1.0.0 || ^2.0.0"
     lit-html "^3.2.0"
 
-"@lit-labs/ssr-client@^1.1.4", "@lit-labs/ssr-client@^1.1.6":
-  version "1.1.6"
-  resolved "https://registry.npmjs.org/@lit-labs/ssr-client/-/ssr-client-1.1.6.tgz"
-  integrity sha512-MHOHSDGmlum66PP2a6ATLHHwTFvYl+s7R4NYBp8E1NqHDA5UEuEIA1o/E4NoDinc3Ow56yz9Cvh89DvFDif5Pg==
+"@lit-labs/ssr-client@^1.1.7", "@lit-labs/ssr-client@^1.1.8":
+  version "1.1.8"
+  resolved "https://registry.yarnpkg.com/@lit-labs/ssr-client/-/ssr-client-1.1.8.tgz#0a1099e9698450150f4d6f28c4ec06e035432bc3"
+  integrity sha512-PjGh81oKsoI64m3IDjTqqjhC7dr2uC/o0jrllUb5gRAyp/RlAHxapgJrjq9kWz97faCHLQ8jUlTi6tGm+8fgyA==
   dependencies:
-    "@lit/reactive-element" "^1.6.1 || ^2.0.0"
-    lit "^2.7.0 || ^3.0.0"
-    lit-html "^2.7.0 || ^3.0.0"
+    "@lit/reactive-element" "^2.0.4"
+    lit "^3.1.2"
+    lit-html "^3.1.2"
 
-"@lit-labs/ssr-dom-shim@^1.0.0", "@lit-labs/ssr-dom-shim@^1.1.0", "@lit-labs/ssr-dom-shim@^1.2.0":
-  version "1.2.1"
-  resolved "https://registry.npmjs.org/@lit-labs/ssr-dom-shim/-/ssr-dom-shim-1.2.1.tgz"
-  integrity sha512-wx4aBmgeGvFmOKucFKY+8VFJSYZxs9poN3SDNQFF6lT6NrQUnHiPB2PWz2sc4ieEcAaYYzN+1uWahEeTq2aRIQ==
+"@lit-labs/ssr-dom-shim@^1.0.0", "@lit-labs/ssr-dom-shim@^1.1.0", "@lit-labs/ssr-dom-shim@^1.1.2", "@lit-labs/ssr-dom-shim@^1.2.0", "@lit-labs/ssr-dom-shim@^1.4.0", "@lit-labs/ssr-dom-shim@^1.5.0", "@lit-labs/ssr-dom-shim@^1.5.1":
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/@lit-labs/ssr-dom-shim/-/ssr-dom-shim-1.5.1.tgz#3166900c0d481f03d6d4133686e0febf760d521d"
+  integrity sha512-Aou5UdlSpr5whQe8AA/bZG0jMj96CoJIWbGfZ91qieWu5AWUMKw8VR/pAkQkJYvBNhmCcWnZlyyk5oze8JIqYA==
 
-"@lit-labs/ssr-dom-shim@^1.1.2":
-  version "1.1.2"
-  resolved "https://registry.npmjs.org/@lit-labs/ssr-dom-shim/-/ssr-dom-shim-1.1.2.tgz"
-  integrity sha512-jnOD+/+dSrfTWYfSXBXlo5l5f0q1UuJo3tkbMDCYA2lKUYq79jaxqtGEvnRoh049nt1vdo1+45RinipU6FGY2g==
-
-"@lit-labs/ssr-dom-shim@^1.4.0":
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/@lit-labs/ssr-dom-shim/-/ssr-dom-shim-1.4.0.tgz#55eb80ab5ef6e188f7e541c1e2bea1ef582413b8"
-  integrity sha512-ficsEARKnmmW5njugNYKipTm4SFnbik7CXtoencDZzmzo/dQ+2Q0bgkzJuoJP20Aj0F+izzJjOqsnkd6F/o1bw==
-
-"@lit-labs/ssr@^3.2.0":
-  version "3.2.1"
-  resolved "https://registry.npmjs.org/@lit-labs/ssr/-/ssr-3.2.1.tgz"
-  integrity sha512-y8LHFdRFYLXJ44kddCjeaKM/NVqcz1Z0TQHic7Siawxr07d4YZKYtghqnX1bbe2Oa8+qFW7NKFv54CIB7BzrZQ==
+"@lit-labs/ssr@^4.0.0":
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/@lit-labs/ssr/-/ssr-4.0.0.tgz#1fa8a933c2ab64361f3583f32711fedc150a8394"
+  integrity sha512-pODr+t7cZVIrCRLuSLuWAACDnztEk5IrRFwFsbxyAyWcP2XP8aKuUZdVM/biXqxvIyHyCKtNZ92Gdcr+pjA5BQ==
   dependencies:
-    "@lit-labs/ssr-client" "^1.1.4"
-    "@lit-labs/ssr-dom-shim" "^1.1.2"
-    "@lit/reactive-element" "^1.6.1 || ^2.0.0"
+    "@lit-labs/ssr-client" "^1.1.7"
+    "@lit-labs/ssr-dom-shim" "^1.5.0"
+    "@lit/reactive-element" "^2.0.4"
     "@parse5/tools" "^0.3.0"
-    "@types/node" "^16.0.0"
     enhanced-resolve "^5.10.0"
-    lit "^3.1.0"
-    lit-element "^3.3.0 || ^4.0.0"
-    lit-html "^3.1.0"
+    lit "^3.1.2"
+    lit-element "^4.0.4"
+    lit-html "^3.1.2"
     node-fetch "^3.2.8"
     parse5 "^7.1.1"
 
@@ -2975,7 +2964,7 @@
   dependencies:
     "@lit-labs/ssr-dom-shim" "^1.0.0"
 
-"@lit/reactive-element@^1.6.1 || ^2.0.0", "@lit/reactive-element@^2.0.0":
+"@lit/reactive-element@^2.0.0":
   version "2.0.3"
   resolved "https://registry.npmjs.org/@lit/reactive-element/-/reactive-element-2.0.3.tgz"
   integrity sha512-e067EuTNNgOHm1tZcc0Ia7TCzD/9ZpoPegHKgesrGK6pSDRGkGDAQbYuQclqLPIoJ9eC8Kb9mYtGryWcM5AywA==
@@ -5868,11 +5857,6 @@
   version "20.4.8"
   resolved "https://registry.npmjs.org/@types/node/-/node-20.4.8.tgz"
   integrity sha512-0mHckf6D2DiIAzh8fM8f3HQCvMKDpK94YQ0DSVkfWTG9BZleYIWudw9cJxX8oCk9bM+vAkDyujDV6dmKHbvQpg==
-
-"@types/node@^16.0.0":
-  version "16.18.76"
-  resolved "https://registry.npmjs.org/@types/node/-/node-16.18.76.tgz"
-  integrity sha512-/GsO2uv1Z6R42lBr59dtem56gVF/yHKQaScggwU+gLU6DXE25sDmOar4c4IfWb3h+X/7OYZznPOFk7oGF3jQSA==
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.0"
@@ -13535,7 +13519,7 @@ lit-element@^3.3.0:
     "@lit/reactive-element" "^1.3.0"
     lit-html "^2.8.0"
 
-"lit-element@^3.3.0 || ^4.0.0", lit-element@^4.0.0:
+lit-element@^4.0.0:
   version "4.0.3"
   resolved "https://registry.npmjs.org/lit-element/-/lit-element-4.0.3.tgz"
   integrity sha512-2vhidmC7gGLfnVx41P8UZpzyS0Fb8wYhS5RCm16cMW3oERO0Khd3EsKwtRpOnttuByI5rURjT2dfoA7NlInCNw==
@@ -13543,6 +13527,15 @@ lit-element@^3.3.0:
     "@lit-labs/ssr-dom-shim" "^1.1.2"
     "@lit/reactive-element" "^2.0.0"
     lit-html "^3.1.0"
+
+lit-element@^4.0.4:
+  version "4.2.2"
+  resolved "https://registry.yarnpkg.com/lit-element/-/lit-element-4.2.2.tgz#f74fcbfbea945eae5614ece22a674fa52ca3365b"
+  integrity sha512-aFKhNToWxoyhkNDmWZwEva2SlQia+jfG0fjIWV//YeTaWrVnOxD89dPKfigCUspXFmjzOEUQpOkejH5Ly6sG0w==
+  dependencies:
+    "@lit-labs/ssr-dom-shim" "^1.5.0"
+    "@lit/reactive-element" "^2.1.0"
+    lit-html "^3.3.0"
 
 lit-element@^4.1.0:
   version "4.1.1"
@@ -13562,17 +13555,24 @@ lit-element@^4.2.0:
     "@lit/reactive-element" "^2.1.0"
     lit-html "^3.3.0"
 
-"lit-html@^2.7.0 || ^3.0.0", lit-html@^3.1.0:
+lit-html@^2.8.0:
+  version "2.8.0"
+  resolved "https://registry.npmjs.org/lit-html/-/lit-html-2.8.0.tgz"
+  integrity sha512-o9t+MQM3P4y7M7yNzqAyjp7z+mQGa4NS4CxiyLqFPyFWyc4O+nodLrkrxSaCTrla6M5YOLaT3RpbbqjszB5g3Q==
+  dependencies:
+    "@types/trusted-types" "^2.0.2"
+
+lit-html@^3.1.0:
   version "3.1.1"
   resolved "https://registry.npmjs.org/lit-html/-/lit-html-3.1.1.tgz"
   integrity sha512-x/EwfGk2D/f4odSFM40hcGumzqoKv0/SUh6fBO+1Ragez81APrcAMPo1jIrCDd9Sn+Z4CT867HWKViByvkDZUA==
   dependencies:
     "@types/trusted-types" "^2.0.2"
 
-lit-html@^2.8.0:
-  version "2.8.0"
-  resolved "https://registry.npmjs.org/lit-html/-/lit-html-2.8.0.tgz"
-  integrity sha512-o9t+MQM3P4y7M7yNzqAyjp7z+mQGa4NS4CxiyLqFPyFWyc4O+nodLrkrxSaCTrla6M5YOLaT3RpbbqjszB5g3Q==
+lit-html@^3.1.2:
+  version "3.3.2"
+  resolved "https://registry.yarnpkg.com/lit-html/-/lit-html-3.3.2.tgz#4db11fdbf98fc8a0c5eabd9b1e7d088d3bb201a2"
+  integrity sha512-Qy9hU88zcmaxBXcc10ZpdK7cOLXvXpRoBxERdtqV9QOrfpMZZ6pSYP91LhpPtap3sFMUiL7Tw2RImbe0Al2/kw==
   dependencies:
     "@types/trusted-types" "^2.0.2"
 
@@ -13615,7 +13615,7 @@ lit@^2.0.0-rc.2:
     lit-element "^4.1.0"
     lit-html "^3.2.0"
 
-"lit@^2.7.0 || ^3.0.0", lit@^3.0.0, lit@^3.1.0:
+lit@^3.0.0, lit@^3.1.0:
   version "3.1.1"
   resolved "https://registry.npmjs.org/lit/-/lit-3.1.1.tgz"
   integrity sha512-hF1y4K58+Gqrz+aAPS0DNBwPqPrg6P04DuWK52eMkt/SM9Qe9keWLcFgRcEKOLuDlRZlDsDbNL37Vr7ew1VCuw==
@@ -13623,6 +13623,15 @@ lit@^2.0.0-rc.2:
     "@lit/reactive-element" "^2.0.0"
     lit-element "^4.0.0"
     lit-html "^3.1.0"
+
+lit@^3.1.2, lit@^3.3.2:
+  version "3.3.2"
+  resolved "https://registry.yarnpkg.com/lit/-/lit-3.3.2.tgz#d9230ebbf237bfd3d2091bc0b56c576a470ac4d7"
+  integrity sha512-NF9zbsP79l4ao2SNrH3NkfmFgN/hBYSQo90saIVI1o5GpjAdCPVstVzO1MrLOakHoEhYkrtRjPK6Ob521aoYWQ==
+  dependencies:
+    "@lit/reactive-element" "^2.1.0"
+    lit-element "^4.2.0"
+    lit-html "^3.3.0"
 
 lit@^3.2.1:
   version "3.3.1"

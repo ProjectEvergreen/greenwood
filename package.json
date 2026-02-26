@@ -12,6 +12,9 @@
       "www"
     ]
   },
+  "resolutions": {
+    "@lit-labs/ssr-dom-shim": "^1.5.1"
+  },
   "scripts": {
     "lerna": "lerna",
     "clean": "rimraf --glob ./packages/**/.greenwood/** ./packages/**/public/** ./coverage",
