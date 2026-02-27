@@ -4,7 +4,9 @@ import path from "node:path";
 import { checkResourceExists, normalizePathnameForWindows } from "../lib/resource-utils.js";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
+import * as acorn from "acorn";
 import * as walk from "acorn-walk";
+import { ACORN_OPTIONS } from "@greenwood/cli/src/lib/parsing-utils.js";
 
 // https://github.com/rollup/rollup/issues/2121
 // would be nice to get rid of this
@@ -321,10 +323,7 @@ function greenwoodImportMetaUrl(compilation) {
         return null;
       }
 
-      // ideally we would use our own custom Acorn config + parsing
-      // but need to wait for Rollup to remove `assert` which will break Acorn, which only understands `with`
-      // https://github.com/rollup/rollup/issues/5685
-      const ast = this.parse(await response.text());
+      const ast = acorn.parse(await response.text(), ACORN_OPTIONS);
       const assetUrls = [];
       let modifiedCode = false;
 
@@ -482,7 +481,7 @@ function greenwoodSyncImportAttributes(compilation) {
         }
 
         // ideally we would use our own custom Acorn config + parsing
-        const ast = this.parse(code);
+        const ast = acorn.parse(code, ACORN_OPTIONS);
 
         walk.simple(ast, {
           ImportDeclaration(node) {
