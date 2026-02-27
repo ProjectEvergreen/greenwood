@@ -482,8 +482,6 @@ function greenwoodSyncImportAttributes(compilation) {
         }
 
         // ideally we would use our own custom Acorn config + parsing
-        // but need to wait for Rollup to remove `assert` which will break Acorn, which only understands `with`
-        // https://github.com/rollup/rollup/issues/5685
         const ast = this.parse(code);
 
         walk.simple(ast, {
