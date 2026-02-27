@@ -4,7 +4,9 @@ import path from "node:path";
 import { checkResourceExists, normalizePathnameForWindows } from "../lib/resource-utils.js";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
+import * as acorn from "acorn";
 import * as walk from "acorn-walk";
+import { ACORN_OPTIONS } from "@greenwood/cli/src/lib/parsing-utils.js";
 
 // https://github.com/rollup/rollup/issues/2121
 // would be nice to get rid of this
@@ -321,10 +323,7 @@ function greenwoodImportMetaUrl(compilation) {
         return null;
       }
 
-      // ideally we would use our own custom Acorn config + parsing
-      // but need to wait for Rollup to remove `assert` which will break Acorn, which only understands `with`
-      // https://github.com/rollup/rollup/issues/5685
-      const ast = this.parse(await response.text());
+      const ast = acorn.parse(await response.text(), ACORN_OPTIONS);
       const assetUrls = [];
       let modifiedCode = false;
 
@@ -459,10 +458,6 @@ function greenwoodImportMetaUrl(compilation) {
 // to corresponding static bundles, instead of being bundled and shipped as JavaScript
 // e.g. import theme from './theme.css' with { type: 'css' }
 //   -> import theme from './theme.ab345dcc.css' with { type: 'css' }
-//
-// this includes:
-// - replace all instances of assert with with (until Rollup supports with keyword)
-// - sync externalized import attribute paths with bundled CSS paths
 function greenwoodSyncImportAttributes(compilation) {
   const unbundledAssetsRefMapper = {};
   const { basePath, polyfills } = compilation.config;
@@ -486,14 +481,9 @@ function greenwoodSyncImportAttributes(compilation) {
         }
 
         // ideally we would use our own custom Acorn config + parsing
-        // but need to wait for Rollup to remove `assert` which will break Acorn, which only understands `with`
-        // https://github.com/rollup/rollup/issues/5685
-        const ast = this.parse(code);
+        const ast = acorn.parse(code, ACORN_OPTIONS);
 
         walk.simple(ast, {
-          // Rollup currently emits externals with assert keyword and
-          // ideally we get import attributes through the actual AST
-          // https://github.com/ProjectEvergreen/greenwood/issues/1218
           ImportDeclaration(node) {
             const { value } = node.source;
             const extension = value.split(".").pop();
@@ -506,15 +496,11 @@ function greenwoodSyncImportAttributes(compilation) {
                 importAttributes.forEach((attribute) => {
                   if (attribute === extension) {
                     bundles[bundle].code = bundles[bundle].code.replace(
-                      new RegExp(`"assert{type:"${attribute}"}`, "g"),
+                      new RegExp(`"with{type:"${attribute}"}`, "g"),
                       `?polyfill=type-${extension}"`,
                     );
                   }
                 });
-              } else {
-                // waiting on Rollup to formally support `with`
-                // https://github.com/rollup/rollup/issues/5685
-                bundles[bundle].code = bundles[bundle].code.replace(/assert{/g, "with{");
               }
 
               // check for app level assets, like say a shared theme.css
@@ -695,6 +681,9 @@ const getRollupConfigForBrowserScripts = async (compilation) => {
         chunkFileNames: "[name].[hash].js",
         assetFileNames: "[name].[hash].[ext]",
         sourcemap: true,
+        // force import attributes (`with`) until Rollup properly emits import attributes by default (currently uses `assert`)
+        // https://github.com/rollup/rollup/issues/5685#issuecomment-2379581091
+        importAttributesKey: "with",
       },
       plugins: [
         greenwoodResourceLoader(compilation, true),
@@ -750,6 +739,9 @@ const getRollupConfigForApiRoutes = async (compilation) => {
           dir: `${normalizePathnameForWindows(outputDir)}/api`,
           entryFileNames: `${id}.js`,
           chunkFileNames: `${id}.[hash].js`,
+          // force import attributes (`with`) until Rollup properly emits import attributes by default (currently uses `assert`)
+          // https://github.com/rollup/rollup/issues/5685#issuecomment-2379581091
+          importAttributesKey: "with",
         },
         plugins: [
           greenwoodResourceLoader(compilation),
@@ -796,6 +788,9 @@ const getRollupConfigForSsrPages = async (compilation, inputs) => {
         dir: normalizePathnameForWindows(outputDir),
         entryFileNames: `${id}.route.js`,
         chunkFileNames: `${id}.route.chunk.[hash].js`,
+        // force import attributes (`with`) until Rollup properly emits import attributes by default (currently uses `assert`)
+        // https://github.com/rollup/rollup/issues/5685#issuecomment-2379581091
+        importAttributesKey: "with",
       },
       plugins: [
         greenwoodResourceLoader(compilation),
