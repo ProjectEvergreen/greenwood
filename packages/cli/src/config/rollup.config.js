@@ -459,10 +459,6 @@ function greenwoodImportMetaUrl(compilation) {
 // to corresponding static bundles, instead of being bundled and shipped as JavaScript
 // e.g. import theme from './theme.css' with { type: 'css' }
 //   -> import theme from './theme.ab345dcc.css' with { type: 'css' }
-//
-// this includes:
-// - replace all instances of assert with with (until Rollup supports with keyword)
-// - sync externalized import attribute paths with bundled CSS paths
 function greenwoodSyncImportAttributes(compilation) {
   const unbundledAssetsRefMapper = {};
   const { basePath, polyfills } = compilation.config;
@@ -491,9 +487,6 @@ function greenwoodSyncImportAttributes(compilation) {
         const ast = this.parse(code);
 
         walk.simple(ast, {
-          // Rollup currently emits externals with assert keyword and
-          // ideally we get import attributes through the actual AST
-          // https://github.com/ProjectEvergreen/greenwood/issues/1218
           ImportDeclaration(node) {
             const { value } = node.source;
             const extension = value.split(".").pop();
