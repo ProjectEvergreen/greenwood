@@ -492,7 +492,6 @@ function greenwoodSyncImportAttributes(compilation) {
               let preBundled = false;
               let inlineOptimization = false;
 
-              // TODO: hmmm, seems the `polyfill=type` logic is not needed here and lower in this file?
               if (importAttributes && importAttributes.includes(extension)) {
                 importAttributes.forEach((attribute) => {
                   if (attribute === extension) {
