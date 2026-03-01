@@ -138,7 +138,7 @@ class ContentAsDataResource {
   async shouldOptimize(url, response) {
     const { activeContent } = this.compilation.config;
 
-    return response.headers.get("Content-Type").indexOf(this.contentType[0]) >= 0 && activeContent;
+    return response.headers.get("Content-Type")?.indexOf(this.contentType[0]) >= 0 && activeContent;
   }
 
   async optimize(url, response) {
