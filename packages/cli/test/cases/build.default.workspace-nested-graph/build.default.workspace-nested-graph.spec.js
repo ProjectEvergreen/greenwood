@@ -19,29 +19,12 @@
  *   pages/
  *     blog/
  *       2017/
- *         03/26/index.md
- *         03/30/index.md
- *         04/10/index.md
- *         04/22/index.md
- *         05/05/index.md
- *         06/07/index.md
- *         09/10/index.md
- *         10/15/index.md
- *       2018/
- *         01/24/index.md
- *         05/16/index.md
- *         06/06/index.md
- *         09/26/index.md
- *         10/28/index.md
- *         11/19/index.md
+ *         03/26/index.html
+ *         03/30/index.html
  *       2019/
- *         11/11/index.md
- *       2020/
- *         04/07/index.md
- *         08/15/index.md
- *         10/28/index.md
- *     index.md
- *   index.md
+ *         11/11/index.html
+ *     index.html
+ *   index.html
  *   404.html
  */
 import chai from "chai";
@@ -54,8 +37,12 @@ import { fileURLToPath } from "node:url";
 
 const expect = chai.expect;
 
-describe("Build Greenwood With Markdown Plugin: ", function () {
-  const LABEL = "Default Greenwood Configuration and Default Workspace w/ Nested Directories";
+function generatePageHref(pagePath) {
+  return new URL(`./src/pages/${pagePath}`, import.meta.url).href;
+}
+
+describe("Build Greenwood With: ", function () {
+  const LABEL = "Default Greenwood Configuration and Workspace w/ Nested Directories";
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
   let runner;
@@ -68,12 +55,45 @@ describe("Build Greenwood With Markdown Plugin: ", function () {
   });
 
   describe(LABEL, function () {
-    before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, "build");
+    before(function () {
+      runner.setup(outputPath);
+      runner.runCommand(cliPath, "build");
     });
 
     runSmokeTest(["public", "index"], LABEL);
+
+    describe("Expected Graph Contents", function () {
+      let graph;
+
+      before(async function () {
+        graph = JSON.parse(
+          await fs.promises.readFile(path.join(this.context.publicDir, "graph.json"), "utf-8"),
+        );
+      });
+
+      // we _technically_ can't assume the order of pages but we can at least make sure all the files are there
+      // this could easily be solved by adding an `order` property to the page's frontmatter
+      // https://github.com/ProjectEvergreen/greenwood/pull/1308#issuecomment-3368603613
+      it("should have the expected ordering of pages in graph.json", function () {
+        expect(graph.length).to.equal(6);
+
+        const page404 = graph.find((page) => page.route === "/404/");
+        expect(page404.pageHref).to.equal(generatePageHref("404.html"));
+        expect(page404.id).to.be.equal("404");
+
+        const homePage = graph.find((page) => page.route === "/");
+        expect(homePage.pageHref).to.equal(generatePageHref("index.html"));
+        expect(homePage.id).to.be.equal("index");
+
+        const blogPage = graph.find((page) => page.route === "/blog/");
+        expect(blogPage.pageHref).to.equal(generatePageHref("blog/index.html"));
+        expect(blogPage.id).to.be.equal("blog-index");
+
+        const nestedPage = graph.find((page) => page.route === "/blog/2019/11/11/");
+        expect(nestedPage.pageHref).to.equal(generatePageHref("blog/2019/11/11/index.html"));
+        expect(nestedPage.id).to.be.equal("blog-2019-11-11-index");
+      });
+    });
 
     describe("Blog Pages Directory", function () {
       let graph;
@@ -90,9 +110,7 @@ describe("Build Greenwood With Markdown Plugin: ", function () {
 
       it("should create a directory for each year of blog pages", function () {
         expect(fs.existsSync(path.join(this.context.publicDir, "blog/2017"))).to.be.true;
-        expect(fs.existsSync(path.join(this.context.publicDir, "blog/2018"))).to.be.true;
         expect(fs.existsSync(path.join(this.context.publicDir, "blog/2019"))).to.be.true;
-        expect(fs.existsSync(path.join(this.context.publicDir, "blog/2020"))).to.be.true;
       });
 
       it("should have the expected pages for 2017 blog pages", function () {
@@ -106,32 +124,10 @@ describe("Build Greenwood With Markdown Plugin: ", function () {
           });
       });
 
-      it("should have the expected pages for 2018 blog pages", function () {
-        graph
-          .filter((page) => {
-            return page.route.indexOf("2018") > 0;
-          })
-          .forEach((page) => {
-            const outputPath = path.join(this.context.publicDir, page.route, "index.html");
-            expect(fs.existsSync(outputPath)).to.be.true;
-          });
-      });
-
       it("should have the expected pages for 2019 blog pages", function () {
         graph
           .filter((page) => {
             return page.route.indexOf("2019") > 0;
-          })
-          .forEach((page) => {
-            const outputPath = path.join(this.context.publicDir, page.route, "index.html");
-            expect(fs.existsSync(outputPath)).to.be.true;
-          });
-      });
-
-      it("should have the expected pages for 2020 blog pages", function () {
-        graph
-          .filter((page) => {
-            return page.route.indexOf("2020") > 0;
           })
           .forEach((page) => {
             const outputPath = path.join(this.context.publicDir, page.route, "index.html");
@@ -156,7 +152,7 @@ describe("Build Greenwood With Markdown Plugin: ", function () {
     });
   });
 
-  after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+  after(function () {
+    runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });

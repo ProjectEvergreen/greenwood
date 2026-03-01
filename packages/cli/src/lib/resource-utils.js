@@ -84,6 +84,10 @@ function normalizePathnameForWindows(url) {
 }
 
 async function checkResourceExists(url) {
+  if (url.pathname === "/") {
+    return false;
+  }
+
   try {
     await fs.access(url);
     return true;

@@ -681,21 +681,33 @@ describe("Build Greenwood With: ", function () {
         );
       });
 
+      // we _technically_ can't assume the order of pages but we can at least make sure all the files are there
+      // this could easily be solved by adding an `order` property to the page's frontmatter
+      // https://github.com/ProjectEvergreen/greenwood/pull/1308#issuecomment-3368603613
       it("should return the expected response when the serverless adapter entry point handler is invoked", async function () {
-        expect(redirectsFileContents).to.be.equal(
-          `/artists/ /.netlify/functions/artists 200
-/blog/first-post/ /.netlify/functions/blog-first-post 200
-/blog/ /.netlify/functions/blog-index 200
-/ /.netlify/functions/index 200
-/post/ /.netlify/functions/post 200
-/users/ /.netlify/functions/users 200
-/api/fragment /.netlify/functions/api-fragment 200
-/api/greeting /.netlify/functions/api-greeting 200
-/api/nested/endpoint /.netlify/functions/api-nested-endpoint 200
-/api/search /.netlify/functions/api-search 200
-/api/submit-form-data /.netlify/functions/api-submit-form-data 200
-/api/submit-json /.netlify/functions/api-submit-json 200
-`,
+        expect(redirectsFileContents).to.contain("/artists/ /.netlify/functions/artists 200");
+        expect(redirectsFileContents).to.contain(
+          "/blog/first-post/ /.netlify/functions/blog-first-post 200",
+        );
+        expect(redirectsFileContents).to.contain("/blog/ /.netlify/functions/blog-index 200");
+        expect(redirectsFileContents).to.contain("/ /.netlify/functions/index 200");
+        expect(redirectsFileContents).to.contain("/post/ /.netlify/functions/post 200");
+        expect(redirectsFileContents).to.contain("/users/ /.netlify/functions/users 200");
+        expect(redirectsFileContents).to.contain(
+          "/api/fragment /.netlify/functions/api-fragment 200",
+        );
+        expect(redirectsFileContents).to.contain(
+          "/api/greeting /.netlify/functions/api-greeting 200",
+        );
+        expect(redirectsFileContents).to.contain(
+          "/api/nested/endpoint /.netlify/functions/api-nested-endpoint 200",
+        );
+        expect(redirectsFileContents).to.contain("/api/search /.netlify/functions/api-search 200");
+        expect(redirectsFileContents).to.contain(
+          "/api/submit-form-data /.netlify/functions/api-submit-form-data 200",
+        );
+        expect(redirectsFileContents).to.contain(
+          "/api/submit-json /.netlify/functions/api-submit-json 200",
         );
       });
     });
