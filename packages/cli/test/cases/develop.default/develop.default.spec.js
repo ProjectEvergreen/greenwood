@@ -40,10 +40,15 @@
  *       nothing.js
  *       submit-form-data.js
  *       submit-json.js
- *     index.html
  *     404.html
+ *     index.html
+ *.    wasm.html
  *   styles/
  *     main.css
+ *   wasm/
+ *     index.js
+ *     wasm_hello_world_bg.wasm
+ *     wasm_hello_world_bg.js
  * package.json
  */
 import chai from "chai";
@@ -497,6 +502,31 @@ describe("Develop Greenwood With: ", function () {
 
       it("should return the correct response body", function (done) {
         expect(body).to.contain("ID3");
+        done();
+      });
+    });
+
+    describe("Develop command with WASM format (.wasm) behavior", function () {
+      let response = {};
+      let body;
+
+      before(async function () {
+        response = await fetch(`${hostname}:${port}/wasm/wasm_hello_world_bg.wasm`);
+        body = await response.clone().text();
+      });
+
+      it("should return a 200 status", function (done) {
+        expect(response.status).to.equal(200);
+        done();
+      });
+
+      it("should return the correct content type", function (done) {
+        expect(response.headers.get("content-type")).to.equal("application/wasm");
+        done();
+      });
+
+      it("should return the correct response body", function (done) {
+        expect(body.startsWith("\u0000asm")).to.equal(true);
         done();
       });
     });
