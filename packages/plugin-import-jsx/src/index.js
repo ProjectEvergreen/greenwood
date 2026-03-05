@@ -4,7 +4,7 @@
  *
  */
 import { generate } from "astring";
-import { parseJsx } from "wc-compiler/src/jsx-loader.js";
+import { parseJsx } from "wc-compiler/jsx-loader";
 
 class ImportJsxResource {
   constructor(compilation, options) {
