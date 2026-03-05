@@ -26,7 +26,7 @@ import chai from "chai";
 import glob from "glob-promise";
 import { JSDOM } from "jsdom";
 import path from "node:path";
-import { getOutputTeardownFiles } from "../../../../../test/utils.js";
+import { getOutputTeardownFiles, HASH_REGEX } from "../../../../../test/utils.js";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
@@ -122,7 +122,7 @@ describe("Serve Greenwood With: ", function () {
       it("should have a bundled script for the footer component", function () {
         const footerScript = Array.from(
           dom.window.document.querySelectorAll("head > script[type]"),
-        ).filter((script) => /footer.*[a-z0-9].js/.test(script.src));
+        ).filter((script) => new RegExp(`footer\\.${HASH_REGEX}\\.js`).test(script.src));
 
         expect(footerScript.length).to.be.equal(1);
         expect(footerScript[0].type).to.be.equal("module");

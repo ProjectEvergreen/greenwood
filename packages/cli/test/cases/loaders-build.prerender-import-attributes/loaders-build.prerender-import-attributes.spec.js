@@ -71,7 +71,7 @@ describe("Build Greenwood With: ", function () {
 
         expect(scripts.length).to.equal(1);
         expect(scriptContents).to.match(
-          new RegExp(`import e from"/hero\\.${HASH_REGEX}\\.css"with\\{type:"css"\\};`),
+          new RegExp(`import t from"/hero\\.${HASH_REGEX}\\.css"with\\{type:"css"\\};`),
         );
       });
 
