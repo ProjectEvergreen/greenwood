@@ -18,6 +18,7 @@ export default [
       "reports/*",
       "coverage/*",
       "www/**",
+      "packages/cli/test/cases/**/wasm_hello_world.js",
       "packages/cli/test/cases/serve.config.typescript/tsconfig.json",
     ],
   },
