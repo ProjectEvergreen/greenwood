@@ -20,6 +20,9 @@ jobs:
       - name: Installing project dependencies
         run: |
           yarn install --frozen-lockfile --network-timeout 1000000 --immutable
+      - name: Test fixed
+        run: |
+          yarn test:loaders:win2
       - name: Test
         run: |
           yarn test:loaders:win
