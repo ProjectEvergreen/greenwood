@@ -6,7 +6,7 @@
   "author": "Owen Buckley <owen@thegreenhouse.io>",
   "license": "MIT",
   "type": "module",
-  "packageManager": "yarn@1.22.22",
+  "packageManager": "yarn@4.13.0",
   "workspaces": {
     "packages": [
       "packages/*",
