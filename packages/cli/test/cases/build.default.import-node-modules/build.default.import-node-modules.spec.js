@@ -82,7 +82,7 @@ describe("Build Greenwood With: ", function () {
         throw error;
       }
 
-      await Promise.resolve();
+      // await Promise.resolve();
 
       try {
         await runner.runCommand(cliPath, "build");
