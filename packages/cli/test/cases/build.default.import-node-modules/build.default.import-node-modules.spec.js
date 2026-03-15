@@ -80,7 +80,7 @@ describe("Build Greenwood With: ", function () {
         throw error;
       }
 
-      await Promise.resolve();
+      await new Promise((resolve) => setTimeout(resolve, 3000));
 
       try {
         await runner.runCommand(cliPath, "build");
@@ -127,8 +127,6 @@ describe("Build Greenwood With: ", function () {
         console.error("Caught busy error in setup", JSON.stringify(error, null, 2));
         throw error;
       }
-
-      // await Promise.resolve();
 
       try {
         await runner.runCommand(cliPath, "build");
