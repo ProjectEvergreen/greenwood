@@ -71,12 +71,17 @@ describe("Build Greenwood With: ", function () {
         `${outputPath}/node_modules/font-awesome/fonts/`,
       );
 
-      await runner.setup(outputPath, [
-        ...fontAwesomePackageJson,
-        ...fontAwesomeCssFiles,
-        ...fontAwesomeFontFiles,
-      ]);
-      await runner.runCommand(cliPath, "build");
+      try {
+        await runner.setup(outputPath, [
+          ...fontAwesomePackageJson,
+          ...fontAwesomeCssFiles,
+          ...fontAwesomeFontFiles,
+        ]);
+        await runner.runCommand(cliPath, "build");
+      } catch (error) {
+        console.error("Caught busy error", error.message);
+        throw new Error("rethrow for stack trace", { cause: error });
+      }
 
       dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "index.html"));
     });
