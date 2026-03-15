@@ -28,9 +28,7 @@
     "JavaScript",
     "NodeJS"
   ],
-  "bin": {
-    "init": "./src/index.js"
-  },
+  "bin": "./src/index.js",
   "files": [
     "src/"
   ],
