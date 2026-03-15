@@ -18,7 +18,7 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node }}
-          # cache: "yarn"
+          cache: "yarn"
       - name: Installing project dependencies
         run: |
           yarn install --frozen-lockfile --network-timeout 1000000 --immutable
