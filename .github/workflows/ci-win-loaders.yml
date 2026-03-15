@@ -12,8 +12,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
-      - name: Enable Corepack
-        run: corepack enable
       - name: Use Node.js ${{ matrix.node }}
         uses: actions/setup-node@v6
         with:
@@ -21,7 +19,7 @@ jobs:
           cache: "yarn"
       - name: Installing project dependencies
         run: |
-          yarn install --frozen-lockfile --network-timeout 1000000 --immutable
+          yarn install --frozen-lockfile --network-timeout 1000000
       - name: Test fixed
         run: |
           yarn test:loaders:win2
