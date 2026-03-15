@@ -49,6 +49,52 @@ describe("Build Greenwood With: ", function () {
     runner = new Runner();
   });
 
+  describe("with fix", function () {
+    before(async function () {
+      // this package has a known issue with import.meta.resolve
+      // in that it has no main, module, or exports so it has to be hoisted
+      // at least for this current version, as well as for testing relative ../node_modules references
+      // https://unpkg.com/browse/font-awesome@4.7.0/package.json
+      // https://github.com/FortAwesome/Font-Awesome/pull/19041
+      const fontAwesomePackageJson = await getDependencyFiles(
+        `${process.cwd()}/node_modules/font-awesome/package.json`,
+        `${outputPath}/node_modules/font-awesome/`,
+      );
+      const fontAwesomeCssFiles = await getDependencyFiles(
+        `${process.cwd()}/node_modules/font-awesome/css/*`,
+        `${outputPath}/node_modules/font-awesome/css/`,
+      );
+      const fontAwesomeFontFiles = await getDependencyFiles(
+        `${process.cwd()}/node_modules/font-awesome/fonts/*`,
+        `${outputPath}/node_modules/font-awesome/fonts/`,
+      );
+
+      try {
+        await runner.setup(outputPath, [
+          ...fontAwesomePackageJson,
+          ...fontAwesomeCssFiles,
+          ...fontAwesomeFontFiles,
+        ]);
+      } catch (error) {
+        console.error("Caught busy error in setup", JSON.stringify(error, null, 2));
+        throw error;
+      }
+
+      await Promise.resolve();
+
+      try {
+        await runner.runCommand(cliPath, "build");
+      } catch (error) {
+        console.error("Caught busy error in build", JSON.stringify(error, null, 2));
+        throw error;
+      }
+    });
+
+    it("should pass", async function () {
+      expect(true).to.be.true;
+    });
+  });
+
   describe(LABEL, function () {
     let dom;
 
