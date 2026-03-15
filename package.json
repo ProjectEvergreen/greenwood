@@ -23,7 +23,7 @@
     "test": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true __GWD_ROLLUP_MODE__=strict NODE_NO_WARNINGS=1 c8 mocha --exclude \"./packages/**/test/cases/loaders-*/**\" \"./packages/**/**/*.spec.js\"",
     "test:loaders": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true __GWD_ROLLUP_MODE__=strict NODE_NO_WARNINGS=1 node --import $(pwd)/test/test-register.js ./node_modules/mocha/bin/mocha \"./packages/**/**/*.spec.js\"",
     "test:loaders:win": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true __GWD_ROLLUP_MODE__=strict NODE_NO_WARNINGS=1 node --import file:\\\\%cd%\\test\\test-register.js ./node_modules/mocha/bin/mocha --exclude \"./packages/init/test/cases/**\" \"./packages/cli/test/cases/build.default.import-node-modules/build.default.import-node-modules.spec.js\"",
-    "test:loaders:win2": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true __GWD_ROLLUP_MODE__=strict NODE_NO_WARNINGS=1 node --import file:\\\\%cd%\\test\\test-register.js ./node_modules/mocha/bin/mocha \"./packages/cli/test/cases/build.default.import-node-modules copy/build.default.import-node-modules.spec.js\"",
+    "test:loaders:win2": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true __GWD_ROLLUP_MODE__=strict NODE_NO_WARNINGS=1 node --import file:\\\\%cd%\\test\\test-register.js ./node_modules/mocha/bin/mocha \"./packages/cli/test/cases/build.default.import-node-modules-copy/build.default.import-node-modules.spec.js\"",
     "test:tdd": "yarn test --watch",
     "lint": "yarn run lint:ls && yarn run lint:js && yarn run lint:types",
     "lint:js": "eslint",
