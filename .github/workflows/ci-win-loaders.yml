@@ -20,9 +20,10 @@ jobs:
       - name: Installing project dependencies
         run: |
           yarn install --frozen-lockfile --network-timeout 1000000
-      - name: Test fixed
-        run: |
-          yarn test:loaders:win2
       - name: Test
         run: |
           yarn test:loaders:win
+      - name: Test fixed
+        if: ${{ always() }}
+        run: |
+          yarn test:loaders:win2
