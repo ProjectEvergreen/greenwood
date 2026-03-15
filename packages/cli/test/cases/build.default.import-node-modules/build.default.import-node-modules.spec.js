@@ -77,10 +77,16 @@ describe("Build Greenwood With: ", function () {
           ...fontAwesomeCssFiles,
           ...fontAwesomeFontFiles,
         ]);
+      } catch (error) {
+        console.error("Caught busy error in setup", JSON.stringify(error, null, 2));
+        throw error;
+      }
+
+      try {
         await runner.runCommand(cliPath, "build");
       } catch (error) {
-        console.error("Caught busy error", error.message);
-        throw new Error("rethrow for stack trace", { cause: error });
+        console.error("Caught busy error in build", JSON.stringify(error, null, 2));
+        throw error;
       }
 
       dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "index.html"));
