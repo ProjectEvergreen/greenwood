@@ -1,5 +1,5 @@
 {
-  "name": "test-import-node-modules",
+  "name": "test-import-node-modules-2",
   "type": "module",
   "dependencies": {
     "lit": "^3.1.0",
