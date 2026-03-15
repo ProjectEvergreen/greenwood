@@ -19,7 +19,7 @@ jobs:
           cache: "yarn"
       - name: Installing project dependencies
         run: |
-          yarn install --frozen-lockfile --network-timeout 1000000 --immutable
+          yarn install --frozen-lockfile --network-timeout 1000000
       - name: Test fixed
         run: |
           yarn test:loaders:win2
