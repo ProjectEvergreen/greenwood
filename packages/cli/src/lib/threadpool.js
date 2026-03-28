@@ -1,4 +1,5 @@
 // https://amagiacademy.com/blog/posts/2021-04-09/node-worker-threads-pool
+// https://nodejs.org/api/async_context.html#using-asyncresource-for-a-worker-thread-pool
 import { AsyncResource } from "node:async_hooks";
 import { EventEmitter } from "node:events";
 import { Worker } from "node:worker_threads";
@@ -25,9 +26,19 @@ class WorkerPool extends EventEmitter {
     this.workerFile = workerFile;
     this.workers = [];
     this.freeWorkers = [];
+    this.tasks = [];
 
     for (let i = 0; i < numThreads; i += 1) {
       this.addNewWorker();
+
+      // Any time the kWorkerFreedEvent is emitted, dispatch
+      // the next task pending in the queue, if any.
+      this.on(kWorkerFreedEvent, () => {
+        if (this.tasks.length > 0) {
+          const { task, callback } = this.tasks.shift();
+          this.runTask(task, callback);
+        }
+      });
     }
   }
 
@@ -59,7 +70,8 @@ class WorkerPool extends EventEmitter {
 
   runTask(task, callback) {
     if (this.freeWorkers.length === 0) {
-      this.once(kWorkerFreedEvent, () => this.runTask(task, callback));
+      // No free threads, wait until a worker thread becomes free.
+      this.tasks.push({ task, callback });
       return;
     }
 
