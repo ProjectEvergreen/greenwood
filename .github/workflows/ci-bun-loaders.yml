@@ -1,0 +1,36 @@
+name: Continuous Integration - Bun (Loaders)
+
+on: [pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node: [24]
+
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+
+      # still using Yarn since we specifically rely on Yarn workspaces
+      - name: Setup Node.js ${{ matrix.node }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Disable Strict SSL
+        run: yarn config set strict-ssl false
+
+      - name: Install Dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Test
+        run: bun run --bun test:bun:loaders
+
+      - name: Build
+        run: bun run --bun build
