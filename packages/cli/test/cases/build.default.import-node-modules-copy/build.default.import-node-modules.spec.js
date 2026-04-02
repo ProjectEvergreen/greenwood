@@ -36,8 +36,8 @@ import { fileURLToPath } from "node:url";
 
 const expect = chai.expect;
 
-describe("Build Greenwood With: ", function () {
-  const LABEL = "Importing packages from node modules";
+describe("Build Greenwood With FIXED: ", function () {
+  const LABEL = "Importing packages from node modules FIXED";
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
   let runner;
@@ -81,6 +81,8 @@ describe("Build Greenwood With: ", function () {
         console.error("Caught busy error in setup", JSON.stringify(error, null, 2));
         throw error;
       }
+
+      await new Promise((resolve) => setTimeout(resolve, 3000));
 
       try {
         await runner.runCommand(cliPath, "build");
