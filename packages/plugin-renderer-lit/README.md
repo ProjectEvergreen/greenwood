@@ -78,7 +78,6 @@ import type { LitRendererPlugin } from '@greenwood/plugin-renderer-lit';
     - Lit SSR [**only** renders into declarative shadow roots](https://github.com/lit/lit/issues/3080#issuecomment-1165158794), so you will have to keep browser support and polyfill usage in mind.
     - At this time, `LitElement` does not support `async` work (e.g. for `connectedCallback`).  You can follow along with this issue [in the Lit repo](https://github.com/lit/lit/issues/2469).
 1. Lit only supports templates on the server side for HTML generated content, thus Greenwood's `getBody` API must be used.  We would love for [server only components](https://github.com/lit/lit/issues/2469#issuecomment-1759583861) to be a thing though!
-1. Lit does not support [`CSSStyleSheet` (aka CSS Modules) in their SSR DOM shim](https://github.com/lit/lit/issues/4862).  As an alternative, you may consider using Greenwood's [**Raw adapter**](https://greenwoodjs.dev/docs/plugins/raw/) to inline CSS in `<style>` tags into your custom elements.
 1. Full hydration support is not available yet.  See [this Greenwood issue](https://github.com/ProjectEvergreen/greenwood/issues/880) to follow along with when it will land.
 
 > See [this repo](https://github.com/thescientist13/greenwood-lit-ssr) for a full demo of isomorphic Lit SSR with SSR pages and API routes deployed to Vercel serverless functions.
