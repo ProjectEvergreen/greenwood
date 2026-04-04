@@ -2,6 +2,7 @@ import type { ResourcePlugin } from "@greenwood/cli";
 
 type Options = {
   servePages?: boolean;
+  signals?: boolean;
 };
 
 export type ImportJsxPlugin = (options?: Options) => [ResourcePlugin];
