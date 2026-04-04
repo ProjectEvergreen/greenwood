@@ -11,6 +11,7 @@ async function executeRouteModule({
   htmlContents,
   scripts,
   contentOptions = {},
+  params,
 }) {
   const data = {
     layout: null,
@@ -57,11 +58,18 @@ async function executeRouteModule({
         // and then extract the contents of the `<template>`
         const tagName = `${page.id}-page`;
         const tagNameLiteral = literal`${unsafeStatic(tagName)}`;
-        const pageTemplate = html`<${tagNameLiteral}></${tagNameLiteral}>`;
+        // since Lit does not support passing data to the `constructor` have to map params to attributes for now
+        const attributes =
+          Object.entries(params).length > 0
+            ? Object.entries(params)
+                .map(([key, value]) => `${key}="${value}"`)
+                .join(" ")
+            : "";
+        const litAttributes = literal`${unsafeStatic(attributes)}`;
+        const pageTemplate = html`<${tagNameLiteral} ${litAttributes}"></${tagNameLiteral}>`;
 
         customElements.define(tagName, module.default);
 
-        // TODO: constructor props / dynamic routing
         const ssrResult = render(pageTemplate);
         const ssrContent = await collectResult(ssrResult);
         const ssrContentsMatch =
@@ -69,12 +77,14 @@ async function executeRouteModule({
 
         data.body = ssrContent.match(ssrContentsMatch)[1];
       } else if (getBody) {
+        // TODO: constructor props / dynamic routing
         const templateResult = await getBody(compilation, page, data.pageData);
 
         data.body = await collectResult(render(templateResult));
       }
     }
 
+    // TODO: constructor props / dynamic routing
     if (layout && getLayout) {
       const templateResult = await getLayout(compilation, page);
 
