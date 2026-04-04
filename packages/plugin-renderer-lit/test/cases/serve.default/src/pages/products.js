@@ -1,9 +1,9 @@
 import { LitElement, html } from "lit";
 
+// TODO: constructor props
 export default class ProductsPage extends LitElement {
-  // TODO: constructor props
-  constructor() {
-    super();
+  // TODO: async connectedCallback - https://github.com/lit/lit/issues/2469#issuecomment-1759583861
+  connectedCallback() {
     this.products = [
       {
         id: 1,
@@ -15,19 +15,6 @@ export default class ProductsPage extends LitElement {
       },
     ];
   }
-
-  // TODO: connectedCallback - https://github.com/lit/lit/pull/4755
-  // TODO: async connectedCallback - https://github.com/lit/lit/issues/2469#issuecomment-1759583861
-  // connectedCallback() {
-  //   super.connectedCallback();
-  //   this.products = [{
-  //     id: 1,
-  //     name: 'Product 1'
-  //   }, {
-  //     id: 2,
-  //     name: 'Product 2'
-  //   }]
-  // }
 
   render() {
     const { products } = this;
