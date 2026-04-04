@@ -10,8 +10,9 @@ async function executeRouteModule({
   prerender,
   htmlContents,
   scripts,
+  request,
   contentOptions = {},
-  params,
+  params = {},
 }) {
   const data = {
     layout: null,
@@ -77,13 +78,13 @@ async function executeRouteModule({
 
         data.body = ssrContent.match(ssrContentsMatch)[1];
       } else if (getBody) {
-        // TODO: constructor props / dynamic routing
-        const templateResult = await getBody(compilation, page, data.pageData);
+        const templateResult = await getBody(compilation, page, request, params);
 
         data.body = await collectResult(render(templateResult));
       }
     }
 
+    // TODO: layouts as SSR pages
     // TODO: constructor props / dynamic routing
     if (layout && getLayout) {
       const templateResult = await getLayout(compilation, page);

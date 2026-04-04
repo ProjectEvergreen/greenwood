@@ -26,6 +26,8 @@
  *   pages/
  *     api/
  *       search.js
+ *     artist/
+ *       [name].js
  *     product/
  *       [id].js
  *     artists.js
@@ -181,7 +183,7 @@ describe("Serve Greenwood With: ", function () {
       });
     });
 
-    describe("Serve command with HTML route response using LitElement as a getPage export with an <app-footer> component for the users page", function () {
+    describe("Serve command with HTML route response using LitElement as a getBody export with an <app-footer> component for the users page", function () {
       let usersResponse = {};
       let usersPageDom;
       let usersPageHtml;
@@ -306,6 +308,52 @@ describe("Serve Greenwood With: ", function () {
       it("should have the expected lit hydration script in the <head>", function () {
         const scripts = Array.from(
           productDetailsPageDom.window.document.querySelectorAll("head script"),
+        ).filter(
+          (script) =>
+            !script.getAttribute("src") &&
+            script.textContent?.indexOf("globalThis.litElementHydrateSupport") >= 0,
+        );
+
+        expect(scripts.length).to.equal(1);
+      });
+    });
+
+    describe("Serve command with HTML route response using getBody a dynamic route with params", function () {
+      const artistName = "Analog";
+      let artistDetailsResponse = {};
+      let artistDetailsPageDom;
+      let artistDetailsPageHtml;
+
+      before(async function () {
+        artistDetailsResponse = await fetch(`${hostname}/artist/${artistName.toLowerCase()}/`);
+        artistDetailsPageHtml = await artistDetailsResponse.text();
+        artistDetailsPageDom = new JSDOM(artistDetailsPageHtml);
+      });
+
+      it("the response body should be valid HTML from JSDOM", function (done) {
+        expect(artistDetailsPageDom).to.not.be.undefined;
+        done();
+      });
+
+      it("should have the expected heading text in the <body>", function () {
+        const heading = artistDetailsPageDom.window.document.querySelectorAll("h1");
+
+        expect(heading.length).to.equal(1);
+        expect(heading[0].textContent).to.equal(artistName);
+      });
+
+      it("should have the expected artist image tag in the <body>", function () {
+        const img = artistDetailsPageDom.window.document.querySelectorAll("img");
+
+        expect(img.length).to.equal(1);
+        expect(img[0].getAttribute("src").endsWith(`${artistName.toLowerCase()}.jpg`)).to.equal(
+          true,
+        );
+      });
+
+      it("should have the expected lit hydration script in the <head>", function () {
+        const scripts = Array.from(
+          artistDetailsPageDom.window.document.querySelectorAll("head script"),
         ).filter(
           (script) =>
             !script.getAttribute("src") &&
