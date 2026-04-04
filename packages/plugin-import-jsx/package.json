@@ -40,6 +40,7 @@
   },
   "dependencies": {
     "astring": "^1.9.0",
+    "node-html-parser": "^7.0.1",
     "wc-compiler": "~0.20.0"
   },
   "devDependencies": {
