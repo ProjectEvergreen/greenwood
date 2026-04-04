@@ -49,8 +49,10 @@ async function executeRouteModule({
     }
 
     if (body) {
-      // TODO: update caveats and document SSR pages on the website
       if (module.default) {
+        // only enable when default export is a LitElement
+        globalThis.litSsrCallConnectedCallback = true;
+
         // for the Lit implementation, we render the custom element programmatically
         // and then extract the contents of the `<template>`
         const tagName = `${page.id}-page`;
