@@ -1,17 +1,18 @@
 import { LitElement, html } from "lit";
 
 export default class ProductDetailsPage extends LitElement {
-  #id;
-
-  connectedCallback() {
-    super.connectedCallback();
-    this.#id = this.getAttribute("id");
+  static get properties() {
+    return {
+      id: { type: Number },
+    };
   }
 
   render() {
+    const { id } = this;
+
     return html`
       <h1>Product Details Page</h1>
-      <p>Product ID: ${this.#id}</p>
+      <p>Product ID: ${id}</p>
     `;
   }
 }
