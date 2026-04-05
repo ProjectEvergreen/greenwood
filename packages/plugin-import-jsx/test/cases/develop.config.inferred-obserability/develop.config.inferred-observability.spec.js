@@ -14,7 +14,7 @@
  * {
  *   plugins: [{
  *     greenwoodPluginImportJsx({
- *       signals: true
+ *       inferredObservability: true
  *     })
  *   }]
  * }

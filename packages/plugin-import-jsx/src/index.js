@@ -19,7 +19,7 @@ class ImportJsxResource {
     this.extensions = ["jsx", "tsx"];
     this.contentType = "text/javascript";
     this.servePage = options.servePages ? "dynamic" : null;
-    this.signals = options.signals;
+    this.inferredObservability = options.inferredObservability;
   }
 
   async shouldServe(url) {
@@ -43,7 +43,9 @@ class ImportJsxResource {
   }
 
   async shouldIntercept(url, request, response) {
-    return this.signals && response.headers.get("Content-Type")?.indexOf("text/html") >= 0;
+    return (
+      this.inferredObservability && response.headers.get("Content-Type")?.indexOf("text/html") >= 0
+    );
   }
 
   async intercept(url, request, response) {
@@ -81,11 +83,15 @@ class ImportJsxResource {
 }
 
 /** @type {import('./types/index.d.ts').ImportJsxPlugin} */
-const greenwoodPluginImportJsx = (options = { servePages: true }) => [
+const greenwoodPluginImportJsx = (options = {}) => [
   {
     type: "resource",
     name: "plugin-import-jsx:resource",
-    provider: (compilation) => new ImportJsxResource(compilation, options),
+    provider: (compilation) =>
+      new ImportJsxResource(compilation, {
+        servePages: true,
+        ...options,
+      }),
   },
 ];
 
