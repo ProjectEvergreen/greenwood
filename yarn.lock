@@ -18519,6 +18519,11 @@ signal-exit@^4.0.1, signal-exit@^4.1.0:
   resolved "https://registry.npmjs.org/signal-exit/-/signal-exit-4.1.0.tgz"
   integrity sha512-bzyZ1e88w9O1iNJbKnOlvYTrWPDl46O1bG0D3XInv+9tkPrxrN8jUUTiFlDkkmKWgn1M6CfIA13SuGqOa9Korw==
 
+signal-polyfill@^0.2.2:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/signal-polyfill/-/signal-polyfill-0.2.2.tgz#722e2cd272cbd6cdc5fcc741459bd066f93d0264"
+  integrity sha512-p63Y4Er5/eMQ9RHg0M0Y64NlsQKpiu6MDdhBXpyywRuWiPywhJTpKJ1iB5K2hJEbFZ0BnDS7ZkJ+0AfTuL37Rg==
+
 signal-utils@^0.21.1:
   version "0.21.1"
   resolved "https://registry.npmjs.org/signal-utils/-/signal-utils-0.21.1.tgz"
@@ -20341,16 +20346,17 @@ walk-up-path@^4.0.0:
   resolved "https://registry.yarnpkg.com/walk-up-path/-/walk-up-path-4.0.0.tgz#590666dcf8146e2d72318164f1f2ac6ef51d4198"
   integrity sha512-3hu+tD8YzSLGuFYtPRb48vdhKMi0KQV5sn+uWr8+7dMEq/2G/dtLrdDinkLjqq5TIbIBjYJ4Ax/n3YiaW7QM8A==
 
-wc-compiler@~0.20.0:
-  version "0.20.0"
-  resolved "https://registry.yarnpkg.com/wc-compiler/-/wc-compiler-0.20.0.tgz#95b971c1d03be5854cc87ae6044beb43921b4106"
-  integrity sha512-+zFMIkaPjSRFrcLXrFmHEnOJQN1QMhUPDm5Di1wyyuvY1Il/EIWauEdbQ5ZWmHlEK9X+w0ABnzsl41jR1SLmfw==
+wc-compiler@~0.21.1:
+  version "0.21.1"
+  resolved "https://registry.yarnpkg.com/wc-compiler/-/wc-compiler-0.21.1.tgz#9d4ffed52610ff36bb15d84855f0e033ef44b788"
+  integrity sha512-3dyif7N+Lohm24+ovDoWG/eLfaQiuNhV8fY4vS0ZZCHPJNX8NEoao6pfTj0280H/lEdCvlChIZGwwpMMDmRj5g==
   dependencies:
     "@projectevergreen/acorn-jsx-esm" "~0.1.0"
     acorn "^8.14.0"
     acorn-walk "^8.3.4"
     astring "^1.9.0"
     parse5 "^7.2.1"
+    signal-polyfill "^0.2.2"
     sucrase "^3.35.0"
 
 wcwidth@^1.0.0, wcwidth@^1.0.1:

@@ -90,10 +90,25 @@ export default {
 }
 ```
 
+#### Inferred Observability
+
+With this option enabled, this plugin will automatically handle the `<script>` setup needed to support [Signals based reactivity in WCC](https://www.wcc.dev/docs/#inferred-observability-signals).
+
+```javascript
+import { greenwoodPluginImportJsx } from '@greenwood/plugin-import-jsx';
+
+export default {
+  // ...
+
+  plugins: [
+    greenwoodPluginImportJsx({
+      inferredObservability: true, // default is `false`
+    })
+  ]
+}
+```
+
 ## Notes
 
 - For SSR and `prerender` use cases, [follow these steps](/docs/server-rendering/#custom-imports-experimental)
-- For client side / browser code specifically, it is recommended to use import attributes syntax, e.g.
-  ```js
-  import '../path/to/footer.jsx' with { type: 'jsx' };
-  ```
+- Read the [full WCC JSX documentation](https://wcc.dev/docs/#jsx) for all caveats and considerations
