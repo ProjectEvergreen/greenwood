@@ -106,16 +106,14 @@ async function getDevServer(compilation) {
       // when looping through and sharing responses between plugins
       const response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
         const intermediateResponse = await responsePromise;
+        // Create a single snapshot to avoid multiple clone() calls failing on exhausted bodies
+        const responseSnapshot = intermediateResponse.clone();
         if (
           plugin.shouldPreIntercept &&
-          (await plugin.shouldPreIntercept(url, request, intermediateResponse.clone()))
+          (await plugin.shouldPreIntercept(url, request, responseSnapshot.clone()))
         ) {
-          const current = await plugin.preIntercept(
-            url,
-            request,
-            await intermediateResponse.clone(),
-          );
-          const merged = mergeResponse(intermediateResponse.clone(), current);
+          const current = await plugin.preIntercept(url, request, await responseSnapshot.clone());
+          const merged = mergeResponse(responseSnapshot, current);
 
           return Promise.resolve(merged);
         } else {
@@ -152,12 +150,14 @@ async function getDevServer(compilation) {
       // when looping through and sharing responses between plugins
       const response = await resourcePlugins.reduce(async (responsePromise, plugin) => {
         const intermediateResponse = await responsePromise;
+        // Create a single "snapshot" to avoid multiple clone() calls failing on exhausted bodies
+        const responseSnapshot = intermediateResponse.clone();
         if (
           plugin.shouldIntercept &&
-          (await plugin.shouldIntercept(url, request, intermediateResponse.clone()))
+          (await plugin.shouldIntercept(url, request, responseSnapshot.clone()))
         ) {
-          const current = await plugin.intercept(url, request, await intermediateResponse.clone());
-          const merged = mergeResponse(intermediateResponse.clone(), current);
+          const current = await plugin.intercept(url, request, await responseSnapshot.clone());
+          const merged = mergeResponse(responseSnapshot, current);
 
           return Promise.resolve(merged);
         } else {
