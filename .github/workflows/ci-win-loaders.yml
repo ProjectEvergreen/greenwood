@@ -11,18 +11,19 @@ jobs:
         node: [22]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Use Node.js ${{ matrix.node }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node }}
-      - uses: pnpm/action-setup@v4
-        name: Install pnpm
-        with:
-          version: latest
+          cache: "yarn"
       - name: Installing project dependencies
         run: |
           yarn install --frozen-lockfile --network-timeout 1000000
       - name: Test
         run: |
           yarn test:loaders:win
+      - name: Test fixed
+        if: ${{ always() }}
+        run: |
+          yarn test:loaders:win2
