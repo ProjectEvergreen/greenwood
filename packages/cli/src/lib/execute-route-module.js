@@ -16,6 +16,8 @@ async function executeRouteModule({
     body: null,
     frontmatter: null,
     html: null,
+    staticPaths: null,
+    hasStaticParams: null,
   };
 
   if (prerender) {
@@ -25,7 +27,7 @@ async function executeRouteModule({
     data.html = html;
   } else {
     const module = await import(moduleUrl).then((module) => module);
-    const { body, layout, frontmatter } = contentOptions;
+    const { body, layout, frontmatter, statics } = contentOptions;
     const {
       prerender = false,
       getLayout = null,
@@ -33,6 +35,48 @@ async function executeRouteModule({
       getFrontmatter = null,
       isolation,
     } = module;
+
+    if (statics && module.getStaticPaths) {
+      data.staticPaths = await module.getStaticPaths();
+    }
+
+    if (statics && module.getStaticParams) {
+      data.hasStaticParams = true;
+    }
+
+    console.log("executeRouteModule", { params, page });
+    if (params) {
+      if (page.staticPaths) {
+        const staticPaths = page.staticPaths ?? [];
+
+        console.log({ staticPaths });
+        console.log(staticPaths[0]);
+
+        if (page.hasStaticParams) {
+          // TODO: does name have to come from the key?  I don't think it should be hardcoded here, no?
+          console.log(
+            "has static props?",
+            staticPaths.find((path) => path.params.name === params.name),
+          );
+          const initParams = {
+            ...params,
+            ...staticPaths.find((path) => path.params.name === params.name),
+          };
+          console.log({ initParams });
+
+          const staticParams = module.getStaticParams
+            ? await module.getStaticParams(initParams)
+            : {};
+
+          params = {
+            ...params,
+            ...staticParams,
+          };
+        }
+      }
+    }
+
+    console.log("final params", { params });
 
     if (body) {
       if (module.default) {
