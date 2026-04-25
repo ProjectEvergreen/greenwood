@@ -53,14 +53,17 @@ async function executeRouteModule({
         console.log(staticPaths[0]);
 
         if (page.hasStaticParams) {
-          // TODO: does name have to come from the key?  I don't think it should be hardcoded here, no?
           console.log(
             "has static props?",
-            staticPaths.find((path) => path.params.name === params.name),
+            staticPaths.find(
+              (staticPath) => staticPath.params[page.segment.key] === params[page.segment.key],
+            ),
           );
           const initParams = {
             ...params,
-            ...staticPaths.find((path) => path.params.name === params.name),
+            ...staticPaths.find(
+              (staticPath) => staticPath.params[page.segment.key] === params[page.segment.key],
+            ),
           };
           console.log({ initParams });
 
@@ -74,9 +77,8 @@ async function executeRouteModule({
           };
         }
       }
+      console.log("final params", { params });
     }
-
-    console.log("final params", { params });
 
     if (body) {
       if (module.default) {
