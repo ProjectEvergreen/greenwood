@@ -20,6 +20,7 @@
  *     blog-posts.ts
  */
 import chai from "chai";
+import fs from "node:fs/promises";
 import { JSDOM } from "jsdom";
 import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
@@ -58,6 +59,16 @@ describe("Serve Greenwood With: ", function () {
             },
           })
           .catch(reject);
+      });
+    });
+
+    describe("Build Output", function () {
+      it("should have no SSR page chunks", async function () {
+        const files = await Array.fromAsync(
+          fs.glob("*.js", { cwd: new URL("./public", import.meta.url) }),
+        );
+
+        expect(files.length).to.equal(0);
       });
     });
 
