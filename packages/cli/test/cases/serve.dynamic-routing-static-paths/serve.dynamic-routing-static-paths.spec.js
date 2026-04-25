@@ -16,6 +16,8 @@
  *   pages/
  *     blog/
  *       [slug].ts
+ *     product/
+ *       [name].js
  *   services/
  *     blog-posts.ts
  */
@@ -99,14 +101,14 @@ describe("Serve Greenwood With: ", function () {
       });
     });
 
-    xdescribe("An SSR page with a dynamic route segment with getBody", function () {
-      const name = "my-cool-product";
+    describe("An SSR page with a dynamic route segment with getBody", function () {
+      const name = "My Cool Product";
       let response;
       let dom;
       let body;
 
       before(async function () {
-        response = await fetch(`${hostname}/product/${name}/`);
+        response = await fetch(`${hostname}/product/${name.replace(/ /g, "-").toLowerCase()}/`);
         body = await response.clone().text();
         dom = new JSDOM(body);
       });
