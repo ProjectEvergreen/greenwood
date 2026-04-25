@@ -118,38 +118,89 @@ async function optimizeStaticPages(compilation, plugins) {
 
   const pages = compilation.graph.filter(
     (page) =>
-      !page.isSSR || (page.isSSR && page.prerender) || (page.isSSR && compilation.config.prerender),
+      !page.isSSR ||
+      (page.isSSR && page.prerender) ||
+      (page.isSSR && compilation.config.prerender) ||
+      page.staticPaths,
   );
 
   await asyncForEach(pages, async (page) => {
-    const { route, outputHref } = page;
-    const outputDirUrl = new URL(outputHref.replace("index.html", "").replace("404.html", ""));
-    const url = new URL(`http://localhost:${compilation.config.port}${route}`);
-    const contents = await fs.readFile(
-      new URL(`./${outputHref.replace(outputDir.href, "")}`, scratchDir),
-      "utf-8",
-    );
-    const headers = new Headers({ "Content-Type": "text/html" });
-    let response = new Response(contents, { headers });
+    const { outputHref, route, segment, staticPaths } = page;
 
-    if (!(await checkResourceExists(outputDirUrl))) {
-      await fs.mkdir(outputDirUrl, {
-        recursive: true,
-      });
-    }
+    if (staticPaths) {
+      for (const staticPath of staticPaths) {
+        console.log({ staticPath });
+        // TODO: is there a URL util for this?
+        const staticRoute = route.replace(`[${segment.key}]`, staticPath.params[segment.key]);
+        const outputDirUrl = new URL(
+          outputHref
+            .replace(`[${segment.key}]`, staticPath.params[segment.key])
+            .replace("index.html", ""),
+        );
+        const url = new URL(`http://localhost:${compilation.config.port}${route}`); // TODO: keeping placeholder route for optimization looks ups, is this right?
+        const contents = await fs.readFile(
+          new URL(
+            `./${outputHref.replace(outputDir.href, "").replace(`[${segment.key}]`, staticPath.params[segment.key])}`,
+            scratchDir,
+          ),
+          "utf-8",
+        );
+        console.log({ staticRoute, outputDirUrl, url, contents });
+        const headers = new Headers({ "Content-Type": "text/html" });
+        let response = new Response(contents, { headers });
 
-    for (const plugin of plugins) {
-      if (plugin.shouldOptimize && (await plugin.shouldOptimize(url, response.clone()))) {
-        const currentResponse = await plugin.optimize(url, response.clone());
+        if (!(await checkResourceExists(outputDirUrl))) {
+          await fs.mkdir(outputDirUrl, {
+            recursive: true,
+          });
+        }
 
-        response = mergeResponse(response.clone(), currentResponse.clone());
+        for (const plugin of plugins) {
+          if (plugin.shouldOptimize && (await plugin.shouldOptimize(url, response.clone()))) {
+            const currentResponse = await plugin.optimize(url, response.clone());
+
+            response = mergeResponse(response.clone(), currentResponse.clone());
+          }
+        }
+
+        // clean up optimization markers
+        const body = (await response.text()).replace(/data-gwd-opt=".*?[a-z]"/g, "");
+
+        await fs.writeFile(
+          new URL(outputHref.replace(`[${segment.key}]`, staticPath.params[segment.key])),
+          body,
+        );
       }
+    } else {
+      const { route, outputHref } = page;
+      const outputDirUrl = new URL(outputHref.replace("index.html", "").replace("404.html", ""));
+      const url = new URL(`http://localhost:${compilation.config.port}${route}`);
+      const contents = await fs.readFile(
+        new URL(`./${outputHref.replace(outputDir.href, "")}`, scratchDir),
+        "utf-8",
+      );
+      const headers = new Headers({ "Content-Type": "text/html" });
+      let response = new Response(contents, { headers });
+
+      if (!(await checkResourceExists(outputDirUrl))) {
+        await fs.mkdir(outputDirUrl, {
+          recursive: true,
+        });
+      }
+
+      for (const plugin of plugins) {
+        if (plugin.shouldOptimize && (await plugin.shouldOptimize(url, response.clone()))) {
+          const currentResponse = await plugin.optimize(url, response.clone());
+
+          response = mergeResponse(response.clone(), currentResponse.clone());
+        }
+      }
+
+      // clean up optimization markers
+      const body = (await response.text()).replace(/data-gwd-opt=".*?[a-z]"/g, "");
+
+      await fs.writeFile(new URL(outputHref), body);
     }
-
-    // clean up optimization markers
-    const body = (await response.text()).replace(/data-gwd-opt=".*?[a-z]"/g, "");
-
-    await fs.writeFile(new URL(outputHref), body);
   });
 }
 
@@ -280,7 +331,9 @@ async function bundleApiRoutes(compilation) {
 
 async function bundleSsrPages(compilation, optimizePlugins) {
   const { context, config } = compilation;
-  const ssrPages = compilation.graph.filter((page) => page.isSSR && !page.prerender);
+  const ssrPages = compilation.graph.filter(
+    (page) => page.isSSR && !page.prerender && !page.staticPaths,
+  );
   const ssrPrerenderPagesRouteMapper = {};
   const input = [];
 
