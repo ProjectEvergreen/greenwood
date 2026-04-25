@@ -153,6 +153,8 @@ const generateGraph = async (compilation) => {
           let prerender = true;
           let isolation = false;
           let hydration = false;
+          let staticPaths = null;
+          let hasStaticParams = false;
 
           /*
            * check if additional nested directories exist to correctly determine route (minus filename)
@@ -202,6 +204,14 @@ const generateGraph = async (compilation) => {
                   ssrFrontmatter = result.frontmatter;
                 }
 
+                if (result.staticPaths) {
+                  staticPaths = result.staticPaths;
+                }
+
+                if (result.hasStaticParams) {
+                  hasStaticParams = result.hasStaticParams;
+                }
+
                 resolve();
               });
               worker.on("error", reject);
@@ -224,6 +234,7 @@ const generateGraph = async (compilation) => {
                 request,
                 contentOptions: JSON.stringify({
                   frontmatter: true,
+                  statics: true,
                 }),
               });
             });
@@ -242,6 +253,7 @@ const generateGraph = async (compilation) => {
             delete customData[key];
           });
 
+          // TODO: document segment, staticPaths, and hasStaticParams
           /*
            * Page Properties
            *----------------------
@@ -269,6 +281,7 @@ const generateGraph = async (compilation) => {
             basePath,
           });
 
+          console.log("staticPaths???", { route, staticPaths, hasStaticParams });
           const page = {
             id: decodeURIComponent(getIdFromRelativePathPath(relativePagePath, extension)),
             label: decodeURIComponent(label),
@@ -287,9 +300,12 @@ const generateGraph = async (compilation) => {
             prerender,
             isolation,
             hydration,
-            servePage: isCustom,
+            // TODO: this "may" break some things...? validate with testing in Greenwood
+            servePage: isCustom ? isCustom : isDynamic ? "dynamic" : "static",
             segment:
               dynamicRoute.indexOf(":") > 0 ? { key: segmentKey, pathname: dynamicRoute } : null,
+            staticPaths,
+            hasStaticParams,
           };
 
           pages.push(page);
