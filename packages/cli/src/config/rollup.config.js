@@ -586,7 +586,7 @@ function greenwoodSyncImportAttributes(compilation) {
           if (externalizedResources.includes(ext)) {
             const hash = fileName.split(".")[fileName.split(".").length - 2];
 
-            if (fileName.replace(`.${hash}`, "") === asset) {
+            if (fileName.replace(`.${hash}`, "").replace(/_20/g, "%20") === asset) {
               unbundledAssetsRefMapper[asset].importers.forEach((importer, idx) => {
                 let contents = fs.readFileSync(
                   new URL(`./${importer}`, compilation.context.outputDir),
