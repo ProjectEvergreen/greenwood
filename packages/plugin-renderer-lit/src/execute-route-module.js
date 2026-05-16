@@ -1,6 +1,6 @@
-import { render } from "@lit-labs/ssr";
+import { render, LitElementRenderer } from "@lit-labs/ssr";
 import { collectResult } from "@lit-labs/ssr/lib/render-result.js";
-import { html } from "lit";
+import { html, literal, unsafeStatic } from "lit/static-html.js";
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
 
 async function executeRouteModule({
@@ -10,7 +10,9 @@ async function executeRouteModule({
   prerender,
   htmlContents,
   scripts,
+  request,
   contentOptions = {},
+  params = {},
 }) {
   const data = {
     layout: null,
@@ -48,16 +50,93 @@ async function executeRouteModule({
       data.hydration = true;
     }
 
-    if (body && getBody) {
-      const templateResult = await getBody(compilation, page, data.pageData);
+    if (body) {
+      if (module.default) {
+        // for the Lit implementation, we render the custom element programmatically
+        // and then extract the contents of the `<template>`
+        const tagName = `${page.id}-page`;
+        const tagNameLiteral = literal`${unsafeStatic(tagName)}`;
+        // since Lit does not support passing data to the `constructor` have to map params to attributes for now
+        const attributes =
+          Object.entries(params).length > 0
+            ? Object.entries(params)
+                .map(([key, value]) => `${key}="${value}"`)
+                .join(" ")
+            : "";
+        const litAttributes = literal`${unsafeStatic(attributes)}`;
+        const pageTemplate = html`<${tagNameLiteral} ${litAttributes}"></${tagNameLiteral}>`;
 
-      data.body = await collectResult(render(templateResult));
+        customElements.define(tagName, module.default);
+
+        // only enable when default export is a LitElement
+        // TODO: provide options for additional tag names from config
+        LitElementRenderer.renderOptions.push((element) =>
+          element.localName === tagName ? { connectedCallback: true } : undefined,
+        );
+
+        // TODO: support disabling SSR on a per element basis from config
+        // LitElementRenderer.renderOptions.push((element) =>
+        //   element.localName === 'my-element' ? {disableSsr: true} : undefined
+        // );
+
+        const ssrResult = render(pageTemplate);
+        const ssrContent = await collectResult(ssrResult);
+        const ssrContentsMatch =
+          /<template shadowroot="open" shadowrootmode="open">(.*.)<\/template>/s;
+
+        data.body = ssrContent.match(ssrContentsMatch)[1];
+      } else if (getBody) {
+        const templateResult = await getBody(compilation, page, request, params);
+
+        data.body = await collectResult(render(templateResult));
+      }
     }
 
-    if (layout && getLayout) {
-      const templateResult = await getLayout(compilation, page);
+    // TODO: layouts as SSR pages
+    // TODO: constructor props / dynamic routing
+    // https://github.com/ProjectEvergreen/greenwood/issues/1248
 
-      data.layout = await collectResult(render(templateResult));
+    if (layout) {
+      // support dynamic layouts that are just custom elements vs calls to getLayout
+      if (!getLayout && !data.body && !page.isSSR && module.default) {
+        // for the Lit implementation, we render the custom element programmatically
+        // and then extract the contents of the `<template>`
+        const tagName = `${page.id}-layout`;
+        const tagNameLiteral = literal`${unsafeStatic(tagName)}`;
+        // since Lit does not support passing data to the `constructor` have to map params to attributes for now
+        const attributes =
+          Object.entries(params).length > 0
+            ? Object.entries(params)
+                .map(([key, value]) => `${key}="${value}"`)
+                .join(" ")
+            : "";
+        const litAttributes = literal`${unsafeStatic(attributes)}`;
+        const layoutTemplate = html`<${tagNameLiteral} ${litAttributes}"></${tagNameLiteral}>`;
+
+        customElements.define(tagName, module.default);
+
+        // only enable when default export is a LitElement
+        // TODO: provide options for additional tag names from config
+        LitElementRenderer.renderOptions.push((element) =>
+          element.localName === tagName ? { connectedCallback: true } : undefined,
+        );
+
+        // TODO: support disabling SSR on a per element basis from config
+        // LitElementRenderer.renderOptions.push((element) =>
+        //   element.localName === 'my-element' ? {disableSsr: true} : undefined
+        // );
+
+        const ssrResult = render(layoutTemplate);
+        const ssrContent = await collectResult(ssrResult);
+        const ssrContentsMatch =
+          /<template shadowroot="open" shadowrootmode="open">(.*.)<\/template>/s;
+
+        data.layout = ssrContent.match(ssrContentsMatch)[1];
+      } else if (getLayout) {
+        const templateResult = await getLayout(compilation, page, request, params);
+
+        data.layout = await collectResult(render(templateResult));
+      }
     }
 
     if (frontmatter && getFrontmatter) {

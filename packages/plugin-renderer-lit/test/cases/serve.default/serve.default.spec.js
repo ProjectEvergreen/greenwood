@@ -26,7 +26,12 @@
  *   pages/
  *     api/
  *       search.js
+ *     artist/
+ *       [name].js
+ *     product/
+ *       [id].js
  *     artists.js
+ *     products.js
  *     users.js (isolation = false)
  *   layouts/
  *     app.html
@@ -73,41 +78,34 @@ describe("Serve Greenwood With: ", function () {
       });
     });
 
-    let artistsResponse = {};
-    let usersResponse = {};
-    let artists = [];
-    let data;
-    let dom;
-    let usersPageDom;
-    let usersPageHtml;
-    let artistsPageGraphData;
-
-    before(async function () {
-      const graph = JSON.parse(
-        await fs.promises.readFile(path.join(outputPath, "public/graph.json"), "utf-8"),
-      );
-      artists = JSON.parse(
-        await fs.promises.readFile(new URL("./artists.json", import.meta.url), "utf-8"),
-      );
-
-      artistsPageGraphData = graph.filter((page) => page.route === "/artists/")[0];
-
-      artistsResponse = await fetch(`${hostname}/artists/`);
-      data = await artistsResponse.text();
-      dom = new JSDOM(data);
-
-      usersResponse = await fetch(`${hostname}/users/`);
-      usersPageHtml = await usersResponse.text();
-      usersPageDom = new JSDOM(usersPageHtml);
-    });
-
     describe("Serve command with HTML route response using getBody, getLayout and getFrontmatter for the artists page", function () {
+      let response = {};
+      let data;
+      let dom;
+      let artists = [];
+      let artistsPageGraphData;
+
+      before(async function () {
+        const graph = JSON.parse(
+          await fs.promises.readFile(path.join(outputPath, "public/graph.json"), "utf-8"),
+        );
+        artists = JSON.parse(
+          await fs.promises.readFile(new URL("./artists.json", import.meta.url), "utf-8"),
+        );
+
+        artistsPageGraphData = graph.filter((page) => page.route === "/artists/")[0];
+
+        response = await fetch(`${hostname}/artists/`);
+        data = await response.text();
+        dom = new JSDOM(data);
+      });
+
       it("should return a 200 status", function () {
-        expect(artistsResponse.status).to.equal(200);
+        expect(response.status).to.equal(200);
       });
 
       it("should return the correct content type", function () {
-        expect(artistsResponse.headers.get("content-type")).to.equal("text/html");
+        expect(response.headers.get("content-type")).to.equal("text/html");
       });
 
       it("should return a response body", function () {
@@ -185,7 +183,21 @@ describe("Serve Greenwood With: ", function () {
       });
     });
 
-    describe("Serve command with HTML route response using LitElement as a getPage export with an <app-footer> component for the users page", function () {
+    describe("Serve command with HTML route response using LitElement as a getBody export with an <app-footer> component for the users page", function () {
+      let usersResponse = {};
+      let usersPageDom;
+      let usersPageHtml;
+      let users = [];
+
+      before(async function () {
+        users = JSON.parse(
+          await fs.promises.readFile(new URL("./artists.json", import.meta.url), "utf-8"),
+        );
+        usersResponse = await fetch(`${hostname}/users/`);
+        usersPageHtml = await usersResponse.text();
+        usersPageDom = new JSDOM(usersPageHtml);
+      });
+
       it("the response body should be valid HTML from JSDOM", function (done) {
         expect(usersPageDom).to.not.be.undefined;
         done();
@@ -197,7 +209,7 @@ describe("Serve Greenwood With: ", function () {
 
       it("should have the expected users length text in the <body>", function () {
         expect(usersPageHtml).to.contain(
-          `<div id="users"><!--lit-part-->${artists.length}<!--/lit-part--></div>`,
+          `<div id="users"><!--lit-part-->${users.length}<!--/lit-part--></div>`,
         );
       });
 
@@ -208,6 +220,179 @@ describe("Serve Greenwood With: ", function () {
       it("should have the expected lit hydration script in the <head>", function () {
         const scripts = Array.from(
           usersPageDom.window.document.querySelectorAll("head script"),
+        ).filter(
+          (script) =>
+            !script.getAttribute("src") &&
+            script.textContent?.indexOf("globalThis.litElementHydrateSupport") >= 0,
+        );
+
+        expect(scripts.length).to.equal(1);
+      });
+    });
+
+    describe("Serve command with HTML route response using LitElement with custom element definition as a layout", function () {
+      let albumResponse = {};
+      let albumPageDom;
+      let albumPageHtml;
+
+      before(async function () {
+        albumResponse = await fetch(`${hostname}/album/foo/`);
+        albumPageHtml = await albumResponse.text();
+        albumPageDom = new JSDOM(albumPageHtml);
+      });
+
+      it("the response body should be valid HTML from JSDOM", function (done) {
+        expect(albumPageDom).to.not.be.undefined;
+        done();
+      });
+
+      it("should have the expected <h1> text in the <body>", function () {
+        const heading = albumPageDom.window.document.querySelectorAll("h1");
+
+        expect(heading.length).to.equal(1);
+        expect(heading[0].textContent).to.equal("Album Page");
+      });
+
+      it("should have the expected <h2> title text in the <body>", function () {
+        const heading = albumPageDom.window.document.querySelectorAll("h2");
+
+        expect(heading.length).to.equal(1);
+        expect(heading[0].textContent).to.equal("Foo Artist");
+      });
+
+      it("should have the expected <ul> items from layout connected callback", function () {
+        const list = albumPageDom.window.document.querySelectorAll("ul li");
+
+        expect(list.length).to.equal(2);
+        expect(list[0].textContent).to.equal("1) Foo");
+        expect(list[1].textContent).to.equal("2) Bar");
+      });
+    });
+
+    describe("Serve command with HTML route response using LitElement as a default export for the products page", function () {
+      let productsResponse = {};
+      let productsPageDom;
+      let productsPageHtml;
+
+      before(async function () {
+        productsResponse = await fetch(`${hostname}/products/`);
+        productsPageHtml = await productsResponse.text();
+        productsPageDom = new JSDOM(productsPageHtml);
+      });
+
+      it("the response body should be valid HTML from JSDOM", function (done) {
+        expect(productsPageDom).to.not.be.undefined;
+        done();
+      });
+
+      it("should have the expected <h1> text in the <body>", function () {
+        const heading = productsPageDom.window.document.querySelectorAll("h1");
+
+        expect(heading.length).to.equal(1);
+        expect(heading[0].textContent).to.equal("Products Page");
+      });
+
+      it("should have the expected products list output", function () {
+        const productsList = productsPageDom.window.document.querySelectorAll("ul li");
+
+        expect(productsList.length).to.equal(2);
+        expect(productsList[0].textContent).to.equal("1) Product 1");
+        expect(productsList[1].textContent).to.equal("2) Product 2");
+      });
+
+      it("should have the expected lit hydration script in the <head>", function () {
+        const scripts = Array.from(
+          productsPageDom.window.document.querySelectorAll("head script"),
+        ).filter(
+          (script) =>
+            !script.getAttribute("src") &&
+            script.textContent?.indexOf("globalThis.litElementHydrateSupport") >= 0,
+        );
+
+        expect(scripts.length).to.equal(1);
+      });
+    });
+
+    describe("Serve command with HTML route response using LitElement as a default export for a dynamic route with params", function () {
+      const productId = 1;
+      let productDetailsResponse = {};
+      let productDetailsPageDom;
+      let productDetailsPageHtml;
+
+      before(async function () {
+        productDetailsResponse = await fetch(`${hostname}/product/${productId}/`);
+        productDetailsPageHtml = await productDetailsResponse.text();
+        productDetailsPageDom = new JSDOM(productDetailsPageHtml);
+      });
+
+      it("the response body should be valid HTML from JSDOM", function (done) {
+        expect(productDetailsPageDom).to.not.be.undefined;
+        done();
+      });
+
+      it("should have the expected heading text in the <body>", function () {
+        const heading = productDetailsPageDom.window.document.querySelectorAll("h1");
+
+        expect(heading.length).to.equal(1);
+        expect(heading[0].textContent).to.equal("Product Details Page");
+      });
+
+      it("should have the expected product id text in the <body>", function () {
+        const paragraph = productDetailsPageDom.window.document.querySelectorAll("p");
+
+        expect(paragraph.length).to.equal(1);
+        expect(paragraph[0].textContent).to.equal(`Product ID: ${productId}`);
+      });
+
+      it("should have the expected lit hydration script in the <head>", function () {
+        const scripts = Array.from(
+          productDetailsPageDom.window.document.querySelectorAll("head script"),
+        ).filter(
+          (script) =>
+            !script.getAttribute("src") &&
+            script.textContent?.indexOf("globalThis.litElementHydrateSupport") >= 0,
+        );
+
+        expect(scripts.length).to.equal(1);
+      });
+    });
+
+    describe("Serve command with HTML route response using getBody a dynamic route with params", function () {
+      const artistName = "Analog";
+      let artistDetailsResponse = {};
+      let artistDetailsPageDom;
+      let artistDetailsPageHtml;
+
+      before(async function () {
+        artistDetailsResponse = await fetch(`${hostname}/artist/${artistName.toLowerCase()}/`);
+        artistDetailsPageHtml = await artistDetailsResponse.text();
+        artistDetailsPageDom = new JSDOM(artistDetailsPageHtml);
+      });
+
+      it("the response body should be valid HTML from JSDOM", function (done) {
+        expect(artistDetailsPageDom).to.not.be.undefined;
+        done();
+      });
+
+      it("should have the expected heading text in the <body>", function () {
+        const heading = artistDetailsPageDom.window.document.querySelectorAll("h1");
+
+        expect(heading.length).to.equal(1);
+        expect(heading[0].textContent).to.equal(artistName);
+      });
+
+      it("should have the expected artist image tag in the <body>", function () {
+        const img = artistDetailsPageDom.window.document.querySelectorAll("img");
+
+        expect(img.length).to.equal(1);
+        expect(img[0].getAttribute("src").endsWith(`${artistName.toLowerCase()}.jpg`)).to.equal(
+          true,
+        );
+      });
+
+      it("should have the expected lit hydration script in the <head>", function () {
+        const scripts = Array.from(
+          artistDetailsPageDom.window.document.querySelectorAll("head script"),
         ).filter(
           (script) =>
             !script.getAttribute("src") &&
@@ -257,7 +442,7 @@ describe("Serve Greenwood With: ", function () {
         const cardDom = new JSDOM(cards[0].innerHTML);
 
         expect(cards.length).to.equal(1);
-        // TODO this should be real data (see issue with static in card.js)
+        // TODO this should be using real data from attributes (see issue with static in card.js)
         expect(cardDom.window.document.querySelectorAll("h3")[0].textContent).to.equal("Foo");
         expect(cardDom.window.document.querySelectorAll("img")[0].getAttribute("src")).to.equal(
           "bar.png",
