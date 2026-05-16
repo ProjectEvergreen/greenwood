@@ -3003,36 +3003,20 @@
     lit "^3.1.2"
     lit-html "^3.1.2"
 
-"@lit-labs/ssr-dom-shim@^1.0.0", "@lit-labs/ssr-dom-shim@^1.1.0", "@lit-labs/ssr-dom-shim@^1.2.0":
-  version "1.2.1"
-  resolved "https://registry.npmjs.org/@lit-labs/ssr-dom-shim/-/ssr-dom-shim-1.2.1.tgz"
-  integrity sha512-wx4aBmgeGvFmOKucFKY+8VFJSYZxs9poN3SDNQFF6lT6NrQUnHiPB2PWz2sc4ieEcAaYYzN+1uWahEeTq2aRIQ==
+"@lit-labs/ssr-dom-shim@^1.0.0", "@lit-labs/ssr-dom-shim@^1.1.0", "@lit-labs/ssr-dom-shim@^1.1.2", "@lit-labs/ssr-dom-shim@^1.2.0", "@lit-labs/ssr-dom-shim@^1.4.0", "@lit-labs/ssr-dom-shim@^1.5.0", "@lit-labs/ssr-dom-shim@^1.6.0":
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/@lit-labs/ssr-dom-shim/-/ssr-dom-shim-1.6.0.tgz#693e129b809741fd23e98fcb57e41fd3d082db1a"
+  integrity sha512-VHb0ALPMTlgKjM6yIxxoQNnpKyUKLD04VzeQdsiXkMqkvYlAHxq9glGLmgbb889/1GsohSOAjvQYoiBppXFqrQ==
 
-"@lit-labs/ssr-dom-shim@^1.1.2":
-  version "1.1.2"
-  resolved "https://registry.npmjs.org/@lit-labs/ssr-dom-shim/-/ssr-dom-shim-1.1.2.tgz"
-  integrity sha512-jnOD+/+dSrfTWYfSXBXlo5l5f0q1UuJo3tkbMDCYA2lKUYq79jaxqtGEvnRoh049nt1vdo1+45RinipU6FGY2g==
-
-"@lit-labs/ssr-dom-shim@^1.3.0", "@lit-labs/ssr-dom-shim@^1.5.0":
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/@lit-labs/ssr-dom-shim/-/ssr-dom-shim-1.5.1.tgz#3166900c0d481f03d6d4133686e0febf760d521d"
-  integrity sha512-Aou5UdlSpr5whQe8AA/bZG0jMj96CoJIWbGfZ91qieWu5AWUMKw8VR/pAkQkJYvBNhmCcWnZlyyk5oze8JIqYA==
-
-"@lit-labs/ssr-dom-shim@^1.4.0":
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/@lit-labs/ssr-dom-shim/-/ssr-dom-shim-1.4.0.tgz#55eb80ab5ef6e188f7e541c1e2bea1ef582413b8"
-  integrity sha512-ficsEARKnmmW5njugNYKipTm4SFnbik7CXtoencDZzmzo/dQ+2Q0bgkzJuoJP20Aj0F+izzJjOqsnkd6F/o1bw==
-
-"@lit-labs/ssr@^3.3.0":
-  version "3.3.1"
-  resolved "https://registry.yarnpkg.com/@lit-labs/ssr/-/ssr-3.3.1.tgz#39bcb47b0343442b7201231d6cf25b37a0e97c42"
-  integrity sha512-JlF1PempxvzrGEpRFrF+Ki0MHzR3HA51SK8Zv0cFpW9p0bPW4k0FeCwrElCu371UEpXF7RcaE2wgYaE1az0XKg==
+"@lit-labs/ssr@^4.1.0":
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/@lit-labs/ssr/-/ssr-4.1.0.tgz#529e6c6d50ed049e3c3bc6d348472bd279d02b15"
+  integrity sha512-m0zymVVlHB1ddJQ1lastsV8ROW3whFOiHJhVPQWd04MnGTkTlUUVLQctux1QlyD9BtLXNN6iASxv388vhgKMFg==
   dependencies:
     "@lit-labs/ssr-client" "^1.1.7"
-    "@lit-labs/ssr-dom-shim" "^1.3.0"
+    "@lit-labs/ssr-dom-shim" "^1.6.0"
     "@lit/reactive-element" "^2.0.4"
     "@parse5/tools" "^0.3.0"
-    "@types/node" "^16.0.0"
     enhanced-resolve "^5.10.0"
     lit "^3.1.2"
     lit-element "^4.0.4"
@@ -5997,11 +5981,6 @@
   version "20.4.8"
   resolved "https://registry.npmjs.org/@types/node/-/node-20.4.8.tgz"
   integrity sha512-0mHckf6D2DiIAzh8fM8f3HQCvMKDpK94YQ0DSVkfWTG9BZleYIWudw9cJxX8oCk9bM+vAkDyujDV6dmKHbvQpg==
-
-"@types/node@^16.0.0":
-  version "16.18.76"
-  resolved "https://registry.npmjs.org/@types/node/-/node-16.18.76.tgz"
-  integrity sha512-/GsO2uv1Z6R42lBr59dtem56gVF/yHKQaScggwU+gLU6DXE25sDmOar4c4IfWb3h+X/7OYZznPOFk7oGF3jQSA==
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.0"

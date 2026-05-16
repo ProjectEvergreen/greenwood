@@ -5,9 +5,6 @@ import { html } from "lit";
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
 import "../../components/card.js";
 
-// TODO: need to confirm if this is needed in the new implementation of connectedCallback
-export const isolation = true;
-
 export async function handler(request) {
   const artists = JSON.parse(
     fs.readFileSync(new URL("../../../artists.json", import.meta.url), "utf-8"),

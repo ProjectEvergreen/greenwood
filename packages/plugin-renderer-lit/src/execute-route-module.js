@@ -1,4 +1,4 @@
-import { render } from "@lit-labs/ssr";
+import { render, LitElementRenderer } from "@lit-labs/ssr";
 import { collectResult } from "@lit-labs/ssr/lib/render-result.js";
 import { html, literal, unsafeStatic } from "lit/static-html.js";
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
@@ -52,9 +52,6 @@ async function executeRouteModule({
 
     if (body) {
       if (module.default) {
-        // only enable when default export is a LitElement
-        globalThis.litSsrCallConnectedCallback = true;
-
         // for the Lit implementation, we render the custom element programmatically
         // and then extract the contents of the `<template>`
         const tagName = `${page.id}-page`;
@@ -70,6 +67,17 @@ async function executeRouteModule({
         const pageTemplate = html`<${tagNameLiteral} ${litAttributes}"></${tagNameLiteral}>`;
 
         customElements.define(tagName, module.default);
+
+        // only enable when default export is a LitElement
+        // TODO: provide options for additional tag names from config
+        LitElementRenderer.renderOptions.push((element) =>
+          element.localName === tagName ? { connectedCallback: true } : undefined,
+        );
+
+        // TODO: support disabling SSR on a per element basis from config
+        // LitElementRenderer.renderOptions.push((element) =>
+        //   element.localName === 'my-element' ? {disableSsr: true} : undefined
+        // );
 
         const ssrResult = render(pageTemplate);
         const ssrContent = await collectResult(ssrResult);
