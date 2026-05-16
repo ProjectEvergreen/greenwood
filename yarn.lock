@@ -3003,18 +3003,18 @@
     lit "^3.1.2"
     lit-html "^3.1.2"
 
-"@lit-labs/ssr-dom-shim@^1.0.0", "@lit-labs/ssr-dom-shim@^1.1.0", "@lit-labs/ssr-dom-shim@^1.1.2", "@lit-labs/ssr-dom-shim@^1.2.0", "@lit-labs/ssr-dom-shim@^1.4.0", "@lit-labs/ssr-dom-shim@^1.5.0", "@lit-labs/ssr-dom-shim@^1.5.1":
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/@lit-labs/ssr-dom-shim/-/ssr-dom-shim-1.5.1.tgz#3166900c0d481f03d6d4133686e0febf760d521d"
-  integrity sha512-Aou5UdlSpr5whQe8AA/bZG0jMj96CoJIWbGfZ91qieWu5AWUMKw8VR/pAkQkJYvBNhmCcWnZlyyk5oze8JIqYA==
+"@lit-labs/ssr-dom-shim@^1.0.0", "@lit-labs/ssr-dom-shim@^1.1.0", "@lit-labs/ssr-dom-shim@^1.1.2", "@lit-labs/ssr-dom-shim@^1.2.0", "@lit-labs/ssr-dom-shim@^1.4.0", "@lit-labs/ssr-dom-shim@^1.5.0", "@lit-labs/ssr-dom-shim@^1.6.0":
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/@lit-labs/ssr-dom-shim/-/ssr-dom-shim-1.6.0.tgz#693e129b809741fd23e98fcb57e41fd3d082db1a"
+  integrity sha512-VHb0ALPMTlgKjM6yIxxoQNnpKyUKLD04VzeQdsiXkMqkvYlAHxq9glGLmgbb889/1GsohSOAjvQYoiBppXFqrQ==
 
-"@lit-labs/ssr@^4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@lit-labs/ssr/-/ssr-4.0.0.tgz#1fa8a933c2ab64361f3583f32711fedc150a8394"
-  integrity sha512-pODr+t7cZVIrCRLuSLuWAACDnztEk5IrRFwFsbxyAyWcP2XP8aKuUZdVM/biXqxvIyHyCKtNZ92Gdcr+pjA5BQ==
+"@lit-labs/ssr@^4.1.0":
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/@lit-labs/ssr/-/ssr-4.1.0.tgz#529e6c6d50ed049e3c3bc6d348472bd279d02b15"
+  integrity sha512-m0zymVVlHB1ddJQ1lastsV8ROW3whFOiHJhVPQWd04MnGTkTlUUVLQctux1QlyD9BtLXNN6iASxv388vhgKMFg==
   dependencies:
     "@lit-labs/ssr-client" "^1.1.7"
-    "@lit-labs/ssr-dom-shim" "^1.5.0"
+    "@lit-labs/ssr-dom-shim" "^1.6.0"
     "@lit/reactive-element" "^2.0.4"
     "@parse5/tools" "^0.3.0"
     enhanced-resolve "^5.10.0"

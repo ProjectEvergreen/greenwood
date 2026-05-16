@@ -13,7 +13,7 @@
     ]
   },
   "resolutions": {
-    "@lit-labs/ssr-dom-shim": "^1.5.1"
+    "@lit-labs/ssr-dom-shim": "^1.6.0"
   },
   "scripts": {
     "lerna": "lerna",
