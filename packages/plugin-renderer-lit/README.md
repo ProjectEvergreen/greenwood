@@ -77,7 +77,7 @@ import type { LitRendererPlugin } from '@greenwood/plugin-renderer-lit';
 1. Be aware of the known [caveats](https://lit.dev/docs/ssr/overview/#library-status) as called out in the Lit SSR docs, such as:
     - Lit SSR [**only** renders into declarative shadow roots](https://github.com/lit/lit/issues/3080#issuecomment-1165158794), so you will have to keep browser support (and polyfill usage) in mind.
     - At this time, `LitElement` does not support `async` work (e.g. for `connectedCallback`).  You can follow along with [this issue](https://github.com/lit/lit/issues/2469) and [this issue](https://github.com/lit/lit/issues/4866) from the Lit repo.
-    - What can be controlled through `connectedCallback` support [may be limited when dealing with third party dependencies](https://github.com/lit/lit/issues/5175)
+1. For constructor props support, you will have to [map attributes to properties](https://greenwoodjs.dev/docs/plugins/lit-ssr/#usage)
 1. Lit does not support [`CSSStyleSheet` (aka CSS Modules) in their SSR DOM shim](https://github.com/lit/lit/issues/4862).  As an alternative, you may consider using Greenwood's [**Raw adapter**](https://greenwoodjs.dev/docs/plugins/raw/) to inline CSS in `<style>` tags into your custom elements.
 1. Full hydration support is not available yet.  See [this Greenwood issue](https://github.com/ProjectEvergreen/greenwood/issues/880) to follow along with when it will land.
 
