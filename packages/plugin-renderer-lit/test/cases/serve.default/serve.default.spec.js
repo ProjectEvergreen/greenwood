@@ -230,6 +230,45 @@ describe("Serve Greenwood With: ", function () {
       });
     });
 
+    describe("Serve command with HTML route response using LitElement with custom element definition as a layout", function () {
+      let albumResponse = {};
+      let albumPageDom;
+      let albumPageHtml;
+
+      before(async function () {
+        albumResponse = await fetch(`${hostname}/album/foo/`);
+        albumPageHtml = await albumResponse.text();
+        albumPageDom = new JSDOM(albumPageHtml);
+      });
+
+      it("the response body should be valid HTML from JSDOM", function (done) {
+        expect(albumPageDom).to.not.be.undefined;
+        done();
+      });
+
+      it("should have the expected <h1> text in the <body>", function () {
+        const heading = albumPageDom.window.document.querySelectorAll("h1");
+
+        expect(heading.length).to.equal(1);
+        expect(heading[0].textContent).to.equal("Album Page");
+      });
+
+      it("should have the expected <h2> title text in the <body>", function () {
+        const heading = albumPageDom.window.document.querySelectorAll("h2");
+
+        expect(heading.length).to.equal(1);
+        expect(heading[0].textContent).to.equal("Foo Artist");
+      });
+
+      it("should have the expected <ul> items from layout connected callback", function () {
+        const list = albumPageDom.window.document.querySelectorAll("ul li");
+
+        expect(list.length).to.equal(2);
+        expect(list[0].textContent).to.equal("1) Foo");
+        expect(list[1].textContent).to.equal("2) Bar");
+      });
+    });
+
     describe("Serve command with HTML route response using LitElement as a default export for the products page", function () {
       let productsResponse = {};
       let productsPageDom;

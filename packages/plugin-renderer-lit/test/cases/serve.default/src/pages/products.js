@@ -1,6 +1,5 @@
 import { LitElement, html } from "lit";
 
-// TODO: constructor props
 export default class ProductsPage extends LitElement {
   // TODO: async connectedCallback - https://github.com/lit/lit/issues/2469#issuecomment-1759583861
   connectedCallback() {
