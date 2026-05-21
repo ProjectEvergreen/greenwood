@@ -18,12 +18,15 @@
  *   pages/
  *     index.html
  *   scripts/
- *     index.js
+ *     loaders.js
+ *     other loader.js
+ *   styles/
+ *    my styles.css
  */
 import chai from "chai";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { getOutputTeardownFiles, getDependencyFiles } from "../../../../../test/utils.js";
+import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
 
@@ -31,7 +34,7 @@ const expect = chai.expect;
 
 // https://github.com/ProjectEvergreen/greenwood/issues/1679
 describe("Build Greenwood With: ", function () {
-  const LABEL = "Default Greenwood Configuration and Workspace";
+  const LABEL = "Default Greenwood Configuration and Workspace with spaces in filenames";
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
   const hostname = "http://localhost:8181";
@@ -46,20 +49,29 @@ describe("Build Greenwood With: ", function () {
 
   describe(LABEL, function () {
     before(async function () {
-      const monacoThemesPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/monaco-themes/package.json`,
-        `${outputPath}/node_modules/monaco-themes/`,
-      );
-      const monacoThemes = await getDependencyFiles(
-        `${process.cwd()}/node_modules/monaco-themes/themes/*`,
-        `${outputPath}/node_modules/monaco-themes/themes/`,
-      );
-
-      await runner.setup(outputPath, [...monacoThemesPackageJson, ...monacoThemes]);
+      await runner.setup(outputPath);
       await runner.runCommand(cliPath, "build");
     });
 
-    it("should have the correct filename in the bundled output", async function () {
+    it("should have the correct filename in the output HTML for a script tag", async function () {
+      const files = await Array.fromAsync(
+        fs.glob("other*.*.js", { cwd: new URL("./public/", import.meta.url) }),
+      );
+      const html = await fs.readFile(new URL("./public/index.html", import.meta.url), "utf-8");
+
+      expect(html).to.include(`/${files[0]}`);
+    });
+
+    it("should have the correct filename in the output HTML for a style tag", async function () {
+      const files = await Array.fromAsync(
+        fs.glob("my styles.*.css", { cwd: new URL("./public/styles/", import.meta.url) }),
+      );
+      const html = await fs.readFile(new URL("./public/index.html", import.meta.url), "utf-8");
+
+      expect(html).to.include(`/${files[0]}`);
+    });
+
+    it("should have the correct filename in the bundled output for an import attribute", async function () {
       const files = await Array.fromAsync(
         fs.glob("loader.*.js", { cwd: new URL("./public", import.meta.url) }),
       );

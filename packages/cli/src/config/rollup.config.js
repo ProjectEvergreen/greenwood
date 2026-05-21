@@ -136,7 +136,8 @@ function greenwoodSyncPageResourceBundlesPlugin(compilation) {
         for (const bundle in bundles) {
           const facadeModuleId = (bundles[bundle].facadeModuleId || "").replace(/\\/g, "/");
 
-          if (resourceKey === facadeModuleId) {
+          // handle spaces in filenames when syncing bundles back to resources
+          if (resourceKey.replace(/%20/g, " ") === facadeModuleId) {
             const { fileName } = bundles[bundle];
             const { contents } = resource;
             const outputPath = new URL(`./${fileName}`, outputDir);
@@ -662,7 +663,7 @@ const getRollupConfigForBrowserScripts = async (compilation) => {
   const { outputDir } = compilation.context;
   const input = [...compilation.resources.values()]
     .filter((resource) => resource.type === "script")
-    .map((resource) => normalizePathnameForWindows(resource.sourcePathURL));
+    .map((resource) => normalizePathnameForWindows(resource.sourcePathURL).replace(/%20/g, " "));
   const customRollupPlugins = compilation.config.plugins
     .filter((plugin) => {
       return plugin.type === "rollup";
