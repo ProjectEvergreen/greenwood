@@ -586,6 +586,7 @@ function greenwoodSyncImportAttributes(compilation) {
           if (externalizedResources.includes(ext)) {
             const hash = fileName.split(".")[fileName.split(".").length - 2];
 
+            // https://github.com/ProjectEvergreen/greenwood/issues/1679
             if (fileName.replace(`.${hash}`, "").replace(/_20/g, "%20") === asset) {
               unbundledAssetsRefMapper[asset].importers.forEach((importer, idx) => {
                 let contents = fs.readFileSync(
