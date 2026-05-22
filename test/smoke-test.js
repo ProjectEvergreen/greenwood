@@ -6,15 +6,13 @@
  * There are a number of examples in the CLI package you can use as a reference.
  *
  */
-import chai from "chai";
+import { expect } from "chai";
 import fs from "node:fs";
 import glob from "glob-promise";
 import http from "node:http";
 import { JSDOM } from "jsdom";
 import path from "node:path";
 import { tagsMatch } from "./utils.js";
-
-const expect = chai.expect;
 
 function commonIndexSpecs(dom, html, label) {
   describe(`Running Common Index Smoke Tests for ${label}`, function () {

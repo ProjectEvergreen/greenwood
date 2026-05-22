@@ -29,14 +29,12 @@
  *   styles/
  *     some.css
  */
-import chai from "chai";
+import { expect } from "chai";
 import { JSDOM } from "jsdom";
 import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
-
-const expect = chai.expect;
 
 xdescribe("Serve Greenwood With: ", function () {
   const LABEL = "A Server Rendered Application (SSR) with API Routes importing CSS";

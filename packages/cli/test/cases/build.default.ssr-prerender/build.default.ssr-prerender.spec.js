@@ -26,15 +26,13 @@
  *   layouts/
  *     app.html
  */
-import chai from "chai";
+import { expect } from "chai";
 import { JSDOM } from "jsdom";
 import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
-
-const expect = chai.expect;
 
 // contains test cases for these bugs
 // https://github.com/ProjectEvergreen/greenwood/issues/1044

@@ -1,8 +1,6 @@
-import chai from "chai";
+import { expect } from "chai";
 import { getQueryHash } from "../../src/core/common.js";
 import { HASH_REGEX } from "../../../../test/utils.js";
-
-const expect = chai.expect;
 
 describe("Unit Test: Data", function () {
   describe("Common", function () {

@@ -1,8 +1,6 @@
-import chai from "chai";
+import { expect } from "chai";
 import { graphResolvers } from "../../../src/schema/graph.js";
 import { MOCK_GRAPH } from "../mocks/graph.js";
-
-const expect = chai.expect;
 
 xdescribe("Unit Test: Data", function () {
   describe("Schema", function () {

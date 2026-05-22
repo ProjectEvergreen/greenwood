@@ -30,14 +30,12 @@
  *       greeting.ts
  *     index.html
  */
-import chai from "chai";
+import { expect } from "chai";
 import { JSDOM } from "jsdom";
 import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
-
-const expect = chai.expect;
 
 describe("Serve Greenwood With: ", function () {
   const LABEL =

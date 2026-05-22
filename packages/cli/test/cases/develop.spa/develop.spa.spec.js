@@ -17,13 +17,11 @@
  *   main.css
  *
  */
-import chai from "chai";
+import { expect } from "chai";
 import fs from "node:fs";
 import path from "node:path";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
-
-const expect = chai.expect;
 
 function removeWhiteSpace(string = "") {
   return string.replace(/\n/g, "").replace(/ /g, "");

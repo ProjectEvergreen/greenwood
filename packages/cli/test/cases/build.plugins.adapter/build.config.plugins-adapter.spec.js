@@ -35,15 +35,13 @@
  *     about.js
  *     index.js
  */
-import chai from "chai";
+import { expect } from "chai";
 import glob from "glob-promise";
 import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { JSDOM } from "jsdom";
-
-const expect = chai.expect;
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Generic Adapter Plugin with SSR Pages + API Routes";

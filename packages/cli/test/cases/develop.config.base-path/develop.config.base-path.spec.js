@@ -33,13 +33,11 @@
  *     main.css
  * package.json
  */
-import chai from "chai";
+import { expect } from "chai";
 import { JSDOM } from "jsdom";
 import path from "node:path";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
-
-const expect = chai.expect;
 
 describe("Develop Greenwood With: ", function () {
   const LABEL = "Base Path Configuration";

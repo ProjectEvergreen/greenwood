@@ -18,7 +18,7 @@
  *       index.html
  *     index.html
  */
-import chai from "chai";
+import { expect } from "chai";
 import fs from "node:fs";
 import { JSDOM } from "jsdom";
 import path from "node:path";
@@ -26,7 +26,6 @@ import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
 
-const expect = chai.expect;
 const packageJson = JSON.parse(
   await fs.promises.readFile(new URL("./package.json", import.meta.url), "utf-8"),
 );

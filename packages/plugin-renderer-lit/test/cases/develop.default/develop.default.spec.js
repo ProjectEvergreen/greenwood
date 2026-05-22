@@ -22,14 +22,12 @@
  *   pages/
  *     index.js
  */
-import chai from "chai";
+import { expect } from "chai";
 import { JSDOM } from "jsdom";
 import path from "node:path";
 import { getDependencyFiles, getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
-
-const expect = chai.expect;
 
 describe("Develop Greenwood With: ", function () {
   const LABEL = "Lit Renderer";

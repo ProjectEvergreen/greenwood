@@ -36,7 +36,7 @@
  *       demo.html
  *     index.html
  */
-import chai from "chai";
+import { expect } from "chai";
 import fs from "node:fs";
 import glob from "glob-promise";
 import { JSDOM } from "jsdom";
@@ -45,8 +45,6 @@ import { getOutputTeardownFiles, HASH_REGEX } from "../../../../../test/utils.js
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
-
-const expect = chai.expect;
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Default Greenwood Configuration and Workspace with Frontmatter Imports";

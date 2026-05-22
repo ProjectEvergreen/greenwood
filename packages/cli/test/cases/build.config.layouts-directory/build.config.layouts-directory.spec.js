@@ -24,13 +24,11 @@
 import fs from "node:fs";
 import { JSDOM } from "jsdom";
 import path from "node:path";
-import chai from "chai";
+import { expect } from "chai";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
-
-const expect = chai.expect;
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Custom Layouts Directory from Configuration";

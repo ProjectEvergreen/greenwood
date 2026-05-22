@@ -11,13 +11,11 @@
  * User Workspace
  * N / A
  */
-import chai from "chai";
+import { expect } from "chai";
 import fs from "node:fs";
 import path from "node:path";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
-
-const expect = chai.expect;
 
 describe("Initialize a new Greenwood project: ", function () {
   const APP_NAME = "my-app";
