@@ -21,14 +21,12 @@
  *   services/
  *     blog-posts.ts
  */
-import chai from "chai";
+import { expect } from "chai";
 import { JSDOM } from "jsdom";
 import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
-
-const expect = chai.expect;
 
 describe("Develop Greenwood With: ", function () {
   const LABEL = "Dynamic Routing for Get Static Paths and Get Static Params";
