@@ -23,14 +23,12 @@
  *   styles/
  *    my styles.css
  */
-import chai from "chai";
+import { expect } from "chai";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
-
-const expect = chai.expect;
 
 // https://github.com/ProjectEvergreen/greenwood/issues/1679
 describe("Build Greenwood With: ", function () {
