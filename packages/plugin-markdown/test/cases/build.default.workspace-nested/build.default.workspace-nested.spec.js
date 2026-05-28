@@ -44,15 +44,13 @@
  *   index.md
  *   404.html
  */
-import chai from "chai";
+import { expect } from "chai";
 import fs from "node:fs";
 import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
-
-const expect = chai.expect;
 
 function generatePageHref(pagePath) {
   return new URL(`./src/pages/${pagePath}`, import.meta.url).href;

@@ -26,7 +26,7 @@
  *     blog/
  *       [slug].ts
  */
-import chai from "chai";
+import { expect } from "chai";
 import fs from "node:fs/promises";
 import { JSDOM } from "jsdom";
 import path from "node:path";
@@ -35,8 +35,6 @@ import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
 import { normalizePathnameForWindows } from "../../../../cli/src/lib/resource-utils.js";
 import extract from "extract-zip";
-
-const expect = chai.expect;
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Netlify Adapter plugin output";

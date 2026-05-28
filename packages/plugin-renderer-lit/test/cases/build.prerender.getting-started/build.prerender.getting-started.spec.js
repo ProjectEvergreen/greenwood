@@ -38,15 +38,13 @@
  *     app.html
  *     blog.html
  */
-import chai from "chai";
+import { expect } from "chai";
 import { JSDOM } from "jsdom";
 import path from "node:path";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
-
-const expect = chai.expect;
 
 describe("Build Greenwood With Custom Lit Renderer for SSG prerendering: ", function () {
   const LABEL = "For SSG prerendering of Getting Started example";

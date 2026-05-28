@@ -42,7 +42,7 @@
  *     artists.js
  *     greeting.js
  */
-import chai from "chai";
+import { expect } from "chai";
 import fs from "node:fs/promises";
 import glob from "glob-promise";
 import { JSDOM } from "jsdom";
@@ -54,8 +54,6 @@ import {
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
-
-const expect = chai.expect;
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Vercel Adapter plugin output";

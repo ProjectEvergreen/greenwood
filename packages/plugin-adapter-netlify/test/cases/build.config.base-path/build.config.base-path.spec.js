@@ -26,7 +26,7 @@
  *       greeting.js
  *     users.js
  */
-import chai from "chai";
+import { expect } from "chai";
 import fs from "node:fs/promises";
 import glob from "glob-promise";
 import { JSDOM } from "jsdom";
@@ -36,8 +36,6 @@ import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
 import { normalizePathnameForWindows } from "../../../../cli/src/lib/resource-utils.js";
 import extract from "extract-zip";
-
-const expect = chai.expect;
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Netlify Adapter plugin output w/ base path configuration";

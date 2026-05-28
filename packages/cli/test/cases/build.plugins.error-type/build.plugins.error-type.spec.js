@@ -21,15 +21,14 @@
  * N / A
  *
  */
-import chai from "chai";
+import * as chai from "chai";
+import { expect } from "chai";
 import chaiAsPromised from "chai-as-promised";
 import path from "node:path";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
 
 chai.use(chaiAsPromised);
-
-const expect = chai.expect;
 
 describe("Build Greenwood With: ", function () {
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");

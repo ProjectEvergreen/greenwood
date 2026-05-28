@@ -35,7 +35,7 @@
  * }
  *
  */
-import chai from "chai";
+import { expect } from "chai";
 import fs from "node:fs";
 import glob from "glob-promise";
 import path from "node:path";
@@ -43,8 +43,6 @@ import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
-
-const expect = chai.expect;
 
 xdescribe("Build Greenwood With: ", function () {
   const LABEL = "Default TypeScript configuration";

@@ -16,13 +16,11 @@
  *   main.ts
  *
  */
-import chai from "chai";
+import { expect } from "chai";
 import path from "node:path";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
-
-const expect = chai.expect;
 
 xdescribe("Develop Greenwood With: ", function () {
   const LABEL = "TypeScript plugin for resolving .ts files";

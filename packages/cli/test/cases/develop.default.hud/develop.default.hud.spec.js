@@ -15,15 +15,13 @@
  *   pages/
  *     index.html
  */
-import chai from "chai";
+import { expect } from "chai";
 import fs from "node:fs";
 import { JSDOM } from "jsdom";
 import path from "node:path";
 import { Runner } from "gallinago";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { fileURLToPath } from "node:url";
-
-const expect = chai.expect;
 
 describe("Develop Greenwood With: ", function () {
   const LABEL = "Default Greenwood Configuration and Workspace w/HUD enabled";

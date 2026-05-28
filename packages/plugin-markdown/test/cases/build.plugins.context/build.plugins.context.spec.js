@@ -19,7 +19,7 @@
  *     about-me.html
  *     index.html
  */
-import chai from "chai";
+import { expect } from "chai";
 import glob from "glob-promise";
 import { JSDOM } from "jsdom";
 import path from "node:path";
@@ -27,8 +27,6 @@ import { getDependencyFiles, getOutputTeardownFiles } from "../../../../../test/
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
-
-const expect = chai.expect;
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Custom Context Plugin and Default Workspace (aka Theme Packs) with Markdown";

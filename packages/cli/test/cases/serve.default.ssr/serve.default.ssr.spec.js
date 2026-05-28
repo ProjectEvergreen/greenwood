@@ -32,7 +32,7 @@
  *   layouts/
  *     app.html
  */
-import chai from "chai";
+import { expect } from "chai";
 import glob from "glob-promise";
 import fs from "node:fs";
 import { JSDOM } from "jsdom";
@@ -41,8 +41,6 @@ import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
-
-const expect = chai.expect;
 
 describe("Serve Greenwood With: ", function () {
   const LABEL = "A Server Rendered Application (SSR)";

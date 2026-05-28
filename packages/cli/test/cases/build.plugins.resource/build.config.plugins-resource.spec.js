@@ -29,15 +29,13 @@
  *     my-custom-file.foo
  *     my-other-custom-file.foo
  */
-import chai from "chai";
+import { expect } from "chai";
 import fs from "node:fs";
 import glob from "glob-promise";
 import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
-
-const expect = chai.expect;
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Custom FooResource Plugin and Default Workspace";
