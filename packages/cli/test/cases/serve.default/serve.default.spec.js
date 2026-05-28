@@ -315,7 +315,7 @@ describe("Serve Greenwood With: ", function () {
       });
     });
 
-    describe("Develop command with WASM format (.wasm) behavior", function () {
+    describe("Serve command with WASM format (.wasm) behavior", function () {
       let response = {};
       let body;
 
