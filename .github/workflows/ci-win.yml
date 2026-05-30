@@ -16,14 +16,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
-      # https://github.com/puppeteer/puppeteer/issues/10388#issuecomment-2424197416
-      - name: Cache Puppeteer Browser
-        uses: actions/cache@v4
-        with:
-          path: .cache/puppeteer
-          key: puppeteer-${{ runner.os }}-${{ hashFiles('**/package.json') }}
-          restore-keys: |
-            puppeteer-${{ runner.os }}-
       - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
@@ -33,7 +25,6 @@ jobs:
           yarn install --frozen-lockfile --network-timeout 1000000
       - name: Install Puppeteer Browser
         run: |
-          rmdir /s /q ".cache\puppeteer\chrome\*" 2>nul || true
           npx puppeteer browsers install chrome
       - name: Test
         run: |
