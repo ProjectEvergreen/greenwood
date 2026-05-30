@@ -1,4 +1,4 @@
-import gql from "graphql-tag";
+import { gql } from "graphql-tag";
 
 const getGallery = async (root, query) => {
   if (query.name === "logos") {

@@ -15,6 +15,7 @@ To develop for the project, you'll want to follow these steps:
 1. Clone the repository
 1. For NVM users, run `nvm use`
 1. Run `yarn install`
+1. For Windows developers, run `npx puppeteer browsers install chrome`
 
 ## Feature Development
 

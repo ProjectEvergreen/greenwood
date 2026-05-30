@@ -217,7 +217,7 @@ query {
 Or within your component:
 
 ```js
-import gql from 'graphql-tag';  // comes with Greenwood
+import { gql } from 'graphql-tag';  // comes with Greenwood
 
 const query = gql`
   {
@@ -290,7 +290,7 @@ Just create a _data/schema_ directory and then Greenwood will look for any files
 
 For example, you could create a "gallery" schema that could be used to group and organize photos for your frontend using variable.
 ```js
-import gql from 'graphql-tag';
+import { gql } from 'graphql-tag';
 
 const getGallery = async (root, query) => {
   if (query.name === 'logos') {

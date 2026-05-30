@@ -12,6 +12,8 @@ export default [
   {
     // https://github.com/eslint/eslint/discussions/18304#discussioncomment-9069706
     ignores: [
+      // ignore local chrome binary install folder for CI and Windows
+      ".cache/",
       ".greenwood/*",
       "node_modules/*",
       "public/*",

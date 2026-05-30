@@ -8,7 +8,7 @@
  * Wraps Puppeteer's interface to Headless Chrome to expose high level rendering
  * APIs that are able to handle web components and PWAs.
  */
-import puppeteer from "puppeteer";
+import { launch } from "puppeteer";
 
 class BrowserRunner {
   constructor() {
@@ -16,7 +16,7 @@ class BrowserRunner {
   }
 
   async init() {
-    this.browser = await puppeteer.launch({
+    this.browser = await launch({
       args: ["--no-sandbox"],
     });
   }

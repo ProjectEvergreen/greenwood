@@ -34,6 +34,9 @@
     "format:check": "prettier . --check",
     "prepare": "husky"
   },
+  "resolutions": {
+    "yauzl": "3.3.1"
+  },
   "devDependencies": {
     "@babel/core": "^7.24.4",
     "@babel/eslint-parser": "^7.25.7",

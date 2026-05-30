@@ -26,6 +26,10 @@ jobs:
       - name: Installing project dependencies
         run: |
           yarn install --frozen-lockfile
+        # use path installed by chromium-lib-install.sh
+        env:
+          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true"
+          PUPPETEER_EXECUTABLE_PATH: "/usr/bin/google-chrome-unstable"
       - name: Test
         run: |
           yarn test:loaders

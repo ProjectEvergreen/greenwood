@@ -2,7 +2,7 @@ import { checkResourceExists } from "@greenwood/cli/src/lib/resource-utils.js";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 import { graphTypeDefs, graphResolvers } from "./graph.js";
 import fs from "node:fs/promises";
-import gql from "graphql-tag";
+import { gql } from "graphql-tag";
 
 const createSchema = async (compilation) => {
   const { graph } = compilation;
