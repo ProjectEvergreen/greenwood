@@ -1,5 +1,7 @@
 *.DS_Store
 *.log
+# ignore local chrome binary install folder for CI and Windows
+.cache/
 .greenwood/
 .nyc_output/
 .vscode/
