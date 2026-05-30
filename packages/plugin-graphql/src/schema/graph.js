@@ -27,10 +27,10 @@ const getCollection = async (root, { name, orderBy }, context) => {
 const sortCollection = (collection, orderBy) => {
   const compare = (a, b) => {
     if (orderBy === "title_asc" || orderBy === "title_desc") {
-      (a = a?.title), (b = b?.title);
+      ((a = a?.title), (b = b?.title));
     }
     if (orderBy === "order_asc" || orderBy === "order_desc") {
-      (a = a?.data.order), (b = b?.data?.order);
+      ((a = a?.data.order), (b = b?.data?.order));
     }
     if (orderBy === "title_asc" || orderBy === "order_asc") {
       if (a < b) {

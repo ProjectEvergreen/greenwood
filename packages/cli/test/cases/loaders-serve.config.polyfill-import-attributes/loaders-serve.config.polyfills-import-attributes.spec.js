@@ -91,9 +91,8 @@ describe("Serve Greenwood With: ", function () {
 
       it("should have the expected SSR output in the HTML for an <h2> tag from JSON import", function (done) {
         const hero = new JSDOM(
-          dom.window.document.querySelectorAll(
-            'app-hero template[shadowrootmode="open"]',
-          )[0].innerHTML,
+          dom.window.document.querySelectorAll('app-hero template[shadowrootmode="open"]')[0]
+            .innerHTML,
         );
         const headings = hero.window.document.querySelectorAll("div h2");
 
@@ -105,9 +104,8 @@ describe("Serve Greenwood With: ", function () {
 
       it("should have the expected SSR output in the HTML for <a> tags", function (done) {
         const hero = new JSDOM(
-          dom.window.document.querySelectorAll(
-            'app-hero template[shadowrootmode="open"]',
-          )[0].innerHTML,
+          dom.window.document.querySelectorAll('app-hero template[shadowrootmode="open"]')[0]
+            .innerHTML,
         );
         const links = hero.window.document.querySelectorAll("div a");
 
