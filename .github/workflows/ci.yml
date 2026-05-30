@@ -26,9 +26,9 @@ jobs:
       - name: Installing project dependencies
         run: |
           yarn install --frozen-lockfile
-      - name: Install Puppeteer Browser
-        run: |
-          npx puppeteer browsers install chrome
+        env:
+          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true"
+          PUPPETEER_EXECUTABLE_PATH: "/usr/bin/google-chrome-unstable"
       - name: Lint
         run: |
           yarn lint
