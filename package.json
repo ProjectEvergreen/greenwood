@@ -32,8 +32,7 @@
     "commit:edit": "commitlint --edit $1",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
-    "prepare": "husky",
-    "postinstall": "npx puppeteer browsers install chrome"
+    "prepare": "husky"
   },
   "devDependencies": {
     "@babel/core": "^7.24.4",

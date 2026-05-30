@@ -34,6 +34,10 @@ jobs:
       - name: Installing project dependencies
         run: |
           yarn install --frozen-lockfile
+      - name: Install Puppeteer Browser
+        run: |
+          rm -rf .cache/puppeteer/chrome/linux-*/chrome-linux64
+          npx puppeteer browsers install chrome
       - name: Test
         run: |
           yarn test:loaders

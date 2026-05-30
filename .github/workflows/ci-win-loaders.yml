@@ -31,6 +31,10 @@ jobs:
       - name: Installing project dependencies
         run: |
           yarn install --frozen-lockfile --network-timeout 1000000
+      - name: Install Puppeteer Browser
+        run: |
+          rmdir /s /q ".cache\puppeteer\chrome\*" 2>nul || true
+          npx puppeteer browsers install chrome
       - name: Test
         run: |
           yarn test:loaders:win
