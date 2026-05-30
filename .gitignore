@@ -1,7 +1,5 @@
 *.DS_Store
 *.log
-# for puppeteer
-.cache/
 .greenwood/
 .nyc_output/
 .vscode/
