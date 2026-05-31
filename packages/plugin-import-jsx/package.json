@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/plugin-import-jsx",
-  "version": "0.34.0-alpha.5",
+  "version": "0.34.0-alpha.6",
   "description": "A Greenwood plugin to write JSX rendering Web Components compatible with WCC.",
   "repository": {
     "type": "git",
@@ -44,6 +44,6 @@
     "wc-compiler": "~0.22.0"
   },
   "devDependencies": {
-    "@greenwood/cli": "^0.34.0-alpha.5"
+    "@greenwood/cli": "^0.34.0-alpha.6"
   }
 }
