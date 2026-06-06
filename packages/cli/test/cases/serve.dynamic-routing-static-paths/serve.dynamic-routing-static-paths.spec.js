@@ -16,6 +16,8 @@
  *   pages/
  *     blog/
  *       [slug].ts
+ *     events/
+ *       [title].js
  *     product/
  *       [name].js
  *   services/
@@ -63,12 +65,12 @@ describe("Serve Greenwood With: ", function () {
     });
 
     describe("Build Output", function () {
-      it("should have no SSR page chunks", async function () {
+      it("should have only two SSR page chunks (for events page)", async function () {
         const files = await Array.fromAsync(
           fs.glob("*.js", { cwd: new URL("./public", import.meta.url) }),
         );
 
-        expect(files.length).to.equal(0);
+        expect(files.length).to.equal(2);
       });
     });
 
@@ -116,6 +118,26 @@ describe("Serve Greenwood With: ", function () {
 
         expect(headings.length).to.equal(1);
         expect(headings[0].textContent).to.equal(name);
+      });
+    });
+
+    describe("An SSR page with a dynamic route segment that NOT be static", function () {
+      const title = "My Cool Product";
+      let response;
+      let dom;
+      let body;
+
+      before(async function () {
+        response = await fetch(`${hostname}/events/${title.replace(/ /g, "-").toLowerCase()}/`);
+        body = await response.clone().text();
+        dom = new JSDOM(body);
+      });
+
+      it("should have the expected output for the page", function () {
+        const headings = dom.window.document.querySelectorAll("h1");
+
+        expect(headings.length).to.equal(1);
+        expect(headings[0].textContent).to.equal(title.toUpperCase().replace(/-/g, " "));
       });
     });
   });
