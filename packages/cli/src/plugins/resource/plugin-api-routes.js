@@ -44,11 +44,14 @@ class ApiRoutesResource {
         : undefined;
 
     if (process.env.__GWD_COMMAND__ === "develop") {
-      const workerUrl = new URL("../../lib/api-route-worker.js", import.meta.url);
+      const apiRouterWorkerUrl = this.compilation.config.plugins
+        .find((plugin) => plugin.type === "renderer")
+        .provider().apiRouteWorkerUrl;
+      // const workerUrl = new URL("../../lib/api-route-worker.js", import.meta.url);
       const req = await requestAsObject(request);
 
       const response = await new Promise((resolve, reject) => {
-        const worker = new Worker(workerUrl);
+        const worker = new Worker(apiRouterWorkerUrl);
 
         worker.on("message", (result) => {
           resolve(result);

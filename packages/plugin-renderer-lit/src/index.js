@@ -76,6 +76,7 @@ const greenwoodPluginRendererLit = () => {
       provider: () => {
         return {
           executeModuleUrl: new URL("./execute-route-module.js", import.meta.url),
+          apiRouteWorkerUrl: new URL("./api-route-worker.js", import.meta.url),
         };
       },
     },
