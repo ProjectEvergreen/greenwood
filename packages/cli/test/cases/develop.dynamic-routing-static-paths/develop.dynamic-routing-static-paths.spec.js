@@ -106,6 +106,26 @@ describe("Develop Greenwood With: ", function () {
         expect(headings[0].textContent).to.equal(name);
       });
     });
+
+    describe("An SSR page with a dynamic route segment that NOT be static", function () {
+      const title = "My Cool Product";
+      let response;
+      let dom;
+      let body;
+
+      before(async function () {
+        response = await fetch(`${hostname}/events/${title.replace(/ /g, "-").toLowerCase()}/`);
+        body = await response.clone().text();
+        dom = new JSDOM(body);
+      });
+
+      it("should have the expected output for the page", function () {
+        const headings = dom.window.document.querySelectorAll("h1");
+
+        expect(headings.length).to.equal(1);
+        expect(headings[0].textContent).to.equal(title.toUpperCase().replace(/-/g, " "));
+      });
+    });
   });
 
   after(async function () {

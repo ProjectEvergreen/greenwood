@@ -34,7 +34,7 @@ function getMatchingDynamicSsrRoute(graph, pathname) {
 
 function getParamsFromSegment(segment, pathname) {
   return new URLPattern({ pathname: segment.pathname }).exec(`https://example.com${pathname}`)
-    .pathname.groups;
+    ?.pathname?.groups;
 }
 
 export {
