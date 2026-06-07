@@ -76,10 +76,12 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
     (page) =>
       !page.isSSR ||
       (page.isSSR && page.prerender) ||
-      (page.isSSR && compilation.config.prerender) ||
+      // (page.isSSR && compilation.config.prerender) ||
+      (page.isSSR && page.prerender !== false && compilation.config.prerender) ||
+      // (page.isSSR && page.prerender !== false && page.prerender !== null && compilation.config.prerender) ||
       page.staticPaths,
   );
-  console.log("@@@@@@@@@", { pages });
+  console.log("@@@@@@@@@ preRenderCompilationWorker", { pages });
   const { context, config } = compilation;
   const plugins = getPluginInstances(compilation);
 

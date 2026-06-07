@@ -28,6 +28,7 @@
  */
 import { expect } from "chai";
 import { JSDOM } from "jsdom";
+import fs from "node:fs/promises";
 import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
@@ -58,6 +59,16 @@ describe("Build Greenwood With: ", function () {
     });
 
     runSmokeTest(["public", "index"], LABEL);
+
+    describe("Build Output", function () {
+      it("should not have any ssr page outputs", async function () {
+        const files = (
+          await Array.fromAsync(fs.glob("*.js", { cwd: new URL("./public", import.meta.url) }))
+        ).filter((file) => file.startsWith("about.route") || file.startsWith("index.route"));
+
+        expect(files.length).to.equal(0);
+      });
+    });
 
     describe("Build command that prerenders the SSR home page with multiple custom elements", function () {
       let dom;

@@ -116,13 +116,29 @@ async function cleanUpResources(compilation) {
 async function optimizeStaticPages(compilation, plugins) {
   const { scratchDir, outputDir } = compilation.context;
 
-  const pages = compilation.graph.filter(
-    (page) =>
-      !page.isSSR ||
-      (page.isSSR && page.prerender) ||
-      (page.isSSR && compilation.config.prerender) ||
-      page.staticPaths,
-  );
+  //   let is = page.isSSR && !page.staticPaths && page.prerender !== true;
+
+  // if(is && (config.prerender && page.prerender !== false)) {
+  //   is = false;
+  // }
+
+  // return is;
+  const pages = compilation.graph.filter((page) => {
+    console.log({ page });
+    let is = !page.isSSR || page.staticPaths || page.prerender === true;
+
+    console.log("optimizeStaticPages 111", { is });
+    if (page.isSSR && compilation.config.prerender && page.prerender !== false) {
+      is = true;
+    }
+    console.log("optimizeStaticPages 222", { is });
+    return is;
+    // return !page.isSSR ||
+    //   (page.isSSR && page.prerender === true) ||
+    //   (page.isSSR && ((page.prerender !== false) && compilation.config.prerender)) ||
+    //   page.staticPaths
+  });
+  console.log("@@@@@@@@@ optimizeStaticPages", { pages });
 
   await asyncForEach(pages, async (page) => {
     const { outputHref, route, segment, staticPaths } = page;
@@ -331,13 +347,29 @@ async function bundleApiRoutes(compilation) {
 
 async function bundleSsrPages(compilation, optimizePlugins) {
   const { context, config } = compilation;
-  const ssrPages = compilation.graph.filter(
-    (page) => page.isSSR && !page.prerender && !page.staticPaths,
-  );
+  console.log({ config });
+  const ssrPages = compilation.graph.filter((page) => {
+    let is = page.isSSR && !page.staticPaths && page.prerender !== true;
+
+    if (is && config.prerender && page.prerender !== false) {
+      is = false;
+    }
+
+    return is;
+    // return page.isSSR && !page.staticPaths && page.prerender !== true || (config.prerender && page.prerender === false));
+    // // && (config.prerender === true && page.prerender === false ? true : false)
+    // // if(config.prerender && page.prerender !== false) {
+    // //   is = true;
+    // // }
+    // // console.log({ page, is });
+    // // return is;
+  });
+  console.log("$$$$$$", { ssrPages });
+  console.log("config prerender", config.prerender);
   const ssrPrerenderPagesRouteMapper = {};
   const input = [];
 
-  if (!config.prerender && ssrPages.length > 0) {
+  if (ssrPages.length > 0) {
     const { executeModuleUrl } = config.plugins
       .find((plugin) => plugin.type === "renderer")
       .provider();
@@ -448,6 +480,7 @@ async function bundleSsrPages(compilation, optimizePlugins) {
     });
 
     const ssrConfigs = await getRollupConfigForSsrPages(compilation, input);
+    console.log("$$$$$$", { input, ssrConfigs });
 
     if (ssrConfigs.length > 0 && ssrConfigs[0].input !== "") {
       console.info("bundling dynamic pages...");

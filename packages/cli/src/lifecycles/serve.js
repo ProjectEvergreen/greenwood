@@ -341,7 +341,7 @@ async function getStaticServer(compilation, composable) {
           ? isSPA.outputHref
           : isStatic && !matchingRoute.staticPaths
             ? matchingRoute.outputHref
-            : matchingRoute.staticPaths
+            : matchingRoute?.staticPaths
               ? new URL(`.${url.pathname.replace(basePath, "")}index.html`, outputDir).href
               : new URL(`.${url.pathname.replace(basePath, "")}`, outputDir).href;
         console.log({ outputHref });
@@ -375,6 +375,7 @@ async function getHybridServer(compilation) {
   app.use(async (ctx) => {
     try {
       const url = new URL(`http://localhost:${config.port}${ctx.url}`);
+      console.log("getHybridServer url???", { url });
       const { pathname } = url;
       const matchingRoute = graph.find((node) => node.route === url.pathname) || { data: {} };
       const isApiRoute = manifest.apis.has(url.pathname);
@@ -385,13 +386,39 @@ async function getHybridServer(compilation) {
       );
       const matchingRouteWithSegment =
         getMatchingDynamicSsrRoute(compilation.graph, pathname) || {};
-
-      if (
-        !config.prerender &&
+      console.log("!!!!!", { url, matchingRoute, matchingRouteWithSegment });
+      let is =
         (matchingRoute.isSSR || matchingRouteWithSegment.isSSR) &&
-        !matchingRoute.prerender &&
-        !matchingRouteWithSegment.staticPaths
+        !matchingRouteWithSegment.staticPaths;
+      console.log("1111", { is });
+      if (
+        (matchingRoute.isSSR && config.prerender === true && matchingRoute.prerender !== false) ||
+        (matchingApiRouteWithSegment?.isSSR &&
+          config.prerender === true &&
+          matchingRouteWithSegment?.prerender !== false)
       ) {
+        is = false;
+      }
+      console.log("222", { is });
+      // page.isSSR && !page.staticPaths && (page.prerender !== true || !config.prerender && page.prerender !== false)
+
+      // let is = page.isSSR && !page.staticPaths && page.prerender !== true;
+
+      // if(is && (config.prerender && page.prerender !== false)) {
+      //   is = false;
+      // }
+
+      // return is;
+      if (
+        is
+        // (matchingRoute.isSSR || matchingRouteWithSegment.isSSR) &&
+        // !matchingRouteWithSegment.staticPaths &&
+        // (matchingRoute.prerender !== true || (!config.prerender && matchingRoute.prerender !== false)) &&
+        // (matchingRouteWithSegment.prerender !== true || (!config.prerender && matchingRouteWithSegment.prerender !== false))
+        // (matchingRoute.prerender !== true && matchingRouteWithSegment.prerender !== true) &&
+        // ((matchingRoute.prerender !== null && matchingRouteWithSegment.prerender !== null) && compilation.config.prerender)
+      ) {
+        console.log("getHybridServer serving url => ", { url });
         const entryPointUrl = new URL(
           matchingRoute?.outputHref ?? matchingRouteWithSegment.outputHref,
         );
