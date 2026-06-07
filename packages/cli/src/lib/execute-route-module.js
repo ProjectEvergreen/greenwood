@@ -29,7 +29,7 @@ async function executeRouteModule({
     const module = await import(moduleUrl).then((module) => module);
     const { body, layout, frontmatter, statics } = contentOptions;
     const {
-      prerender = false,
+      prerender = null,
       getLayout = null,
       getBody = null,
       getFrontmatter = null,
@@ -44,28 +44,17 @@ async function executeRouteModule({
       data.hasStaticParams = true;
     }
 
-    console.log("executeRouteModule", { params, page });
     if (params) {
       if (page.staticPaths) {
         const staticPaths = page.staticPaths ?? [];
 
-        console.log({ staticPaths });
-        console.log(staticPaths[0]);
-
         if (page.hasStaticParams) {
-          console.log(
-            "has static props?",
-            staticPaths.find(
-              (staticPath) => staticPath.params[page.segment.key] === params[page.segment.key],
-            ),
-          );
           const initParams = {
             ...params,
             ...staticPaths.find(
               (staticPath) => staticPath.params[page.segment.key] === params[page.segment.key],
             ),
           };
-          console.log({ initParams });
 
           const staticParams = module.getStaticParams
             ? await module.getStaticParams(initParams)
@@ -77,7 +66,6 @@ async function executeRouteModule({
           };
         }
       }
-      console.log("final params", { params });
     }
 
     if (body) {

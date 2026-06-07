@@ -150,7 +150,7 @@ const generateGraph = async (compilation) => {
           let label = getLabelFromRoute(`${route}/`);
           let imports = [];
           let customData = {};
-          let prerender = true;
+          let prerender = isStatic === true ? true : null;
           let isolation = false;
           let hydration = false;
           let staticPaths = null;
@@ -195,7 +195,8 @@ const generateGraph = async (compilation) => {
               const worker = new Worker(new URL("../lib/ssr-route-worker.js", import.meta.url));
 
               worker.on("message", (result) => {
-                prerender = result.prerender ?? false;
+                prerender =
+                  result.prerender === true || result.prerender === false ? result.prerender : null;
                 isolation = result.isolation ?? isolation;
                 hydration = result.hydration ?? hydration;
 

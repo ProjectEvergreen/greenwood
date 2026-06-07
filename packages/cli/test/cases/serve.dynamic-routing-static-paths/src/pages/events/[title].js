@@ -12,3 +12,5 @@ export default class EventDetailPage extends HTMLElement {
     `;
   }
 }
+
+export const prerender = false;
