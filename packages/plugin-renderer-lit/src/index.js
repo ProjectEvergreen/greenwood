@@ -1,16 +1,25 @@
+import { getMatchingDynamicSsrRoute } from "@greenwood/cli/src/lib/url-utils.js";
+
 class LitHydrationResource {
   constructor(compilation, options) {
     this.compilation = compilation;
     this.options = options;
   }
 
-  async shouldIntercept(url) {
+  async shouldIntercept(url, request, response) {
     const { pathname } = url;
+
+    if (response.headers?.get("Content-Type")?.indexOf("text/html") < 0) {
+      return false;
+    }
+
+    const matchingRouteWithSegment = getMatchingDynamicSsrRoute(this.compilation.graph, pathname);
     const matchingRoute = this.compilation.graph.find((node) => node.route === pathname);
 
     return (
-      matchingRoute &&
-      ((matchingRoute.isSSR && matchingRoute.hydration) || this.compilation.config.prerender)
+      matchingRouteWithSegment ||
+      (matchingRoute &&
+        ((matchingRoute.isSSR && matchingRoute.hydration) || this.compilation.config.prerender))
     );
   }
 

@@ -28,6 +28,8 @@
  *       search.js
  *     artist/
  *       [name].js
+ *     blog/
+ *       [slug].js # uses getStaticPaths / getStaticParams
  *     product/
  *       [id].js
  *     artists.js
@@ -301,6 +303,58 @@ describe("Serve Greenwood With: ", function () {
       it("should have the expected lit hydration script in the <head>", function () {
         const scripts = Array.from(
           productsPageDom.window.document.querySelectorAll("head script"),
+        ).filter(
+          (script) =>
+            !script.getAttribute("src") &&
+            script.textContent?.indexOf("globalThis.litElementHydrateSupport") >= 0,
+        );
+
+        expect(scripts.length).to.equal(1);
+      });
+    });
+
+    describe("Serve command with HTML route response using LitElement as a default export for the blog post pages using getStaticPaths / getStaticProps", function () {
+      let blogPostResponse = {};
+      let blogPostPageDom;
+      let blogPostPageHtml;
+
+      before(async function () {
+        blogPostResponse = await fetch(`${hostname}/blog/third-post/`);
+        blogPostPageHtml = await blogPostResponse.text();
+        blogPostPageDom = new JSDOM(blogPostPageHtml);
+      });
+
+      // test exported pages count
+      it("the response body should be valid HTML from JSDOM", function (done) {
+        expect(blogPostPageDom).to.not.be.undefined;
+        done();
+      });
+
+      it("the expected number of static paths generated", async function () {
+        const files = await Array.fromAsync(
+          fs.promises.glob("blog/**/*.html", { cwd: new URL("./public", import.meta.url) }),
+        );
+
+        expect(files.length).to.equal(3);
+      });
+
+      it("should have the expected <h1> text in the <body>", function () {
+        const heading = blogPostPageDom.window.document.querySelectorAll("h1");
+
+        expect(heading.length).to.equal(1);
+        expect(heading[0].textContent).to.equal("Third Post");
+      });
+
+      it("should have the expected title output", function () {
+        const title = blogPostPageDom.window.document.querySelectorAll("p");
+
+        expect(title.length).to.equal(1);
+        expect(title[0].textContent).to.equal("This is the third post");
+      });
+
+      it("should have the expected lit hydration script in the <head>", function () {
+        const scripts = Array.from(
+          blogPostPageDom.window.document.querySelectorAll("head script"),
         ).filter(
           (script) =>
             !script.getAttribute("src") &&

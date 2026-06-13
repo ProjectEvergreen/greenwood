@@ -8,7 +8,7 @@ async function executeRouteModule({
   htmlContents = null,
   scripts = [],
   request,
-  params,
+  params = {},
   contentOptions = {},
 }) {
   const data = {
