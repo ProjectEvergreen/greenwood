@@ -25,6 +25,8 @@
  *         [id].ts
  *     blog/
  *       [slug].ts
+ *.    event/
+ *       title.js # has prerender = true
  */
 import { expect } from "chai";
 import fs from "node:fs/promises";

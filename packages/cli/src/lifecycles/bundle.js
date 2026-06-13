@@ -17,6 +17,7 @@ import path from "node:path";
 import { rollup } from "rollup";
 import { pruneGraph } from "../lib/content-utils.js";
 import { asyncForEach } from "../lib/async-utils.js";
+import { getDynamicPages } from "../lib/graph-utils.js";
 
 async function interceptPage(url, request, plugins, body) {
   let response = new Response(body, {
@@ -347,25 +348,7 @@ async function bundleApiRoutes(compilation) {
 
 async function bundleSsrPages(compilation, optimizePlugins) {
   const { context, config } = compilation;
-  console.log({ config });
-  const ssrPages = compilation.graph.filter((page) => {
-    let is = page.isSSR && !page.staticPaths && page.prerender !== true;
-
-    if (is && config.prerender && page.prerender !== false) {
-      is = false;
-    }
-
-    return is;
-    // return page.isSSR && !page.staticPaths && page.prerender !== true || (config.prerender && page.prerender === false));
-    // // && (config.prerender === true && page.prerender === false ? true : false)
-    // // if(config.prerender && page.prerender !== false) {
-    // //   is = true;
-    // // }
-    // // console.log({ page, is });
-    // // return is;
-  });
-  console.log("$$$$$$", { ssrPages });
-  console.log("config prerender", config.prerender);
+  const ssrPages = getDynamicPages(compilation);
   const ssrPrerenderPagesRouteMapper = {};
   const input = [];
 

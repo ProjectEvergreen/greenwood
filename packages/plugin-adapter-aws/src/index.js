@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { checkResourceExists } from "@greenwood/cli/src/lib/resource-utils.js";
+import { getDynamicPages } from "@greenwood/cli/src/lib/graph-utils.js";
 
 // https://docs.aws.amazon.com/lambda/latest/dg/services-apigateway.html#apigateway-example-event
 // https://docs.aws.amazon.com/lambda/latest/dg/urls-invocation.html
@@ -77,7 +78,7 @@ async function awsAdapter(compilation) {
   const { outputDir, projectDirectory } = compilation.context;
   const { basePath } = compilation.config;
   const adapterOutputUrl = new URL("./.aws-output/", projectDirectory);
-  const ssrPages = compilation.graph.filter((page) => page.isSSR);
+  const ssrPages = getDynamicPages(compilation);
   const apiRoutes = compilation.manifest.apis;
 
   if (await checkResourceExists(adapterOutputUrl)) {
