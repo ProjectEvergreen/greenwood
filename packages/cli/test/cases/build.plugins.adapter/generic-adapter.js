@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { checkResourceExists } from "../../../../cli/src/lib/resource-utils.js";
+import { getDynamicPages } from "../../../../cli/src/lib/graph-utils.js";
 
 function generateOutputFormat(id, type) {
   const path = type === "page" ? `/${id}.route` : `/api/${id}`;
@@ -23,7 +24,7 @@ function generateOutputFormat(id, type) {
 async function genericAdapter(compilation) {
   const { outputDir } = compilation.context;
   const adapterOutputUrl = new URL("./adapter-output/", compilation.context.projectDirectory);
-  const ssrPages = compilation.graph.filter((page) => page.isSSR);
+  const ssrPages = getDynamicPages(compilation);
   const apiRoutes = compilation.manifest.apis;
 
   if (!(await checkResourceExists(adapterOutputUrl))) {

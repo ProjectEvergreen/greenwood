@@ -8,7 +8,7 @@ async function executeRouteModule({
   htmlContents = null,
   scripts = [],
   request,
-  params,
+  params = {},
   contentOptions = {},
 }) {
   const data = {
@@ -16,6 +16,8 @@ async function executeRouteModule({
     body: null,
     frontmatter: null,
     html: null,
+    staticPaths: null,
+    hasStaticParams: null,
   };
 
   if (prerender) {
@@ -25,14 +27,46 @@ async function executeRouteModule({
     data.html = html;
   } else {
     const module = await import(moduleUrl).then((module) => module);
-    const { body, layout, frontmatter } = contentOptions;
+    const { body, layout, frontmatter, statics } = contentOptions;
     const {
-      prerender = false,
+      prerender = null,
       getLayout = null,
       getBody = null,
       getFrontmatter = null,
       isolation,
     } = module;
+
+    if (statics && module.getStaticPaths) {
+      data.staticPaths = await module.getStaticPaths();
+    }
+
+    if (statics && module.getStaticParams) {
+      data.hasStaticParams = true;
+    }
+
+    if (params) {
+      if (page.staticPaths) {
+        const staticPaths = page.staticPaths ?? [];
+
+        if (page.hasStaticParams) {
+          const initParams = {
+            ...params,
+            ...staticPaths.find(
+              (staticPath) => staticPath.params[page.segment.key] === params[page.segment.key],
+            ),
+          };
+
+          const staticParams = module.getStaticParams
+            ? await module.getStaticParams(initParams)
+            : {};
+
+          params = {
+            ...params,
+            ...staticParams,
+          };
+        }
+      }
+    }
 
     if (body) {
       if (module.default) {

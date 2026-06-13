@@ -148,9 +148,11 @@ const generateGraph = async (compilation) => {
           let label = getLabelFromRoute(`${route}/`);
           let imports = [];
           let customData = {};
-          let prerender = true;
+          let prerender = isStatic === true ? true : null;
           let isolation = false;
           let hydration = false;
+          let staticPaths = null;
+          let hasStaticParams = false;
 
           /*
            * check if additional nested directories exist to correctly determine route (minus filename)
@@ -191,13 +193,22 @@ const generateGraph = async (compilation) => {
               const worker = new Worker(new URL("../lib/ssr-route-worker.js", import.meta.url));
 
               worker.on("message", (result) => {
-                prerender = result.prerender ?? false;
+                prerender =
+                  result.prerender === true || result.prerender === false ? result.prerender : null;
                 isolation = result.isolation ?? isolation;
                 hydration = result.hydration ?? hydration;
 
                 if (result.frontmatter) {
                   result.frontmatter.imports = result.frontmatter.imports || [];
                   ssrFrontmatter = result.frontmatter;
+                }
+
+                if (result.staticPaths) {
+                  staticPaths = result.staticPaths;
+                }
+
+                if (result.hasStaticParams) {
+                  hasStaticParams = result.hasStaticParams;
                 }
 
                 resolve();
@@ -222,6 +233,7 @@ const generateGraph = async (compilation) => {
                 request,
                 contentOptions: JSON.stringify({
                   frontmatter: true,
+                  statics: true,
                 }),
               });
             });
@@ -240,6 +252,7 @@ const generateGraph = async (compilation) => {
             delete customData[key];
           });
 
+          // TODO: document segment, staticPaths, and hasStaticParams
           /*
            * Page Properties
            *----------------------
@@ -267,6 +280,7 @@ const generateGraph = async (compilation) => {
             basePath,
           });
 
+          console.log("staticPaths???", { route, staticPaths, hasStaticParams });
           const page = {
             id: decodeURIComponent(getIdFromRelativePathPath(relativePagePath, extension)),
             label: decodeURIComponent(label),
@@ -285,9 +299,12 @@ const generateGraph = async (compilation) => {
             prerender,
             isolation,
             hydration,
-            servePage: isCustom,
+            // TODO: this "may" break some things...? validate with testing in Greenwood
+            servePage: isCustom ? isCustom : isDynamic ? "dynamic" : "static",
             segment:
               dynamicRoute.indexOf(":") > 0 ? { key: segmentKey, pathname: dynamicRoute } : null,
+            staticPaths,
+            hasStaticParams,
           };
 
           pages.push(page);

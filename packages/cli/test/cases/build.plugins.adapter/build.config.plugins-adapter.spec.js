@@ -29,9 +29,13 @@
  *         endpoint.js
  *       greeting.js
  *       webhook.js
+ *     artists/
+ *       [name].js # uses getStaticPaths
  *     blog/
  *       first-post.js
  *       index.js
+ *     event/
+ *       title.js # has prerender = true
  *     about.js
  *     index.js
  */

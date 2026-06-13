@@ -315,15 +315,22 @@ async function getStaticServer(compilation, composable) {
   app.use(async (ctx, next) => {
     try {
       const url = new URL(`http://localhost:${port}${ctx.url}`);
-      const matchingRoute = compilation.graph.find((page) => page.route === url.pathname);
+      // TODO: handle base path
+      const matchingRoute = compilation.graph.find(
+        (page) =>
+          (page.staticPaths && getParamsFromSegment(page.segment, url.pathname)) ||
+          page.route === url.pathname,
+      );
       const isSPA = compilation.graph.find((page) => page.isSPA);
-      const { isSSR } = matchingRoute || {};
+      const { isSSR, staticPaths } = matchingRoute || {};
       const extension = url.pathname.split(".").pop();
       const isStatic =
+        !!staticPaths ||
         (matchingRoute && !isSSR) ||
         (isSSR && compilation.config.prerender) ||
         (isSSR && matchingRoute.prerender);
 
+      console.log({ isStatic, matchingRoute });
       if (
         ctx.response.status === 404 &&
         ((isSPA && extension === url.pathname) ||
@@ -332,9 +339,12 @@ async function getStaticServer(compilation, composable) {
       ) {
         const outputHref = isSPA
           ? isSPA.outputHref
-          : isStatic
+          : isStatic && !matchingRoute.staticPaths
             ? matchingRoute.outputHref
-            : new URL(`.${url.pathname.replace(basePath, "")}`, outputDir).href;
+            : matchingRoute?.staticPaths
+              ? new URL(`.${url.pathname.replace(basePath, "")}index.html`, outputDir).href
+              : new URL(`.${url.pathname.replace(basePath, "")}`, outputDir).href;
+        console.log({ outputHref });
         const body = await fs.readFile(new URL(outputHref), "utf-8");
 
         ctx.body = body;
@@ -365,6 +375,7 @@ async function getHybridServer(compilation) {
   app.use(async (ctx) => {
     try {
       const url = new URL(`http://localhost:${config.port}${ctx.url}`);
+      console.log("getHybridServer url???", { url });
       const { pathname } = url;
       const matchingRoute = graph.find((node) => node.route === url.pathname) || { data: {} };
       const isApiRoute = manifest.apis.has(url.pathname);
@@ -375,12 +386,39 @@ async function getHybridServer(compilation) {
       );
       const matchingRouteWithSegment =
         getMatchingDynamicSsrRoute(compilation.graph, pathname) || {};
-
-      if (
-        !config.prerender &&
+      console.log("!!!!!", { url, matchingRoute, matchingRouteWithSegment });
+      let is =
         (matchingRoute.isSSR || matchingRouteWithSegment.isSSR) &&
-        !matchingRoute.prerender
+        !matchingRouteWithSegment.staticPaths;
+      console.log("1111", { is });
+      if (
+        (matchingRoute.isSSR && config.prerender === true && matchingRoute.prerender !== false) ||
+        (matchingApiRouteWithSegment?.isSSR &&
+          config.prerender === true &&
+          matchingRouteWithSegment?.prerender !== false)
       ) {
+        is = false;
+      }
+      console.log("222", { is });
+      // page.isSSR && !page.staticPaths && (page.prerender !== true || !config.prerender && page.prerender !== false)
+
+      // let is = page.isSSR && !page.staticPaths && page.prerender !== true;
+
+      // if(is && (config.prerender && page.prerender !== false)) {
+      //   is = false;
+      // }
+
+      // return is;
+      if (
+        is
+        // (matchingRoute.isSSR || matchingRouteWithSegment.isSSR) &&
+        // !matchingRouteWithSegment.staticPaths &&
+        // (matchingRoute.prerender !== true || (!config.prerender && matchingRoute.prerender !== false)) &&
+        // (matchingRouteWithSegment.prerender !== true || (!config.prerender && matchingRouteWithSegment.prerender !== false))
+        // (matchingRoute.prerender !== true && matchingRouteWithSegment.prerender !== true) &&
+        // ((matchingRoute.prerender !== null && matchingRouteWithSegment.prerender !== null) && compilation.config.prerender)
+      ) {
+        console.log("getHybridServer serving url => ", { url });
         const entryPointUrl = new URL(
           matchingRoute?.outputHref ?? matchingRouteWithSegment.outputHref,
         );
@@ -430,7 +468,10 @@ async function getHybridServer(compilation) {
         ctx.message = "OK";
         ctx.set("Content-Type", "text/html");
         ctx.status = 200;
-      } else if (isApiRoute || matchingApiRouteWithSegment) {
+      } else if (
+        isApiRoute ||
+        (matchingApiRouteWithSegment && !matchingApiRouteWithSegment.staticPaths)
+      ) {
         const apiRoute = manifest.apis.get(matchingApiRouteWithSegment ?? pathname);
         const params =
           matchingRouteWithSegment && apiRoute.segment
@@ -471,6 +512,7 @@ async function getHybridServer(compilation) {
             });
           });
         } else {
+          console.log("3333????");
           // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
           const { handler } = await import(entryPointUrl);
           const response = await handler(request, { params });

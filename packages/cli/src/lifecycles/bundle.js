@@ -17,6 +17,7 @@ import path from "node:path";
 import { rollup } from "rollup";
 import { pruneGraph } from "../lib/content-utils.js";
 import { asyncForEach } from "../lib/async-utils.js";
+import { getDynamicPages } from "../lib/graph-utils.js";
 
 async function interceptPage(url, request, plugins, body) {
   let response = new Response(body, {
@@ -116,40 +117,107 @@ async function cleanUpResources(compilation) {
 async function optimizeStaticPages(compilation, plugins) {
   const { scratchDir, outputDir } = compilation.context;
 
-  const pages = compilation.graph.filter(
-    (page) =>
-      !page.isSSR || (page.isSSR && page.prerender) || (page.isSSR && compilation.config.prerender),
-  );
+  //   let is = page.isSSR && !page.staticPaths && page.prerender !== true;
+
+  // if(is && (config.prerender && page.prerender !== false)) {
+  //   is = false;
+  // }
+
+  // return is;
+  const pages = compilation.graph.filter((page) => {
+    console.log({ page });
+    let is = !page.isSSR || page.staticPaths || page.prerender === true;
+
+    console.log("optimizeStaticPages 111", { is });
+    if (page.isSSR && compilation.config.prerender && page.prerender !== false) {
+      is = true;
+    }
+    console.log("optimizeStaticPages 222", { is });
+    return is;
+    // return !page.isSSR ||
+    //   (page.isSSR && page.prerender === true) ||
+    //   (page.isSSR && ((page.prerender !== false) && compilation.config.prerender)) ||
+    //   page.staticPaths
+  });
+  console.log("@@@@@@@@@ optimizeStaticPages", { pages });
 
   await asyncForEach(pages, async (page) => {
-    const { route, outputHref } = page;
-    const outputDirUrl = new URL(outputHref.replace("index.html", "").replace("404.html", ""));
-    const url = new URL(`http://localhost:${compilation.config.port}${route}`);
-    const contents = await fs.readFile(
-      new URL(`./${outputHref.replace(outputDir.href, "")}`, scratchDir),
-      "utf-8",
-    );
-    const headers = new Headers({ "Content-Type": "text/html" });
-    let response = new Response(contents, { headers });
+    const { outputHref, route, segment, staticPaths } = page;
 
-    if (!(await checkResourceExists(outputDirUrl))) {
-      await fs.mkdir(outputDirUrl, {
-        recursive: true,
-      });
-    }
+    if (staticPaths) {
+      for (const staticPath of staticPaths) {
+        console.log({ staticPath });
+        // TODO: is there a URL util for this?
+        const staticRoute = route.replace(`[${segment.key}]`, staticPath.params[segment.key]);
+        const outputDirUrl = new URL(
+          outputHref
+            .replace(`[${segment.key}]`, staticPath.params[segment.key])
+            .replace("index.html", ""),
+        );
+        const url = new URL(`http://localhost:${compilation.config.port}${route}`); // TODO: keeping placeholder route for optimization looks ups, is this right?
+        const contents = await fs.readFile(
+          new URL(
+            `./${outputHref.replace(outputDir.href, "").replace(`[${segment.key}]`, staticPath.params[segment.key])}`,
+            scratchDir,
+          ),
+          "utf-8",
+        );
+        console.log({ staticRoute, outputDirUrl, url, contents });
+        const headers = new Headers({ "Content-Type": "text/html" });
+        let response = new Response(contents, { headers });
 
-    for (const plugin of plugins) {
-      if (plugin.shouldOptimize && (await plugin.shouldOptimize(url, response.clone()))) {
-        const currentResponse = await plugin.optimize(url, response.clone());
+        if (!(await checkResourceExists(outputDirUrl))) {
+          await fs.mkdir(outputDirUrl, {
+            recursive: true,
+          });
+        }
 
-        response = mergeResponse(response.clone(), currentResponse.clone());
+        for (const plugin of plugins) {
+          if (plugin.shouldOptimize && (await plugin.shouldOptimize(url, response.clone()))) {
+            const currentResponse = await plugin.optimize(url, response.clone());
+
+            response = mergeResponse(response.clone(), currentResponse.clone());
+          }
+        }
+
+        // clean up optimization markers
+        const body = (await response.text()).replace(/data-gwd-opt=".*?[a-z]"/g, "");
+
+        await fs.writeFile(
+          new URL(outputHref.replace(`[${segment.key}]`, staticPath.params[segment.key])),
+          body,
+        );
       }
+    } else {
+      const { route, outputHref } = page;
+      const outputDirUrl = new URL(outputHref.replace("index.html", "").replace("404.html", ""));
+      const url = new URL(`http://localhost:${compilation.config.port}${route}`);
+      const contents = await fs.readFile(
+        new URL(`./${outputHref.replace(outputDir.href, "")}`, scratchDir),
+        "utf-8",
+      );
+      const headers = new Headers({ "Content-Type": "text/html" });
+      let response = new Response(contents, { headers });
+
+      if (!(await checkResourceExists(outputDirUrl))) {
+        await fs.mkdir(outputDirUrl, {
+          recursive: true,
+        });
+      }
+
+      for (const plugin of plugins) {
+        if (plugin.shouldOptimize && (await plugin.shouldOptimize(url, response.clone()))) {
+          const currentResponse = await plugin.optimize(url, response.clone());
+
+          response = mergeResponse(response.clone(), currentResponse.clone());
+        }
+      }
+
+      // clean up optimization markers
+      const body = (await response.text()).replace(/data-gwd-opt=".*?[a-z]"/g, "");
+
+      await fs.writeFile(new URL(outputHref), body);
     }
-
-    // clean up optimization markers
-    const body = (await response.text()).replace(/data-gwd-opt=".*?[a-z]"/g, "");
-
-    await fs.writeFile(new URL(outputHref), body);
   });
 }
 
@@ -280,11 +348,11 @@ async function bundleApiRoutes(compilation) {
 
 async function bundleSsrPages(compilation, optimizePlugins) {
   const { context, config } = compilation;
-  const ssrPages = compilation.graph.filter((page) => page.isSSR && !page.prerender);
+  const ssrPages = getDynamicPages(compilation);
   const ssrPrerenderPagesRouteMapper = {};
   const input = [];
 
-  if (!config.prerender && ssrPages.length > 0) {
+  if (ssrPages.length > 0) {
     const { executeModuleUrl } = config.plugins
       .find((plugin) => plugin.type === "renderer")
       .provider();
@@ -395,6 +463,7 @@ async function bundleSsrPages(compilation, optimizePlugins) {
     });
 
     const ssrConfigs = await getRollupConfigForSsrPages(compilation, input);
+    console.log("$$$$$$", { input, ssrConfigs });
 
     if (ssrConfigs.length > 0 && ssrConfigs[0].input !== "") {
       console.info("bundling dynamic pages...");

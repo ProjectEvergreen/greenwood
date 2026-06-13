@@ -80,11 +80,12 @@ class StandardHtmlResource {
         .find((plugin) => plugin.type === "renderer")
         .provider().executeModuleUrl;
       const req = await requestAsObject(request);
-      const params =
+      let params =
         matchingRouteWithSegment && matchingRouteWithSegment.segment
           ? getParamsFromSegment(matchingRouteWithSegment.segment, pathname)
           : undefined;
 
+      console.log("serve plugin???", { matchingRouteWithSegment, pathname, params });
       await new Promise((resolve, reject) => {
         const worker = new Worker(new URL("../../lib/ssr-route-worker.js", import.meta.url));
 
@@ -106,7 +107,7 @@ class StandardHtmlResource {
           executeModuleUrl: routeWorkerUrl.href,
           moduleUrl: routeModuleLocationUrl.href,
           compilation: JSON.stringify(this.compilation),
-          page: JSON.stringify(matchingRoute),
+          page: JSON.stringify(matchingRouteWithSegment ?? matchingRoute),
           request: req,
           contentOptions: JSON.stringify({
             body: true,

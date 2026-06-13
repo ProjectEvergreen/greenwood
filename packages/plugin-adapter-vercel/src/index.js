@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { checkResourceExists } from "@greenwood/cli/src/lib/resource-utils.js";
+import { getDynamicPages } from "@greenwood/cli/src/lib/graph-utils.js";
 
 const DEFAULT_RUNTIME = "nodejs24.x";
 
@@ -87,7 +88,7 @@ async function vercelAdapter(compilation, options) {
   const { runtime = DEFAULT_RUNTIME } = options;
   const { outputDir, projectDirectory } = compilation.context;
   const adapterOutputUrl = new URL("./.vercel/output/functions/", projectDirectory);
-  const ssrPages = compilation.graph.filter((page) => page.isSSR);
+  const ssrPages = getDynamicPages(compilation);
   const apiRoutes = compilation.manifest.apis;
   // https://vercel.com/docs/build-output-api/configuration#routes
   const dynamicRoutes = [];

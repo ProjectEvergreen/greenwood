@@ -7,13 +7,13 @@ import "@lit-labs/ssr-dom-shim/register-css-hook.js";
 async function executeRouteModule({
   moduleUrl,
   compilation,
-  page,
-  prerender,
-  htmlContents,
-  scripts,
+  page = {},
+  prerender = false,
+  htmlContents = null,
+  scripts = [],
   request,
-  contentOptions = {},
   params = {},
+  contentOptions = {},
 }) {
   const data = {
     layout: null,
@@ -21,6 +21,8 @@ async function executeRouteModule({
     frontmatter: null,
     html: null,
     hydration: false,
+    staticPaths: null,
+    hasStaticParams: null,
   };
 
   // prerender static content
@@ -34,7 +36,7 @@ async function executeRouteModule({
     data.html = await collectResult(render(templateResult));
   } else {
     const module = await import(moduleUrl).then((module) => module);
-    const { body, layout, frontmatter } = contentOptions;
+    const { body, layout, frontmatter, statics } = contentOptions;
     const {
       getLayout = null,
       getBody = null,
@@ -51,6 +53,38 @@ async function executeRouteModule({
       data.hydration = true;
     }
 
+    if (statics && module.getStaticPaths) {
+      data.staticPaths = await module.getStaticPaths();
+    }
+
+    if (statics && module.getStaticParams) {
+      data.hasStaticParams = true;
+    }
+
+    if (params) {
+      if (page.staticPaths) {
+        const staticPaths = page.staticPaths ?? [];
+
+        if (page.hasStaticParams) {
+          const initParams = {
+            ...params,
+            ...staticPaths.find(
+              (staticPath) => staticPath.params[page.segment.key] === params[page.segment.key],
+            ),
+          };
+
+          const staticParams = module.getStaticParams
+            ? await module.getStaticParams(initParams)
+            : {};
+
+          params = {
+            ...params,
+            ...staticParams,
+          };
+        }
+      }
+    }
+
     if (body) {
       if (module.default) {
         // for the Lit implementation, we render the custom element programmatically
@@ -61,7 +95,12 @@ async function executeRouteModule({
         const attributes =
           Object.entries(params).length > 0
             ? Object.entries(params)
-                .map(([key, value]) => `${key}="${value}"`)
+                // literal object attributes need to be JSON stringified for Lit
+                // https://github.com/lit/lit/discussions/2714#discussioncomment-2521396
+                .map(
+                  ([key, value]) =>
+                    `${key}='${typeof value === "object" ? JSON.stringify(value) : value}'`,
+                )
                 .join(" ")
             : "";
         const litAttributes = literal`${unsafeStatic(attributes)}`;
@@ -95,10 +134,6 @@ async function executeRouteModule({
       }
     }
 
-    // TODO: layouts as SSR pages
-    // TODO: constructor props / dynamic routing
-    // https://github.com/ProjectEvergreen/greenwood/issues/1248
-
     if (layout) {
       // support dynamic layouts that are just custom elements vs calls to getLayout
       if (!getLayout && !data.body && !page.isSSR && module.default) {
@@ -110,7 +145,12 @@ async function executeRouteModule({
         const attributes =
           Object.entries(params).length > 0
             ? Object.entries(params)
-                .map(([key, value]) => `${key}="${value}"`)
+                // literal object attributes need to be JSON stringified for Lit
+                // https://github.com/lit/lit/discussions/2714#discussioncomment-2521396
+                .map(
+                  ([key, value]) =>
+                    `${key}='${typeof value === "object" ? JSON.stringify(value) : value}'`,
+                )
                 .join(" ")
             : "";
         const litAttributes = literal`${unsafeStatic(attributes)}`;
