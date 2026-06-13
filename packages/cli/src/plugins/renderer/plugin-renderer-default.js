@@ -4,6 +4,7 @@ const greenwoodPluginRendererDefault = {
   provider: () => {
     return {
       executeModuleUrl: new URL("../../lib/execute-route-module.js", import.meta.url),
+      apiRouteWorkerUrl: new URL("../../lib/api-route-worker.js", import.meta.url),
     };
   },
 };

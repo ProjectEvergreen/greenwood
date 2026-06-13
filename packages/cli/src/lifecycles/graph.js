@@ -109,7 +109,9 @@ const generateGraph = async (compilation) => {
           }
 
           // TODO should API routes be run in isolation mode like SSR pages?
-          const { isolation } = await import(filenameUrl).then((module) => module);
+          // const { isolation } = await import(filenameUrl).then((module) => module);
+          const contents = await fs.readFile(filenameUrl, "utf8");
+          const isolation = contents.indexOf("export const isolation = true;") >= 0;
           const { segmentKey, dynamicRoute } = getDynamicSegmentsFromRoute({
             route,
             relativePagePath,
