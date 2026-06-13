@@ -16,9 +16,11 @@
  *   pages/
  *     api/
  *       product/
- *         [id].ts
+ *         [id].js
+ *     artists/
+ *       [name].js # uses getStaticPaths
  *     blog/
- *       [slug].ts
+ *       [slug].js
  *     event/
  *       title.js # has prerender = true
  */
