@@ -7,7 +7,6 @@ const runProdServer = async (compilation) => {
   const postfixSlash = basePath === "" ? "" : "/";
   const hasApisDir = await checkResourceExists(compilation.context.apisDir);
   const hasDynamicRoutes = getDynamicPages(compilation).length > 0;
-  console.log("*****", { hasDynamicRoutes, hasApisDir, prerender: compilation.config.prerender });
   const server = hasDynamicRoutes || hasApisDir ? getHybridServer : getStaticServer;
 
   (await server(compilation)).listen(port, () => {

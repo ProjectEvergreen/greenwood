@@ -17,7 +17,6 @@ const runProductionBuild = async (compilation) => {
     : null;
   const pagesWithStaticPaths = compilation.graph.filter((page) => page.staticPaths);
 
-  // console.log({ prerender, pagesWithStaticPaths });
   if (prerender || pagesWithStaticPaths.length > 0) {
     // start any of the user's server plugins if needed
     const servers = [

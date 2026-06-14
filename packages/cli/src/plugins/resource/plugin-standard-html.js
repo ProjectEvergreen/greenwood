@@ -85,7 +85,6 @@ class StandardHtmlResource {
           ? getParamsFromSegment(matchingRouteWithSegment.segment, pathname)
           : undefined;
 
-      console.log("serve plugin???", { matchingRouteWithSegment, pathname, params });
       await new Promise((resolve, reject) => {
         const worker = new Worker(new URL("../../lib/ssr-route-worker.js", import.meta.url));
 

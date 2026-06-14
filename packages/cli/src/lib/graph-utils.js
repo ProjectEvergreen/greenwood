@@ -12,4 +12,16 @@ function getDynamicPages(compilation) {
   });
 }
 
-export { getDynamicPages };
+function getStaticPages(compilation) {
+  return compilation.graph.filter((page) => {
+    let isStaticRoute = !page.isSSR || page.staticPaths || page.prerender === true;
+
+    if (page.isSSR && compilation.config.prerender && page.prerender !== false) {
+      isStaticRoute = true;
+    }
+
+    return isStaticRoute;
+  });
+}
+
+export { getDynamicPages, getStaticPages };

@@ -282,7 +282,6 @@ const generateGraph = async (compilation) => {
             basePath,
           });
 
-          console.log("staticPaths???", { route, staticPaths, hasStaticParams });
           const page = {
             id: decodeURIComponent(getIdFromRelativePathPath(relativePagePath, extension)),
             label: decodeURIComponent(label),

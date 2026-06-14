@@ -68,10 +68,6 @@ function toScratchUrl(outputHref, context) {
 }
 
 async function preRenderCompilationWorker(compilation, workerPrerender) {
-  // const pages = compilation.graph.filter(
-  //   (page) =>
-  //     !page.isSSR && page.servePage !== "static" || (page.isSSR && (page.prerender || page.segment)) || (page.isSSR && compilation.config.prerender),
-  // );
   const pages = compilation.graph.filter(
     (page) =>
       !page.isSSR ||
@@ -81,7 +77,6 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
       // (page.isSSR && page.prerender !== false && page.prerender !== null && compilation.config.prerender) ||
       page.staticPaths,
   );
-  console.log("@@@@@@@@@ preRenderCompilationWorker", { pages });
   const { context, config } = compilation;
   const plugins = getPluginInstances(compilation);
 
@@ -94,18 +89,12 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
 
   // TODO: refactor / consolidate
   await asyncForEach(pages, async (page) => {
-    console.log("@@@@@ generating page...", { page });
-
     if (page.staticPaths) {
-      console.log("@@@@@ static paths", { staticPaths: page.staticPaths });
-
       for (const staticPath of page.staticPaths) {
         const { route, outputHref, segment } = page;
-        // TODO: is there a URL util for this?
         const staticRoute = route.replace(`[${segment.key}]`, staticPath.params[segment.key]);
         // TODO: base path
         const url = new URL(`http://localhost:${config.port}${staticRoute}`);
-        console.log({ url });
         const request = new Request(url);
         const scratchUrl = toScratchUrl(
           outputHref.replace(`[${segment.key}]`, staticPath.params[segment.key]),
@@ -114,9 +103,7 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
         let ssrContents;
 
         // do we negate the worker pool by also running this, outside the pool?
-        console.log("@@@@@ serving page...", { url: url.href });
         let body = await (await servePage(url, request, plugins)).text();
-        console.log("@@@@@ served page...", { body });
         body = await (await interceptPage(url, request, plugins, body)).text();
 
         // hack to avoid over-rendering SSR content
@@ -160,8 +147,6 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
                 return reject(err);
               }
 
-              console.log("####", { result });
-
               return resolve(result.html);
             },
           );
@@ -174,11 +159,10 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
           );
         }
 
-        console.log("@@@@@ prerendered page...", { scratchUrl });
         await createOutputDirectory(new URL(scratchUrl.href.replace("index.html", "")));
         await fs.writeFile(scratchUrl, body);
 
-        console.info("generated static page...", staticRoute, body);
+        console.info("generated static path...", staticRoute);
       }
     } else {
       const { route, outputHref } = page;
@@ -188,9 +172,7 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
       let ssrContents;
 
       // do we negate the worker pool by also running this, outside the pool?
-      console.log("@@@@@ serving page...", { url: url.href });
       let body = await (await servePage(url, request, plugins)).text();
-      console.log("@@@@@ served page...", { body });
       body = await (await interceptPage(url, request, plugins, body)).text();
 
       // hack to avoid over-rendering SSR content
@@ -233,8 +215,6 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
             if (err) {
               return reject(err);
             }
-
-            console.log("####", { result });
 
             return resolve(result.html);
           },

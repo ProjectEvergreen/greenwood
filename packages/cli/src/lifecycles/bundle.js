@@ -17,7 +17,7 @@ import path from "node:path";
 import { rollup } from "rollup";
 import { pruneGraph } from "../lib/content-utils.js";
 import { asyncForEach } from "../lib/async-utils.js";
-import { getDynamicPages } from "../lib/graph-utils.js";
+import { getDynamicPages, getStaticPages } from "../lib/graph-utils.js";
 
 async function interceptPage(url, request, plugins, body) {
   let response = new Response(body, {
@@ -116,39 +116,13 @@ async function cleanUpResources(compilation) {
 
 async function optimizeStaticPages(compilation, plugins) {
   const { scratchDir, outputDir } = compilation.context;
-
-  //   let is = page.isSSR && !page.staticPaths && page.prerender !== true;
-
-  // if(is && (config.prerender && page.prerender !== false)) {
-  //   is = false;
-  // }
-
-  // return is;
-  const pages = compilation.graph.filter((page) => {
-    console.log({ page });
-    let is = !page.isSSR || page.staticPaths || page.prerender === true;
-
-    console.log("optimizeStaticPages 111", { is });
-    if (page.isSSR && compilation.config.prerender && page.prerender !== false) {
-      is = true;
-    }
-    console.log("optimizeStaticPages 222", { is });
-    return is;
-    // return !page.isSSR ||
-    //   (page.isSSR && page.prerender === true) ||
-    //   (page.isSSR && ((page.prerender !== false) && compilation.config.prerender)) ||
-    //   page.staticPaths
-  });
-  console.log("@@@@@@@@@ optimizeStaticPages", { pages });
+  const pages = getStaticPages(compilation);
 
   await asyncForEach(pages, async (page) => {
     const { outputHref, route, segment, staticPaths } = page;
 
     if (staticPaths) {
       for (const staticPath of staticPaths) {
-        console.log({ staticPath });
-        // TODO: is there a URL util for this?
-        const staticRoute = route.replace(`[${segment.key}]`, staticPath.params[segment.key]);
         const outputDirUrl = new URL(
           outputHref
             .replace(`[${segment.key}]`, staticPath.params[segment.key])
@@ -162,7 +136,6 @@ async function optimizeStaticPages(compilation, plugins) {
           ),
           "utf-8",
         );
-        console.log({ staticRoute, outputDirUrl, url, contents });
         const headers = new Headers({ "Content-Type": "text/html" });
         let response = new Response(contents, { headers });
 
@@ -463,7 +436,6 @@ async function bundleSsrPages(compilation, optimizePlugins) {
     });
 
     const ssrConfigs = await getRollupConfigForSsrPages(compilation, input);
-    console.log("$$$$$$", { input, ssrConfigs });
 
     if (ssrConfigs.length > 0 && ssrConfigs[0].input !== "") {
       console.info("bundling dynamic pages...");
