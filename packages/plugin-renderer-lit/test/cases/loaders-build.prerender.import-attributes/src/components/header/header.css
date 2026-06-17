@@ -1,5 +1,3 @@
-:host {
-  header {
-    color: red;
-  }
+header {
+  color: red;
 }

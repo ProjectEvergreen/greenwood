@@ -89,6 +89,20 @@ describe("Build Greenwood With Custom Lit Renderer for SSG prerendering: ", func
         expect(nav[0].textContent).to.equal("Home");
         expect(nav[1].textContent).to.equal("About");
       });
+
+      // https://github.com/thescientist13/lit-ssr-css-modules/pull/3
+      it("should have the expected <style> tag output from SSR", function () {
+        const wrapper = new JSDOM(
+          dom.window.document.querySelectorAll('app-header template[shadowrootmode="open"]')[0]
+            .innerHTML,
+        );
+        const style = wrapper.window.document.querySelectorAll("style");
+
+        expect(style.length).to.equal(1);
+        expect(style[0].textContent.replace(/ /g, "").replace(/\n/g, "").trim()).to.equal(
+          "header{color:red;}",
+        );
+      });
     });
   });
 

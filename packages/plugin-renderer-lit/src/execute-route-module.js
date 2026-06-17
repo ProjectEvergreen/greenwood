@@ -1,8 +1,9 @@
-import { render, LitElementRenderer } from "@lit-labs/ssr";
+// order matters here - https://github.com/thescientist13/lit-ssr-css-modules/pull/3
+import "@lit-labs/ssr-dom-shim/register-css-hook.js";
+const { render, LitElementRenderer } = await import("@lit-labs/ssr");
 import { collectResult } from "@lit-labs/ssr/lib/render-result.js";
 import { html, literal, unsafeStatic } from "lit/static-html.js";
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
-import "@lit-labs/ssr-dom-shim/register-css-hook.js";
 
 async function executeRouteModule({
   moduleUrl,
