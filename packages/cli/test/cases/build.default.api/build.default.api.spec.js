@@ -3,7 +3,7 @@
  * Run Greenwood build command with no config.
  *
  * User Result
- * Should generate a bare bones Greenwood build.
+ * Should generate a bare bones Greenwood build and not error on generating API routes (that have side-effects).
  *
  * User Command
  * greenwood build
@@ -12,7 +12,10 @@
  * None (Greenwood Default)
  *
  * User Workspace
- * Empty
+ * src/
+ *   pages/
+ *     api/
+ *       greeting.js
  */
 import { expect } from "chai";
 import glob from "glob-promise";
@@ -23,7 +26,7 @@ import { fileURLToPath } from "node:url";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 
 describe("Build Greenwood With: ", function () {
-  const LABEL = "Default (Empty) Greenwood Configuration and Workspace";
+  const LABEL = "Default Config and API Routes";
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
   let runner;
@@ -49,7 +52,13 @@ describe("Build Greenwood With: ", function () {
       });
 
       it("should contain no JS files in the output directory", async function () {
-        expect(await glob.promise(path.join(this.context.publicDir, "*.js"))).to.have.lengthOf(0);
+        expect(await glob.promise(path.join(this.context.publicDir, "*.html"))).to.have.lengthOf(0);
+      });
+
+      it("should contain one API route in the output directory", async function () {
+        expect(
+          await glob.promise(path.join(this.context.publicDir, "api/**/*.js")),
+        ).to.have.lengthOf(1);
       });
     });
   });
