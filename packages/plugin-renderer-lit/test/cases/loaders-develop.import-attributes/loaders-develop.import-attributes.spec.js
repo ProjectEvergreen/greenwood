@@ -46,7 +46,7 @@ describe("Develop Greenwood With Custom Lit Renderer for SSR: ", function () {
     this.context = {
       publicDir: path.join(outputPath, "public"),
     };
-    runner = new Runner(true, true);
+    runner = new Runner(false, true);
   });
 
   describe(LABEL, function () {

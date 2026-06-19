@@ -254,6 +254,16 @@ function transformKoaRequestIntoStandardRequest(url, request) {
   });
 }
 
+function stringifiableObject(obj) {
+  const filtered = {};
+  for (const key in obj) {
+    if (["boolean", "number", "string"].includes(typeof obj[key]) || obj[key] === null) {
+      filtered[key] = obj[key];
+    }
+  }
+  return filtered;
+}
+
 // https://stackoverflow.com/questions/57447685/how-can-i-convert-a-request-object-into-a-stringifiable-object-in-javascript
 async function requestAsObject(_request) {
   if (!(_request instanceof Request)) {
@@ -267,16 +277,6 @@ async function requestAsObject(_request) {
   const contentType = request.headers.get("content-type") || "";
   let headers = Object.fromEntries(request.headers);
   let format;
-
-  function stringifiableObject(obj) {
-    const filtered = {};
-    for (const key in obj) {
-      if (["boolean", "number", "string"].includes(typeof obj[key]) || obj[key] === null) {
-        filtered[key] = obj[key];
-      }
-    }
-    return filtered;
-  }
 
   if (contentType.includes("application/x-www-form-urlencoded")) {
     const formData = await request.formData();
@@ -305,12 +305,30 @@ async function requestAsObject(_request) {
   };
 }
 
+// based on https://stackoverflow.com/questions/57447685/how-can-i-convert-a-request-object-into-a-stringifiable-object-in-javascript
+async function responseAsObject(response) {
+  if (!(response instanceof Response)) {
+    throw Object.assign(new Error(), {
+      name: "TypeError",
+      message: "Argument must be a Response object",
+    });
+  }
+  response = response.clone();
+
+  return {
+    ...stringifiableObject(response),
+    headers: Object.fromEntries(response.headers),
+    body: await response.text(),
+  };
+}
+
 export {
   checkResourceExists,
   mergeResponse,
   modelResource,
   normalizePathnameForWindows,
   requestAsObject,
+  responseAsObject,
   resolveForRelativeUrl,
   trackResourcesForRoute,
   transformKoaRequestIntoStandardRequest,
