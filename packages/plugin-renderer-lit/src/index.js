@@ -1,4 +1,4 @@
-import { getMatchingDynamicSsrRoute } from "@greenwood/cli/src/lib/url-utils.js";
+import { getMatchingPageByRoute } from "@greenwood/cli/src/lib/graph-utils.js";
 
 class LitHydrationResource {
   constructor(compilation, options) {
@@ -13,13 +13,11 @@ class LitHydrationResource {
       return false;
     }
 
-    const matchingRouteWithSegment = getMatchingDynamicSsrRoute(this.compilation.graph, pathname);
-    const matchingRoute = this.compilation.graph.find((node) => node.route === pathname);
+    const matchingRoute = getMatchingPageByRoute(this.compilation, pathname);
 
     return (
-      matchingRouteWithSegment ||
-      (matchingRoute &&
-        ((matchingRoute.isSSR && matchingRoute.hydration) || this.compilation.config.prerender))
+      matchingRoute &&
+      ((matchingRoute.isSSR && matchingRoute.hydration) || this.compilation.config.prerender)
     );
   }
 

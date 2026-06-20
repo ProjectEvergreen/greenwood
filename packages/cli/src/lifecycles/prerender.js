@@ -7,6 +7,8 @@ import {
 import os from "node:os";
 import { WorkerPool } from "../lib/threadpool.js";
 import { asyncForEach } from "../lib/async-utils.js";
+import { getStaticPages } from "../lib/graph-utils.js";
+import { getParamsFromSegment, getStaticRouteFromDynamicRoute } from "../lib/url-utils.js";
 
 async function createOutputDirectory(outputDir) {
   // ignore creating directory for 404 pages since they live at the root of the output directory
@@ -68,15 +70,7 @@ function toScratchUrl(outputHref, context) {
 }
 
 async function preRenderCompilationWorker(compilation, workerPrerender) {
-  const pages = compilation.graph.filter(
-    (page) =>
-      !page.isSSR ||
-      (page.isSSR && page.prerender) ||
-      // (page.isSSR && compilation.config.prerender) ||
-      (page.isSSR && page.prerender !== false && compilation.config.prerender) ||
-      // (page.isSSR && page.prerender !== false && page.prerender !== null && compilation.config.prerender) ||
-      page.staticPaths,
-  );
+  const pages = getStaticPages(compilation);
   const { context, config } = compilation;
   const plugins = getPluginInstances(compilation);
 
@@ -92,8 +86,8 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
     if (page.staticPaths) {
       for (const staticPath of page.staticPaths) {
         const { route, outputHref, segment } = page;
-        const staticRoute = route.replace(`[${segment.key}]`, staticPath.params[segment.key]);
-        // TODO: base path
+        // at this point route will already include the base path
+        const staticRoute = getStaticRouteFromDynamicRoute("", staticPath, segment, route);
         const url = new URL(`http://localhost:${config.port}${staticRoute}`);
         const request = new Request(url);
         const scratchUrl = toScratchUrl(
@@ -101,6 +95,7 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
           context,
         );
         let ssrContents;
+        let params = getParamsFromSegment(compilation, page.segment, staticRoute) ?? {};
 
         // do we negate the worker pool by also running this, outside the pool?
         let body = await (await servePage(url, request, plugins)).text();
@@ -141,6 +136,7 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
               prerender: true,
               htmlContents: body,
               scripts: JSON.stringify(scripts),
+              params: params ? JSON.stringify(params) : params,
             },
             (err, result) => {
               if (err) {

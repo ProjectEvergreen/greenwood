@@ -18,6 +18,7 @@ import { rollup } from "rollup";
 import { pruneGraph } from "../lib/content-utils.js";
 import { asyncForEach } from "../lib/async-utils.js";
 import { getDynamicPages, getStaticPages } from "../lib/graph-utils.js";
+import { getStaticRouteFromDynamicRoute } from "../lib/url-utils.js";
 
 async function interceptPage(url, request, plugins, body) {
   let response = new Response(body, {
@@ -114,6 +115,7 @@ async function cleanUpResources(compilation) {
   });
 }
 
+// TODO: this could be consolidated
 async function optimizeStaticPages(compilation, plugins) {
   const { scratchDir, outputDir } = compilation.context;
   const pages = getStaticPages(compilation);
@@ -123,12 +125,13 @@ async function optimizeStaticPages(compilation, plugins) {
 
     if (staticPaths) {
       for (const staticPath of staticPaths) {
+        const staticRoute = getStaticRouteFromDynamicRoute("", staticPath, segment, route);
         const outputDirUrl = new URL(
           outputHref
             .replace(`[${segment.key}]`, staticPath.params[segment.key])
             .replace("index.html", ""),
         );
-        const url = new URL(`http://localhost:${compilation.config.port}${route}`); // TODO: keeping placeholder route for optimization looks ups, is this right?
+        const url = new URL(`http://localhost:${compilation.config.port}${staticRoute}`);
         const contents = await fs.readFile(
           new URL(
             `./${outputHref.replace(outputDir.href, "").replace(`[${segment.key}]`, staticPath.params[segment.key])}`,

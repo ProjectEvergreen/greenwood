@@ -318,7 +318,7 @@ async function getStaticServer(compilation, composable) {
       // TODO: handle base path
       const matchingRoute = compilation.graph.find(
         (page) =>
-          (page.staticPaths && getParamsFromSegment(page.segment, url.pathname)) ||
+          (page.staticPaths && getParamsFromSegment(compilation, page.segment, url.pathname)) ||
           page.route === url.pathname,
       );
       const isSPA = compilation.graph.find((page) => page.isSPA);
@@ -381,8 +381,7 @@ async function getHybridServer(compilation) {
         compilation.manifest.apis,
         pathname,
       );
-      const matchingRouteWithSegment =
-        getMatchingDynamicSsrRoute(compilation.graph, pathname) || {};
+      const matchingRouteWithSegment = getMatchingDynamicSsrRoute(compilation, pathname) || {};
       let isDynamicRoute =
         (matchingRoute.isSSR || matchingRouteWithSegment.isSSR) &&
         !matchingRouteWithSegment.staticPaths;
@@ -402,7 +401,7 @@ async function getHybridServer(compilation) {
         );
         const params =
           matchingRouteWithSegment && matchingRouteWithSegment.segment
-            ? getParamsFromSegment(matchingRouteWithSegment.segment, pathname)
+            ? getParamsFromSegment(compilation, matchingRouteWithSegment.segment, pathname)
             : undefined;
         let html;
 
@@ -453,7 +452,7 @@ async function getHybridServer(compilation) {
         const apiRoute = manifest.apis.get(matchingApiRouteWithSegment ?? pathname);
         const params =
           matchingRouteWithSegment && apiRoute.segment
-            ? getParamsFromSegment(apiRoute.segment, pathname)
+            ? getParamsFromSegment(compilation, apiRoute.segment, pathname)
             : undefined;
 
         const entryPointUrl = new URL(apiRoute.outputHref);

@@ -28,6 +28,8 @@
  *   pages/
  *     api/
  *       greeting.js
+ *     blog/
+ *       [slug].js
  *     404.html
  *     about.html
  *     index.html
@@ -321,7 +323,18 @@ describe("Serve Greenwood With: ", function () {
       it("should have expected <greenwood-route> tags in the <body> for each page", function () {
         const routeTags = dom.window.document.querySelectorAll("body > greenwood-route");
 
-        expect(routeTags.length).to.be.equal(2);
+        expect(routeTags.length).to.be.equal(5);
+      });
+
+      it("should have the expected properties for each <greenwood-route> tag for the home page", function () {
+        const homeRouteTag = Array.from(
+          dom.window.document.querySelectorAll("body > greenwood-route"),
+        ).filter((tag) => tag.dataset.route === `${basePath}/`);
+        const dataset = homeRouteTag[0].dataset;
+
+        expect(homeRouteTag.length).to.be.equal(1);
+        expect(dataset.layout).to.be.equal("page");
+        expect(dataset.key).to.be.equal(`${basePath}/_routes/index.html`);
       });
 
       it("should have the expected properties for each <greenwood-route> tag for the about page", function () {
@@ -335,24 +348,22 @@ describe("Serve Greenwood With: ", function () {
         expect(dataset.key).to.be.equal(`${basePath}/_routes/about/index.html`);
       });
 
-      it("should have the expected properties for each <greenwood-route> tag for the home page", function () {
-        const aboutRouteTag = Array.from(
-          dom.window.document.querySelectorAll("body > greenwood-route"),
-        ).filter((tag) => tag.dataset.route === `${basePath}/`);
-        const dataset = aboutRouteTag[0].dataset;
-
-        expect(aboutRouteTag.length).to.be.equal(1);
-        expect(dataset.layout).to.be.equal("page");
-        expect(dataset.key).to.be.equal(`${basePath}/_routes/index.html`);
-      });
-
       // tests to make sure we filter out 404 page from _route partials
       it("should have the expected top level HTML files (index.html, 404.html) in the output", function () {
         expect(pages.length).to.equal(2);
       });
 
       it("should have the expected number of _route partials in the output directory for each page", function () {
-        expect(partials.length).to.be.equal(2);
+        expect(partials.length).to.be.equal(5); // 3 partials comes from src/pages/blog/[slug].js
+      });
+
+      it("should have the expected partial output to match the contents of the home page in the <router-outlet> tag in the <body>", function () {
+        const homePartial = fs.readFileSync(path.join(publicPath, "_routes/index.html"), "utf-8");
+        const homeRouterOutlet = dom.window.document.querySelectorAll("body > router-outlet")[0];
+
+        expect(homeRouterOutlet.innerHTML.replace(/\n/g, "").replace(/ /g, "")).to.contain(
+          homePartial.replace(/\n/g, "").replace(/ /g, ""),
+        );
       });
 
       it("should have the expected partial output to match the contents of the about page in the <router-outlet> tag in the <body>", function () {
@@ -364,15 +375,6 @@ describe("Serve Greenwood With: ", function () {
           aboutDom.window.document.querySelectorAll("body > router-outlet")[0];
 
         expect(aboutRouterOutlet.innerHTML).to.contain(aboutPartial);
-      });
-
-      it("should have the expected partial output to match the contents of the home page in the <router-outlet> tag in the <body>", function () {
-        const homePartial = fs.readFileSync(path.join(publicPath, "_routes/index.html"), "utf-8");
-        const homeRouterOutlet = dom.window.document.querySelectorAll("body > router-outlet")[0];
-
-        expect(homeRouterOutlet.innerHTML.replace(/\n/g, "").replace(/ /g, "")).to.contain(
-          homePartial.replace(/\n/g, "").replace(/ /g, ""),
-        );
       });
     });
 
@@ -455,6 +457,80 @@ describe("Serve Greenwood With: ", function () {
         const cards = usersPageDom.window.document.querySelectorAll("body > section");
 
         expect(cards.length).to.be.greaterThan(0);
+      });
+    });
+
+    describe("Partials from dynamic route with getStaticPaths", function () {
+      let partials = [];
+      let dom;
+
+      before(async function () {
+        const response = await fetch(`${hostname}${basePath}/`);
+
+        dom = new JSDOM(await response.clone().text());
+        partials = await Array.fromAsync(
+          fs.promises.glob("**/*.html", { cwd: new URL("./public/_routes/blog", import.meta.url) }),
+        );
+      });
+
+      it("should have three partials for static path blog posts", function () {
+        expect(partials.length).to.equal(3);
+      });
+
+      it("should have the expected content for each partial", function () {
+        const contents = partials.map((partial) =>
+          fs.readFileSync(path.join(publicPath, `_routes/blog/${partial}`), "utf-8"),
+        );
+        let matched = 0;
+
+        // have to loop since filesystems could come back in any order
+        contents.forEach((content) => {
+          const trimmed = content.trim().replace(/\n/g, "").replace(/ /, "");
+
+          if (trimmed.indexOf("First") > 0) {
+            expect(trimmed).to.equal("<h1>FirstPost</h1>");
+            matched++;
+          } else if (content.indexOf("Second") > 0) {
+            expect(trimmed).to.equal("<h1>SecondPost</h1>");
+            matched++;
+          } else if (content.indexOf("Third") > 0) {
+            expect(trimmed).to.equal("<h1>ThirdPost</h1>");
+            matched++;
+          }
+        });
+
+        expect(matched).to.equal(partials.length);
+      });
+
+      it("should have the expected partial output to match the contents of the getStaticPath routes home page in the <router-outlet> tag in the <body>", function () {
+        const routeTags = dom.window.document.querySelectorAll("body > greenwood-route");
+        const firstPostTag = Array.from(routeTags).find(
+          (tag) => tag.getAttribute("data-route") === "/my-path/blog/first-post/",
+        );
+        const secondPostTag = Array.from(routeTags).find(
+          (tag) => tag.getAttribute("data-route") === "/my-path/blog/second-post/",
+        );
+        const thirdPostTag = Array.from(routeTags).find(
+          (tag) => tag.getAttribute("data-route") === "/my-path/blog/third-post/",
+        );
+
+        expect(firstPostTag).to.not.be.undefined;
+        expect(firstPostTag.getAttribute("data-key")).to.equal(
+          "/my-path/_routes/blog/first-post/index.html",
+        );
+        expect(firstPostTag.getAttribute("data-layout")).to.equal("page");
+
+        expect(secondPostTag).to.not.be.undefined;
+        expect(secondPostTag.getAttribute("data-key")).to.equal(
+          "/my-path/_routes/blog/second-post/index.html",
+        );
+        expect(secondPostTag.getAttribute("data-layout")).to.equal("page");
+
+        expect(thirdPostTag).to.not.be.undefined;
+        expect(thirdPostTag.getAttribute("data-key")).to.equal(
+          "/my-path/_routes/blog/third-post/index.html",
+        );
+        expect(thirdPostTag.getAttribute("data-layout")).to.equal("page");
       });
     });
   });
