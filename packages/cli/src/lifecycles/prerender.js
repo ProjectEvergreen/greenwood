@@ -81,12 +81,11 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
     new URL("../lib/ssr-route-worker.js", import.meta.url),
   );
 
-  // TODO: refactor / consolidate
+  // we could try and refactor / consolidate here some of the duplicate logic
   await asyncForEach(pages, async (page) => {
     if (page.staticPaths) {
       for (const staticPath of page.staticPaths) {
         const { route, outputHref, segment } = page;
-        // at this point route will already include the base path
         const staticRoute = getStaticRouteFromDynamicRoute(staticPath, segment, route);
         const url = new URL(`http://localhost:${config.port}${staticRoute}`);
         const request = new Request(url);

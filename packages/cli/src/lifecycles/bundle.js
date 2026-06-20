@@ -115,7 +115,7 @@ async function cleanUpResources(compilation) {
   });
 }
 
-// TODO: this could be consolidated
+// we could try and refactor / consolidate here some of the duplicate logic
 async function optimizeStaticPages(compilation, plugins) {
   const { scratchDir, outputDir } = compilation.context;
   const pages = getStaticPages(compilation);

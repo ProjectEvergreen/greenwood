@@ -315,7 +315,6 @@ async function getStaticServer(compilation, composable) {
   app.use(async (ctx, next) => {
     try {
       const url = new URL(`http://localhost:${port}${ctx.url}`);
-      // TODO: handle base path
       const matchingRoute = compilation.graph.find(
         (page) =>
           (page.staticPaths && getParamsFromSegment(compilation, page.segment, url.pathname)) ||
