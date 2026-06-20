@@ -94,7 +94,7 @@ class StaticRouterResource {
 
         if (staticPaths && staticPaths.length > 0) {
           staticPaths.forEach((staticPath) => {
-            const staticRoute = getStaticRouteFromDynamicRoute("", staticPath, segment, route);
+            const staticRoute = getStaticRouteFromDynamicRoute(staticPath, segment, route);
             const key = staticRoute.slice(0, staticRoute.lastIndexOf("/")).replace(basePath, "");
 
             if (pathname === staticRoute) {

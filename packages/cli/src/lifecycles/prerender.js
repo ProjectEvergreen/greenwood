@@ -87,7 +87,7 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
       for (const staticPath of page.staticPaths) {
         const { route, outputHref, segment } = page;
         // at this point route will already include the base path
-        const staticRoute = getStaticRouteFromDynamicRoute("", staticPath, segment, route);
+        const staticRoute = getStaticRouteFromDynamicRoute(staticPath, segment, route);
         const url = new URL(`http://localhost:${config.port}${staticRoute}`);
         const request = new Request(url);
         const scratchUrl = toScratchUrl(

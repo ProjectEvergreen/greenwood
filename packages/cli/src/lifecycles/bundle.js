@@ -125,7 +125,7 @@ async function optimizeStaticPages(compilation, plugins) {
 
     if (staticPaths) {
       for (const staticPath of staticPaths) {
-        const staticRoute = getStaticRouteFromDynamicRoute("", staticPath, segment, route);
+        const staticRoute = getStaticRouteFromDynamicRoute(staticPath, segment, route);
         const outputDirUrl = new URL(
           outputHref
             .replace(`[${segment.key}]`, staticPath.params[segment.key])

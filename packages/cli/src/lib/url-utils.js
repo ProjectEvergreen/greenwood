@@ -45,8 +45,8 @@ function getParamsFromSegment(compilation, segment, route) {
 }
 
 // get the full route for a static path
-function getStaticRouteFromDynamicRoute(basePath, staticPath, segment, route) {
-  return `${basePath}${route.replace(`[${segment.key}]`, staticPath.params[segment.key])}`;
+function getStaticRouteFromDynamicRoute(dynamicStaticPath, segment, route) {
+  return `${route.replace(`[${segment.key}]`, dynamicStaticPath.params[segment.key])}`;
 }
 
 export {
