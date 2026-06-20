@@ -47,7 +47,6 @@ class ApiRoutesResource {
       const apiRouterWorkerUrl = this.compilation.config.plugins
         .find((plugin) => plugin.type === "renderer")
         .provider().apiRouteWorkerUrl;
-      // const workerUrl = new URL("../../lib/api-route-worker.js", import.meta.url);
       const req = await requestAsObject(request);
 
       const response = await new Promise((resolve, reject) => {
