@@ -1,24 +1,16 @@
 import { getBlogPosts, getBlogPostBySlug } from "../../services/blog-posts.ts";
 import type { BlogPost } from "../../services/blog-posts.ts";
+import type {
+  GetStaticPaths,
+  GetStaticParams,
+  InferGetStaticParamsType,
+  InferGetStaticPropsType,
+} from "@greenwood/cli";
 
-// TODO: types for all this would be nice: StaticPaths / Params / SSR page / etc?  can they be inferred?
-interface StaticPaths {
-  params: {
-    slug: string;
-  };
-}
+type Params = InferGetStaticParamsType<typeof getStaticPaths>;
+type Props = InferGetStaticPropsType<typeof getStaticParams>;
 
-interface StaticParams {
-  post: BlogPost;
-}
-
-interface BlogPostPageProps {
-  params: {
-    post: BlogPost;
-  };
-}
-
-export async function getStaticPaths(): Promise<StaticPaths[]> {
+export const getStaticPaths = async function () {
   const posts = await getBlogPosts();
 
   return posts.map((post) => {
@@ -28,18 +20,18 @@ export async function getStaticPaths(): Promise<StaticPaths[]> {
       },
     };
   });
-}
+} satisfies GetStaticPaths;
 
-export async function getStaticParams({ params }: StaticPaths): Promise<StaticParams> {
+export const getStaticParams = async function ({ params }: { params: Params }) {
   const post = (await getBlogPostBySlug(params.slug)) ?? ({} as BlogPost);
 
   return { post };
-}
+} satisfies GetStaticParams;
 
 export default class BlogPostPage extends HTMLElement {
   #post: BlogPost;
 
-  constructor({ params }: BlogPostPageProps) {
+  constructor({ params }: { params: Props }) {
     super();
     this.#post = params?.post;
   }

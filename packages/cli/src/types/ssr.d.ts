@@ -23,10 +23,23 @@ export type GetBody = (
   request: Request,
   params: Params,
 ) => Promise<string>;
+
 export type GetLayout = (
   compilation: Compilation,
   page: Page,
   request: Request,
   params: Params,
 ) => Promise<string>;
+
 export type GetFrontmatter = (compilation: Compilation, page: Page) => Promise<Frontmatter>;
+
+export type StaticPath = { params: object };
+export type StaticParam = Record<string, unknown>;
+
+export type GetStaticPaths = () => Promise<StaticPath[]>;
+export type GetStaticParams = ({ params }) => Promise<StaticParam>;
+
+export type InferGetStaticParamsType<T> = T extends () => Promise<Array<{ params: infer P }>>
+  ? P
+  : never;
+export type InferGetStaticPropsType<T> = T extends (...args: any[]) => Promise<infer R> ? R : never;
