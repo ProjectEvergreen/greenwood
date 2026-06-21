@@ -55,7 +55,7 @@ import type { PuppeteerRendererPlugin } from '@greenwood/plugin-renderer-puppete
 
 ### Limitations
 
-Given this plugin instruments an entire browser, this plugin _only_ works with Greenwood's [`prerender` configuration](https://greenwoodjs.dev/docs/reference/configuration/#prerender) option and so will NOT be viable for any of Greenwood's [SSR or Serverless](https://greenwoodjs.dev/docs/pages/server-rendering/) capabilities.  Instead, Greenwood will be focusing on making [**WCC**](https://github.com/ProjectEvergreen/wcc) the default and recommended first-party solution.
+Given this plugin instruments an entire browser, this plugin _only_ works with Greenwood's [`prerender` configuration](https://greenwoodjs.dev/docs/reference/configuration/#prerender) option and so will NOT be viable for any of Greenwood's [SSR or Serverless](https://greenwoodjs.dev/docs/pages/server-rendering/) capabilities, including `getStaticPaths` / `getStaticProps`.  Instead, Greenwood will be focusing on making [**WCC**](https://github.com/ProjectEvergreen/wcc) the default and recommended first-party solution.
 
 In addition, **puppeteer** also leverages npm `postinstall` scripts which in some environments, like [Stackblitz](https://github.com/ProjectEvergreen/greenwood/discussions/639), would be disabled and so [YMMV](https://dictionary.cambridge.org/us/dictionary/english/ymmv).
 
