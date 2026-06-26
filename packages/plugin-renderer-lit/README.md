@@ -77,7 +77,7 @@ import type { LitRendererPlugin } from '@greenwood/plugin-renderer-lit';
 If you're using CSS Module Scripts and [API Routes](https://greenwoodjs.dev/docs/pages/api-routes/), you will need to make sure to import [Lit's CSS Register Hook](https://github.com/lit/lit/tree/main/packages/labs/ssr-dom-shim#css-nodejs-customization-hook) at the top of your function handler.
 
 ```js
-// make sure to import this first!
+// make sure to import the register-css-hook first!
 import "@lit-labs/ssr-dom-shim/register-css-hook.js";
 import { render } from '@lit-labs/ssr';
 import { collectResult } from '@lit-labs/ssr/lib/render-result.js'
@@ -87,7 +87,7 @@ import { getProducts } from '../../services/products.ts';
 import '../../components/card/card.ts';
 
 export async function handler() {
-  const products = (await getProducts());
+  const products = await getProducts();
   const body = await collectResult(render(html`
     ${
       unsafeHTML(products.map((item, idx) => {
