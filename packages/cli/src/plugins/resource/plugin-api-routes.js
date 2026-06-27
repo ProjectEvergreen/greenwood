@@ -44,7 +44,13 @@ class ApiRoutesResource {
         : undefined;
 
     if (process.env.__GWD_COMMAND__ === "develop") {
-      const workerUrl = new URL("../../lib/api-route-worker.js", import.meta.url);
+      // would be good to figure out why Lit renderer needs a custom API route handler even when directly importing the CSS register hook
+      // and WCC does not - https://github.com/ProjectEvergreen/greenwood/issues/1694
+      const defaultWorkerUrl = new URL("../../lib/api-route-worker.js", import.meta.url);
+      const customWorkerUrl = this.compilation.config.plugins
+        .find((plugin) => plugin.type === "renderer")
+        .provider()?.apiRouteWorkerUrl;
+      const workerUrl = customWorkerUrl ?? defaultWorkerUrl;
       const req = await requestAsObject(request);
 
       const response = await new Promise((resolve, reject) => {

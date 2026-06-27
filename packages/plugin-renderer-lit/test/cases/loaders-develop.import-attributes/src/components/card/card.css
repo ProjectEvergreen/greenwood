@@ -1,0 +1,19 @@
+h3 {
+  font-size: 1.85rem;
+}
+
+button {
+  background: var(--color-accent);
+  color: var(--color-white);
+  padding: 1rem 2rem;
+  border: 0;
+  font-size: 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+img {
+  max-width: 500px;
+  min-width: 500px;
+  width: 100%;
+}

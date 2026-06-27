@@ -4,6 +4,8 @@
 
 A Greenwood plugin for using [**Lit**'s SSR capabilities](https://github.com/lit/lit/tree/main/packages/labs/ssr) as a custom server-side renderer instead of Greenwood's default renderer (WCC). This plugin also gives the ability to statically [(pre) render entire pages and layouts](https://greenwoodjs.dev/docs/reference/rendering-strategies/#prerendering) to output completely static sites. For more information and complete docs on Greenwood, please visit [our website](https://www.greenwoodjs.dev).
 
+You can see [this repo](https://github.com/thescientist13/greenwood-lit-ssr) for a full demo of an isomorphic Lit SSR project with SSR pages and API routes, deployed to Vercel.
+
 > This package assumes you already have `@greenwood/cli` installed.
 
 ## Prerequisite
@@ -70,6 +72,44 @@ Types should automatically be inferred through this package's exports map, but c
 import type { LitRendererPlugin } from '@greenwood/plugin-renderer-lit';
 ```
 
+## API Routes
+
+If you're using CSS Module Scripts and [API Routes](https://greenwoodjs.dev/docs/pages/api-routes/), you will need to make sure to import [Lit's CSS Register Hook](https://github.com/lit/lit/tree/main/packages/labs/ssr-dom-shim#css-nodejs-customization-hook) at the top of your function handler.
+
+```js
+// make sure to import the register-css-hook first!
+import "@lit-labs/ssr-dom-shim/register-css-hook.js";
+import { render } from '@lit-labs/ssr';
+import { collectResult } from '@lit-labs/ssr/lib/render-result.js'
+import { html } from 'lit';
+import { unsafeHTML } from 'lit/directives/unsafe-html.js';
+import { getProducts } from '../../services/products.ts';
+import '../../components/card/card.ts';
+
+export async function handler() {
+  const products = await getProducts();
+  const body = await collectResult(render(html`
+    ${
+      unsafeHTML(products.map((item, idx) => {
+        const { title, thumbnail } = item;
+
+        return `
+          <app-card
+            title="${idx + 1}) ${title}"
+            thumbnail="${thumbnail}"
+          ></app-card>
+        `;
+      }).join(''))
+    }
+  `));
+
+  return new Response(body, {
+    headers: new Headers({
+      'Content-Type': 'text/html'
+    })
+  });
+}
+```
 
 ## Caveats
 
@@ -81,8 +121,6 @@ import type { LitRendererPlugin } from '@greenwood/plugin-renderer-lit';
 1. Full hydration support is not available yet.  See [this Greenwood issue](https://github.com/ProjectEvergreen/greenwood/issues/880) to follow along with when it will land.
 
 _**Note**: As `LitElement` [only renders into Shadow Roots](https://github.com/lit/lit/issues/3080#issuecomment-1165158794), for pages and layouts this plugin will extract the HTML contents of the SSR'd `<template>` tag and output those content into the **Light DOM** of your page._
-
-> See [this repo](https://github.com/thescientist13/greenwood-lit-ssr) for a full demo of isomorphic Lit SSR with SSR pages and API routes deployed to Vercel serverless functions.
 
 ## Usage
 

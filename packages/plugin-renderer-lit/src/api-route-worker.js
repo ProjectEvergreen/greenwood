@@ -1,6 +1,10 @@
 // https://github.com/nodejs/modules/issues/307#issuecomment-858729422
 import { parentPort } from "node:worker_threads";
-import { transformKoaRequestIntoStandardRequest, responseAsObject } from "./resource-utils.js";
+import {
+  transformKoaRequestIntoStandardRequest,
+  responseAsObject,
+} from "@greenwood/cli/src/lib/resource-utils.js";
+import "@lit-labs/ssr-dom-shim/register-css-hook.js";
 
 async function executeRouteModule({ href, request, params }) {
   const { body, headers = {}, method, url } = request;
