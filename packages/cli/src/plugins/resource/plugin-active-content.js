@@ -74,7 +74,7 @@ class ContentAsDataResource {
   async shouldIntercept(url, request, response) {
     const { activeContent } = this.compilation.config;
 
-    return response.headers.get("Content-Type")?.indexOf(this.contentType[0]) >= 0 && activeContent;
+    return activeContent && response.headers.get("Content-Type")?.indexOf(this.contentType[0]) >= 0;
   }
 
   async intercept(url, request, response) {
@@ -139,7 +139,7 @@ class ContentAsDataResource {
   async shouldOptimize(url, response) {
     const { activeContent } = this.compilation.config;
 
-    return response.headers.get("Content-Type")?.indexOf(this.contentType[0]) >= 0 && activeContent;
+    return activeContent && response.headers.get("Content-Type")?.indexOf(this.contentType[0]) >= 0;
   }
 
   async optimize(url, response) {
