@@ -1,3 +1,4 @@
+// get the dynamic segments from a dynamic route, e.g. pages/blog/[slug].js
 function getDynamicSegmentsFromRoute({ route, relativePagePath, extension }) {
   const dynamicRoute = route.replace("[", ":").replace("]", "");
   const segmentKey = relativePagePath
@@ -10,31 +11,42 @@ function getDynamicSegmentsFromRoute({ route, relativePagePath, extension }) {
   return { segmentKey, dynamicRoute };
 }
 
-function getMatchingDynamicApiRoute(apis, pathname) {
+// all API routes
+function getMatchingDynamicApiRoute(apis, route) {
   return Array.from(apis.keys()).find((key) => {
-    const route = apis.get(key);
+    const page = apis.get(key);
     return (
-      route.segment &&
-      new URLPattern({ pathname: `${route.segment.pathname}*` }).test(
-        `https://example.com${pathname}`,
+      page.segment &&
+      new URLPattern({ pathname: `${page.segment.pathname}*` }).test(`https://example.com${route}`)
+    );
+  });
+}
+
+// pure SSR routes
+function getMatchingDynamicSsrRoute(compilation, route) {
+  const { graph, config } = compilation;
+
+  return graph.find((node) => {
+    return (
+      route !== "/404/" &&
+      node.segment &&
+      new URLPattern({ pathname: `${config.basePath}${node.segment.pathname}` }).test(
+        `https://example.com${route}`,
       )
     );
   });
 }
 
-function getMatchingDynamicSsrRoute(graph, pathname) {
-  return graph.find((node) => {
-    return (
-      (pathname !== "/404/") !== "/404/" &&
-      node.segment &&
-      new URLPattern({ pathname: node.segment.pathname }).test(`https://example.com${pathname}`)
-    );
-  });
+// get params for dynamic routes from URLPattern based segment extraction
+function getParamsFromSegment(compilation, segment, route) {
+  return new URLPattern({ pathname: `${compilation.config.basePath}${segment.pathname}` }).exec(
+    `https://example.com${route}`,
+  )?.pathname?.groups;
 }
 
-function getParamsFromSegment(segment, pathname) {
-  return new URLPattern({ pathname: segment.pathname }).exec(`https://example.com${pathname}`)
-    .pathname.groups;
+// get the full route for a static path
+function getStaticRouteFromDynamicRoute(dynamicStaticPath, segment, route) {
+  return `${route.replace(`[${segment.key}]`, dynamicStaticPath.params[segment.key])}`;
 }
 
 export {
@@ -42,4 +54,5 @@ export {
   getMatchingDynamicApiRoute,
   getParamsFromSegment,
   getMatchingDynamicSsrRoute,
+  getStaticRouteFromDynamicRoute,
 };

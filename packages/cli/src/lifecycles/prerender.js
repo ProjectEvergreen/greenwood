@@ -7,6 +7,8 @@ import {
 import os from "node:os";
 import { WorkerPool } from "../lib/threadpool.js";
 import { asyncForEach } from "../lib/async-utils.js";
+import { getStaticPages } from "../lib/graph-utils.js";
+import { getParamsFromSegment, getStaticRouteFromDynamicRoute } from "../lib/url-utils.js";
 
 async function createOutputDirectory(outputDir) {
   // ignore creating directory for 404 pages since they live at the root of the output directory
@@ -68,82 +70,161 @@ function toScratchUrl(outputHref, context) {
 }
 
 async function preRenderCompilationWorker(compilation, workerPrerender) {
-  const pages = compilation.graph.filter(
-    (page) =>
-      !page.isSSR || (page.isSSR && page.prerender) || (page.isSSR && compilation.config.prerender),
-  );
+  const pages = getStaticPages(compilation);
   const { context, config } = compilation;
   const plugins = getPluginInstances(compilation);
 
   console.info("pages to generate", `\n ${pages.map((page) => page.route).join("\n ")}`);
 
   const pool = new WorkerPool(
-    os.availableParallelism(),
+    os.cpus().length,
     new URL("../lib/ssr-route-worker.js", import.meta.url),
   );
 
+  // we could try and refactor / consolidate here some of the duplicate logic
   await asyncForEach(pages, async (page) => {
-    const { route, outputHref } = page;
-    const scratchUrl = toScratchUrl(outputHref, context);
-    const url = new URL(`http://localhost:${config.port}${route}`);
-    const request = new Request(url);
-    let ssrContents;
+    if (page.staticPaths) {
+      for (const staticPath of page.staticPaths) {
+        const { route, outputHref, segment } = page;
+        const staticRoute = getStaticRouteFromDynamicRoute(staticPath, segment, route);
+        const url = new URL(`http://localhost:${config.port}${staticRoute}`);
+        const request = new Request(url);
+        const scratchUrl = toScratchUrl(
+          outputHref.replace(`[${segment.key}]`, staticPath.params[segment.key]),
+          context,
+        );
+        let ssrContents;
+        let params = getParamsFromSegment(compilation, page.segment, staticRoute) ?? {};
 
-    // do we negate the worker pool by also running this, outside the pool?
-    let body = await (await servePage(url, request, plugins)).text();
-    body = await (await interceptPage(url, request, plugins, body)).text();
+        // do we negate the worker pool by also running this, outside the pool?
+        let body = await (await servePage(url, request, plugins)).text();
+        body = await (await interceptPage(url, request, plugins, body)).text();
 
-    // hack to avoid over-rendering SSR content
-    // https://github.com/ProjectEvergreen/greenwood/issues/1044
-    // https://github.com/ProjectEvergreen/greenwood/issues/988#issuecomment-1288168858
-    if (page.isSSR) {
-      const ssrContentsMatch = /<!-- greenwood-ssr-start -->(.*.)<!-- greenwood-ssr-end -->/s;
-      const match = body.match(ssrContentsMatch);
+        // hack to avoid over-rendering SSR content
+        // https://github.com/ProjectEvergreen/greenwood/issues/1044
+        // https://github.com/ProjectEvergreen/greenwood/issues/988#issuecomment-1288168858
+        if (page.isSSR) {
+          const ssrContentsMatch = /<!-- greenwood-ssr-start -->(.*.)<!-- greenwood-ssr-end -->/s;
+          const match = body.match(ssrContentsMatch);
 
-      if (match) {
-        ssrContents = match[0];
-        body = body.replace(ssrContents, "<!-- greenwood-ssr-start --><!-- greenwood-ssr-end -->");
+          if (match) {
+            ssrContents = match[0];
+            body = body.replace(
+              ssrContents,
+              "<!-- greenwood-ssr-start --><!-- greenwood-ssr-end -->",
+            );
 
-        ssrContents = ssrContents
-          .replace("<!-- greenwood-ssr-start -->", "")
-          .replace("<!-- greenwood-ssr-end -->", "");
-      }
-    }
-
-    const resources = await trackResourcesForRoute(body, compilation, route);
-    const scripts = resources
-      .filter((resource) => resource.type === "script")
-      .map((resource) => resource.sourcePathURL.href);
-
-    body = await new Promise((resolve, reject) => {
-      pool.runTask(
-        {
-          executeModuleUrl: workerPrerender.executeModuleUrl.href,
-          modulePath: null,
-          compilation: JSON.stringify(compilation),
-          page: JSON.stringify(page),
-          prerender: true,
-          htmlContents: body,
-          scripts: JSON.stringify(scripts),
-        },
-        (err, result) => {
-          if (err) {
-            return reject(err);
+            ssrContents = ssrContents
+              .replace("<!-- greenwood-ssr-start -->", "")
+              .replace("<!-- greenwood-ssr-end -->", "");
           }
+        }
 
-          return resolve(result.html);
-        },
-      );
-    });
+        const resources = await trackResourcesForRoute(body, compilation, route);
+        const scripts = resources
+          .filter((resource) => resource.type === "script")
+          .map((resource) => resource.sourcePathURL.href);
 
-    if (page.isSSR) {
-      body = body.replace("<!-- greenwood-ssr-start --><!-- greenwood-ssr-end -->", ssrContents);
+        body = await new Promise((resolve, reject) => {
+          pool.runTask(
+            {
+              executeModuleUrl: workerPrerender.executeModuleUrl.href,
+              modulePath: null,
+              compilation: JSON.stringify(compilation),
+              page: JSON.stringify(page),
+              prerender: true,
+              htmlContents: body,
+              scripts: JSON.stringify(scripts),
+              params: params ? JSON.stringify(params) : params,
+            },
+            (err, result) => {
+              if (err) {
+                return reject(err);
+              }
+
+              return resolve(result.html);
+            },
+          );
+        });
+
+        if (page.isSSR) {
+          body = body.replace(
+            "<!-- greenwood-ssr-start --><!-- greenwood-ssr-end -->",
+            ssrContents,
+          );
+        }
+
+        await createOutputDirectory(new URL(scratchUrl.href.replace("index.html", "")));
+        await fs.writeFile(scratchUrl, body);
+
+        console.info("generated static path...", staticRoute);
+      }
+    } else {
+      const { route, outputHref } = page;
+      const scratchUrl = toScratchUrl(outputHref, context);
+      const url = new URL(`http://localhost:${config.port}${route}`);
+      const request = new Request(url);
+      let ssrContents;
+
+      // do we negate the worker pool by also running this, outside the pool?
+      let body = await (await servePage(url, request, plugins)).text();
+      body = await (await interceptPage(url, request, plugins, body)).text();
+
+      // hack to avoid over-rendering SSR content
+      // https://github.com/ProjectEvergreen/greenwood/issues/1044
+      // https://github.com/ProjectEvergreen/greenwood/issues/988#issuecomment-1288168858
+      if (page.isSSR) {
+        const ssrContentsMatch = /<!-- greenwood-ssr-start -->(.*.)<!-- greenwood-ssr-end -->/s;
+        const match = body.match(ssrContentsMatch);
+
+        if (match) {
+          ssrContents = match[0];
+          body = body.replace(
+            ssrContents,
+            "<!-- greenwood-ssr-start --><!-- greenwood-ssr-end -->",
+          );
+
+          ssrContents = ssrContents
+            .replace("<!-- greenwood-ssr-start -->", "")
+            .replace("<!-- greenwood-ssr-end -->", "");
+        }
+      }
+
+      const resources = await trackResourcesForRoute(body, compilation, route);
+      const scripts = resources
+        .filter((resource) => resource.type === "script")
+        .map((resource) => resource.sourcePathURL.href);
+
+      body = await new Promise((resolve, reject) => {
+        pool.runTask(
+          {
+            executeModuleUrl: workerPrerender.executeModuleUrl.href,
+            modulePath: null,
+            compilation: JSON.stringify(compilation),
+            page: JSON.stringify(page),
+            prerender: true,
+            htmlContents: body,
+            scripts: JSON.stringify(scripts),
+          },
+          (err, result) => {
+            if (err) {
+              return reject(err);
+            }
+
+            return resolve(result.html);
+          },
+        );
+      });
+
+      if (page.isSSR) {
+        body = body.replace("<!-- greenwood-ssr-start --><!-- greenwood-ssr-end -->", ssrContents);
+      }
+
+      await createOutputDirectory(new URL(scratchUrl.href.replace("index.html", "")));
+      await fs.writeFile(scratchUrl, body);
+
+      console.info("generated page...", route);
     }
-
-    await createOutputDirectory(new URL(scratchUrl.href.replace("index.html", "")));
-    await fs.writeFile(scratchUrl, body);
-
-    console.info("generated page...", route);
   });
 }
 

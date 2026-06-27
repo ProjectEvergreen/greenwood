@@ -108,8 +108,7 @@ const generateGraph = async (compilation) => {
             return;
           }
 
-          // TODO: should API routes be run in isolation mode like SSR pages?
-          // TODO: is there a better way to detect for isolation option?
+          // is there a better way to detect for isolation export without having to actually import() the module?
           const contents = await fs.readFile(filenameUrl, "utf8");
           const isolation = contents.indexOf("export const isolation = true;") >= 0;
           const { segmentKey, dynamicRoute } = getDynamicSegmentsFromRoute({
@@ -150,9 +149,11 @@ const generateGraph = async (compilation) => {
           let label = getLabelFromRoute(`${route}/`);
           let imports = [];
           let customData = {};
-          let prerender = true;
+          let prerender = isStatic === true ? true : null;
           let isolation = false;
           let hydration = false;
+          let staticPaths = null;
+          let hasStaticParams = false;
 
           /*
            * check if additional nested directories exist to correctly determine route (minus filename)
@@ -193,13 +194,22 @@ const generateGraph = async (compilation) => {
               const worker = new Worker(new URL("../lib/ssr-route-worker.js", import.meta.url));
 
               worker.on("message", (result) => {
-                prerender = result.prerender ?? false;
+                prerender =
+                  result.prerender === true || result.prerender === false ? result.prerender : null;
                 isolation = result.isolation ?? isolation;
                 hydration = result.hydration ?? hydration;
 
                 if (result.frontmatter) {
                   result.frontmatter.imports = result.frontmatter.imports || [];
                   ssrFrontmatter = result.frontmatter;
+                }
+
+                if (result.staticPaths) {
+                  staticPaths = result.staticPaths;
+                }
+
+                if (result.hasStaticParams) {
+                  hasStaticParams = result.hasStaticParams;
                 }
 
                 resolve();
@@ -224,6 +234,7 @@ const generateGraph = async (compilation) => {
                 request,
                 contentOptions: JSON.stringify({
                   frontmatter: true,
+                  statics: true,
                 }),
               });
             });
@@ -260,6 +271,9 @@ const generateGraph = async (compilation) => {
            * isolation: if this page should be run in isolated mode
            * hydration: if this page needs hydration support
            * servePage: signal that this is a custom page file type (static | dynamic)
+           * segment: key and dynamic pathname for a dynamic routes; the key is what is in the brackets, e.g. [slug].ts
+           * staticPaths: paths and props returned from getStaticPaths and getStaticProps
+           * hasStaticParams: if getStaticProps is present on the route
            */
 
           const { segmentKey, dynamicRoute } = getDynamicSegmentsFromRoute({
@@ -287,15 +301,17 @@ const generateGraph = async (compilation) => {
             prerender,
             isolation,
             hydration,
-            servePage: isCustom,
+            servePage: isCustom ? isCustom : isDynamic ? "dynamic" : "static",
             segment:
               dynamicRoute.indexOf(":") > 0 ? { key: segmentKey, pathname: dynamicRoute } : null,
+            staticPaths,
+            hasStaticParams,
           };
 
           pages.push(page);
 
           // handle collections
-          trackCollectionsForPage(page, compilation.collections); // collections;
+          trackCollectionsForPage(page, compilation.collections);
         } else {
           console.warn(`Unsupported format detected for page => ${filename}`);
         }

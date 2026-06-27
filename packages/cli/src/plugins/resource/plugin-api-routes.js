@@ -40,7 +40,7 @@ class ApiRoutesResource {
     const href = apiUrl.href;
     const params =
       matchingRouteWithSegment && api.segment
-        ? getParamsFromSegment(api.segment, pathname)
+        ? getParamsFromSegment(this.compilation, api.segment, pathname)
         : undefined;
 
     if (process.env.__GWD_COMMAND__ === "develop") {

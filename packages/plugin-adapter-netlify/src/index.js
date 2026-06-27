@@ -4,6 +4,7 @@ import {
   checkResourceExists,
   normalizePathnameForWindows,
 } from "@greenwood/cli/src/lib/resource-utils.js";
+import { getDynamicPages } from "@greenwood/cli/src/lib/graph-utils.js";
 import { zip } from "zip-a-folder";
 
 // https://docs.netlify.com/functions/create/?fn-language=js
@@ -93,7 +94,7 @@ async function netlifyAdapter(compilation) {
   const { outputDir, projectDirectory, scratchDir } = compilation.context;
   const adapterOutputUrl = new URL("./netlify/functions/", projectDirectory);
   const adapterOutputScratchUrl = new URL("./netlify/functions/", scratchDir);
-  const ssrPages = compilation.graph.filter((page) => page.isSSR);
+  const ssrPages = getDynamicPages(compilation);
   const apiRoutes = compilation.manifest.apis;
   // https://docs.netlify.com/routing/redirects/
   // https://docs.netlify.com/routing/redirects/rewrites-proxies/

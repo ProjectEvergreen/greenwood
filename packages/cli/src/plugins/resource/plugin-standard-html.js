@@ -8,6 +8,7 @@ import fs from "node:fs/promises";
 import { getPageLayout, getAppLayout, getGreenwoodScripts } from "../../lib/layout-utils.js";
 import { requestAsObject } from "../../lib/resource-utils.js";
 import { getMatchingDynamicSsrRoute, getParamsFromSegment } from "../../lib/url-utils.js";
+import { getMatchingPageByRoute } from "@greenwood/cli/src/lib/graph-utils.js";
 import { Worker } from "node:worker_threads";
 import { parse } from "node-html-parser";
 
@@ -22,7 +23,7 @@ class StandardHtmlResource {
     const { protocol, pathname } = url;
     const hasMatchingPageRoute = this.compilation.graph.find((node) => node.route === pathname);
     const isSPA = this.compilation.graph.find((node) => node.isSPA) && pathname.indexOf(".") < 0;
-    const matchingRouteWithSegment = getMatchingDynamicSsrRoute(this.compilation.graph, pathname);
+    const matchingRouteWithSegment = getMatchingDynamicSsrRoute(this.compilation, pathname);
 
     return (
       protocol.startsWith("http") &&
@@ -38,8 +39,7 @@ class StandardHtmlResource {
     const { pathname } = url;
     const isSpaRoute = this.compilation.graph.find((node) => node.isSPA);
     const matchingRoute = this.compilation.graph.find((node) => node.route === pathname) || {};
-    const matchingRouteWithSegment =
-      getMatchingDynamicSsrRoute(this.compilation.graph, pathname) || {};
+    const matchingRouteWithSegment = getMatchingDynamicSsrRoute(this.compilation, pathname) || {};
     const { pageHref } = matchingRoute;
     const filePath =
       !matchingRoute.external && pageHref
@@ -80,9 +80,9 @@ class StandardHtmlResource {
         .find((plugin) => plugin.type === "renderer")
         .provider().executeModuleUrl;
       const req = await requestAsObject(request);
-      const params =
+      let params =
         matchingRouteWithSegment && matchingRouteWithSegment.segment
-          ? getParamsFromSegment(matchingRouteWithSegment.segment, pathname)
+          ? getParamsFromSegment(this.compilation, matchingRouteWithSegment.segment, pathname)
           : undefined;
 
       await new Promise((resolve, reject) => {
@@ -106,7 +106,7 @@ class StandardHtmlResource {
           executeModuleUrl: routeWorkerUrl.href,
           moduleUrl: routeModuleLocationUrl.href,
           compilation: JSON.stringify(this.compilation),
-          page: JSON.stringify(matchingRoute),
+          page: JSON.stringify(matchingRouteWithSegment ?? matchingRoute),
           request: req,
           contentOptions: JSON.stringify({
             body: true,
@@ -151,7 +151,7 @@ class StandardHtmlResource {
   async optimize(url, response) {
     const { optimization, basePath } = this.compilation.config;
     const { pathname } = url;
-    const pageResources = this.compilation.graph.find((page) => page.route === pathname).resources;
+    const pageResources = getMatchingPageByRoute(this.compilation, pathname).resources;
     let body = await response.text();
 
     const root = parse(body, {

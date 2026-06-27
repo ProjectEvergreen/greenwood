@@ -1,15 +1,13 @@
 import { getStaticServer, getHybridServer } from "../lifecycles/serve.js";
 import { checkResourceExists } from "../lib/resource-utils.js";
+import { getDynamicPages } from "../lib/graph-utils.js";
 
 const runProdServer = async (compilation) => {
   const { basePath, port } = compilation.config;
   const postfixSlash = basePath === "" ? "" : "/";
   const hasApisDir = await checkResourceExists(compilation.context.apisDir);
-  const hasDynamicRoutes = compilation.graph.find((page) => page.isSSR && !page.prerender);
-  const server =
-    (hasDynamicRoutes && !compilation.config.prerender) || hasApisDir
-      ? getHybridServer
-      : getStaticServer;
+  const hasDynamicRoutes = getDynamicPages(compilation).length > 0;
+  const server = hasDynamicRoutes || hasApisDir ? getHybridServer : getStaticServer;
 
   (await server(compilation)).listen(port, () => {
     console.info(`Started server at http://localhost:${port}${basePath}${postfixSlash}`);

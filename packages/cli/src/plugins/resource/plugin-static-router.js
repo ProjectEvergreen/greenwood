@@ -6,6 +6,8 @@
  *
  */
 import { checkResourceExists } from "../../lib/resource-utils.js";
+import { getStaticPages, getMatchingPageByRoute } from "../../lib/graph-utils.js";
+import { getStaticRouteFromDynamicRoute } from "../../lib/url-utils.js";
 import fs from "node:fs/promises";
 
 class StaticRouterResource {
@@ -65,8 +67,10 @@ class StaticRouterResource {
     let body = await response.text();
     const { basePath } = this.compilation.config;
     const { pathname } = url;
-    const isStaticRoute = this.compilation.graph.find(
-      (page) => page.route === pathname && !page.isSSR,
+    const staticPages = getStaticPages(this.compilation);
+    const isStaticRoute = getMatchingPageByRoute(
+      { graph: staticPages, config: this.compilation.config },
+      pathname,
     );
     const { outputDir } = this.compilation.context;
     const partial = body
@@ -81,20 +85,38 @@ class StaticRouterResource {
       `file://${outputPartialDirUrl.pathname.split("/").slice(0, -1).join("/").concat("/")}`,
     );
     let currentLayout;
+    let routeTags = [];
 
-    const routeTags = this.compilation.graph
-      .filter((page) => !page.isSSR && !page.route.endsWith("/404/"))
-      .map((page) => {
-        const { layout, route } = page;
-        const key =
-          route === "/" ? "" : route.slice(0, route.lastIndexOf("/")).replace(basePath, "");
+    staticPages
+      .filter((page) => !page.route.endsWith("/404/"))
+      .forEach((page) => {
+        const { layout, route, staticPaths, segment } = page;
 
-        if (pathname === route) {
-          currentLayout = layout;
+        if (staticPaths && staticPaths.length > 0) {
+          staticPaths.forEach((staticPath) => {
+            const staticRoute = getStaticRouteFromDynamicRoute(staticPath, segment, route);
+            const key = staticRoute.slice(0, staticRoute.lastIndexOf("/")).replace(basePath, "");
+
+            if (pathname === staticRoute) {
+              currentLayout = layout;
+            }
+
+            routeTags.push(`
+              <greenwood-route data-route="${staticRoute}" data-layout="${layout}" data-key="${basePath}/_routes${key}/index.html"></greenwood-route>
+            `);
+          });
+        } else {
+          const key =
+            route === "/" ? "" : route.slice(0, route.lastIndexOf("/")).replace(basePath, "");
+
+          if (pathname === route) {
+            currentLayout = layout;
+          }
+
+          routeTags.push(`
+            <greenwood-route data-route="${route}" data-layout="${layout}" data-key="${basePath}/_routes${key}/index.html"></greenwood-route>
+          `);
         }
-        return `
-          <greenwood-route data-route="${route}" data-layout="${layout}" data-key="${basePath}/_routes${key}/index.html"></greenwood-route>
-        `;
       });
 
     if (isStaticRoute) {

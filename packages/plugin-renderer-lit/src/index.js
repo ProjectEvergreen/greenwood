@@ -1,12 +1,19 @@
+import { getMatchingPageByRoute } from "@greenwood/cli/src/lib/graph-utils.js";
+
 class LitHydrationResource {
   constructor(compilation, options) {
     this.compilation = compilation;
     this.options = options;
   }
 
-  async shouldIntercept(url) {
+  async shouldIntercept(url, request, response) {
     const { pathname } = url;
-    const matchingRoute = this.compilation.graph.find((node) => node.route === pathname);
+
+    if (response.headers?.get("Content-Type")?.indexOf("text/html") < 0) {
+      return false;
+    }
+
+    const matchingRoute = getMatchingPageByRoute(this.compilation, pathname);
 
     return (
       matchingRoute &&

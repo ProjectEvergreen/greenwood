@@ -22,9 +22,13 @@
  *   pages/
  *     api/
  *       product/
- *         [id].ts
+ *         [id].js
+ *     artists/
+ *       [name].js # uses getStaticPaths
  *     blog/
- *       [slug].ts
+ *       [slug].js
+ *     event/
+ *       title.js # has prerender = true
  */
 import { expect } from "chai";
 import fs from "node:fs/promises";
@@ -73,11 +77,11 @@ describe("Build Greenwood With: ", function () {
       });
 
       it("should output the expected number of serverless function output folders for SSR pages", function () {
-        expect(functionFolders.length).to.be.equal(1);
+        expect(routeFolders.length).to.be.equal(1);
       });
 
       it("should output the expected number of serverless function output folders for API routes", function () {
-        expect(routeFolders.length).to.be.equal(1);
+        expect(functionFolders.length).to.be.equal(1);
       });
 
       it("should output the expected package.json for each serverless function", function () {

@@ -9,7 +9,16 @@ import type {
 } from "./content.d.ts";
 import type { Compilation, Frontmatter } from "./compilation.d.ts";
 import type { ApiRouteHandler } from "./api.d.ts";
-import type { SsrRouteHandler, GetBody, GetLayout, GetFrontmatter } from "./ssr.d.ts";
+import type {
+  SsrRouteHandler,
+  GetBody,
+  GetLayout,
+  GetFrontmatter,
+  GetStaticPaths,
+  GetStaticParams,
+  InferGetStaticParamsType,
+  InferGetStaticPropsType,
+} from "./ssr.d.ts";
 import type {
   PLUGINS,
   PLUGIN_TYPES,
@@ -56,6 +65,10 @@ export type {
   GetBody,
   GetLayout,
   GetFrontmatter,
+  GetStaticPaths,
+  GetStaticParams,
+  InferGetStaticParamsType,
+  InferGetStaticPropsType,
 };
 
 export type CLI_COMMAND = "develop" | "build" | "serve";
