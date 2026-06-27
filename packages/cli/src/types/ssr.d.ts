@@ -37,7 +37,9 @@ export type StaticPath = { params: object };
 export type StaticParam = Record<string, unknown>;
 
 export type GetStaticPaths = () => Promise<StaticPath[]>;
-export type GetStaticParams = ({ params }) => Promise<StaticParam>;
+export type GetStaticParams = ({
+  params,
+}: InferGetStaticParamsType<StaticPath>) => Promise<StaticParam>;
 
 export type InferGetStaticParamsType<T> = T extends () => Promise<Array<{ params: infer P }>>
   ? P
