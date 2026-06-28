@@ -8,7 +8,7 @@ export default class EventDetailPage extends HTMLElement {
 
   async connectedCallback() {
     this.innerHTML = `
-      <h1>${this.#title.toUpperCase().replace(/-/g, " ")}</h1>
+      <h2>${this.#title.toUpperCase().replace(/-/g, " ")}</h2>
     `;
   }
 }

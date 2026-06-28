@@ -39,7 +39,7 @@ export default class BlogPostPage extends HTMLElement {
   connectedCallback() {
     this.innerHTML = `
       <body>
-        <h1>${this.#post.title}</h1>
+        <h2>${this.#post.title}</h2>
         <p>${this.#post.content}</p>
       </body>
     `;

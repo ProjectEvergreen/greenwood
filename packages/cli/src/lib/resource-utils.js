@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import { hashString } from "./hashing-utils.js";
 import { getResolvedHrefFromPathnameShortcut } from "../lib/node-modules-utils.js";
+import { getMatchingPageByRoute } from "../lib/graph-utils.js";
 import { parse } from "node-html-parser";
 import { asyncMap } from "./async-utils.js";
 
@@ -208,9 +209,9 @@ async function trackResourcesForRoute(html, compilation, route) {
     });
   });
 
-  compilation.graph.find((page) => page.route === route).resources = resources.map(
-    (resource) => resource.sourcePathURL.pathname,
-  );
+  const matchingRoute = getMatchingPageByRoute(compilation, route);
+
+  matchingRoute.resources = resources.map((resource) => resource.sourcePathURL.pathname);
 
   return resources;
 }

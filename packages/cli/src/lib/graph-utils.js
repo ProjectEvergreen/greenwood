@@ -28,28 +28,42 @@ function getStaticPages(compilation) {
 }
 
 // get a page by route; including getStaticPaths or dynamic SSR pages
+// not sure if there's a better way to filter through all the possible matches in one-shot?
 function getMatchingPageByRoute(compilation, route) {
   const { graph, config } = compilation;
 
-  return graph.find((page) => {
-    return (
-      // exact match
-      page.route === route ||
-      // dynamic route
-      (page.segment &&
-        new URLPattern({ pathname: `${config.basePath}${page.segment.pathname}` }).test(
-          `https://example.com${route}`,
-        )) ||
-      // getStaticPaths
-      (page.hasStaticParams &&
-        page.staticPaths.find((path) => {
-          const { segment } = page;
-          const staticRoute = route.replace(`[${segment.key}]`, path.params[segment.key]);
+  const exactMatch = graph.find((page) => page.route === route);
 
-          return `${config.basePath}${staticRoute}` === route;
-        }))
-    );
-  });
+  if (exactMatch) {
+    return exactMatch;
+  }
+
+  const dynamicMatch = graph.find(
+    (page) =>
+      page.segment &&
+      new URLPattern({ pathname: `${config.basePath}${page.segment.pathname}` }).test(
+        `https://example.com${route}`,
+      ),
+  );
+
+  if (dynamicMatch) {
+    return dynamicMatch;
+  }
+
+  const staticMatch = graph.find(
+    (page) =>
+      page.hasStaticParams &&
+      page.staticPaths.find((path) => {
+        const { segment } = page;
+        const staticRoute = route.replace(`[${segment.key}]`, path.params[segment.key]);
+
+        return `${config.basePath}${staticRoute}` === route;
+      }),
+  );
+
+  if (staticMatch) {
+    return staticMatch;
+  }
 }
 
 export { getDynamicPages, getStaticPages, getMatchingPageByRoute };

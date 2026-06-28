@@ -27,5 +27,5 @@ export async function getStaticParams({ params }) {
 }
 
 export async function getBody(compilation, request, page, params) {
-  return `<h1>${params.product.name}</h1>`;
+  return `<h2>${params.product.name}</h2>`;
 }

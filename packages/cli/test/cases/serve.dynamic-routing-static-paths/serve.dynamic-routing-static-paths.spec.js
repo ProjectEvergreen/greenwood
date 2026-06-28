@@ -13,6 +13,11 @@
  *
  * User Workspace
  *  src/
+ *   components/
+ *     greeting.js
+ *     header.js
+ *   layouts/
+ *     app.html
  *   pages/
  *     blog/
  *       [slug].ts
@@ -20,6 +25,7 @@
  *       [title].js
  *     product/
  *       [name].js
+ *     index.html
  *   services/
  *     blog-posts.ts
  */
@@ -70,7 +76,53 @@ describe("Serve Greenwood With: ", function () {
           fs.glob("*.js", { cwd: new URL("./public", import.meta.url) }),
         );
 
-        expect(files.length).to.equal(2);
+        expect(files.length).to.equal(4);
+      });
+    });
+
+    describe("A static HTML page with correctly synced page resources", function () {
+      let response;
+      let dom;
+      let body;
+
+      before(async function () {
+        response = await fetch(`${hostname}/`);
+        body = await response.clone().text();
+        dom = new JSDOM(body);
+      });
+
+      it("should have the expected output for the page in the h1 tag", function () {
+        const headings = dom.window.document.querySelectorAll("body > h1");
+
+        expect(headings.length).to.equal(1);
+        expect(headings[0].textContent).to.equal("This is my site");
+      });
+
+      it("should have the expected output for the page in the h2 tag", function () {
+        const headings = dom.window.document.querySelectorAll("body > h2");
+
+        expect(headings.length).to.equal(1);
+        expect(headings[0].textContent).to.equal("Home Page");
+      });
+
+      it("should have the expected bundled script tag for the header component", function () {
+        const scripts = dom.window.document.querySelectorAll("head > script");
+        const headingScript = Array.from(scripts).filter(
+          (script) => script.getAttribute("src")?.indexOf("header") > 0,
+        );
+
+        expect(headingScript.length).to.equal(1);
+        expect(headingScript[0].getAttribute("src").startsWith("/header.")).to.equal(true);
+      });
+
+      it("should have the expected bundled script tag for the greeting component", function () {
+        const scripts = dom.window.document.querySelectorAll("head > script");
+        const greetingScript = Array.from(scripts).filter(
+          (script) => script.getAttribute("src")?.indexOf("greeting") > 0,
+        );
+
+        expect(greetingScript.length).to.equal(1);
+        expect(greetingScript[0].getAttribute("src").startsWith("/greeting.")).to.equal(true);
       });
     });
 
@@ -86,8 +138,25 @@ describe("Serve Greenwood With: ", function () {
         dom = new JSDOM(body);
       });
 
-      it("should have the expected output for the page in the title", function () {
+      it("should have the expected bundled script tag for the header component", function () {
+        const scripts = dom.window.document.querySelectorAll("head > script");
+        const headingScript = Array.from(scripts).filter(
+          (script) => script.getAttribute("src")?.indexOf("header") > 0,
+        );
+
+        expect(headingScript.length).to.equal(1);
+        expect(headingScript[0].getAttribute("src").startsWith("/header.")).to.equal(true);
+      });
+
+      it("should have the expected output for the page in the h1 tag", function () {
         const headings = dom.window.document.querySelectorAll("body > h1");
+
+        expect(headings.length).to.equal(1);
+        expect(headings[0].textContent).to.equal("This is my site");
+      });
+
+      it("should have the expected output for the page in the h2 tag", function () {
+        const headings = dom.window.document.querySelectorAll("body > h2");
 
         expect(headings.length).to.equal(1);
         expect(headings[0].textContent).to.equal("First Post");
@@ -113,8 +182,25 @@ describe("Serve Greenwood With: ", function () {
         dom = new JSDOM(body);
       });
 
-      it("should have the expected output for the page", function () {
-        const headings = dom.window.document.querySelectorAll("h1");
+      it("should have the expected bundled script tag for the header component", function () {
+        const scripts = dom.window.document.querySelectorAll("head > script");
+        const headingScript = Array.from(scripts).filter(
+          (script) => script.getAttribute("src")?.indexOf("header") > 0,
+        );
+
+        expect(headingScript.length).to.equal(1);
+        expect(headingScript[0].getAttribute("src").startsWith("/header.")).to.equal(true);
+      });
+
+      it("should have the expected output for the page in the h1 tag", function () {
+        const headings = dom.window.document.querySelectorAll("body > h1");
+
+        expect(headings.length).to.equal(1);
+        expect(headings[0].textContent).to.equal("This is my site");
+      });
+
+      it("should have the expected output for the page in the h2 tag", function () {
+        const headings = dom.window.document.querySelectorAll("body > h2");
 
         expect(headings.length).to.equal(1);
         expect(headings[0].textContent).to.equal(name);
@@ -133,11 +219,28 @@ describe("Serve Greenwood With: ", function () {
         dom = new JSDOM(body);
       });
 
-      it("should have the expected output for the page", function () {
-        const headings = dom.window.document.querySelectorAll("h1");
+      it("should have the expected bundled script tag for the header component", function () {
+        const scripts = dom.window.document.querySelectorAll("head > script");
+        const headingScript = Array.from(scripts).filter(
+          (script) => script.getAttribute("src")?.indexOf("header") > 0,
+        );
+
+        expect(headingScript.length).to.equal(1);
+        expect(headingScript[0].getAttribute("src").startsWith("/header.")).to.equal(true);
+      });
+
+      it("should have the expected output for the page in the h1 tag", function () {
+        const headings = dom.window.document.querySelectorAll("body > h1");
 
         expect(headings.length).to.equal(1);
-        expect(headings[0].textContent).to.equal(title.toUpperCase().replace(/-/g, " "));
+        expect(headings[0].textContent).to.equal("This is my site");
+      });
+
+      it("should have the expected output for the page in the h2 tag", function () {
+        const headings = dom.window.document.querySelectorAll("body > h2");
+
+        expect(headings.length).to.equal(1);
+        expect(headings[0].textContent).to.equal(title.toUpperCase());
       });
     });
   });
