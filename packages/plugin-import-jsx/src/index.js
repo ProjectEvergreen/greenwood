@@ -6,6 +6,7 @@
 import { generate } from "astring";
 import { parseJsx } from "wc-compiler/jsx-loader";
 import { mergeImportMap } from "@greenwood/cli/src/lib/node-modules-utils.js";
+import { getMatchingPageByRoute } from "@greenwood/cli/src/lib/graph-utils.js";
 import { parse } from "node-html-parser";
 
 const importMap = {
@@ -43,8 +44,12 @@ class ImportJsxResource {
   }
 
   async shouldIntercept(url, request, response) {
+    const matchingRoute = getMatchingPageByRoute(this.compilation, url.pathname);
+
     return (
-      this.inferredObservability && response.headers.get("Content-Type")?.indexOf("text/html") >= 0
+      this.inferredObservability &&
+      matchingRoute &&
+      response.headers.get("Content-Type")?.indexOf("text/html") >= 0
     );
   }
 
