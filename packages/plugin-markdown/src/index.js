@@ -109,6 +109,7 @@ class MarkdownResource {
 
   async shouldServe(url) {
     const { pathname } = url;
+    // we only want exact matches, since markdown pages cannot be dynamic
     const hasMatchingPageRoute = this.compilation.graph.find((node) => node.route === pathname);
 
     return hasMatchingPageRoute?.pageHref?.endsWith(`.${PLUGIN_EXTENSION}`);

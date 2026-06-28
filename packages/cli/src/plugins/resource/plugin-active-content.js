@@ -7,6 +7,7 @@ import {
   filterContentByCollection,
   filterContentByRoute,
 } from "../../lib/content-utils.js";
+import { getMatchingPageByRoute } from "../../lib/graph-utils.js";
 import fs from "node:fs/promises";
 
 const importMap = {
@@ -78,7 +79,7 @@ class ContentAsDataResource {
 
   async intercept(url, request, response) {
     const { polyfills, devServer } = this.compilation.config;
-    const matchingRoute = this.compilation.graph.find((page) => page.route === url.pathname);
+    const matchingRoute = getMatchingPageByRoute(this.compilation, url.pathname);
     const body = await response.text();
     let newBody = body;
 
