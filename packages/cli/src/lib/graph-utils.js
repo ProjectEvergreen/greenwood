@@ -38,19 +38,7 @@ function getMatchingPageByRoute(compilation, route) {
     return exactMatch;
   }
 
-  const dynamicMatch = graph.find(
-    (page) =>
-      page.segment &&
-      new URLPattern({ pathname: `${config.basePath}${page.segment.pathname}` }).test(
-        `https://example.com${route}`,
-      ),
-  );
-
-  if (dynamicMatch) {
-    return dynamicMatch;
-  }
-
-  const staticMatch = graph.find(
+  const staticParamsMatch = graph.find(
     (page) =>
       page.hasStaticParams &&
       page.staticPaths.find((path) => {
@@ -61,8 +49,20 @@ function getMatchingPageByRoute(compilation, route) {
       }),
   );
 
-  if (staticMatch) {
-    return staticMatch;
+  if (staticParamsMatch) {
+    return staticParamsMatch;
+  }
+
+  const dynamicMatch = graph.find(
+    (page) =>
+      page.segment &&
+      new URLPattern({ pathname: `${config.basePath}${page.segment.pathname}` }).test(
+        `https://example.com${route}`,
+      ),
+  );
+
+  if (dynamicMatch) {
+    return dynamicMatch;
   }
 }
 

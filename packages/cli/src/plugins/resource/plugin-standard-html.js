@@ -8,7 +8,7 @@ import fs from "node:fs/promises";
 import { getPageLayout, getAppLayout, getGreenwoodScripts } from "../../lib/layout-utils.js";
 import { requestAsObject } from "../../lib/resource-utils.js";
 import { getMatchingDynamicSsrRoute, getParamsFromSegment } from "../../lib/url-utils.js";
-import { getMatchingPageByRoute } from "@greenwood/cli/src/lib/graph-utils.js";
+import { getMatchingPageByRoute } from "../../lib/graph-utils.js";
 import { Worker } from "node:worker_threads";
 import { parse } from "node-html-parser";
 

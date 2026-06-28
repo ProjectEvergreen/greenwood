@@ -5,6 +5,7 @@
  */
 import { IMPORT_MAP_RESOLVED_PREFIX } from "@greenwood/cli/src/lib/walker-package-ranger.js";
 import { mergeImportMap } from "@greenwood/cli/src/lib/node-modules-utils.js";
+import { getMatchingPageByRoute } from "@greenwood/cli/src/lib/graph-utils.js";
 import { parse } from "node-html-parser";
 
 function generateImportMapExtensionsMap(body = "", extensions = []) {
@@ -35,7 +36,7 @@ class ImportMapExtensionsResourcePlugin {
 
   async shouldIntercept(url, request, response) {
     const { protocol, pathname } = url;
-    const hasMatchingPageRoute = this.compilation.graph.find((node) => node.route === pathname);
+    const hasMatchingPageRoute = getMatchingPageByRoute(this.compilation, pathname);
 
     return (
       this.options?.importMapExtensions?.length > 0 &&
