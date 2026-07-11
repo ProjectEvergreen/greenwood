@@ -36,7 +36,7 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@greenwood/cli": "^0.33.0",
+    "@greenwood/cli": "^0.34.0",
     "lit": "^3.3.3"
   },
   "dependencies": {
