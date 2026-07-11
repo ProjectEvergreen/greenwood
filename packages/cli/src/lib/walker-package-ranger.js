@@ -163,7 +163,10 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
   if (typeof exports === "string") {
     // https://unpkg.com/browse/robust-predicates@3.0.2/package.json
     updateImportMap(dependency, exports, resolvedRoot);
-  } else if (typeof exports === "object") {
+  } else if (exports && typeof exports === "object") {
+    // we need to check for conditional exports that are null, since typeof null === "object"
+    // https://github.com/ProjectEvergreen/greenwood/issues/1704
+    // https://app.unpkg.com/effect@4.0.0-beta.97/files/package.json#L52
     /*
      * test for conditional subpath exports
      * 1. import
@@ -209,7 +212,10 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
             }
           }
         }
-      } else if (typeof exports[sub] === "object") {
+      } else if (exports[sub] && typeof exports[sub] === "object") {
+        // we need to check for conditional exports that are null, since typeof null === "object"
+        // https://github.com/ProjectEvergreen/greenwood/issues/1704
+        // https://app.unpkg.com/effect@4.0.0-beta.97/files/package.json#L52
         let matched = false;
 
         for (const condition of SUPPORTED_EXPORT_CONDITIONS) {
