@@ -32,7 +32,11 @@ class ContentAsDataResource {
   async serve(url, request) {
     const { graph } = this.compilation;
     const contentKey = request.headers.get("x-content-key") ?? "";
-    const keyPieces = contentKey.split("-");
+    // split on only the first "-" so hyphenated collection names / routes keep their hyphens
+    // https://github.com/ProjectEvergreen/greenwood/issues/1715
+    const delimiterIndex = contentKey.indexOf("-");
+    const type = delimiterIndex === -1 ? contentKey : contentKey.slice(0, delimiterIndex);
+    const value = delimiterIndex === -1 ? "" : contentKey.slice(delimiterIndex + 1);
     let status;
     let body;
 
@@ -44,10 +48,10 @@ class ContentAsDataResource {
 
       if (contentKey === "graph") {
         body = graph;
-      } else if (keyPieces[0] === "collection") {
-        body = filterContentByCollection(graph, keyPieces[1]);
-      } else if (keyPieces[0] === "route") {
-        body = filterContentByRoute(graph, keyPieces[1]);
+      } else if (type === "collection") {
+        body = filterContentByCollection(graph, value);
+      } else if (type === "route") {
+        body = filterContentByRoute(graph, value);
       }
 
       if (process.env.__GWD_COMMAND__ === "build") {
