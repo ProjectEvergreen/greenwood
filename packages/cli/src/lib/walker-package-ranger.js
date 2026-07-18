@@ -77,6 +77,25 @@ function derivePackageRoot(resolved) {
   return root !== "" ? root : null;
 }
 
+function deriveWildcardImportSubpath(normalizedSub, normalizedCondition, match) {
+  // Both the export subpath and the export condition are patterns that may
+  // contain a single wildcard segment. The goal here is to capture the
+  // matching wildcard token from the actual file path and graft it onto the
+  // import-side export pattern.
+  const [subPrefix, subSuffix = ""] = normalizedSub.split("*");
+  const [conditionPrefix, conditionSuffix = ""] = normalizedCondition.split("*");
+
+  let wildcardValue = match.startsWith(conditionPrefix)
+    ? match.slice(conditionPrefix.length)
+    : match;
+
+  if (conditionSuffix && wildcardValue.endsWith(conditionSuffix)) {
+    wildcardValue = wildcardValue.slice(0, -conditionSuffix.length);
+  }
+
+  return `${subPrefix}${wildcardValue}${subSuffix}`.replace(/\\/g, "/").replace(/^\//, "");
+}
+
 /*
  * https://nodejs.org/api/packages.html#subpath-patterns
  *
@@ -86,7 +105,7 @@ function derivePackageRoot(resolved) {
  * "./src/components/*": "./src/components/* /index.js - https://unpkg.com/browse/@uswds/web-components@0.0.1-alpha/package.json
  *  "./*": { "default": "./dist/*.ts.js" } - https://unpkg.com/browse/signal-utils@0.21.1/package.json
  */
-async function walkExportPatterns(dependency, condition, resolvedRoot) {
+async function walkExportPatterns(dependency, sub, condition, resolvedRoot) {
   // automatically deep glob, e.g. **
   // https://app.unpkg.com/@shoelace-style/shoelace@2.20.1/files/package.json#L24
   // https://app.unpkg.com/three@0.180.0/files/package.json
@@ -98,9 +117,24 @@ async function walkExportPatterns(dependency, condition, resolvedRoot) {
   for await (const match of matches) {
     const filePathUrl = new URL(`./${match}`, resolvedRoot);
     const relativePath = filePathUrl.href.replace(resolvedRoot, "");
+
+    // Normalize export map subpath and condition patterns by stripping a leading "./"
+    // so we can compare them against file matches in the package root.
+    const normalizedSub = sub ? sub.replace(/^\.\//, "") : null;
+    const normalizedCondition = condition.replace(/^\.\//, "");
+
     // trim matches that are just a .
     // https://app.unpkg.com/tslib@2.8.1/files/package.json#L45
-    const subKey = match === "." ? "" : match;
+    const subKey =
+      match === "."
+        ? ""
+        : normalizedSub === null
+          ? // If there is no subpath pattern, use the raw file path match.
+            match
+          : normalizedSub.includes("*")
+            ? deriveWildcardImportSubpath(normalizedSub, normalizedCondition, match)
+            : // For non-wildcard subpaths, use the match directly as the import subpath.
+              match;
 
     updateImportMap(`${dependency}/${subKey}`, relativePath, resolvedRoot);
   }
@@ -216,7 +250,7 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
           if (exports[sub][condition]) {
             matched = true;
             if (sub.indexOf("*") >= 0) {
-              await walkExportPatterns(dependency, exports[sub][condition], resolvedRoot);
+              await walkExportPatterns(dependency, sub, exports[sub][condition], resolvedRoot);
             } else {
               trackExportConditions(dependency, exports, sub, condition, resolvedRoot);
             }
@@ -231,12 +265,12 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
             `no supported export conditions (\`${SUPPORTED_EXPORT_CONDITIONS.join(", ")}\`) for dependency => \`${dependency}\``,
           );
         }
-      } else {
+      } else if (sub) {
         // handle (unconditional) subpath exports
         if (sub === ".") {
           updateImportMap(dependency, `${exports[sub]}`, resolvedRoot);
         } else if (sub.indexOf("*") >= 0) {
-          await walkExportPatterns(dependency, exports[sub], resolvedRoot);
+          await walkExportPatterns(dependency, sub, exports[sub], resolvedRoot);
         } else if (SUPPORTED_EXPORT_CONDITIONS.includes(sub)) {
           // filter out for just supported top level conditions
           // https://unpkg.com/browse/d3@7.9.0/package.json
@@ -259,7 +293,7 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
     const root = main.split("/").slice(0, -1).join("/");
 
     updateImportMap(dependency, main, resolvedRoot);
-    await walkExportPatterns(dependency, `${root}/*`, resolvedRoot);
+    await walkExportPatterns(dependency, null, `${root}/*`, resolvedRoot);
   } else if (fs.existsSync(new URL("./index.js", resolvedRoot))) {
     // if an index.js file exists but with no main entry point, then it should count as a main entry point
     // https://docs.npmjs.com/cli/v7/configuring-npm/package-json#main
