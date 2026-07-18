@@ -164,7 +164,7 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
     // https://unpkg.com/browse/robust-predicates@3.0.2/package.json
     updateImportMap(dependency, exports, resolvedRoot);
   } else if (exports && typeof exports === "object") {
-    // we need to check for conditional exports that are null, since typeof null === "object"
+    // we need to check for conditional exports that are null first, since typeof null === "object"
     // https://github.com/ProjectEvergreen/greenwood/issues/1704
     // https://app.unpkg.com/effect@4.0.0-beta.97/files/package.json#L52
     /*
@@ -174,8 +174,7 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
      * 3. default
      */
     for (const sub in exports) {
-      // although not widely used and is generally discouraged / deprecated
-      // some export maps have an array
+      // although not widely used and is generally discouraged / deprecated, some export maps have an array
       // https://app.unpkg.com/@jridgewell/gen-mapping@0.3.13/files/package.json#L18
       if (Array.isArray(exports[sub])) {
         for (const item of exports[sub]) {
@@ -213,7 +212,7 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
           }
         }
       } else if (exports[sub] && typeof exports[sub] === "object") {
-        // we need to check for conditional exports that are null, since typeof null === "object"
+        // we need to check for conditional exports that are null first, since typeof null === "object"
         // https://github.com/ProjectEvergreen/greenwood/issues/1704
         // https://app.unpkg.com/effect@4.0.0-beta.97/files/package.json#L52
         let matched = false;
@@ -241,7 +240,10 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
         // handle (unconditional) subpath exports
         if (sub === ".") {
           updateImportMap(dependency, `${exports[sub]}`, resolvedRoot);
-        } else if (sub.indexOf("*") >= 0) {
+        } else if (exports[sub] && sub.indexOf("*") >= 0) {
+          // we need to check for conditional export sub conditions that are null first
+          // https://github.com/ProjectEvergreen/greenwood/issues/1704
+          // https://app.unpkg.com/effect@4.0.0-beta.97/files/package.json#L52
           await walkExportPatterns(dependency, exports[sub], resolvedRoot);
         } else if (SUPPORTED_EXPORT_CONDITIONS.includes(sub)) {
           // filter out for just supported top level conditions
