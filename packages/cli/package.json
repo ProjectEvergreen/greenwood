@@ -61,7 +61,6 @@
     "livereload": "^0.9.1",
     "node-html-parser": "^7.0.1",
     "rollup": "^4.59.0",
-    "urlpattern-polyfill": "^10.1.0",
     "wc-compiler": "~0.22.2"
   },
   "devDependencies": {
