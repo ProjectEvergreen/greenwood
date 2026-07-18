@@ -42,7 +42,8 @@ class LiveReloadServer {
       ...customPluginsExtensions,
       ...this.compilation.config.devServer.extensions,
     ]
-      .filter((ext) => ext !== "*" || ext !== "") // basic filter for false positives
+      // https://github.com/ProjectEvergreen/greenwood/issues/1717
+      .filter((ext) => ext !== "*" && ext !== "") // basic filter for false positives
       .filter((ext, idx, array) => array.indexOf(ext) === idx) // dedupe
       .map((ext) => (ext.startsWith(".") ? ext.replace(".", "") : ext)); // trim . from all entries
 
@@ -62,6 +63,17 @@ class LiveReloadServer {
         );
       },
     );
+
+    // don't crash the whole dev server if the live reload port (35729) is already in use,
+    // e.g. a second concurrent `greenwood develop`; degrade gracefully and keep serving
+    // https://github.com/ProjectEvergreen/greenwood/issues/1717
+    liveReloadServer.on("error", (error) => {
+      if (error.code === "EADDRINUSE") {
+        console.warn("live reload port 35729 is in use — live reload disabled for this session.");
+      } else {
+        throw error;
+      }
+    });
 
     liveReloadServer.watch(userWorkspace.pathname);
   }
