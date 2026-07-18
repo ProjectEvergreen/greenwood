@@ -5,6 +5,7 @@
  *
  */
 import fs from "node:fs/promises";
+import fm from "front-matter";
 import { getPageLayout, getAppLayout, getGreenwoodScripts } from "../../lib/layout-utils.js";
 import { requestAsObject } from "../../lib/resource-utils.js";
 import { getMatchingDynamicSsrRoute, getParamsFromSegment } from "../../lib/url-utils.js";
@@ -57,7 +58,10 @@ class StandardHtmlResource {
       // purge frontmatter data from HTML files that only have a `<body>` tag
       // frontmatter outside of an <html> tag will get ignored by node-html-parser
       if (body.trim().startsWith("---")) {
-        body = body.replace(/---(.*)---/s, "");
+        // strip only the leading frontmatter block via the same parser that reads its
+        // attributes, so a later `---` in the body isn't greedily matched and deleted
+        // https://github.com/ProjectEvergreen/greenwood/issues/1711
+        body = fm(body).body;
       }
     } else if (matchingRoute.servePage === "static") {
       const customStaticPageFormatPlugins = config.plugins
