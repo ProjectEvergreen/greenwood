@@ -5,15 +5,14 @@ import { getDynamicPages } from "@greenwood/cli/src/lib/graph-utils.js";
 
 // https://docs.aws.amazon.com/lambda/latest/dg/services-apigateway.html#apigateway-example-event
 // https://docs.aws.amazon.com/lambda/latest/dg/urls-invocation.html
-function generateOutputFormat(id, type, segmentKey) {
+function generateOutputFormat(id, type, segmentKey, route = "") {
   const handlerAlias = "$handler";
   const path = type === "page" ? `${id}.route` : id;
-  // TODO: use `URLPattern` for extracting props after we upgrade to Node24
-  // https://github.com/ProjectEvergreen/greenwood/issues/1614
+  const routePattern = route.replace(new RegExp(`\\[${segmentKey}\\]`, "g"), `:${segmentKey}`);
   const extractParams = segmentKey
-    ? type === "page"
-      ? `const params = { ${segmentKey}: rawPath.split('/')[rawPath.split('/').length - 2] }`
-      : `const params = { ${segmentKey}: rawPath.split('?')[0].split('/').pop() }`
+    ? `const pattern = new URLPattern({ pathname: '${routePattern}' });
+      const match = pattern.exec(new URL(\`\${rawPath}\${queryParams}\`, 'http://localhost'));
+      const params = match ? { ${segmentKey}: match.pathname.groups.${segmentKey} } : {};`
     : "const params = {}";
 
   return `
@@ -61,8 +60,8 @@ function generateOutputFormat(id, type, segmentKey) {
   `;
 }
 
-async function setupFunctionBuildFolder(id, outputType, outputRoot, segmentKey) {
-  const outputFormat = generateOutputFormat(id, outputType, segmentKey);
+async function setupFunctionBuildFolder(id, outputType, outputRoot, segmentKey, route) {
+  const outputFormat = generateOutputFormat(id, outputType, segmentKey, route);
 
   await fs.mkdir(outputRoot, { recursive: true });
   await fs.writeFile(new URL("./index.js", outputRoot), outputFormat);
@@ -89,13 +88,13 @@ async function awsAdapter(compilation) {
 
   for (const page of ssrPages) {
     const outputType = "page";
-    const { id, outputHref, segment } = page;
+    const { id, outputHref, route, segment } = page;
     const outputRoot = new URL(`./routes/${basePath}/${id}/`, adapterOutputUrl);
     const chunks = (await fs.readdir(outputDir)).filter(
       (file) => file.startsWith(`${id}.route.chunk`) && file.endsWith(".js"),
     );
 
-    await setupFunctionBuildFolder(id, outputType, outputRoot, segment?.key);
+    await setupFunctionBuildFolder(id, outputType, outputRoot, segment?.key, route);
 
     // handle user's actual route entry file
     await fs.cp(
@@ -114,11 +113,11 @@ async function awsAdapter(compilation) {
 
   for (const [key, value] of apiRoutes.entries()) {
     const outputType = "api";
-    const { id, outputHref, segment } = apiRoutes.get(key);
+    const { id, outputHref, route, segment } = apiRoutes.get(key);
     const outputRoot = new URL(`.${basePath}/api/${id}/`, adapterOutputUrl);
     const { assets = [] } = value;
 
-    await setupFunctionBuildFolder(id, outputType, outputRoot, segment?.key);
+    await setupFunctionBuildFolder(id, outputType, outputRoot, segment?.key, route);
 
     await fs.cp(new URL(outputHref), new URL(`./${id}.js`, outputRoot), { recursive: true });
 
