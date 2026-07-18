@@ -78,21 +78,30 @@ function derivePackageRoot(resolved) {
 }
 
 function deriveWildcardImportSubpath(normalizedSub, normalizedCondition, match) {
-  // Both the export subpath and the export condition are patterns that may
-  // contain a single wildcard segment. The goal here is to capture the
-  // matching wildcard token from the actual file path and graft it onto the
-  // import-side export pattern.
-  const [subPrefix, subSuffix = ""] = normalizedSub.split("*");
-  const [conditionPrefix, conditionSuffix = ""] = normalizedCondition.split("*");
+  // Both the export subpath and the export condition may contain a single
+  // wildcard segment. Normalize separators so behavior is consistent on
+  // Windows (backslashes) and POSIX (forward-slashes).
+  const sub = String(normalizedSub)
+    .replace(/\\/g, "/")
+    .replace(/^[.][\\/]+/, "");
+  const cond = String(normalizedCondition)
+    .replace(/\\/g, "/")
+    .replace(/^[.][\\/]+/, "");
+  const m = String(match).replace(/\\/g, "/");
 
-  let wildcardValue = match.startsWith(conditionPrefix)
-    ? match.slice(conditionPrefix.length)
-    : match;
+  const [subPrefix, subSuffix = ""] = sub.split("*");
+  const [conditionPrefix, conditionSuffix = ""] = cond.split("*");
+
+  // Remove the fixed portion of the condition from the matched path so we
+  // capture only the wildcard portion.
+  let wildcardValue = m.startsWith(conditionPrefix) ? m.slice(conditionPrefix.length) : m;
 
   if (conditionSuffix && wildcardValue.endsWith(conditionSuffix)) {
     wildcardValue = wildcardValue.slice(0, -conditionSuffix.length);
   }
 
+  // Recombine and ensure we return a forward-slash normalized path without
+  // a leading slash.
   return `${subPrefix}${wildcardValue}${subSuffix}`.replace(/\\/g, "/").replace(/^\//, "");
 }
 
