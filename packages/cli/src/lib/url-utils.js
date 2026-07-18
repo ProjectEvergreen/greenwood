@@ -39,9 +39,26 @@ function getMatchingDynamicSsrRoute(compilation, route) {
 
 // get params for dynamic routes from URLPattern based segment extraction
 function getParamsFromSegment(compilation, segment, route) {
-  return new URLPattern({ pathname: `${compilation.config.basePath}${segment.pathname}` }).exec(
-    `https://example.com${route}`,
-  )?.pathname?.groups;
+  const groups = new URLPattern({
+    pathname: `${compilation.config.basePath}${segment.pathname}`,
+  }).exec(`https://example.com${route}`)?.pathname?.groups;
+
+  if (!groups) {
+    return groups;
+  }
+
+  // URLPattern groups are percent-encoded, so decode them (mirroring graph.js) so params
+  // round-trip losslessly to getBody / getStaticParams for non-ASCII / space slugs
+  // https://github.com/ProjectEvergreen/greenwood/issues/1713
+  return Object.fromEntries(
+    Object.entries(groups).map(([key, value]) => {
+      try {
+        return [key, value === undefined ? value : decodeURIComponent(value)];
+      } catch {
+        return [key, value];
+      }
+    }),
+  );
 }
 
 // get the full route for a static path
