@@ -134,7 +134,7 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
               recursive: true,
             });
 
-            fs.promises.copyFile(resolvedUrl, new URL(`.${finalValue}`, outputDir));
+            fs.copyFileSync(resolvedUrl, new URL(`.${finalValue}`, outputDir));
           }
 
           optimizedCss += `url('${basePath}${finalValue}')`;
