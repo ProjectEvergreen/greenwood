@@ -6,15 +6,14 @@ import { getDynamicPages } from "@greenwood/cli/src/lib/graph-utils.js";
 const DEFAULT_RUNTIME = "nodejs24.x";
 
 // https://vercel.com/docs/functions/serverless-functions/runtimes/node-js#node.js-helpers
-function generateOutputFormat(id, type, segmentKey) {
+function generateOutputFormat(id, type, segmentKey, route = "") {
   const handlerAlias = "$handler";
   const path = type === "page" ? `${id}.route` : id;
-  // TODO: use `URLPattern` for extracting props after we upgrade to Node24
-  // https://github.com/ProjectEvergreen/greenwood/issues/1614
+  const routePattern = route.replace(new RegExp(`\\[${segmentKey}\\]`, "g"), `:${segmentKey}`);
   const extractParams = segmentKey
-    ? type === "page"
-      ? `const params = { ${segmentKey}: url.split('/')[url.split('/').length - 2] }`
-      : `const params = { ${segmentKey}: url.split('?')[0].split('/').pop() }`
+    ? `const pattern = new URLPattern({ pathname: '${routePattern}' });
+      const match = pattern.exec(url);
+      const params = match ? { ${segmentKey}: match.pathname.groups.${segmentKey} } : {};`
     : "const params = {}";
 
   return `
@@ -62,8 +61,8 @@ function generateOutputFormat(id, type, segmentKey) {
   `;
 }
 
-async function setupFunctionBuildFolder(id, outputType, outputRoot, runtime, key) {
-  const outputFormat = generateOutputFormat(id, outputType, key);
+async function setupFunctionBuildFolder(id, outputType, outputRoot, runtime, key, route) {
+  const outputFormat = generateOutputFormat(id, outputType, key, route);
 
   await fs.mkdir(outputRoot, { recursive: true });
   await fs.writeFile(new URL("./index.js", outputRoot), outputFormat);
@@ -109,7 +108,7 @@ async function vercelAdapter(compilation, options) {
       (file) => file.startsWith(`${id}.route.chunk`) && file.endsWith(".js"),
     );
 
-    await setupFunctionBuildFolder(id, outputType, outputRoot, runtime, segment?.key);
+    await setupFunctionBuildFolder(id, outputType, outputRoot, runtime, segment?.key, route);
 
     // handle user's actual route entry file
     await fs.cp(
@@ -142,7 +141,7 @@ async function vercelAdapter(compilation, options) {
     const outputRoot = new URL(`.${route}.func/`, adapterOutputUrl);
     const { assets = [] } = value;
 
-    await setupFunctionBuildFolder(id, outputType, outputRoot, runtime, segment?.key);
+    await setupFunctionBuildFolder(id, outputType, outputRoot, runtime, segment?.key, route);
 
     await fs.cp(new URL(outputHref), new URL(`./${id}.js`, outputRoot), { recursive: true });
 

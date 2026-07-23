@@ -51,7 +51,7 @@ const config: Config = {
   plugins: [
     greenwoodPluginAdapterAws(),
     greenwoodPluginAdapterNetlify(),
-    greenwoodPluginAdapterVercel({ runtime: "nodejs20.x" }),
+    greenwoodPluginAdapterVercel({ runtime: "nodejs24.x" }),
     greenwoodPluginBabel(),
     greenwoodPluginCssModules(),
     greenwoodPluginGoogleAnalytics({ analyticsId: "XXX-123456" }),
