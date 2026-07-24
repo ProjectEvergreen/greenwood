@@ -26,6 +26,18 @@ function getLabelFromRoute(_route) {
     .join(" ");
 }
 
+// decodeURIComponent is only meant to normalize percent-encoded filenames; raw
+// frontmatter values (e.g. "100% Complete") can contain a bare "%" that throws
+// URIError and aborts the whole build, so fall back to the original string
+// https://github.com/ProjectEvergreen/greenwood/issues/1709
+function safeDecodeURIComponent(value) {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
 function getIdFromRelativePathPath(relativePathPath, extension) {
   return relativePathPath
     .replace(`.${extension}`, "")
@@ -284,9 +296,9 @@ const generateGraph = async (compilation) => {
           });
 
           const page = {
-            id: decodeURIComponent(getIdFromRelativePathPath(relativePagePath, extension)),
-            label: decodeURIComponent(label),
-            title: title ? decodeURIComponent(title) : title,
+            id: safeDecodeURIComponent(getIdFromRelativePathPath(relativePagePath, extension)),
+            label: safeDecodeURIComponent(label),
+            title: title ? safeDecodeURIComponent(title) : title,
             route: `${basePath}${route}`,
             layout,
             data: customData || {},
