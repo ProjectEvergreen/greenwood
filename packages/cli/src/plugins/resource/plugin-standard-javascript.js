@@ -79,7 +79,7 @@ class StandardJavaScriptResource {
           }
 
           rewriteSpecifier(node.source, attribute);
-          // drop the trailing `with { ... }` / `assert { ... }` clause by its AST range
+          // drop the trailing `with { ... }` clause by its AST range
           const closeBrace = body.indexOf("}", attributes[attributes.length - 1].end);
           edits.push({ start: node.source.end, end: closeBrace + 1, replacement: "" });
         },
@@ -88,8 +88,9 @@ class StandardJavaScriptResource {
             return;
           }
 
-          const clause = node.options.properties.find((property) =>
-            ["with", "assert"].includes(keyName(property.key)),
+          // only the standard `with` key is supported; legacy `assert` is not
+          const clause = node.options.properties.find(
+            (property) => keyName(property.key) === "with",
           );
 
           if (clause?.value.type !== "ObjectExpression") {
