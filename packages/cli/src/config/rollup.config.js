@@ -320,7 +320,12 @@ function greenwoodImportMetaUrl(compilation) {
         }
       }
 
-      if (!canTransform) {
+      // only parse resources that were actually served as JavaScript, otherwise binary resources
+      // (e.g. .wasm / .png / .woff2) get fed to acorn and crash the build with a cryptic SyntaxError
+      // https://github.com/ProjectEvergreen/greenwood/issues/1723
+      const contentType = response.headers.get("content-type") || "";
+
+      if (!canTransform || !contentType.includes("text/javascript")) {
         return null;
       }
 
@@ -363,7 +368,9 @@ function greenwoodImportMetaUrl(compilation) {
           if (plugin.shouldServe && (await plugin.shouldServe(url, request))) {
             const response = await plugin.serve(url, request);
 
-            if (response?.headers?.get("content-type") || "".indexOf("text/javascript") >= 0) {
+            // parenthesize so we test the content-type string contains "text/javascript"
+            // https://github.com/ProjectEvergreen/greenwood/issues/1723
+            if ((response?.headers?.get("content-type") || "").indexOf("text/javascript") >= 0) {
               bundleExtensions = [...bundleExtensions, ...plugin.extensions];
             }
           }
