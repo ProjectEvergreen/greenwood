@@ -18,7 +18,10 @@ async function getContentAsData(key = "") {
   } else if (CONTENT_STATE && !PRERENDER) {
     // if user is not prerendering, just fetch the entire graph but apply the same filtering
     const graph = await fetch("/graph.json").then((resp) => resp.json());
-    const value = key.split("-").pop();
+    // split on only the first "-" so hyphenated collection names / routes keep their hyphens
+    // https://github.com/ProjectEvergreen/greenwood/issues/1715
+    const delimiterIndex = key.indexOf("-");
+    const value = delimiterIndex === -1 ? "" : key.slice(delimiterIndex + 1);
 
     if (key === "graph") {
       return graph;
