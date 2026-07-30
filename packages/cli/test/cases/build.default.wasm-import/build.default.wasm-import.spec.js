@@ -1,11 +1,16 @@
 /*
  * Use Case
- * Run Greenwood build command referencing a .wasm asset via the supported
- * `new URL("./add.wasm", import.meta.url)` pattern.
+ * Run Greenwood build command with .wasm modules, covering both the supported
+ * `new URL("./add.wasm", import.meta.url)` pattern and an unsupported direct
+ * `import ... from "./add.wasm"`.
  *
  * User Result
- * Should generate a Greenwood build that emits the .wasm as a content-hashed,
- * byte-identical asset, without crashing the JavaScript parser on the binary.
+ * For the supported pattern, should generate a Greenwood build that emits the .wasm as a
+ * content-hashed, byte-identical asset, without crashing the JavaScript parser on the binary.
+ * For the unsupported direct import, the build should fail, but NOT with the misleading acorn
+ * `SyntaxError` thrown from inside the `greenwood-import-meta-url` Rollup plugin (which pointed
+ * users at internal plugin code when the wasm binary was fed to the JavaScript parser). A clear,
+ * Rollup-native parse error is acceptable.
  *
  * User Command
  * greenwood build
@@ -82,6 +87,46 @@ describe("Build Greenwood With: ", function () {
 
         expect(contents).to.contain(wasmFiles[0]);
       });
+    });
+  });
+
+  describe("An unsupported direct import of a .wasm module", function () {
+    const mainScriptUrl = new URL("./src/scripts/main.js", import.meta.url);
+    let originalMainScript;
+    let buildError;
+
+    before(async function () {
+      originalMainScript = await fs.readFile(mainScriptUrl, "utf-8");
+      await fs.writeFile(
+        mainScriptUrl,
+        [
+          'import * as wasm from "./add.wasm";',
+          "",
+          'document.getElementById("out").textContent = `add(2,3)=${wasm.add(2, 3)}`;',
+          "",
+        ].join("\n"),
+      );
+      await runner.setup(outputPath);
+
+      try {
+        await runner.runCommand(cliPath, "build");
+      } catch (error) {
+        buildError = `${error}`;
+      }
+    });
+
+    // restore the workspace fixture no matter how the build run above ends
+    after(async function () {
+      await fs.writeFile(mainScriptUrl, originalMainScript);
+    });
+
+    it("should fail the build", function () {
+      expect(buildError).to.not.equal(undefined);
+    });
+
+    // https://github.com/ProjectEvergreen/greenwood/issues/1723
+    it("should not crash with the acorn SyntaxError from the greenwood-import-meta-url plugin", function () {
+      expect(buildError).to.not.contain("greenwood-import-meta-url");
     });
   });
 
