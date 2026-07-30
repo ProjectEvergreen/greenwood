@@ -8,7 +8,11 @@ import os from "node:os";
 import { WorkerPool } from "../lib/threadpool.js";
 import { asyncForEach } from "../lib/async-utils.js";
 import { getStaticPages } from "../lib/graph-utils.js";
-import { getParamsFromSegment, getStaticRouteFromDynamicRoute } from "../lib/url-utils.js";
+import {
+  getParamsFromSegment,
+  getStaticRouteFromDynamicRoute,
+  getOutputHrefForStaticPath,
+} from "../lib/url-utils.js";
 
 async function createOutputDirectory(outputDir) {
   // ignore creating directory for 404 pages since they live at the root of the output directory
@@ -90,7 +94,7 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
         const url = new URL(`http://localhost:${config.port}${staticRoute}`);
         const request = new Request(url);
         const scratchUrl = toScratchUrl(
-          outputHref.replace(`[${segment.key}]`, staticPath.params[segment.key]),
+          getOutputHrefForStaticPath(staticPath, segment, outputHref),
           context,
         );
         let ssrContents;

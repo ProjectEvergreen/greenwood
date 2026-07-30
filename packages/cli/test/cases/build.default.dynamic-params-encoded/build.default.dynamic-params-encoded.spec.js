@@ -4,7 +4,8 @@
  * non-ASCII slug, and whose getBody echoes the slug param back into the page.
  *
  * User Result
- * Should generate a static page whose params are decoded (café), not percent-encoded (caf%C3%A9).
+ * Should generate a static page whose params are decoded (café), not percent-encoded (caf%C3%A9),
+ * and a static page for a slug containing a literal "%" (100%) without crashing the build.
  *
  * User Command
  * greenwood build
@@ -67,6 +68,28 @@ describe("Build Greenwood With: ", function () {
 
       it("should not leak the percent-encoded slug value into the output", function () {
         expect(html).to.not.include("caf%C3%A9");
+      });
+    });
+
+    describe("A static page generated for a slug containing a literal percent sign", function () {
+      let dom;
+      let html;
+
+      before(async function () {
+        // 100%25 decodes to a literal "100%" directory on disk
+        html = await fs.readFile(new URL("./public/100%25/index.html", import.meta.url), "utf-8");
+        dom = new JSDOM(html);
+      });
+
+      it("should generate the page at the literal slug directory without crashing the build", function () {
+        expect(html.length).to.be.greaterThan(0);
+      });
+
+      it("should render the literal '%' slug param in the page body verbatim", function () {
+        const headings = dom.window.document.querySelectorAll("body > h2");
+
+        expect(headings.length).to.equal(1);
+        expect(headings[0].textContent).to.equal("100%");
       });
     });
   });

@@ -18,7 +18,7 @@ import { rollup } from "rollup";
 import { pruneGraph } from "../lib/content-utils.js";
 import { asyncForEach } from "../lib/async-utils.js";
 import { getDynamicPages, getStaticPages } from "../lib/graph-utils.js";
-import { getStaticRouteFromDynamicRoute } from "../lib/url-utils.js";
+import { getStaticRouteFromDynamicRoute, getOutputHrefForStaticPath } from "../lib/url-utils.js";
 
 async function interceptPage(url, request, plugins, body) {
   let response = new Response(body, {
@@ -127,14 +127,12 @@ async function optimizeStaticPages(compilation, plugins) {
       for (const staticPath of staticPaths) {
         const staticRoute = getStaticRouteFromDynamicRoute(staticPath, segment, route);
         const outputDirUrl = new URL(
-          outputHref
-            .replace(`[${segment.key}]`, staticPath.params[segment.key])
-            .replace("index.html", ""),
+          getOutputHrefForStaticPath(staticPath, segment, outputHref).replace("index.html", ""),
         );
         const url = new URL(`http://localhost:${compilation.config.port}${staticRoute}`);
         const contents = await fs.readFile(
           new URL(
-            `./${outputHref.replace(outputDir.href, "").replace(`[${segment.key}]`, staticPath.params[segment.key])}`,
+            `./${getOutputHrefForStaticPath(staticPath, segment, outputHref).replace(outputDir.href, "")}`,
             scratchDir,
           ),
           "utf-8",
@@ -160,7 +158,7 @@ async function optimizeStaticPages(compilation, plugins) {
         const body = (await response.text()).replace(/data-gwd-opt=".*?[a-z]"/g, "");
 
         await fs.writeFile(
-          new URL(outputHref.replace(`[${segment.key}]`, staticPath.params[segment.key])),
+          new URL(getOutputHrefForStaticPath(staticPath, segment, outputHref)),
           body,
         );
       }

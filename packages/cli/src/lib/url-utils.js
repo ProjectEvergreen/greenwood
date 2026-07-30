@@ -91,6 +91,17 @@ function safeDecodeURIComponent(value) {
   }
 }
 
+// get the output file href for a static path; the param is encoded when spliced in since
+// a raw value containing a literal "%" (e.g. "100%") is an invalid percent-sequence in a
+// file URL that makes fs promises / fileURLToPath throw "URIError: URI malformed"
+// https://github.com/ProjectEvergreen/greenwood/issues/1713
+function getOutputHrefForStaticPath(dynamicStaticPath, segment, outputHref) {
+  return outputHref.replace(
+    `[${segment.key}]`,
+    encodeURIComponent(dynamicStaticPath.params[segment.key]),
+  );
+}
+
 export {
   getDynamicSegmentsFromRoute,
   getMatchingDynamicApiRoute,
@@ -98,4 +109,5 @@ export {
   getMatchingDynamicSsrRoute,
   getStaticRouteFromDynamicRoute,
   safeDecodeURIComponent,
+  getOutputHrefForStaticPath,
 };
