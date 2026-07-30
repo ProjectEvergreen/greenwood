@@ -390,6 +390,11 @@ const generateGraph = async (compilation) => {
           resources: [],
           outputHref: new URL(`.${route}index.html`, outputDir).href,
           ...node,
+          // normalize the same fields as filesystem pages so both content APIs
+          // treat percent-encoded (and literal "%") values identically
+          id: node.id ? safeDecodeURIComponent(node.id) : node.id,
+          label: node.label ? safeDecodeURIComponent(node.label) : node.label,
+          title: node.title ? safeDecodeURIComponent(node.title) : node.title,
           route: encodeURIComponent(route).replace(/%2F/g, "/"),
           data: {
             ...node.data,
