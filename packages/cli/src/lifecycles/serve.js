@@ -13,6 +13,7 @@ import {
   getMatchingDynamicApiRoute,
   getMatchingDynamicSsrRoute,
   getParamsFromSegment,
+  getStaticRouteFromDynamicRoute,
 } from "../lib/url-utils.js";
 import { Readable } from "node:stream";
 import { Worker } from "node:worker_threads";
@@ -320,7 +321,21 @@ async function getStaticServer(compilation, composable) {
       const url = new URL(`http://localhost:${port}${ctx.url}`);
       const matchingRoute = compilation.graph.find(
         (page) =>
-          (page.staticPaths && getParamsFromSegment(compilation, page.segment, url.pathname)) ||
+          // for dynamic routes, only match values enumerated from getStaticPaths, otherwise
+          // unknown values should fall through to a 404 instead of an ENOENT / 500
+          // https://github.com/ProjectEvergreen/greenwood/issues/1737
+          (page.staticPaths &&
+            getParamsFromSegment(compilation, page.segment, url.pathname) &&
+            page.staticPaths.some((staticPath) => {
+              const staticRoute = getStaticRouteFromDynamicRoute(
+                staticPath,
+                page.segment,
+                page.route,
+              );
+
+              // compare the raw and encoded forms since URL percent-encodes the pathname
+              return staticRoute === url.pathname || encodeURI(staticRoute) === url.pathname;
+            })) ||
           page.route === url.pathname,
       );
       const isSPA = compilation.graph.find((page) => page.isSPA);
