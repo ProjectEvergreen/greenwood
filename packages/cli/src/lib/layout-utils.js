@@ -110,7 +110,12 @@ async function mergeContentIntoLayout(
         childTitle && childTitle.rawText.indexOf(activeFrontmatterTitleKey) >= 0
           ? childTitle.rawText
           : parentTitle.rawText;
-      title = text.replace(activeFrontmatterTitleKey, matchingRoute.title || matchingRoute.label);
+      // function replacement so titles with $&, $`, $' or $n are inserted verbatim
+      // https://github.com/ProjectEvergreen/greenwood/issues/1743
+      title = text.replace(
+        activeFrontmatterTitleKey,
+        () => matchingRoute.title || matchingRoute.label,
+      );
     } else {
       // we favor frontmatter title for the page
       // otherwise we defer to page layouts and then ultimately the app layout
