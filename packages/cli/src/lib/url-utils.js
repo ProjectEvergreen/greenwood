@@ -1,8 +1,6 @@
 // get the dynamic segments from a dynamic route, e.g. pages/blog/[slug].js
 function getDynamicSegmentsFromRoute({ route }) {
-  // convert every bracket pair so a nested route doesn't leak a literal "[..]" into the URLPattern
-  // https://github.com/ProjectEvergreen/greenwood/issues/1719
-  const dynamicRoute = route.replace(/\[([^\]]+)\]/g, ":$1");
+  const dynamicRoute = route.replace("[", ":").replace("]", "");
   // derive the key from the bracket in the route itself; stripping the extension substring
   // mangles params whose name contains it (e.g. [json].js -> "onjs", [posts].ts)
   // https://github.com/ProjectEvergreen/greenwood/issues/1719
