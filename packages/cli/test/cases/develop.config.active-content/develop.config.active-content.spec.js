@@ -26,6 +26,7 @@
  *       index.html
  *     contact.html
  *     index.html
+ *     pricing.html
  *     toc.html
  */
 
@@ -109,7 +110,7 @@ describe("Develop Greenwood With: ", function () {
         it("should have the expected content response data", async () => {
           const data = await response.json();
 
-          expect(data.length).to.equal(6);
+          expect(data.length).to.equal(7);
         });
       });
 
@@ -147,6 +148,44 @@ describe("Develop Greenwood With: ", function () {
 
           expect(data.length).to.equal(4);
         });
+      });
+    });
+
+    // https://github.com/ProjectEvergreen/greenwood/issues/1743
+    describe("Active Frontmatter values containing replacement patterns", () => {
+      let dom;
+      let html;
+
+      before(async function () {
+        const response = await fetch(`${hostname}:${port}/pricing/`);
+
+        html = await response.text();
+        dom = new JSDOM(html);
+      });
+
+      it("should interpolate a custom data frontmatter value with $&, $` and $1 verbatim", function () {
+        const money = dom.window.document.querySelector("body p.money").textContent;
+
+        expect(money).to.be.equal("pay $& now $` later and $1 tomorrow");
+      });
+
+      it("should interpolate an active frontmatter title value with $& verbatim in the <head>", function () {
+        const title = dom.window.document.querySelector("head title").textContent;
+
+        expect(title).to.be.equal("costs $& per month");
+      });
+
+      it("should interpolate an active frontmatter title value with $& verbatim in the <body>", function () {
+        const heading = dom.window.document.querySelector("body h1").textContent;
+
+        expect(heading).to.be.equal("costs $& per month");
+      });
+
+      it("should not duplicate the page inside itself", function () {
+        const headings = dom.window.document.querySelectorAll("h1");
+
+        expect(headings.length).to.be.equal(1);
+        expect(html.match(/<p class="money">/g).length).to.be.equal(1);
       });
     });
   });
