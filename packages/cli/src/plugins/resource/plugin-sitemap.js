@@ -15,11 +15,10 @@ class SitemapResource {
   }
 
   async shouldServe(url) {
-    const { sitemap } = this.compilation.manifest;
+    // the custom loader (loader.js) provides no manifest when instantiating resource plugins
+    const { sitemap } = this.compilation.manifest ?? {};
 
-    return (
-      process.env.__GWD_COMMAND__ === "develop" && !!sitemap && url.pathname === sitemap.route
-    );
+    return process.env.__GWD_COMMAND__ === "develop" && !!sitemap && url.pathname === sitemap.route;
   }
 
   async serve(url, request) {
