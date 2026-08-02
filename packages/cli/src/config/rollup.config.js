@@ -232,6 +232,30 @@ function greenwoodSyncApiRoutesOutputPath(compilation) {
   };
 }
 
+function greenwoodSyncSitemapOutputPaths(compilation) {
+  return {
+    name: "greenwood-sync-sitemap-output-paths",
+    generateBundle(options, bundle) {
+      const { outputDir } = compilation.context;
+
+      // sync the bundled sitemap module and its chunks back into the manifest
+      Object.keys(bundle).forEach((key) => {
+        if (bundle[key].isEntry) {
+          const linkedAssets = getAllBundleChunks(key, bundle).map(
+            (chunk) => new URL(`./${chunk}`, outputDir).href,
+          );
+
+          compilation.manifest.sitemap = {
+            ...compilation.manifest.sitemap,
+            outputHref: new URL(`./${key}`, outputDir).href,
+            assets: linkedAssets,
+          };
+        }
+      });
+    },
+  };
+}
+
 function getMetaImportPath(node) {
   return node.arguments[0].value.split("/").join(path.sep).replace(/\\/g, "/"); // handle Windows style paths
 }
@@ -780,6 +804,52 @@ const getRollupConfigForApiRoutes = async (compilation) => {
     });
 };
 
+const getRollupConfigForSitemap = async (compilation) => {
+  const { outputDir } = compilation.context;
+  const { pageHref } = compilation.manifest.sitemap;
+
+  return [
+    {
+      input: normalizePathnameForWindows(new URL(pageHref)),
+      output: {
+        dir: normalizePathnameForWindows(outputDir),
+        entryFileNames: "sitemap.xml.route.js",
+        chunkFileNames: "sitemap.xml.route.[hash].js",
+        // force import attributes (`with`) until Rollup properly emits import attributes by default (currently uses `assert`)
+        // https://github.com/rollup/rollup/issues/5685#issuecomment-2379581091
+        importAttributesKey: "with",
+      },
+      plugins: [
+        greenwoodResourceLoader(compilation),
+        // support node export conditions for the sitemap module
+        // https://github.com/ProjectEvergreen/greenwood/issues/1118
+        // https://github.com/rollup/plugins/issues/362#issuecomment-873448461
+        nodeResolve({
+          exportConditions: ["node"],
+          preferBuiltins: true,
+        }),
+        commonjs(),
+        greenwoodImportMetaUrl(compilation),
+        greenwoodSyncSitemapOutputPaths(compilation),
+      ],
+      onwarn: (errorObj) => {
+        const { code, message } = errorObj;
+
+        switch (code) {
+          case "CIRCULAR_DEPENDENCY":
+            // let this through for WCC + sucrase
+            // https://github.com/ProjectEvergreen/greenwood/pull/1212
+            // https://github.com/lit/lit/issues/449#issuecomment-416688319
+            break;
+          default:
+            // otherwise, log all warnings from rollup
+            console.debug(message);
+        }
+      },
+    },
+  ];
+};
+
 const getRollupConfigForSsrPages = async (compilation, inputs) => {
   const { outputDir } = compilation.context;
 
@@ -831,5 +901,6 @@ const getRollupConfigForSsrPages = async (compilation, inputs) => {
 export {
   getRollupConfigForApiRoutes,
   getRollupConfigForBrowserScripts,
+  getRollupConfigForSitemap,
   getRollupConfigForSsrPages,
 };

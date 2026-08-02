@@ -355,6 +355,28 @@ const generateGraph = async (compilation) => {
   compilation.graph = graph;
   compilation.manifest = { apis };
 
+  // track a dynamic sitemap module if the user's workspace provides one,
+  // deferring to a static sitemap.xml if both exist
+  // https://github.com/ProjectEvergreen/greenwood/issues/1232
+  for (const extension of ["js", "ts"]) {
+    const sitemapModuleUrl = new URL(`./sitemap.xml.${extension}`, userWorkspace);
+
+    if (await checkResourceExists(sitemapModuleUrl)) {
+      if (await checkResourceExists(new URL("./sitemap.xml", userWorkspace))) {
+        console.warn(
+          `Detected both a sitemap.xml and a sitemap.xml.${extension} file in your workspace, the static sitemap.xml will take precedence.`,
+        );
+      } else {
+        compilation.manifest.sitemap = {
+          pageHref: sitemapModuleUrl.href,
+          route: `${basePath}/sitemap.xml`,
+        };
+      }
+
+      break;
+    }
+  }
+
   if (sourcePlugins.length > 0) {
     console.debug("building from external sources...");
     for (const plugin of sourcePlugins) {
