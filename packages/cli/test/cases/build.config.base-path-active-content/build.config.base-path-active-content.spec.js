@@ -34,7 +34,7 @@ import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
 
 describe("Build Greenwood With: ", function () {
-  const LABEL = "Base Path Configuration with Content as Data";
+  const LABEL = "Base Path Configuration with Active Content";
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
   const basePath = "/my-path";
