@@ -156,7 +156,10 @@ const readAndMergeConfig = async () => {
     if (plugins && plugins.length > 0) {
       const flattened = plugins.flat(PLUGINS_FLATTENED_DEPTH);
 
-      flattened.forEach((plugin) => {
+      // use for...of (not forEach) so these rejections actually return from readAndMergeConfig
+      // instead of surfacing as an UnhandledPromiseRejection crash
+      // https://github.com/ProjectEvergreen/greenwood/issues/1745
+      for (const plugin of flattened) {
         if (!plugin.type || pluginTypes.indexOf(plugin.type) < 0) {
           return Promise.reject(
             `Configuration error: plugins must be one of type "${pluginTypes.join(", ")}". got "${plugin.type}" instead.`,
@@ -178,7 +181,7 @@ const readAndMergeConfig = async () => {
             `Configuration error: plugins must have a name. got ${nameTypeof} instead.`,
           );
         }
-      });
+      }
 
       // if user provided a custom renderer, filter out Greenwood's default renderer
       const customRendererPlugins = flattened.filter((plugin) => plugin.type === "renderer").length;

@@ -61,5 +61,15 @@ describe("Build Greenwood With: ", function () {
         `Configuration error: plugins must be one of type "${pluginTypes.join(", ")}". got "indexxx" instead.`,
       );
     });
+
+    // https://github.com/ProjectEvergreen/greenwood/issues/1745
+    it("should surface the configuration error directly instead of an unhandled promise rejection", async function () {
+      const stderr = await runner.runCommand(cliPath, "build").then(
+        () => "",
+        (err) => err,
+      );
+
+      expect(stderr).to.not.contain("UnhandledPromiseRejection");
+    });
   });
 });
