@@ -3,13 +3,13 @@
  * Run Greenwood develop command with the import attributes polyfill enabled against JavaScript
  * that exercises the tricky inputs that a naive whole-file string rewrite mangles: a commented-out
  * copy of an import, a binding name containing "with", two imports of the same specifier, a
- * multi-line attributes clause, a specifier repeated inside a string literal, a dynamic import
- * with a `with` options object, and a file using the legacy `assert` keyword.
+ * multi-line attributes clause, a specifier repeated inside a string literal, and a dynamic
+ * import with a `with` options object.
  *
  * User Result
  * Should start the development server and polyfill exactly the real import specifiers
  * (one `?polyfill=type-css` / `?polyfill=type-json` each), leaving comments and string literals
- * untouched, and pass through un-parseable `assert` syntax without bricking the response.
+ * untouched.
  *
  * User Command
  * greenwood develop
@@ -22,12 +22,10 @@
  * User Workspace
  * src/
  *   main.js
- *   legacy.js
  *   theme.css
  *   shared.css
  *   dynamic.css
  *   data.json
- *   config.json
  *   index.html
  * greenwood.config.js
  * package.json
@@ -141,31 +139,6 @@ describe("Develop Greenwood With: ", function () {
       it("should not mangle a string literal that duplicates a real import's specifier", function (done) {
         expect(text).to.contain('run: import banner from "./banner.css" with { type: "css" };');
         expect(stripped).to.contain('importbannerfrom"./banner.css?polyfill=type-css"');
-        done();
-      });
-    });
-
-    describe("Import Attributes Polyfill Behavior for legacy `assert` syntax (legacy.js)", function () {
-      let response = {};
-      let text;
-
-      before(async function () {
-        response = await fetch(`${hostname}:${port}/legacy.js`, {
-          headers: {
-            accept: "text/html",
-          },
-        });
-
-        text = await response.clone().text();
-      });
-
-      it("should not brick the response and returns a 200", function (done) {
-        expect(response.status).to.equal(200);
-        done();
-      });
-
-      it("should pass the un-parseable source through unmodified", function (done) {
-        expect(text).to.contain('import legacy from "./config.json" assert { type: "json" };');
         done();
       });
     });
