@@ -10,6 +10,8 @@ import { getAppLayout, getPageLayout, getGreenwoodScripts } from "../lib/layout-
 import { hashString } from "../lib/hashing-utils.js";
 import {
   checkResourceExists,
+  mapJsonReplacer,
+  mapJsonReviver,
   mergeResponse,
   normalizePathnameForWindows,
   trackResourcesForRoute,
@@ -73,30 +75,12 @@ async function emitResources(compilation) {
   // https://stackoverflow.com/a/56150320/417806
   await fs.writeFile(
     new URL("./resources.json", outputDir),
-    JSON.stringify(resources, (key, value) => {
-      if (value instanceof Map) {
-        return {
-          dataType: "Map",
-          value: [...value],
-        };
-      } else {
-        return value;
-      }
-    }),
+    JSON.stringify(resources, mapJsonReplacer),
   );
 
   await fs.writeFile(
     new URL("./manifest.json", scratchDir),
-    JSON.stringify(manifest, (key, value) => {
-      if (value instanceof Map) {
-        return {
-          dataType: "Map",
-          value: [...value],
-        };
-      } else {
-        return value;
-      }
-    }),
+    JSON.stringify(manifest, mapJsonReplacer),
   );
 
   await fs.writeFile(new URL("./graph.json", outputDir), JSON.stringify(graph));
@@ -324,7 +308,8 @@ async function bundleApiRoutes(compilation) {
 }
 
 async function bundleSitemap(compilation) {
-  if (!compilation.manifest.sitemap) {
+  // a static sitemap.xml takes precedence over a dynamic module and is emitted by the copy plugin
+  if (!compilation.manifest.sitemap || compilation.manifest.sitemap.static) {
     return;
   }
 
@@ -349,7 +334,7 @@ async function bundleSitemap(compilation) {
     new Request(new URL(`http://localhost:${compilation.config.port}${route}`)),
     {
       // match the JSON serialization the sitemap handler sees when run from a worker during development
-      compilation: JSON.parse(JSON.stringify(compilation)),
+      compilation: JSON.parse(JSON.stringify(compilation, mapJsonReplacer), mapJsonReviver),
     },
   );
 

@@ -362,10 +362,18 @@ const generateGraph = async (compilation) => {
     const sitemapModuleUrl = new URL(`./sitemap.xml.${extension}`, userWorkspace);
 
     if (await checkResourceExists(sitemapModuleUrl)) {
-      if (await checkResourceExists(new URL("./sitemap.xml", userWorkspace))) {
+      const staticSitemapUrl = new URL("./sitemap.xml", userWorkspace);
+
+      if (await checkResourceExists(staticSitemapUrl)) {
         console.warn(
           `Detected both a sitemap.xml and a sitemap.xml.${extension} file in your workspace, the static sitemap.xml will take precedence.`,
         );
+
+        compilation.manifest.sitemap = {
+          pageHref: staticSitemapUrl.href,
+          route: `${basePath}/sitemap.xml`,
+          static: true,
+        };
       } else {
         compilation.manifest.sitemap = {
           pageHref: sitemapModuleUrl.href,
