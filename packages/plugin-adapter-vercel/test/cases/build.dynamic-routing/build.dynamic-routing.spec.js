@@ -142,6 +142,39 @@ describe("Build Greenwood With: ", function () {
       });
     });
 
+    // https://github.com/ProjectEvergreen/greenwood/issues/1737
+    describe("An SSR page using getStaticPaths for its dynamic route segment", function () {
+      let configFile;
+      let functionFolders;
+
+      before(async function () {
+        configFile = await fs.readFile(new URL("./config.json", vercelOutputFolder), "utf-8");
+        functionFolders = await Array.fromAsync(
+          fs.glob("**/*.func", { cwd: vercelFunctionsOutputUrl }),
+        );
+      });
+
+      it("should not output a serverless function for the route", function () {
+        expect(functionFolders.filter((folder) => folder.includes("artists")).length).to.equal(0);
+      });
+
+      // with no route rule, non-enumerated values fall through to the platform's static 404
+      it("should not output a route rule for the dynamic segment", function () {
+        expect(configFile).to.not.contain("artists");
+      });
+
+      it("should output static HTML for each path enumerated from getStaticPaths", async function () {
+        for (const name of ["foo", "bar", "baz"]) {
+          const html = await fs.readFile(
+            new URL(`./static/artists/${name}/index.html`, vercelOutputFolder),
+            "utf-8",
+          );
+
+          expect(html).to.contain("Some Artists Page");
+        }
+      });
+    });
+
     describe("Dynamic API Route adapter", function () {
       it("should return the expected response when the serverless adapter entry point handler is invoked", async function () {
         const handler = (
