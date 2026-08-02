@@ -134,7 +134,17 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
               recursive: true,
             });
 
-            fs.promises.copyFile(resolvedUrl, new URL(`.${finalValue}`, outputDir));
+            const destinationUrl = new URL(`.${finalValue}`, outputDir);
+
+            // copy synchronously, skipping destinations already written, since the same source
+            // can be referenced from multiple url()s (e.g. an eot ?#iefix fallback) and
+            // concurrent copies to the same destination intermittently fail on Windows with
+            // EBUSY, crashing the build as an unhandled rejection.  the destination name is
+            // content-hashed, so an existing file can safely be kept as is
+            // https://github.com/ProjectEvergreen/greenwood/issues/1585
+            if (!fs.existsSync(destinationUrl)) {
+              fs.copyFileSync(resolvedUrl, destinationUrl);
+            }
           }
 
           optimizedCss += `url('${basePath}${finalValue}')`;
