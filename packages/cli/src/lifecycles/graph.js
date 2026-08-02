@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import fm from "front-matter";
 import { checkResourceExists, requestAsObject } from "../lib/resource-utils.js";
 import { activeFrontmatterKeys } from "../lib/content-utils.js";
-import { getDynamicSegmentsFromRoute } from "../lib/url-utils.js";
+import { getDynamicSegmentsFromRoute, safeDecodeURIComponent } from "../lib/url-utils.js";
 import { Worker } from "node:worker_threads";
 
 function getLabelFromRoute(_route) {
@@ -24,18 +24,6 @@ function getLabelFromRoute(_route) {
       return `${routePart.charAt(0).toUpperCase()}${routePart.substring(1)}`;
     })
     .join(" ");
-}
-
-// decodeURIComponent is only meant to normalize percent-encoded filenames; raw
-// frontmatter values (e.g. "100% Complete") can contain a bare "%" that throws
-// URIError and aborts the whole build, so fall back to the original string
-// https://github.com/ProjectEvergreen/greenwood/issues/1709
-function safeDecodeURIComponent(value) {
-  try {
-    return decodeURIComponent(value);
-  } catch {
-    return value;
-  }
 }
 
 function getIdFromRelativePathPath(relativePathPath, extension) {
