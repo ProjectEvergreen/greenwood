@@ -1,0 +1,13 @@
+{
+  "name": "fake-array-pattern-exports",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./*": [
+      {
+        "import": "./src/*.js"
+      }
+    ]
+  }
+}

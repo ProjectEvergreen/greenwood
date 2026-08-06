@@ -192,11 +192,12 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot, stat
               if (item[condition]) {
                 matched = true;
                 if (sub.indexOf("*") >= 0) {
-                  // basic support, not properly tested
+                  // walk the pattern target from the matched array item; indexing the array
+                  // itself by condition name would pass undefined as the resolved root
+                  // https://github.com/ProjectEvergreen/greenwood/issues/1758
                   await walkExportPatterns(
                     dependency,
-                    sub,
-                    exports[sub][condition],
+                    item[condition].default ?? item[condition],
                     resolvedRoot,
                     state,
                   );
@@ -296,10 +297,14 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot, stat
 // we recursively cache / memoize walkedPackages to account for scenarios where Greenwood can (pre)render concurrently
 async function walkPackageDependencies(packageJson, walkedPackages, parent, state) {
   const { diagnostics } = state;
-  try {
-    const dependencies = Object.keys(packageJson.dependencies || {});
+  const dependencies = Object.keys(packageJson.dependencies || {});
 
-    for (const dependency of dependencies) {
+  for (const dependency of dependencies) {
+    // isolate failures per dependency, so one package with an unexpected exports shape
+    // degrades to an error for that package instead of silently dropping every remaining
+    // dependency from the import map
+    // https://github.com/ProjectEvergreen/greenwood/issues/1758
+    try {
       const resolved = resolveBareSpecifier(dependency, parent, diagnostics);
 
       if (resolved) {
@@ -332,9 +337,9 @@ async function walkPackageDependencies(packageJson, walkedPackages, parent, stat
           }
         }
       }
+    } catch (e) {
+      console.error(`Error building up import map for dependency => \`${dependency}\``, e);
     }
-  } catch (e) {
-    console.error("Error building up import map", e);
   }
 }
 
