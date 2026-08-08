@@ -53,7 +53,16 @@ class StandardHtmlResource {
     let html = "";
 
     if (isHtmlContent) {
-      body = await fs.readFile(new URL(pageHref), "utf-8");
+      try {
+        body = await fs.readFile(new URL(pageHref), "utf-8");
+      } catch (e) {
+        // the graph is only generated once, so a matching route's page may have been deleted since then
+        if (e.code === "ENOENT") {
+          return new Response(null, { status: 404 });
+        }
+
+        throw e;
+      }
 
       // purge frontmatter data from HTML files that only have a `<body>` tag
       // frontmatter outside of an <html> tag will get ignored by node-html-parser
