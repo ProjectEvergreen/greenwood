@@ -40,7 +40,6 @@ class StandardHtmlResource {
     const { pathname } = url;
     const isSpaRoute = this.compilation.graph.find((node) => node.isSPA);
     const matchingRoute = this.compilation.graph.find((node) => node.route === pathname) || {};
-    // must stay undefined (not {}) so the ?? below can fall back to the page node
     const matchingRouteWithSegment = getMatchingDynamicSsrRoute(this.compilation, pathname);
     const { pageHref } = matchingRoute;
     const filePath =
