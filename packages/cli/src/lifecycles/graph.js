@@ -105,7 +105,9 @@ const generateGraph = async (compilation) => {
         if (isApiRoute) {
           if (extension !== "js" && extension !== "ts" && !isCustom) {
             console.warn(`${filenameUrl} is not a supported API file extension, skipping...`);
-            return;
+            // skip this file but keep walking the directory instead of aborting the whole build
+            // https://github.com/ProjectEvergreen/greenwood/issues/1707
+            continue;
           }
 
           // is there a better way to detect for isolation export without having to actually import() the module?
