@@ -42,7 +42,6 @@ class LiveReloadServer {
       ...customPluginsExtensions,
       ...this.compilation.config.devServer.extensions,
     ]
-      // https://github.com/ProjectEvergreen/greenwood/issues/1717
       .filter((ext) => ext !== "*" && ext !== "") // basic filter for false positives
       .filter((ext, idx, array) => array.indexOf(ext) === idx) // dedupe
       .map((ext) => (ext.startsWith(".") ? ext.replace(".", "") : ext)); // trim . from all entries
