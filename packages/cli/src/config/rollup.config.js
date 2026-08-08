@@ -368,8 +368,6 @@ function greenwoodImportMetaUrl(compilation) {
           if (plugin.shouldServe && (await plugin.shouldServe(url, request))) {
             const response = await plugin.serve(url, request);
 
-            // parenthesize so we test the content-type string contains "text/javascript"
-            // https://github.com/ProjectEvergreen/greenwood/issues/1723
             if ((response?.headers?.get("content-type") || "").indexOf("text/javascript") >= 0) {
               bundleExtensions = [...bundleExtensions, ...plugin.extensions];
             }
