@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import fm from "front-matter";
 import { checkResourceExists, requestAsObject } from "../lib/resource-utils.js";
 import { activeFrontmatterKeys } from "../lib/content-utils.js";
-import { getDynamicSegmentsFromRoute } from "../lib/url-utils.js";
+import { getDynamicSegmentsFromRoute, safeDecodeURIComponent } from "../lib/url-utils.js";
 import { Worker } from "node:worker_threads";
 
 function getLabelFromRoute(_route) {
@@ -286,9 +286,9 @@ const generateGraph = async (compilation) => {
           });
 
           const page = {
-            id: decodeURIComponent(getIdFromRelativePathPath(relativePagePath, extension)),
-            label: decodeURIComponent(label),
-            title: title ? decodeURIComponent(title) : title,
+            id: safeDecodeURIComponent(getIdFromRelativePathPath(relativePagePath, extension)),
+            label: safeDecodeURIComponent(label),
+            title: title ? safeDecodeURIComponent(title) : title,
             route: `${basePath}${route}`,
             layout,
             data: customData || {},
@@ -378,6 +378,11 @@ const generateGraph = async (compilation) => {
           resources: [],
           outputHref: new URL(`.${route}index.html`, outputDir).href,
           ...node,
+          // normalize the same fields as filesystem pages so both content APIs
+          // treat percent-encoded (and literal "%") values identically
+          id: node.id ? safeDecodeURIComponent(node.id) : node.id,
+          label: node.label ? safeDecodeURIComponent(node.label) : node.label,
+          title: node.title ? safeDecodeURIComponent(node.title) : node.title,
           route: encodeURIComponent(route).replace(/%2F/g, "/"),
           data: {
             ...node.data,

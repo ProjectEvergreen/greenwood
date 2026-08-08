@@ -42,6 +42,20 @@ const customExternalSourcesPlugin = {
           body: `<h1>First Post Page</h1>`,
         },
         {
+          title: "100% Complete",
+          id: "promo",
+          label: "Save 20%",
+          route: "/promo/",
+          body: `<h1>100% Complete Page</h1>`,
+        },
+        {
+          title: "Caf%C3%A9",
+          id: "cafe",
+          label: "Caf%C3%A9",
+          route: "/cafe/",
+          body: `<h1>Cafe Page</h1>`,
+        },
+        {
           title: "Sitemap",
           body: `
             <ul>

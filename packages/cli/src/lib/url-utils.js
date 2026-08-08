@@ -49,10 +49,23 @@ function getStaticRouteFromDynamicRoute(dynamicStaticPath, segment, route) {
   return `${route.replace(`[${segment.key}]`, dynamicStaticPath.params[segment.key])}`;
 }
 
+// decodeURIComponent throws URIError on a "%" that does not start a valid escape
+// sequence (e.g. a frontmatter title like "100% Complete"), so fall back to
+// returning the value untouched instead of aborting the whole build
+// https://github.com/ProjectEvergreen/greenwood/issues/1709
+function safeDecodeURIComponent(value) {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
 export {
   getDynamicSegmentsFromRoute,
   getMatchingDynamicApiRoute,
   getParamsFromSegment,
   getMatchingDynamicSsrRoute,
   getStaticRouteFromDynamicRoute,
+  safeDecodeURIComponent,
 };

@@ -171,6 +171,46 @@ describe("Build Greenwood With: ", function () {
       });
     });
 
+    describe("Default output for a page with a literal percent sign in its title and label", function () {
+      let dom;
+
+      before(async function () {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "./promo/index.html"));
+      });
+
+      it("should have the expected heading text", function () {
+        const heading = dom.window.document.querySelector("body h1").textContent;
+
+        expect(heading).to.be.equal("100% Complete Page");
+      });
+
+      it("should keep the literal '%' in the <title> verbatim", function () {
+        const title = dom.window.document.querySelector("head title").textContent;
+
+        expect(title).to.be.equal("100% Complete");
+      });
+    });
+
+    describe("Default output for a page with a percent-encoded title and label", function () {
+      let dom;
+
+      before(async function () {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "./cafe/index.html"));
+      });
+
+      it("should have the expected heading text", function () {
+        const heading = dom.window.document.querySelector("body h1").textContent;
+
+        expect(heading).to.be.equal("Cafe Page");
+      });
+
+      it("should decode the percent-encoded <title>", function () {
+        const title = dom.window.document.querySelector("head title").textContent;
+
+        expect(title).to.be.equal("Café");
+      });
+    });
+
     describe("Sitemap Page", function () {
       let dom;
 
