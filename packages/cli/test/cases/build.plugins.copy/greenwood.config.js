@@ -3,8 +3,9 @@ import {
   resolveBareSpecifier,
 } from "@greenwood/cli/src/lib/walker-package-ranger.js";
 
-// a multi file directory copy always takes longer than a single file copy, so pairing them against
-// the same destination shows whether copies run in series and let the last one registered win
+// the directory copy only reaches prism.min.css after creating the destination and walking the
+// other themes, so when copies overlap it clobbers the override registered after it; in series
+// the override wins
 const themesUrl = new URL("./themes/", derivePackageRoot(resolveBareSpecifier("prismjs")));
 const overrideUrl = new URL("./duplicate-destination.css", import.meta.url);
 

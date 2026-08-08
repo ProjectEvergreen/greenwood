@@ -67,6 +67,17 @@ describe("Build Greenwood With: ", function () {
         "utf-8",
       );
 
+      it("should copy the whole themes directory into each shared destination", async function () {
+        for (const sharedDir of [
+          "duplicate-destination-plugins",
+          "duplicate-destination-locations",
+        ]) {
+          expect(
+            await glob.promise(path.join(this.context.publicDir, sharedDir, "*.css")),
+          ).to.have.lengthOf(16);
+        }
+      });
+
       it("should let the last of two plugins sharing a destination win", function () {
         const contents = fs.readFileSync(
           path.join(this.context.publicDir, "duplicate-destination-plugins/prism.min.css"),
