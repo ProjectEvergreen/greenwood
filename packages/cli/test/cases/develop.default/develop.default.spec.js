@@ -957,6 +957,9 @@ describe("Develop Greenwood With: ", function () {
   });
 
   after(async function () {
+    // remove the copied in page first, since an aborted run can hang in stopCommand before teardown
+    fs.rmSync(deletedPagePath, { force: true });
+
     await runner.stopCommand();
     await runner.teardown([
       path.join(outputPath, ".greenwood"),
