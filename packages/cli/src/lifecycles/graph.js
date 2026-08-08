@@ -71,11 +71,18 @@ function reportStaticPathRouteCollisions(compilation) {
   for (const page of staticPages) {
     const { staticPaths, segment, route } = page;
 
-    if (!staticPaths) {
+    // reporting collisions should never be what breaks a build, so skip pages that have no
+    // dynamic segment to expand a static path into
+    if (!staticPaths || !segment) {
       continue;
     }
 
     for (const staticPath of staticPaths) {
+      // ... nor static paths that have no params to expand
+      if (!staticPath?.params) {
+        continue;
+      }
+
       const staticRoute = getStaticRouteFromDynamicRoute(staticPath, segment, route);
       const claimedBy = getPageClaimingStaticRoute(staticPages, page, staticRoute);
 
