@@ -39,28 +39,18 @@ async function getCustomPageLayoutsFromPlugins(compilation, layoutName) {
  * and a page template title would be prioritized over an app layout title
  *
  */
-// drop duplicate <script src> / <link href> tags that appear in more than one of app layout,
-// page layout, and page, keeping the first occurrence, so a shared resource is only
-// loaded (and for classic scripts, executed) once
-// https://github.com/ProjectEvergreen/greenwood/issues/1760
-function dedupeMergedResourceTags(tags, attribute) {
+// keep only the first occurrence of identical tags when merging app layout, page layout, and page
+function dedupeMergedResourceTags(tags) {
   const seen = new Set();
 
   return tags.filter((tag) => {
-    const value =
-      typeof tag === "string"
-        ? (tag.match(new RegExp(`${attribute}="([^"]*)"`)) ?? [])[1]
-        : tag.getAttribute(attribute);
+    const key = tag.toString().replace(/\s+/g, " ").trim();
 
-    if (!value) {
-      return true;
-    }
-
-    if (seen.has(value)) {
+    if (seen.has(key)) {
       return false;
     }
 
-    seen.add(value);
+    seen.add(key);
 
     return true;
   });
@@ -167,13 +157,10 @@ async function mergeContentIntoLayout(
       ...[...((childRoot && childRoot.querySelectorAll("head meta")) || [])],
     ].join("\n");
 
-    const mergedLinks = dedupeMergedResourceTags(
-      [
-        ...((parentRoot && parentRoot?.querySelectorAll("head link")) ?? []),
-        ...[...((childRoot && childRoot.querySelectorAll("head link")) || [])],
-      ],
-      "href",
-    ).join("\n");
+    const mergedLinks = dedupeMergedResourceTags([
+      ...((parentRoot && parentRoot?.querySelectorAll("head link")) ?? []),
+      ...[...((childRoot && childRoot.querySelectorAll("head link")) || [])],
+    ]).join("\n");
 
     const mergedStyles = [
       ...((parentRoot && parentRoot?.querySelectorAll("head style")) ?? []),
@@ -213,46 +200,43 @@ async function mergeContentIntoLayout(
       }),
     ].join("\n");
 
-    const mergedScripts = dedupeMergedResourceTags(
-      [
-        ...((parentRoot && parentRoot?.querySelectorAll("head script")) || []),
-        ...[...((childRoot && childRoot.querySelectorAll("head script")) || [])],
-        ...(
-          await asyncFilter(customImports, async (resource) => {
-            const [src] = resource.split(" ");
-            const isSupportedScript = ["js", "ts"].includes(src.split(" ")[0].split(".").pop());
+    const mergedScripts = dedupeMergedResourceTags([
+      ...((parentRoot && parentRoot?.querySelectorAll("head script")) || []),
+      ...[...((childRoot && childRoot.querySelectorAll("head script")) || [])],
+      ...(
+        await asyncFilter(customImports, async (resource) => {
+          const [src] = resource.split(" ");
+          const isSupportedScript = ["js", "ts"].includes(src.split(" ")[0].split(".").pop());
 
-            if (isSupportedScript) {
-              return true;
+          if (isSupportedScript) {
+            return true;
+          }
+
+          const contentType = "text/javascript";
+          const resourceUrl = new URL(`file://${src}`);
+          const request = new Request(resourceUrl, { headers: { Accept: contentType } });
+          let isSupportedCustomFormat = false;
+
+          for (const plugin of resourcePlugins) {
+            if (
+              plugin.contentType === contentType &&
+              plugin.shouldServe &&
+              (await plugin.shouldServe(resourceUrl, request))
+            ) {
+              isSupportedCustomFormat = true;
+              break;
             }
+          }
 
-            const contentType = "text/javascript";
-            const resourceUrl = new URL(`file://${src}`);
-            const request = new Request(resourceUrl, { headers: { Accept: contentType } });
-            let isSupportedCustomFormat = false;
+          return isSupportedCustomFormat;
+        })
+      ).map((resource) => {
+        const [src, ...attributes] = resource.split(" ");
+        const attrs = attributes?.length > 0 ? attributes.join(" ") : "";
 
-            for (const plugin of resourcePlugins) {
-              if (
-                plugin.contentType === contentType &&
-                plugin.shouldServe &&
-                (await plugin.shouldServe(resourceUrl, request))
-              ) {
-                isSupportedCustomFormat = true;
-                break;
-              }
-            }
-
-            return isSupportedCustomFormat;
-          })
-        ).map((resource) => {
-          const [src, ...attributes] = resource.split(" ");
-          const attrs = attributes?.length > 0 ? attributes.join(" ") : "";
-
-          return `<script src="${src}" ${attrs}></script>`;
-        }),
-      ],
-      "src",
-    ).join("\n");
+        return `<script src="${src}" ${attrs}></script>`;
+      }),
+    ]).join("\n");
 
     // // https://stackoverflow.com/a/51432792/417806
     const outletRegex =
