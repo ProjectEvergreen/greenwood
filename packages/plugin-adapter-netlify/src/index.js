@@ -8,14 +8,13 @@ import { getDynamicPages } from "@greenwood/cli/src/lib/graph-utils.js";
 import { zip } from "zip-a-folder";
 
 // https://docs.netlify.com/functions/create/?fn-language=js
-function generateOutputFormat(id, type, segmentKey) {
+function generateOutputFormat(id, type, segmentKey, route = "") {
   const handlerAlias = "$handler";
-  // TODO: use `URLPattern` for extracting props after we upgrade to Node24
-  // https://github.com/ProjectEvergreen/greenwood/issues/1614
+  const routePattern = route.replace(new RegExp(`\\[${segmentKey}\\]`, "g"), `:${segmentKey}`);
   const extractParams = segmentKey
-    ? type === "page"
-      ? `const params = { ${segmentKey}: rawUrl.split('/')[rawUrl.split('/').length - 2] }`
-      : `const params = { ${segmentKey}: rawUrl.split('?')[0].split('/').pop() }`
+    ? `const pattern = new URLPattern({ pathname: '${routePattern}' });
+      const match = pattern.exec(new URL(rawUrl));
+      const params = match ? { ${segmentKey}: match.pathname.groups.${segmentKey} } : {};`
     : "const params = {}";
   return `
     import { handler as ${handlerAlias} } from './${id}.js';
@@ -64,10 +63,10 @@ function generateOutputFormat(id, type, segmentKey) {
   `;
 }
 
-async function setupOutputDirectory(id, outputRoot, outputType, segmentKey) {
+async function setupOutputDirectory(id, outputRoot, outputType, segmentKey, route) {
   const entryPoint = outputType === "api" ? id : `${id}.route`;
   const filename = outputType === "api" ? `api-${id}` : id;
-  const outputFormat = generateOutputFormat(entryPoint, outputType, segmentKey);
+  const outputFormat = generateOutputFormat(entryPoint, outputType, segmentKey, route);
 
   await fs.mkdir(outputRoot, { recursive: true });
   await fs.writeFile(new URL(`./${filename}.js`, outputRoot), outputFormat);
@@ -120,7 +119,7 @@ async function netlifyAdapter(compilation) {
     );
     const outputRoot = new URL(`./${id}/`, adapterOutputScratchUrl);
 
-    await setupOutputDirectory(id, outputRoot, outputType, segment?.key);
+    await setupOutputDirectory(id, outputRoot, outputType, segment?.key, route);
 
     // handle user's actual route entry file
     await fs.cp(
@@ -156,7 +155,7 @@ async function netlifyAdapter(compilation) {
     const outputRoot = new URL(`./api/${id}/`, adapterOutputScratchUrl);
     const { assets = [] } = value;
 
-    await setupOutputDirectory(id, outputRoot, outputType, segment?.key);
+    await setupOutputDirectory(id, outputRoot, outputType, segment?.key, route);
 
     await fs.cp(new URL(outputHref), new URL(`./${id}.js`, outputRoot), { recursive: true });
 

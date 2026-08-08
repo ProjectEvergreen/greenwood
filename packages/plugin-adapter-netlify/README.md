@@ -42,10 +42,10 @@ You will then want to create a _netlify.toml_ file at the root of your project (
   skip_processing = true
 
 [build.environment]
-  NODE_VERSION = "18.x" # or pin to a specific version, like 18.15.0
+  NODE_VERSION = "24.x" # or pin to a specific version, like 18.15.0
 ```
 
-Set the `AWS_LAMBDA_JS_RUNTIME` environment variable [in your Netlify UI](https://answers.netlify.com/t/aws-lambda-js-runtime-nodejs14-x/32161/2) to the value of  `nodejs18.x`.
+Set the `AWS_LAMBDA_JS_RUNTIME` environment variable [in your Netlify UI](https://answers.netlify.com/t/aws-lambda-js-runtime-nodejs14-x/32161/2) to the value of  `nodejs24.x`, or if needed set the [`AWS_LAMBDA_JS_RUNTIME` environment variable](https://github.com/ProjectEvergreen/greenwood/discussions/1533#discussioncomment-15249252) in your Netlify project's dashboard.
 
 
 ## Usage
