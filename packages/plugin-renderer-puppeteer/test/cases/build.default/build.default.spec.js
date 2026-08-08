@@ -150,6 +150,34 @@ describe("Build Greenwood With: ", function () {
         expect(header[0].textContent.trim()).to.equal("This is the header component.");
       });
     });
+
+    // validates that the 404.html page's <meta> refresh directive is ignored during prerendering by Puppeteer
+    // https://github.com/ProjectEvergreen/greenwood/issues/1585#issuecomment-5227293583
+    describe("Default output for 404.html that has a <meta> refresh directive", function () {
+      let dom;
+
+      before(async function () {
+        const outputFile = path.join(this.context.publicDir, "./404.html");
+
+        dom = await JSDOM.fromFile(outputFile);
+      });
+
+      it("should ignore client-side redirects during prerendering", function () {
+        const appHeader = dom.window.document.querySelector("body app-header");
+        const header = appHeader.querySelector("header");
+
+        expect(header).to.not.equal(null);
+        expect(header.textContent.trim()).to.equal("This is the header component.");
+        expect(dom.window.document.querySelector("h1").textContent).to.equal("Page Not Found");
+      });
+
+      it("should still retain the meta refresh tag", function () {
+        const refresh = dom.window.document.querySelector('meta[http-equiv="refresh"]');
+
+        expect(refresh).to.not.equal(null);
+        expect(refresh.content).to.equal("0; url=https://www.greenwoodjs.dev");
+      });
+    });
   });
 
   after(async function () {
