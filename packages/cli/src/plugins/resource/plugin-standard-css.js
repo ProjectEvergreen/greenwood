@@ -136,12 +136,7 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
 
             const destinationUrl = new URL(`.${finalValue}`, outputDir);
 
-            // copy synchronously, skipping destinations already written, since the same source
-            // can be referenced from multiple url()s (e.g. an eot ?#iefix fallback) and
-            // concurrent copies to the same destination intermittently fail on Windows with
-            // EBUSY, crashing the build as an unhandled rejection.  the destination name is
-            // content-hashed, so an existing file can safely be kept as is
-            // https://github.com/ProjectEvergreen/greenwood/issues/1585
+            // destination names are content-hashed, so an existing file is already correct
             if (!fs.existsSync(destinationUrl)) {
               fs.copyFileSync(resolvedUrl, destinationUrl);
             }
