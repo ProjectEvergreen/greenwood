@@ -221,12 +221,12 @@ async function getDevServer(compilation) {
 }
 
 // extensions no standard resource plugin claims, but which static hosts still serve
-const STATIC_FALLBACK_CONTENT_TYPES = {
-  csv: "text/csv",
-  txt: "text/plain",
-  webmanifest: "application/manifest+json",
-  xml: "application/xml",
-};
+const STATIC_FALLBACK_CONTENT_TYPES = new Map([
+  ["csv", "text/csv"],
+  ["txt", "text/plain"],
+  ["webmanifest", "application/manifest+json"],
+  ["xml", "application/xml"],
+]);
 
 async function getStaticServer(compilation, composable) {
   const app = new Koa();
@@ -267,8 +267,9 @@ async function getStaticServer(compilation, composable) {
         }
 
         if (response === initResponse) {
-          const contentType =
-            STATIC_FALLBACK_CONTENT_TYPES[url.pathname.split(".").pop().toLowerCase()];
+          const contentType = STATIC_FALLBACK_CONTENT_TYPES.get(
+            url.pathname.split(".").pop().toLowerCase(),
+          );
 
           if (contentType) {
             response = new Response(await fs.readFile(url), {

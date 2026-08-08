@@ -26,6 +26,7 @@
  *   sitemap.xml
  *   wasm.html
  *   assets/
+ *     data.bak
  *     data.json
  *     data.xml
  *     favicon.ico
@@ -493,6 +494,29 @@ describe("Serve Greenwood With: ", function () {
 
       it("should return a Content-Type of text/plain", function (done) {
         expect(response.headers.get("Content-Type")).to.equal("text/plain");
+        done();
+      });
+    });
+
+    // https://github.com/ProjectEvergreen/greenwood/issues/1767
+    // assets/data.bak is copied into the output directory, so this only passes while the
+    // fallback stays an allow list of extensions instead of serving anything that exists
+    describe("Serve command with 404 not found behavior for an existing file with an unsupported extension", function () {
+      let response = {};
+      let body = "";
+
+      before(async function () {
+        response = await fetch(`${hostname}/assets/data.bak`);
+        body = await response.text();
+      });
+
+      it("should return a 404 status", function (done) {
+        expect(response.status).to.equal(404);
+        done();
+      });
+
+      it("should not return the contents of the file", function (done) {
+        expect(body).to.not.contain("THIS_EXTENSION_IS_NOT_IN_THE_FALLBACK_ALLOWLIST");
         done();
       });
     });
