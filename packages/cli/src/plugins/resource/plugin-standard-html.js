@@ -40,7 +40,8 @@ class StandardHtmlResource {
     const { pathname } = url;
     const isSpaRoute = this.compilation.graph.find((node) => node.isSPA);
     const matchingRoute = this.compilation.graph.find((node) => node.route === pathname) || {};
-    const matchingRouteWithSegment = getMatchingDynamicSsrRoute(this.compilation, pathname) || {};
+    // must stay undefined (not {}) so the ?? below can fall back to the page node
+    const matchingRouteWithSegment = getMatchingDynamicSsrRoute(this.compilation, pathname);
     const { pageHref } = matchingRoute;
     const filePath =
       !matchingRoute.external && pageHref
@@ -78,8 +79,8 @@ class StandardHtmlResource {
           break;
         }
       }
-    } else if (matchingRoute.isSSR || matchingRouteWithSegment.isSSR) {
-      const routeModuleLocationUrl = new URL(pageHref ?? matchingRouteWithSegment.pageHref);
+    } else if (matchingRoute.isSSR || matchingRouteWithSegment?.isSSR) {
+      const routeModuleLocationUrl = new URL(pageHref ?? matchingRouteWithSegment?.pageHref);
       const routeWorkerUrl = this.compilation.config.plugins
         .find((plugin) => plugin.type === "renderer")
         .provider().executeModuleUrl;
