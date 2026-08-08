@@ -232,8 +232,11 @@ async function getStaticServer(compilation, composable) {
   app.use(async (ctx, next) => {
     try {
       const url = new URL(`.${ctx.url.replace(basePath, "")}`, outputDir.href);
+      // reject paths that resolve outside the output directory (e.g. `../` traversal);
+      // outputDir.href ends in `/`, so this boundary also excludes sibling-prefix paths
+      const isWithinOutputDir = url.href.startsWith(outputDir.href);
 
-      if (await checkResourceExists(url)) {
+      if (isWithinOutputDir && (await checkResourceExists(url))) {
         const resourcePlugins = standardResourcePlugins
           .filter((plugin) => plugin.isStandardStaticResource)
           .map((plugin) => {
