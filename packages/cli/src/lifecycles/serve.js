@@ -318,9 +318,6 @@ async function getStaticServer(compilation, composable) {
   app.use(async (ctx, next) => {
     try {
       const url = new URL(`http://localhost:${port}${ctx.url}`);
-      // for dynamic routes, getMatchingDynamicSsrRoute only matches values enumerated from
-      // getStaticPaths, so unknown values fall through to a 404 instead of an ENOENT / 500
-      // https://github.com/ProjectEvergreen/greenwood/issues/1737
       const matchingRoute =
         compilation.graph.find((page) => page.route === url.pathname) ||
         getMatchingDynamicSsrRoute(compilation, url.pathname);
