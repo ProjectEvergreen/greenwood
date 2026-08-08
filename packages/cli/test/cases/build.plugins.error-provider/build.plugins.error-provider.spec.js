@@ -50,5 +50,15 @@ describe("Build Greenwood With: ", function () {
         `Configuration error: plugins provider must be a function. got object instead.`,
       );
     });
+
+    // https://github.com/ProjectEvergreen/greenwood/issues/1745
+    it("should surface the configuration error directly instead of an unhandled promise rejection", async function () {
+      const stderr = await runner.runCommand(cliPath, "build").then(
+        () => "",
+        (err) => err,
+      );
+
+      expect(stderr).to.not.contain("UnhandledPromiseRejection");
+    });
   });
 });
