@@ -66,4 +66,9 @@ function getMatchingPageByRoute(compilation, route) {
   }
 }
 
-export { getDynamicPages, getStaticPages, getMatchingPageByRoute };
+// an existing page already emitting this route, which takes precedence over a getStaticPaths value
+function getPageClaimingStaticRoute(staticPages, page, staticRoute) {
+  return staticPages.find((node) => node !== page && node.route === staticRoute);
+}
+
+export { getDynamicPages, getStaticPages, getMatchingPageByRoute, getPageClaimingStaticRoute };
