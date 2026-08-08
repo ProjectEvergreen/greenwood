@@ -56,8 +56,8 @@ class StandardHtmlResource {
       try {
         body = await fs.readFile(new URL(pageHref), "utf-8");
       } catch (e) {
-        // the graph is only generated once, so a matching route's page may have been deleted since then
-        if (e.code === "ENOENT") {
+        // in development the graph is only generated once, so a matching page may since be deleted
+        if (e.code === "ENOENT" && process.env.__GWD_COMMAND__ === "develop") {
           return new Response(null, { status: 404 });
         }
 
