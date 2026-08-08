@@ -16,6 +16,13 @@ const importMap = {
     "/node_modules/@greenwood/cli/src/lib/content-utils.js",
 };
 
+// escape regex metacharacters in user provided key / collection names
+// (RegExp.escape needs Node >= 24)
+// https://github.com/ProjectEvergreen/greenwood/issues/1743
+function escapeRegExpCharacters(text) {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 class ContentAsDataResource {
   constructor(compilation) {
     this.compilation = compilation;
@@ -108,31 +115,35 @@ class ContentAsDataResource {
 
     // Greenwood active frontmatter keys
     for (const key of activeFrontmatterKeys) {
-      const interpolatedFrontmatter = "\\$\\{globalThis.page." + key + "\\}";
+      const interpolatedFrontmatter =
+        "\\$\\{globalThis.page." + escapeRegExpCharacters(key) + "\\}";
       const needle =
         key === "title" && !matchingRoute.title ? matchingRoute.label : matchingRoute[key];
 
-      newBody = newBody.replace(new RegExp(interpolatedFrontmatter, "g"), needle);
+      // function replacement so values with $&, $`, $' or $n are inserted verbatim
+      // https://github.com/ProjectEvergreen/greenwood/issues/1743
+      newBody = newBody.replace(new RegExp(interpolatedFrontmatter, "g"), () => needle);
     }
 
     // custom user frontmatter data
     for (const fm in matchingRoute.data) {
-      const interpolatedFrontmatter = "\\$\\{globalThis.page.data." + fm + "\\}";
+      const interpolatedFrontmatter =
+        "\\$\\{globalThis.page.data." + escapeRegExpCharacters(fm) + "\\}";
       const needle =
         typeof matchingRoute.data[fm] === "string"
           ? matchingRoute.data[fm]
           : JSON.stringify(matchingRoute.data[fm]).replace(/"/g, "&quot;");
 
-      newBody = newBody.replace(new RegExp(interpolatedFrontmatter, "g"), needle);
+      newBody = newBody.replace(new RegExp(interpolatedFrontmatter, "g"), () => needle);
     }
 
     // collections
     for (const collection in this.compilation.collections) {
-      const interpolatedFrontmatter = "\\$\\{globalThis.collection." + collection + "\\}";
+      const interpolatedFrontmatter =
+        "\\$\\{globalThis.collection." + escapeRegExpCharacters(collection) + "\\}";
       const cleanedCollections = cleanContentCollection(this.compilation.collections[collection]);
 
-      newBody = newBody.replace(
-        new RegExp(interpolatedFrontmatter, "g"),
+      newBody = newBody.replace(new RegExp(interpolatedFrontmatter, "g"), () =>
         JSON.stringify(cleanedCollections).replace(/"/g, "&quot;"),
       );
     }
