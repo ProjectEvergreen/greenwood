@@ -78,6 +78,8 @@ const defaultConfig = {
   useTsc: false,
   workspace: new URL("./src/", cwd),
 };
+// staticRouter has no default value of its own, so it is not part of defaultConfig
+const supportedConfigOptions = [...Object.keys(defaultConfig), "staticRouter"];
 
 const readAndMergeConfig = async () => {
   // check for greenwood.config.ts or greenwood.config.js
@@ -119,6 +121,14 @@ const readAndMergeConfig = async () => {
       polyfills,
       useTsc,
     } = userCfgFile;
+
+    for (const key of Object.keys(userCfgFile)) {
+      if (!supportedConfigOptions.includes(key)) {
+        console.warn(
+          `Configuration warning: "${key}" is not a supported configuration option and will be ignored.`,
+        );
+      }
+    }
 
     // workspace validation
     if (workspace) {
