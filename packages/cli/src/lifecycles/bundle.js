@@ -18,7 +18,12 @@ import path from "node:path";
 import { rollup } from "rollup";
 import { pruneGraph } from "../lib/content-utils.js";
 import { asyncForEach, runWithConcurrency } from "../lib/async-utils.js";
-import { getDynamicPages, getStaticPages, shouldPrerender } from "../lib/graph-utils.js";
+import {
+  getDynamicPages,
+  getPageClaimingStaticRoute,
+  getStaticPages,
+  shouldPrerender,
+} from "../lib/graph-utils.js";
 import { executePageScripts } from "./prerender.js";
 import { WorkerPool } from "../lib/threadpool.js";
 import { getStaticRouteFromDynamicRoute, getOutputHrefForStaticPath } from "../lib/url-utils.js";
@@ -132,6 +137,11 @@ async function optimizeStaticPages(compilation, plugins) {
     if (staticPaths) {
       for (const staticPath of staticPaths) {
         const staticRoute = getStaticRouteFromDynamicRoute(staticPath, segment, route);
+
+        if (getPageClaimingStaticRoute(pages, page, staticRoute)) {
+          continue;
+        }
+
         const outputDirUrl = new URL(
           getOutputHrefForStaticPath(staticPath, segment, outputHref).replace("index.html", ""),
         );
