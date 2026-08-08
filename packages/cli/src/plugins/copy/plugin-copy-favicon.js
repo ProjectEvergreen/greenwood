@@ -17,7 +17,11 @@ const greenwoodPluginCopyFavicon = [
           from: faviconPathIcoUrl,
           to: new URL(`./${fileNameIco}`, outputDir),
         });
-      } else if (await checkResourceExists(faviconPathSvgUrl)) {
+      }
+
+      // copy favicon.svg independently of favicon.ico so both are available when a project ships both
+      // https://github.com/ProjectEvergreen/greenwood/issues/1739
+      if (await checkResourceExists(faviconPathSvgUrl)) {
         assets.push({
           from: faviconPathSvgUrl,
           to: new URL(`./${fileNameSvg}`, outputDir),
