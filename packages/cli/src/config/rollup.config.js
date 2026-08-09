@@ -320,9 +320,6 @@ function greenwoodImportMetaUrl(compilation) {
         }
       }
 
-      // only parse resources that were actually served as JavaScript, otherwise binary resources
-      // (e.g. .wasm / .png / .woff2) get fed to acorn and crash the build with a cryptic SyntaxError
-      // https://github.com/ProjectEvergreen/greenwood/issues/1723
       const contentType = response.headers.get("content-type") || "";
 
       if (!canTransform || !contentType.includes("text/javascript")) {

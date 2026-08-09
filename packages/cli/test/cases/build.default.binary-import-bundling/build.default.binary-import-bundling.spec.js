@@ -1,16 +1,14 @@
 /*
  * Use Case
- * Run Greenwood build command with .wasm modules, covering both the supported
- * `new URL("./add.wasm", import.meta.url)` pattern and an unsupported direct
- * `import ... from "./add.wasm"`.
+ * Run Greenwood build command against a binary asset, using .wasm as the concrete case,
+ * covering both the supported `new URL("./add.wasm", import.meta.url)` pattern and an
+ * unsupported direct `import ... from "./add.wasm"`.
  *
  * User Result
  * For the supported pattern, should generate a Greenwood build that emits the .wasm as a
- * content-hashed, byte-identical asset, without crashing the JavaScript parser on the binary.
- * For the unsupported direct import, the build should fail, but NOT with the misleading acorn
- * `SyntaxError` thrown from inside the `greenwood-import-meta-url` Rollup plugin (which pointed
- * users at internal plugin code when the wasm binary was fed to the JavaScript parser). A clear,
- * Rollup-native parse error is acceptable.
+ * content-hashed, byte-identical asset.
+ * For the unsupported direct import, the build should fail with a Rollup parse error rather
+ * than an acorn `SyntaxError` attributed to the `greenwood-import-meta-url` plugin.
  *
  * User Command
  * greenwood build
@@ -36,7 +34,7 @@ import { fileURLToPath } from "node:url";
 
 // https://github.com/ProjectEvergreen/greenwood/issues/1723
 describe("Build Greenwood With: ", function () {
-  const LABEL = "Referencing a .wasm asset with new URL and import.meta.url";
+  const LABEL = "Referencing a binary asset with new URL and import.meta.url";
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
   let runner;
