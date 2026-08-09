@@ -220,6 +220,27 @@ function isLocalLink(url = "") {
   return url !== "" && !url.startsWith("http") && !url.startsWith("//");
 }
 
+// JSON round-tripping for compilation state that contains Map instances, e.g. manifest.apis
+// https://stackoverflow.com/a/56150320/417806
+function mapJsonReplacer(key, value) {
+  if (value instanceof Map) {
+    return {
+      dataType: "Map",
+      value: [...value],
+    };
+  }
+
+  return value;
+}
+
+function mapJsonReviver(key, value) {
+  if (typeof value === "object" && value !== null && value.dataType === "Map") {
+    return new Map(value.value);
+  }
+
+  return value;
+}
+
 // TODO handle full request
 // https://github.com/ProjectEvergreen/greenwood/discussions/1146
 function transformKoaRequestIntoStandardRequest(url, request) {
@@ -325,6 +346,8 @@ async function responseAsObject(response) {
 
 export {
   checkResourceExists,
+  mapJsonReplacer,
+  mapJsonReviver,
   mergeResponse,
   modelResource,
   normalizePathnameForWindows,
