@@ -38,10 +38,8 @@ function getMatchingDynamicSsrRoute(compilation, route) {
       return false;
     }
 
-    // for getStaticPaths routes, only match values enumerated at build time (Next.js
-    // `fallback: false` semantics) so unknown values 404 in develop and serve alike,
-    // instead of live rendering in develop and throwing an ENOENT / 500 in serve
-    // https://github.com/ProjectEvergreen/greenwood/issues/1737
+    // for getStaticPaths routes, only match values enumerated at build time so unknown
+    // values 404 in develop and serve alike
     return (
       !node.staticPaths ||
       node.staticPaths.some((staticPath) => {
