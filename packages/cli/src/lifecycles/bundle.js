@@ -17,7 +17,7 @@ import path from "node:path";
 import { rollup } from "rollup";
 import { pruneGraph } from "../lib/content-utils.js";
 import { asyncForEach } from "../lib/async-utils.js";
-import { getDynamicPages, getStaticPages } from "../lib/graph-utils.js";
+import { getDynamicPages, getPageClaimingStaticRoute, getStaticPages } from "../lib/graph-utils.js";
 import { getStaticRouteFromDynamicRoute } from "../lib/url-utils.js";
 
 async function interceptPage(url, request, plugins, body) {
@@ -126,6 +126,11 @@ async function optimizeStaticPages(compilation, plugins) {
     if (staticPaths) {
       for (const staticPath of staticPaths) {
         const staticRoute = getStaticRouteFromDynamicRoute(staticPath, segment, route);
+
+        if (getPageClaimingStaticRoute(pages, page, staticRoute)) {
+          continue;
+        }
+
         const outputDirUrl = new URL(
           outputHref
             .replace(`[${segment.key}]`, staticPath.params[segment.key])

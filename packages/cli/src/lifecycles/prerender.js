@@ -7,7 +7,7 @@ import {
 import os from "node:os";
 import { WorkerPool } from "../lib/threadpool.js";
 import { asyncForEach } from "../lib/async-utils.js";
-import { getStaticPages } from "../lib/graph-utils.js";
+import { getPageClaimingStaticRoute, getStaticPages } from "../lib/graph-utils.js";
 import { getParamsFromSegment, getStaticRouteFromDynamicRoute } from "../lib/url-utils.js";
 
 async function createOutputDirectory(outputDir) {
@@ -87,6 +87,11 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
       for (const staticPath of page.staticPaths) {
         const { route, outputHref, segment } = page;
         const staticRoute = getStaticRouteFromDynamicRoute(staticPath, segment, route);
+
+        if (getPageClaimingStaticRoute(pages, page, staticRoute)) {
+          continue;
+        }
+
         const url = new URL(`http://localhost:${config.port}${staticRoute}`);
         const request = new Request(url);
         const scratchUrl = toScratchUrl(
