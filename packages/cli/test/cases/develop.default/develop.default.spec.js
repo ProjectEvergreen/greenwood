@@ -16,6 +16,8 @@
  * }
  *
  * User Workspace
+ * fixtures/
+ *   deleted.html (copied in as src/pages/deleted.html, then deleted mid test run)
  * src/
  *   assets/
  *     data.json
@@ -66,6 +68,7 @@ describe("Develop Greenwood With: ", function () {
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
   const hostname = "http://localhost";
   const port = 1984;
+  const deletedPagePath = path.join(outputPath, "src/pages/deleted.html");
   let runner;
 
   before(function () {
@@ -77,7 +80,12 @@ describe("Develop Greenwood With: ", function () {
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
+      await runner.setup(outputPath, [
+        {
+          source: path.join(outputPath, "fixtures/deleted.html"),
+          destination: deletedPagePath,
+        },
+      ]);
 
       await new Promise((resolve, reject) => {
         runner
@@ -689,6 +697,48 @@ describe("Develop Greenwood With: ", function () {
       });
     });
 
+    // https://github.com/ProjectEvergreen/greenwood/issues/1766
+    describe("Develop command with a page deleted while the development server is running", function () {
+      let responseBeforeDelete = {};
+      let response = {};
+      let body;
+
+      before(async function () {
+        responseBeforeDelete = await fetch(`${hostname}:${port}/deleted/`);
+        await responseBeforeDelete.clone().text();
+
+        fs.rmSync(deletedPagePath);
+
+        response = await fetch(`${hostname}:${port}/deleted/`);
+        body = await response.clone().text();
+      });
+
+      it("should have returned a 200 status while the page still existed", function (done) {
+        expect(responseBeforeDelete.status).to.equal(200);
+        done();
+      });
+
+      it("should return a 404 status once the page has been deleted", function (done) {
+        expect(response.status).to.equal(404);
+        done();
+      });
+
+      it("should return an empty response body", function (done) {
+        expect(body).to.equal("");
+        done();
+      });
+
+      it("should return the correct content type", function (done) {
+        expect(response.headers.get("content-type")).to.equal("text/plain; charset=utf-8");
+        done();
+      });
+
+      it("should return the correct status message", function (done) {
+        expect(response.statusText).to.contain("Not Found");
+        done();
+      });
+    });
+
     // proxies to https://jsonplaceholder.typicode.com/posts via greenwood.config.js
     describe("Develop command with dev proxy", function () {
       let response = {};
@@ -907,6 +957,9 @@ describe("Develop Greenwood With: ", function () {
   });
 
   after(async function () {
+    // remove the copied in page first, since an aborted run can hang in stopCommand before teardown
+    fs.rmSync(deletedPagePath, { force: true });
+
     await runner.stopCommand();
     await runner.teardown([
       path.join(outputPath, ".greenwood"),
