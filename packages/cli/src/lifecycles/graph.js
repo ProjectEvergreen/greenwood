@@ -177,7 +177,15 @@ const generateGraph = async (compilation) => {
 
           if (isStatic) {
             fileContents = await fs.readFile(filenameUrl, "utf8");
-            const { attributes } = fm(fileContents);
+            let attributes;
+
+            try {
+              ({ attributes } = fm(fileContents));
+            } catch (e) {
+              throw new Error(
+                `Error parsing frontmatter for page "${relativePagePath}". ${e.message}`,
+              );
+            }
 
             layout = attributes.layout || layout;
             title = attributes.title || title;
