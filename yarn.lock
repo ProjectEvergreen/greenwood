@@ -13543,10 +13543,10 @@ mkdirp@^1.0.3:
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-1.0.4.tgz#3eb5ed62622756d79a5f0e2a221dfebad75c2f7e"
   integrity sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==
 
-mocha@^12.0.0-rc.5:
-  version "12.0.0-rc.5"
-  resolved "https://registry.yarnpkg.com/mocha/-/mocha-12.0.0-rc.5.tgz#2472c4ae174b05c6871e8a5c4c17c5f6c330253a"
-  integrity sha512-K6Ai6a1kSfZezibYKkgM7PVQP9mrtk0dcZqwbEv9gHScNj7eJzH33ACsN/JuxVXf1HCV6hw035z8zDDG/SLpmg==
+mocha@^12.0.0-rc.6:
+  version "12.0.0-rc.6"
+  resolved "https://registry.yarnpkg.com/mocha/-/mocha-12.0.0-rc.6.tgz#e85efc148a1bb6eea7a80f50ff22c213ec803950"
+  integrity sha512-JfQk/OfLIU+Ajm76oTYM5YZn7gHWUZZF9+V9FQhveAv4mnB5I0Qwmtqx6O8uWGwmK+rPaqCBPlXS5+mcmgYbKg==
   dependencies:
     browser-stdout "^1.3.1"
     chokidar "^5.0.0"
