@@ -87,7 +87,7 @@ describe("Build Greenwood With: ", function () {
               'transport_type': 'beacon'
             });
           }
-          window.dataLayer = window.dataLayer || [];
+          globalThis.dataLayer = globalThis.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
           gtag('config', '${mockAnalyticsId}', { 'anonymize_ip': true });
