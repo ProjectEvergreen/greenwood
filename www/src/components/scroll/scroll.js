@@ -7,13 +7,13 @@ class scroll extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
-    window.addEventListener("hashchange", this.handleHashChange.bind(this), false);
-    window.addEventListener("load", this.handleHashChange.bind(this), false);
+    globalThis.addEventListener("hashchange", this.handleHashChange.bind(this), false);
+    globalThis.addEventListener("load", this.handleHashChange.bind(this), false);
   }
 
   disconnectedCallback() {
-    window.removeEventListener("hashchange", this.handleHashChange.bind(this), false);
-    window.removeEventListener("load", this.handleHashChange.bind(this), false);
+    globalThis.removeEventListener("hashchange", this.handleHashChange.bind(this), false);
+    globalThis.removeEventListener("load", this.handleHashChange.bind(this), false);
     super.disconnectedCallback();
   }
 
@@ -36,7 +36,7 @@ class scroll extends LitElement {
       });
     };
 
-    let { hash } = window.location;
+    let { hash } = globalThis.location;
 
     // query hash text
     const heading = contains("a", hash)[0];

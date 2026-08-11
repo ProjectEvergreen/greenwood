@@ -44,11 +44,11 @@ export default class HeaderComponent extends HTMLElement {
           <div class="head-wrap">
             <div class="brand">
               <a href="/">
-                <img src="${this.#logo.pathname.replace(window.location.pathname, "/")}" alt="Greenwood Logo"/>
+                <img src="${this.#logo.pathname.replace(globalThis.location.pathname, "/")}" alt="Greenwood Logo"/>
                 <h4>My Blog</h4>
               </a>
             </div>
-            <img src="${this.#node.pathname.replace(window.location.pathname, "/")}" alt="NodeJS Logo"/>
+            <img src="${this.#node.pathname.replace(globalThis.location.pathname, "/")}" alt="NodeJS Logo"/>
           </div>
         </header>
       `;

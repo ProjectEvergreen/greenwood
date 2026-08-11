@@ -98,7 +98,7 @@ class Shelf extends LitElement {
       const response = await this.fetchShelfData();
 
       this.shelfList = response.data.collection;
-      this.expandRoute(window.location.pathname);
+      this.expandRoute(globalThis.location.pathname);
       this.requestUpdate();
     }
   }

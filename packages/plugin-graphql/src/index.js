@@ -68,7 +68,7 @@ class GraphQLResource {
       `
       <head>
         <script data-state="apollo" data-gwd-opt="none">
-          window.__APOLLO_STATE__ = true;
+          globalThis.__APOLLO_STATE__ = true;
         </script>
     `,
     );

@@ -77,7 +77,7 @@ describe("Build Greenwood With: ", function () {
 
       it("should have the expected code with users analyticsId", function () {
         const expectedContent = `
-            window.dataLayer = window.dataLayer || [];
+            globalThis.dataLayer = globalThis.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
             gtag('config', '${mockAnalyticsId}', { 'anonymize_ip': false });
