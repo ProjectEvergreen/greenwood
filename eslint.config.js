@@ -6,6 +6,7 @@ import js from "@eslint/js";
 import globals from "globals";
 import noOnlyTests from "eslint-plugin-no-only-tests";
 import importPlugin from "eslint-plugin-import";
+import unicorn from "eslint-plugin-unicorn";
 
 export default [
   importPlugin.flatConfigs.recommended,
@@ -50,9 +51,11 @@ export default [
       "no-only-tests/no-only-tests": "error",
       "import/no-unresolved": "off",
       "import/enforce-node-protocol-usage": ["error", "always"],
+      "unicorn/prefer-global-this": "error",
     },
     plugins: {
       "no-only-tests": noOnlyTests,
+      unicorn,
     },
   },
   {
