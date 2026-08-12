@@ -17,6 +17,30 @@ To contribute to the project, you'll want to follow these steps:
 1. Run `yarn install`
 1. For Windows developers, run `npx puppeteer browsers install chrome`
 
+## Values
+
+To help set expectations for contributing to Greenwood, we would like to share a few of the core values we find meaningful to our project and to open source in general:
+
+- We value human interaction above all else.  We expect human authored content when collaborating in issues, discussions, and PRs
+- If you are new to the project, please considering engaging in a [good first issue](https://github.com/ProjectEvergreen/greenwood/issues?q=is%3Aissue%20state%3Aopen%20label%3A%22good%20first%20issue%22)
+- Feature requests should come from a clearly defined user-land need that is demonstrable and that is not currently possible through plugins alone. (if you feel otherwise, please open a discussion first)
+- When requesting a feature or reporting a bug, always consider the developer experience first, and design or advocate with perspective in mind.  In other words, a compelling case should be made on the merits of the issue itself, without the need for heavy up-front implementation or spec design.  We can all relate to a well designed API, regardless of how it was implemented under the hood.
+- Comments in code should be used sparingly, for cases where the "why" is not obvious, like edge cases or runtime specific quirks.  Excessive / obvious commenting is not valuable and will be asked to be removed.
+
+----
+
+On the topic of LLMs...
+
+While we appreciate the value AI can bring to research and exploration, finding bugs, and uncovering security issues, contributions made with AI are still required to follow the principles outlined above.  Even more so when engaging in communications with the team like issues, PRs, or discussions.  We want to be talking to _you_, **not** the agent. LLM generated text is overly verbose and robotic, which adds more burden on the reader.
+
+As LLMs should not "speak" for you, they should not "think" for you either.  Only submit code that you understand and can explain in your own words, which we hope are a lot less than an LLM!  (and feels more natural to read, too)
+
+Use of LLM interactions or use of AI assistants to automate your participation in the project may result in your issues or PRs being denied.
+
+LLM usage for **good first issues** will be rejected, as that defeats the goal of this category of issues.  We want them specifically reserved for new contributors to the project as a way for them to get to learn the codebase and start contributing to open source.
+
+> 💚 _In general, be mindful of your contributions and the volume at which you are engaging with the project.  Time is limited and we want to make sure we can get to everyone's needs in a fair and balanced manner._
+
 ## Contributions
 
 Generally we prefer to develop new features in the context of a project or direct use case, working directly within _node_modules_ and validating the value, behavior, or fix first hand.  Since Greenwood runs on [plugins](https://greenwoodjs.dev/docs/reference/plugins-api/) though, a lot can often be achieved by just creating a custom plugin!  Keep this in mind when considering if a feature needs to go in core.  If in doubt, feel free to open a discussion.
