@@ -4,7 +4,7 @@
 
 We're excited for your interest in Greenwood, and maybe even your contribution!
 
-> 💡_We encourage all contributors to first read about the project's vision and motivation on our [website](https://www.greenwoodjs.dev/docs/introduction/)._
+> 💡 _We encourage all contributors to first read about the project's vision and motivation on our [website](https://www.greenwoodjs.dev/docs/introduction/)._
 
 ## Setup
 
