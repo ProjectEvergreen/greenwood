@@ -169,6 +169,42 @@ describe("Build Greenwood With: ", function () {
       });
     });
 
+    // https://github.com/ProjectEvergreen/greenwood/issues/1737
+    describe("An SSR page using getStaticPaths for its dynamic route segment", function () {
+      let staticPathsFunctions;
+      let redirectsFileContents;
+
+      before(async function () {
+        staticPathsFunctions = await Array.fromAsync(
+          fs.glob("artists*.zip", { cwd: netlifyFunctionsOutputUrl }),
+        );
+        redirectsFileContents = await fs.readFile(
+          path.join(outputPath, "public/_redirects"),
+          "utf-8",
+        );
+      });
+
+      it("should not output a serverless function zip file for the route", function () {
+        expect(staticPathsFunctions.length).to.equal(0);
+      });
+
+      // with no redirect rule, non-enumerated values fall through to the platform's static 404
+      it("should not output a redirect rule for the dynamic segment", function () {
+        expect(redirectsFileContents).to.not.contain("artists");
+      });
+
+      it("should output static HTML for each path enumerated from getStaticPaths", async function () {
+        for (const name of ["foo", "bar", "baz"]) {
+          const html = await fs.readFile(
+            path.join(outputPath, `public/artists/${name}/index.html`),
+            "utf-8",
+          );
+
+          expect(html).to.contain("Some Artists Page");
+        }
+      });
+    });
+
     describe("_redirects file contents", function () {
       let redirectsFileContents;
 

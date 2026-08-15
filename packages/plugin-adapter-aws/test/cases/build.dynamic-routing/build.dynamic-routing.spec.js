@@ -96,6 +96,34 @@ describe("Build Greenwood With: ", function () {
       });
     });
 
+    // https://github.com/ProjectEvergreen/greenwood/issues/1737
+    describe("An SSR page using getStaticPaths for its dynamic route segment", function () {
+      let staticPathsRouteFolders;
+
+      before(async function () {
+        staticPathsRouteFolders = await glob.promise(
+          path.join(normalizePathnameForWindows(awsOutputFolder), "routes/artists*"),
+        );
+      });
+
+      // non-enumerated values have no function to route to and fall through
+      // to the platform's static 404
+      it("should not output a serverless function folder for the route", function () {
+        expect(staticPathsRouteFolders.length).to.equal(0);
+      });
+
+      it("should output static HTML for each path enumerated from getStaticPaths", async function () {
+        for (const name of ["foo", "bar", "baz"]) {
+          const html = await fs.readFile(
+            path.join(outputPath, `public/artists/${name}/index.html`),
+            "utf-8",
+          );
+
+          expect(html).to.contain("Some Artists Page");
+        }
+      });
+    });
+
     describe("A Dynamic SSR Page adapter", function () {
       it("should return the expected response when the serverless adapter entry point handler is invoked with a dynamic path segment", async function () {
         const { handler } = await import(

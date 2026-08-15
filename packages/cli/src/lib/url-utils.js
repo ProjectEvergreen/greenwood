@@ -27,12 +27,27 @@ function getMatchingDynamicSsrRoute(compilation, route) {
   const { graph, config } = compilation;
 
   return graph.find((node) => {
-    return (
+    const matchesSegment =
       route !== "/404/" &&
       node.segment &&
       new URLPattern({ pathname: `${config.basePath}${node.segment.pathname}` }).test(
         `https://example.com${route}`,
-      )
+      );
+
+    if (!matchesSegment) {
+      return false;
+    }
+
+    // for getStaticPaths routes, only match values enumerated at build time so unknown
+    // values 404 in develop and serve alike
+    return (
+      !node.staticPaths ||
+      node.staticPaths.some((staticPath) => {
+        const staticRoute = getStaticRouteFromDynamicRoute(staticPath, node.segment, node.route);
+
+        // compare the raw and encoded forms since URL percent-encodes the pathname
+        return staticRoute === route || encodeURI(staticRoute) === route;
+      })
     );
   });
 }

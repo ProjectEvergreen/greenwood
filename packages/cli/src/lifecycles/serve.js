@@ -318,11 +318,9 @@ async function getStaticServer(compilation, composable) {
   app.use(async (ctx, next) => {
     try {
       const url = new URL(`http://localhost:${port}${ctx.url}`);
-      const matchingRoute = compilation.graph.find(
-        (page) =>
-          (page.staticPaths && getParamsFromSegment(compilation, page.segment, url.pathname)) ||
-          page.route === url.pathname,
-      );
+      const matchingRoute =
+        compilation.graph.find((page) => page.route === url.pathname) ||
+        getMatchingDynamicSsrRoute(compilation, url.pathname);
       const isSPA = compilation.graph.find((page) => page.isSPA);
       const { isSSR, staticPaths } = matchingRoute || {};
       const extension = url.pathname.split(".").pop();
