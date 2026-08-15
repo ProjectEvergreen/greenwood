@@ -23,13 +23,24 @@ class BrowserRunner {
 
   async serialize(requestUrl) {
     const page = await this.browser.newPage();
-    let response = null;
 
     // Page may reload when setting isMobile
     // https://github.com/GoogleChrome/puppeteer/blob/v1.10.0/docs/api.md#pagesetviewportviewport
-    page.evaluateOnNewDocument("customElements.forcePolyfill = true");
-    page.evaluateOnNewDocument("ShadyDOM = {force: true}");
-    page.evaluateOnNewDocument("ShadyCSS = {shimcssproperties: true}");
+    await page.evaluateOnNewDocument("customElements.forcePolyfill = true");
+    await page.evaluateOnNewDocument("ShadyDOM = {force: true}");
+    await page.evaluateOnNewDocument("ShadyCSS = {shimcssproperties: true}");
+
+    // Keep the initial document active and block navigation's during prerendering while still allowing JavaScript to execute
+    // https://github.com/ProjectEvergreen/greenwood/issues/1585#issuecomment-5227293583
+    await page.evaluateOnNewDocument(`
+      if (globalThis.top === globalThis && globalThis.navigation) {
+        globalThis.navigation.addEventListener("navigate", (event) => {
+          if (!event.destination.sameDocument) {
+            event.preventDefault();
+          }
+        });
+      }
+    `);
 
     await page.setCacheEnabled(false); // https://github.com/ProjectEvergreen/greenwood/pull/699
     await page.setRequestInterception(true);
@@ -51,32 +62,25 @@ class BrowserRunner {
 
     try {
       // Navigate to page. Wait until there are no outstanding network requests.
-      // https://pptr.dev/#?product=Puppeteer&version=v1.8.0&show=api-pagegotourl-options
-      response = await page.goto(requestUrl, {
+      const response = await page.goto(requestUrl, {
         waitUntil: "networkidle0",
         timeout: 0,
       });
-    } catch (e) {
-      console.error("browser error", e);
+
+      if (!response) {
+        throw new Error(`Unable to prerender ${requestUrl}: navigation returned no HTTP response.`);
+      }
+
+      return await page.content();
+    } finally {
+      if (!page.isClosed()) {
+        await page.close();
+      }
     }
-
-    if (!response) {
-      console.error("response does not exist");
-      // This should only occur when the page is about:blank. See
-      // https://github.com/GoogleChrome/puppeteer/blob/v1.5.0/docs/api.md#pagegotourl-options.
-      return { status: 400, content: "" };
-    }
-
-    // Serialize page.
-    const content = await page.content();
-
-    await page.close();
-
-    return content;
   }
 
-  close() {
-    this.browser.close();
+  async close() {
+    await this.browser.close();
   }
 }
 

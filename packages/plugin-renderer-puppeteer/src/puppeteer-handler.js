@@ -5,24 +5,19 @@ export default async function (compilation, callback) {
   const browserRunner = new BrowserRunner();
 
   const runBrowser = async (serverUrl, pages) => {
-    try {
-      return asyncMap(pages, async (page) => {
-        const { route } = page;
-        console.info("prerendering page...", route);
+    return asyncMap(pages, async (page) => {
+      const { route } = page;
+      console.info("prerendering page...", route);
 
-        return await browserRunner.serialize(`${serverUrl}${route}`).then(async (html) => {
-          console.info(`prerendering complete for page ${route}.`);
+      const html = await browserRunner.serialize(`${serverUrl}${route}`);
 
-          // clean this up here to avoid sending webcomponents-bundle to rollup
-          html = html.replace(/<script src="(.*webcomponents-bundle.js)"><\/script>/, "");
+      console.info(`prerendering complete for page ${route}.`);
 
-          await callback(page, html);
-        });
-      });
-    } catch (e) {
-      console.error(e);
-      return false;
-    }
+      // clean this up here to avoid sending webcomponents-bundle to rollup
+      const body = html.replace(/<script src="(.*webcomponents-bundle.js)"><\/script>/, "");
+
+      await callback(page, body);
+    });
   };
 
   // gracefully handle if puppeteer is not installed correctly
@@ -54,6 +49,9 @@ export default async function (compilation, callback) {
   const offsetPort = port + 1; // don't try and start the dev server on the same port as the CLI
   const serverAddress = `http://127.0.0.1:${offsetPort}`;
 
-  await runBrowser(serverAddress, pages);
-  browserRunner.close();
+  try {
+    await runBrowser(serverAddress, pages);
+  } finally {
+    await browserRunner.close();
+  }
 }
