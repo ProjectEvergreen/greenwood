@@ -1,0 +1,11 @@
+@font-face {
+  font-family: "Example";
+  src: url("../fonts/example.woff?v=1.0");
+  src:
+    url("../fonts/example.woff?#iefix&v=1.0") format("woff"),
+    url("../fonts/example.woff?v=1.0") format("woff");
+}
+
+body {
+  font-family: "Example", sans-serif;
+}

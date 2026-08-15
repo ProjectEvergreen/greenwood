@@ -134,7 +134,12 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
               recursive: true,
             });
 
-            fs.promises.copyFile(resolvedUrl, new URL(`.${finalValue}`, outputDir));
+            const destinationUrl = new URL(`.${finalValue}`, outputDir);
+
+            // destination names are content-hashed, so an existing file is already correct
+            if (!fs.existsSync(destinationUrl)) {
+              fs.copyFileSync(resolvedUrl, destinationUrl);
+            }
           }
 
           optimizedCss += `url('${basePath}${finalValue}')`;
