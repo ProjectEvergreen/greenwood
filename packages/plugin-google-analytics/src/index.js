@@ -36,7 +36,7 @@ class GoogleAnalyticsResource {
             'transport_type': 'beacon'
           });
         }
-        window.dataLayer = window.dataLayer || [];
+        globalThis.dataLayer = globalThis.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
         gtag('config', '${analyticsId}', { 'anonymize_ip': ${trackAnon} });

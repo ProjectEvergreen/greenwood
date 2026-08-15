@@ -134,8 +134,8 @@ class StaticRouterResource {
         "</head>",
         `
           <script data-gwd="static-router">
-            window.__greenwood = window.__greenwood || {};
-            window.__greenwood.currentLayout = "${currentLayout}";
+            globalThis.__greenwood = globalThis.__greenwood || {};
+            globalThis.__greenwood.currentLayout = "${currentLayout}";
           </script>
         </head>
       `,

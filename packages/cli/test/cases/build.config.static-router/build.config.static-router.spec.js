@@ -86,10 +86,10 @@ describe("Build Greenwood With: ", function () {
 
         expect(inlineRouterTags.length).to.be.equal(1);
         expect(inlineRouterTags[0].textContent).to.contain(
-          "window.__greenwood = window.__greenwood || {};",
+          "globalThis.__greenwood = globalThis.__greenwood || {};",
         );
         expect(inlineRouterTags[0].textContent).to.contain(
-          'window.__greenwood.currentLayout = "page"',
+          'globalThis.__greenwood.currentLayout = "page"',
         );
       });
 

@@ -41,7 +41,7 @@ class HeaderComponent extends LitElement {
   /* eslint-disable indent */
   render() {
     const { navigation } = this;
-    const activeRoute = window.location.pathname;
+    const activeRoute = globalThis.location.pathname;
 
     return html`
       <header class="header">

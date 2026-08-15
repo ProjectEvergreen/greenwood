@@ -32,7 +32,7 @@ export default class HeroBanner extends HTMLElement {
 
     console.log("clicked button =>", content);
 
-    window.dispatchEvent(buttonClickedEvent);
+    globalThis.dispatchEvent(buttonClickedEvent);
   }
 
   connectedCallback() {

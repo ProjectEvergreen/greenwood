@@ -310,7 +310,7 @@ describe("Serve Greenwood With: ", function () {
 
         expect(routerScriptTags.length).to.be.equal(1);
         expect(routerScriptTags[0].textContent.replace(/ /g, "").replace(/\n/g, "")).to.contain(
-          `window.__greenwood=window.__greenwood||{};window.__greenwood.currentLayout="page"`,
+          `globalThis.__greenwood=globalThis.__greenwood||{};globalThis.__greenwood.currentLayout="page"`,
         );
       });
 

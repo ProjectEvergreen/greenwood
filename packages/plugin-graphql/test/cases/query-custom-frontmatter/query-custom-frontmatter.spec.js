@@ -38,7 +38,7 @@ import { fileURLToPath } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Custom GraphQuery for Front Matter from GraphQL";
-  const apolloStateRegex = /window.__APOLLO_STATE__ = true/;
+  const apolloStateRegex = /globalThis.__APOLLO_STATE__ = true/;
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
   let runner;
@@ -66,7 +66,7 @@ describe("Build Greenwood With: ", function () {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "index.html"));
       });
 
-      it("should have one window.__APOLLO_STATE__ <script> with (approximated) expected state", function () {
+      it("should have one globalThis.__APOLLO_STATE__ <script> with (approximated) expected state", function () {
         const scriptTags = dom.window.document.querySelectorAll("head script");
         const apolloScriptTags = Array.prototype.slice.call(scriptTags).filter((script) => {
           return script.getAttribute("data-state") === "apollo";

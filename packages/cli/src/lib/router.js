@@ -1,6 +1,6 @@
 // @ts-nocheck
 document.addEventListener("click", async function (e) {
-  const currentUrl = window.location;
+  const currentUrl = globalThis.location;
   // https://developer.mozilla.org/en-US/docs/Web/API/Event/composedPath
   const href =
     e.composedPath && e.composedPath()[0].tagName === "A" ? e.composedPath()[0].href : "";
@@ -26,7 +26,7 @@ document.addEventListener("click", async function (e) {
     // also, some routes may be SSR, so we may not always match on a static route
     if (
       routerOutlet &&
-      routerOutlet.getAttribute("data-layout") === window.__greenwood.currentLayout
+      routerOutlet.getAttribute("data-layout") === globalThis.__greenwood.currentLayout
     ) {
       const { hash, pathname } = targetUrl;
 
@@ -42,14 +42,14 @@ document.addEventListener("click", async function (e) {
     } else {
       // this page uses is a completely different page layout from the current page
       // so just load the new page
-      window.location.href = href;
+      globalThis.location.href = href;
     }
   }
 });
 
-window.addEventListener("popstate", () => {
+globalThis.addEventListener("popstate", () => {
   try {
-    const targetRoute = window.location;
+    const targetRoute = globalThis.location;
     const routerOutlet = Array.from(document.getElementsByTagName("greenwood-route")).filter(
       (outlet) => {
         return outlet.getAttribute("data-route") === targetRoute.pathname;
