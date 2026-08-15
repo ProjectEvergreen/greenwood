@@ -21,8 +21,10 @@
  *       [slug].ts
  *     product/
  *       [name].js
+ *     [json].js
  */
 import { expect } from "chai";
+import fs from "node:fs/promises";
 import { JSDOM } from "jsdom";
 import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
@@ -99,6 +101,39 @@ describe("Serve Greenwood With: ", function () {
 
         expect(headings.length).to.equal(1);
         expect(headings[0].textContent).to.equal(name);
+      });
+    });
+
+    // https://github.com/ProjectEvergreen/greenwood/issues/1719
+    describe("An SSR page with a dynamic route segment whose param name contains the file extension substring", function () {
+      it("should emit a static path for each set of params returned from getStaticPaths", async function () {
+        const files = await Array.fromAsync(
+          fs.glob("{alpha,beta}/index.html", { cwd: new URL("./public/", import.meta.url) }),
+        );
+
+        expect(files.length).to.equal(2);
+      });
+
+      it("should NOT emit a literal /[json]/index.html directory", async function () {
+        const files = await Array.fromAsync(
+          fs.glob("[[]json[]]/index.html", { cwd: new URL("./public/", import.meta.url) }),
+        );
+
+        expect(files.length).to.equal(0);
+      });
+
+      it("should serve each static path with its own resolved params, not the first one", async function () {
+        const themes = { alpha: "Alpha", beta: "Beta" };
+
+        for (const [route, label] of Object.entries(themes)) {
+          const response = await fetch(`${hostname}/${route}/`);
+          const body = await response.text();
+          const headings = new JSDOM(body).window.document.querySelectorAll("h1");
+
+          expect(response.status).to.equal(200);
+          expect(headings.length).to.equal(1);
+          expect(headings[0].textContent).to.equal(label);
+        }
       });
     });
 

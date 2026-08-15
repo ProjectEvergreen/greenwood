@@ -16,8 +16,11 @@
  *   pages/
  *     blog/
  *       [slug].ts
+ *     events/
+ *       [title].js
  *     product/
  *       [name].js
+ *     [json].js
  *   services/
  *     blog-posts.ts
  */
@@ -104,6 +107,26 @@ describe("Develop Greenwood With: ", function () {
 
         expect(headings.length).to.equal(1);
         expect(headings[0].textContent).to.equal(name);
+      });
+    });
+
+    // https://github.com/ProjectEvergreen/greenwood/issues/1719
+    describe("An SSR page with a dynamic route segment whose param name contains the file extension substring", function () {
+      let response;
+      let dom;
+      let body;
+
+      before(async function () {
+        response = await fetch(`${hostname}/beta/`);
+        body = await response.clone().text();
+        dom = new JSDOM(body);
+      });
+
+      it("should resolve the params for the requested static path, not the first one", function () {
+        const headings = dom.window.document.querySelectorAll("h1");
+
+        expect(headings.length).to.equal(1);
+        expect(headings[0].textContent).to.equal("Beta");
       });
     });
 

@@ -113,12 +113,7 @@ const generateGraph = async (compilation) => {
           // is there a better way to detect for isolation export without having to actually import() the module?
           const contents = await fs.readFile(filenameUrl, "utf8");
           const isolation = contents.indexOf("export const isolation = true;") >= 0;
-          const { segmentKey, dynamicRoute } = getDynamicSegmentsFromRoute({
-            route,
-            relativePagePath,
-            extension,
-            basePath,
-          });
+          const { segmentKey, dynamicRoute } = getDynamicSegmentsFromRoute({ route });
 
           /*
            * API Properties (per route)
@@ -278,12 +273,7 @@ const generateGraph = async (compilation) => {
            * hasStaticParams: if getStaticProps is present on the route
            */
 
-          const { segmentKey, dynamicRoute } = getDynamicSegmentsFromRoute({
-            route,
-            relativePagePath,
-            extension,
-            basePath,
-          });
+          const { segmentKey, dynamicRoute } = getDynamicSegmentsFromRoute({ route });
 
           const page = {
             id: safeDecodeURIComponent(getIdFromRelativePathPath(relativePagePath, extension)),
