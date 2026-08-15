@@ -52,9 +52,26 @@ function getMatchingDynamicSsrRoute(compilation, route) {
 
 // get params for dynamic routes from URLPattern based segment extraction
 function getParamsFromSegment(compilation, segment, route) {
-  return new URLPattern({ pathname: `${compilation.config.basePath}${segment.pathname}` }).exec(
-    `https://example.com${route}`,
-  )?.pathname?.groups;
+  const groups = new URLPattern({
+    pathname: `${compilation.config.basePath}${segment.pathname}`,
+  }).exec(`https://example.com${route}`)?.pathname?.groups;
+
+  if (!groups) {
+    return groups;
+  }
+
+  // URLPattern groups are percent-encoded, so decode them (mirroring graph.js) so params
+  // round-trip losslessly to getBody / getStaticParams for non-ASCII / space slugs
+  // https://github.com/ProjectEvergreen/greenwood/issues/1713
+  return Object.fromEntries(
+    Object.entries(groups).map(([key, value]) => {
+      try {
+        return [key, value === undefined ? value : decodeURIComponent(value)];
+      } catch {
+        return [key, value];
+      }
+    }),
+  );
 }
 
 // get the full route for a static path
@@ -74,6 +91,17 @@ function safeDecodeURIComponent(value) {
   }
 }
 
+// get the output file href for a static path; the param is encoded when spliced in since
+// a raw value containing a literal "%" (e.g. "100%") is an invalid percent-sequence in a
+// file URL that makes fs promises / fileURLToPath throw "URIError: URI malformed"
+// https://github.com/ProjectEvergreen/greenwood/issues/1713
+function getOutputHrefForStaticPath(dynamicStaticPath, segment, outputHref) {
+  return outputHref.replace(
+    `[${segment.key}]`,
+    encodeURIComponent(dynamicStaticPath.params[segment.key]),
+  );
+}
+
 export {
   getDynamicSegmentsFromRoute,
   getMatchingDynamicApiRoute,
@@ -81,4 +109,5 @@ export {
   getMatchingDynamicSsrRoute,
   getStaticRouteFromDynamicRoute,
   safeDecodeURIComponent,
+  getOutputHrefForStaticPath,
 };
