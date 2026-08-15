@@ -30,10 +30,10 @@ class ContentAsDataResource {
   }
 
   async shouldServe(url) {
-    const { activeContent } = this.compilation.config;
+    const { activeContent, basePath } = this.compilation.config;
     const { pathname } = url;
 
-    return activeContent && pathname === "/___graph.json";
+    return activeContent && pathname === `${basePath}/___graph.json`;
   }
 
   async serve(url, request) {

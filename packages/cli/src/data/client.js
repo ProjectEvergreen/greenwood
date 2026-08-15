@@ -17,7 +17,7 @@ async function getContentAsData(key = "") {
     ).then((resp) => resp.json());
   } else if (CONTENT_STATE && !PRERENDER) {
     // if user is not prerendering, just fetch the entire graph but apply the same filtering
-    const graph = await fetch("/graph.json").then((resp) => resp.json());
+    const graph = await fetch(`${BASE_PATH}/graph.json`).then((resp) => resp.json());
     // split on only the first "-" so hyphenated collection names / routes keep their hyphens
     // https://github.com/ProjectEvergreen/greenwood/issues/1715
     const delimiterIndex = key.indexOf("-");
