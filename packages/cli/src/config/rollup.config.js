@@ -12,8 +12,8 @@ import { ACORN_OPTIONS } from "@greenwood/cli/src/lib/parsing-utils.js";
 // ConstructableStylesheets, JSON Modules
 const externalizedResources = ["css", "json"];
 
-// one-time conversion of array to set for quicker lookup
-const NODE_BUILTINS = new Set(builtinModules.map((specifier) => specifier.replace(/^node:/, "")));
+// one-time conversion of tje builtins array to a Set for quicker lookup
+const NODE_BUILTINS = new Set(builtinModules);
 
 // https://github.com/rollup/rollup/issues/2121
 // would be nice to get rid of this
@@ -25,7 +25,7 @@ function prefixNodeBuiltins() {
   return {
     name: "greenwood-prefix-node-builtins",
     resolveId(id) {
-      if (NODE_BUILTINS.has(id)) {
+      if (!id.startsWith("node:") && NODE_BUILTINS.has(id)) {
         return {
           id: `node:${id}`,
           external: true,
