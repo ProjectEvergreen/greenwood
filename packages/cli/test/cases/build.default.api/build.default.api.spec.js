@@ -19,6 +19,7 @@
  */
 import { expect } from "chai";
 import glob from "glob-promise";
+import fs from "node:fs/promises";
 import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
@@ -59,6 +60,15 @@ describe("Build Greenwood With: ", function () {
         expect(
           await glob.promise(path.join(this.context.publicDir, "api/**/*.js")),
         ).to.have.lengthOf(1);
+      });
+
+      it("should prefix all node import specifiers", async function () {
+        const contents = await fs.readFile(
+          new URL("./public/api/greeting.js", import.meta.url),
+          "utf-8",
+        );
+
+        expect(contents).to.contain("node:assert/strict");
       });
     });
   });

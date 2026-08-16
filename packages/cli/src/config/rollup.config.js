@@ -1,5 +1,6 @@
 // @ts-nocheck
 import fs from "node:fs";
+import { builtinModules } from "node:module";
 import path from "node:path";
 import { checkResourceExists, normalizePathnameForWindows } from "../lib/resource-utils.js";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
@@ -8,14 +9,31 @@ import * as acorn from "acorn";
 import * as walk from "acorn-walk";
 import { ACORN_OPTIONS } from "@greenwood/cli/src/lib/parsing-utils.js";
 
+// ConstructableStylesheets, JSON Modules
+const externalizedResources = ["css", "json"];
+
+// one-time conversion of array to set for quicker lookup
+const NODE_BUILTINS = new Set(builtinModules.map((specifier) => specifier.replace(/^node:/, "")));
+
 // https://github.com/rollup/rollup/issues/2121
 // would be nice to get rid of this
 function cleanRollupId(id = "") {
   return id.replace("\x00", "").replace("?commonjs-proxy", "");
 }
 
-// ConstructableStylesheets, JSON Modules
-const externalizedResources = ["css", "json"];
+function prefixNodeBuiltins() {
+  return {
+    name: "greenwood-prefix-node-builtins",
+    resolveId(id) {
+      if (NODE_BUILTINS.has(id)) {
+        return {
+          id: `node:${id}`,
+          external: true,
+        };
+      }
+    },
+  };
+}
 
 function greenwoodResourceLoader(compilation, browser = false) {
   const { importAttributes } = compilation.config?.polyfills || [];
@@ -757,6 +775,7 @@ const getRollupConfigForApiRoutes = async (compilation) => {
           commonjs(),
           greenwoodImportMetaUrl(compilation),
           greenwoodSyncApiRoutesOutputPath(compilation),
+          prefixNodeBuiltins(),
         ],
         onwarn: (errorObj) => {
           const { code, message } = errorObj;
@@ -806,6 +825,7 @@ const getRollupConfigForSsrPages = async (compilation, inputs) => {
         commonjs(),
         greenwoodImportMetaUrl(compilation),
         greenwoodSyncSsrEntryPointsOutputPaths(compilation),
+        prefixNodeBuiltins(),
       ],
       onwarn: (errorObj) => {
         const { code, message } = errorObj;

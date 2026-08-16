@@ -475,6 +475,18 @@ describe("Serve Greenwood With: ", function () {
         expect(span.length).to.equal(1);
         expect(span[0].textContent).to.equal("Number of Blog Pages: 2");
       });
+
+      it("should prefix all node import specifiers", async function () {
+        const files = await Array.fromAsync(
+          fs.promises.glob("post.route.chunk.*.js", { cwd: new URL("./public", import.meta.url) }),
+        );
+        const contents = await fs.promises.readFile(
+          new URL(`./public/${files[0]}`, import.meta.url),
+          "utf-8",
+        );
+
+        expect(contents).to.contain("node:assert/strict");
+      });
     });
 
     describe("Serve command with 404 not found behavior", function () {

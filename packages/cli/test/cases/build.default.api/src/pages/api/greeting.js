@@ -1,4 +1,6 @@
-import assert from "node:assert/strict";
+// this is unprefixed to test automatic node: prefixing for builtins
+// eslint-disable-next-line import/enforce-node-protocol-usage
+import assert from "assert/strict";
 
 // tests that API routes don't execute at build time
 // https://github.com/ProjectEvergreen/greenwood/issues/1690
