@@ -5,7 +5,6 @@
  *
  */
 import fs from "node:fs/promises";
-import terser from "@rollup/plugin-terser";
 import * as acorn from "acorn";
 import * as walk from "acorn-walk";
 import { ACORN_OPTIONS } from "../../lib/parsing-utils.js";
@@ -139,13 +138,6 @@ const greenwoodPluginStandardJavascript = [
     type: "resource",
     name: "plugin-standard-javascript:resource",
     provider: (compilation) => new StandardJavaScriptResource(compilation),
-  },
-  {
-    type: "rollup",
-    name: "plugin-standard-javascript:rollup",
-    provider: (compilation) => {
-      return compilation.config.optimization !== "none" ? [terser()] : [];
-    },
   },
 ];
 

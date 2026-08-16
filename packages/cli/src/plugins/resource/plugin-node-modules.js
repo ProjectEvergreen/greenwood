@@ -5,7 +5,6 @@
  */
 import { checkResourceExists } from "../../lib/resource-utils.js";
 import fs from "node:fs/promises";
-import { nodeResolve } from "@rollup/plugin-node-resolve";
 import {
   getPackageJsonForProject,
   getResolvedHrefFromPathnameShortcut,
@@ -124,13 +123,6 @@ const greenwoodPluginNodeModules = [
     type: "resource",
     name: "plugin-node-modules:resource",
     provider: (compilation) => new NodeModulesResource(compilation),
-  },
-  {
-    type: "rollup",
-    name: "plugin-node-modules:rollup",
-    provider: () => {
-      return [nodeResolve()];
-    },
   },
 ];
 
