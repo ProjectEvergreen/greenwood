@@ -211,7 +211,10 @@ async function trackResourcesForRoute(html, compilation, route) {
 
   const matchingRoute = getMatchingPageByRoute(compilation, route);
 
-  matchingRoute.resources = resources.map((resource) => resource.sourcePathURL.pathname);
+  // dedupe, since the same resource can be referenced by both a layout and a page
+  matchingRoute.resources = [
+    ...new Set(resources.map((resource) => resource.sourcePathURL.pathname)),
+  ];
 
   return resources;
 }
