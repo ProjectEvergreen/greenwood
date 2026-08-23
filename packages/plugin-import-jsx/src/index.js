@@ -14,7 +14,6 @@ const importMap = {
   "wc-compiler/effect": "/node_modules/wc-compiler/src/effect.js",
 };
 
-// a resource plugin is instantiated per lifecycle, so track reported modules at the module level
 const reportedObservabilityMismatches = new Set();
 
 function hasInferredObservabilityExport(tree) {

@@ -66,7 +66,7 @@ describe("Build Greenwood With: ", function () {
 
     describe("Build command output for the mismatched inferredObservability configuration", function () {
       it("should report the JSX module that opted into inferred observability", function (done) {
-        expect(output).to.contain(path.join("src", "components", "counter.jsx"));
+        expect(output).to.contain("src/components/counter.jsx");
 
         done();
       });
