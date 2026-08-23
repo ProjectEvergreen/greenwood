@@ -23,7 +23,6 @@ const copyAssets = async (compilation) => {
   const copyPlugins = compilation.config.plugins.filter((plugin) => plugin.type === "copy");
   const { projectDirectory } = compilation.context;
 
-  // copies run in series so that when two of them share a destination, the last one registered wins
   for (const plugin of copyPlugins) {
     const locations = await plugin.provider(compilation);
 
