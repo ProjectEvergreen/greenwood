@@ -44,38 +44,36 @@ class ContentAsDataResource {
     const delimiterIndex = contentKey.indexOf("-");
     const type = delimiterIndex === -1 ? contentKey : contentKey.slice(0, delimiterIndex);
     const value = delimiterIndex === -1 ? "" : contentKey.slice(delimiterIndex + 1);
-    let status;
     let body;
 
     if (contentKey === "") {
-      status = 403;
-      body = "Bad Request - No Cache Key found";
+      return new Response("Bad Request - No Cache Key found", { status: 403 });
+    }
+
+    if (contentKey === "graph") {
+      body = graph;
+    } else if (type === "collection") {
+      body = filterContentByCollection(graph, value);
+    } else if (type === "route") {
+      body = filterContentByRoute(graph, value);
     } else {
-      status = 200;
+      return new Response("Bad Request - Unsupported Cache Key", { status: 400 });
+    }
 
-      if (contentKey === "graph") {
-        body = graph;
-      } else if (type === "collection") {
-        body = filterContentByCollection(graph, value);
-      } else if (type === "route") {
-        body = filterContentByRoute(graph, value);
-      }
+    if (process.env.__GWD_COMMAND__ === "build") {
+      const fileKey = `./data-${contentKey.replace(/\//g, "_")}.json`;
 
-      if (process.env.__GWD_COMMAND__ === "build") {
-        const fileKey = `./data-${contentKey.replace(/\//g, "_")}.json`;
-
-        if (!(await checkResourceExists(new URL(fileKey, this.compilation.context.outputDir)))) {
-          await fs.writeFile(
-            new URL(fileKey, this.compilation.context.outputDir),
-            JSON.stringify(pruneGraph(body)),
-            "utf-8",
-          );
-        }
+      if (!(await checkResourceExists(new URL(fileKey, this.compilation.context.outputDir)))) {
+        await fs.writeFile(
+          new URL(fileKey, this.compilation.context.outputDir),
+          JSON.stringify(pruneGraph(body)),
+          "utf-8",
+        );
       }
     }
 
     return new Response(JSON.stringify(pruneGraph(body)), {
-      status,
+      status: 200,
       headers: new Headers({
         "Content-Type": "application/json",
       }),

@@ -151,6 +151,37 @@ describe("Develop Greenwood With: ", function () {
       });
     });
 
+    // https://github.com/ProjectEvergreen/greenwood/issues/1788
+    describe("Content Request Errors", function () {
+      describe("Missing Content Key", function () {
+        let response;
+
+        before(async function () {
+          response = await fetch(`${hostname}:${port}/___graph.json`);
+        });
+
+        it("should return a 403 status", function () {
+          expect(response.status).to.equal(403);
+        });
+      });
+
+      describe("Unrecognized Content Key", function () {
+        let response;
+
+        before(async function () {
+          response = await fetch(`${hostname}:${port}/___graph.json`, {
+            headers: {
+              "x-content-key": "bogus-key",
+            },
+          });
+        });
+
+        it("should return a 400 status", function () {
+          expect(response.status).to.equal(400);
+        });
+      });
+    });
+
     // https://github.com/ProjectEvergreen/greenwood/issues/1743
     describe("Active Frontmatter values containing replacement patterns", () => {
       let dom;
