@@ -1,3 +1,1 @@
-import { register } from "node:module";
-
-register("./test-loader.js", import.meta.url);
+import "../packages/cli/src/runtime/node/register.js";
