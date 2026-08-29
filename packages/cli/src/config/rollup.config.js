@@ -338,7 +338,9 @@ function greenwoodImportMetaUrl(compilation) {
         }
       }
 
-      if (!canTransform) {
+      const contentType = response.headers.get("content-type") || "";
+
+      if (!canTransform || !contentType.includes("text/javascript")) {
         return null;
       }
 
@@ -381,7 +383,7 @@ function greenwoodImportMetaUrl(compilation) {
           if (plugin.shouldServe && (await plugin.shouldServe(url, request))) {
             const response = await plugin.serve(url, request);
 
-            if (response?.headers?.get("content-type") || "".indexOf("text/javascript") >= 0) {
+            if ((response?.headers?.get("content-type") || "").indexOf("text/javascript") >= 0) {
               bundleExtensions = [...bundleExtensions, ...plugin.extensions];
             }
           }
