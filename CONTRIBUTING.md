@@ -282,6 +282,7 @@ The [structure](https://github.com/ProjectEvergreen/greenwood/tree/master/packag
 - _lib/_ - Shared utilities used by the CLI
 - _lifecycles/_ - Scripts that support the various commands exposed by the CLI; starting the dev server, bundling client and server side scripts, prerendering, etc
 - _plugins/_ - Greenwood plugins maintained as core by the CLI itself
+- _runtimes/_ - Greenwood interop support for various runtime behaviors (Node, Deno, Bun), like managing Worker threads for handling custom import behaviors
 
 ## Release Management
 
