@@ -39,7 +39,7 @@ function prefixNodeBuiltins() {
 // support node export conditions for SSR pages + API routes
 // https://github.com/ProjectEvergreen/greenwood/issues/1118
 // https://github.com/rollup/plugins/issues/362#issuecomment-873448461
-function getNodeResolvePluginDefaultOptions() {
+function getDefaultNodeExportConditionOptions() {
   return {
     exportConditions: ["node"],
     preferBuiltins: true,
@@ -779,7 +779,7 @@ const getRollupConfigForApiRoutes = async (compilation) => {
         },
         plugins: [
           greenwoodResourceLoader(compilation),
-          nodeResolve(getNodeResolvePluginDefaultOptions()),
+          nodeResolve(getDefaultNodeExportConditionOptions()),
           commonjs(),
           greenwoodImportMetaUrl(compilation),
           greenwoodSyncApiRoutesOutputPath(compilation),
@@ -823,7 +823,7 @@ const getRollupConfigForSsrPages = async (compilation, inputs) => {
       },
       plugins: [
         greenwoodResourceLoader(compilation),
-        nodeResolve(getNodeResolvePluginDefaultOptions()),
+        nodeResolve(getDefaultNodeExportConditionOptions()),
         commonjs(),
         greenwoodImportMetaUrl(compilation),
         greenwoodSyncSsrEntryPointsOutputPaths(compilation),
