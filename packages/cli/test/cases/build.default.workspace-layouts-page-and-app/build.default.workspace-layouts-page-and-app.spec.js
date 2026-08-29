@@ -18,11 +18,13 @@
  *     app-layout-two.js
  *     page-layout-one.js
  *     page-layout-two.js
+ *     shared.js
  *   styles/
  *     app-layout-one.css
  *     app-layout-two.css
  *     page-layout-one.css
  *     page-layout-two.css
+ *     shared.css
  *   layouts/
  *     app.html
  *     page.html
@@ -84,12 +86,12 @@ describe("Build Greenwood With: ", function () {
           styleTags = dom.window.document.querySelectorAll("head > style");
         });
 
-        it("should have 5 <script> tags in the <head>", function () {
-          expect(scriptTags.length).to.equal(5);
+        it("should have 6 <script> tags in the <head>", function () {
+          expect(scriptTags.length).to.equal(6);
         });
 
-        it("should have 4 <link> tags in the <head>", function () {
-          expect(linkTags.length).to.equal(4);
+        it("should have 5 <link> tags in the <head>", function () {
+          expect(linkTags.length).to.equal(5);
         });
 
         it("should have 4 <style> tags in the <head>", function () {
@@ -99,11 +101,12 @@ describe("Build Greenwood With: ", function () {
         it("should merge page layout <script> tags after app layout <script> tags", function () {
           expect(scriptTags[0].src).to.match(/app-layout-one.*.js/);
           expect(scriptTags[1].src).to.match(/app-layout-two.*.js/);
-          expect(scriptTags[2].textContent).to.contain(
+          expect(scriptTags[2].src).to.match(/shared.*.js/);
+          expect(scriptTags[3].textContent).to.contain(
             'console.log("this should not break anything :)");',
           );
-          expect(scriptTags[3].src).to.match(/page-layout-one.*.js/);
-          expect(scriptTags[4].src).to.match(/page-layout-two.*.js/);
+          expect(scriptTags[4].src).to.match(/page-layout-one.*.js/);
+          expect(scriptTags[5].src).to.match(/page-layout-two.*.js/);
 
           scriptTags.forEach((scriptTag) => {
             expect(scriptTag.type).to.equal("module");
@@ -113,8 +116,9 @@ describe("Build Greenwood With: ", function () {
         it("should merge page layout <link> tags after app layout <link> tags", function () {
           expect(linkTags[0].href).to.match(/app-layout-one.*.css/);
           expect(linkTags[1].href).to.match(/app-layout-two.*.css/);
-          expect(linkTags[2].href).to.match(/page-layout-one.*.css/);
-          expect(linkTags[3].href).to.match(/page-layout-two.*.css/);
+          expect(linkTags[2].href).to.match(/shared.*.css/);
+          expect(linkTags[3].href).to.match(/page-layout-one.*.css/);
+          expect(linkTags[4].href).to.match(/page-layout-two.*.css/);
 
           linkTags.forEach((linkTag) => {
             expect(linkTag.rel).to.equal("stylesheet");
@@ -126,6 +130,41 @@ describe("Build Greenwood With: ", function () {
           expect(styleTags[1].textContent).to.equal("p{margin:0 auto}");
           expect(styleTags[2].textContent).to.equal("ol{list-style:none}");
           expect(styleTags[3].textContent).to.equal("h3{text-decoration:underline}");
+        });
+      });
+
+      // https://github.com/ProjectEvergreen/greenwood/issues/1760
+      describe("a shared resource referenced by the app layout, page layout, and page", function () {
+        it("should emit the shared <script> tag only once", function () {
+          const sharedScripts = Array.from(dom.window.document.querySelectorAll("script")).filter(
+            (tag) => /shared.*.js/.test(tag.getAttribute("src") ?? ""),
+          );
+
+          expect(sharedScripts.length).to.equal(1);
+        });
+
+        it("should emit the shared stylesheet <link> tag only once", function () {
+          const sharedLinks = Array.from(
+            dom.window.document.querySelectorAll('link[rel="stylesheet"]'),
+          ).filter((tag) => /shared.*.css/.test(tag.getAttribute("href") ?? ""));
+
+          expect(sharedLinks.length).to.equal(1);
+        });
+
+        it("should emit only one modulepreload <link> tag for the shared script", function () {
+          const sharedPreloads = Array.from(
+            dom.window.document.querySelectorAll('link[rel="modulepreload"]'),
+          ).filter((tag) => /shared.*.js/.test(tag.getAttribute("href") ?? ""));
+
+          expect(sharedPreloads.length).to.equal(1);
+        });
+
+        it("should emit only one preload <link> tag for the shared stylesheet", function () {
+          const sharedPreloads = Array.from(
+            dom.window.document.querySelectorAll('link[rel="preload"]'),
+          ).filter((tag) => /shared.*.css/.test(tag.getAttribute("href") ?? ""));
+
+          expect(sharedPreloads.length).to.equal(1);
         });
       });
 
