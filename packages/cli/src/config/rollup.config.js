@@ -5,6 +5,7 @@ import path from "node:path";
 import { checkResourceExists, normalizePathnameForWindows } from "../lib/resource-utils.js";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
+import terser from "@rollup/plugin-terser";
 import * as acorn from "acorn";
 import * as walk from "acorn-walk";
 import { ACORN_OPTIONS } from "@greenwood/cli/src/lib/parsing-utils.js";
@@ -12,7 +13,7 @@ import { ACORN_OPTIONS } from "@greenwood/cli/src/lib/parsing-utils.js";
 // ConstructableStylesheets, JSON Modules
 const externalizedResources = ["css", "json"];
 
-// one-time conversion of tje builtins array to a Set for quicker lookup
+// one-time conversion of the builtins array to a Set for quicker lookup
 const NODE_BUILTINS = new Set(builtinModules);
 
 // https://github.com/rollup/rollup/issues/2121
@@ -32,6 +33,16 @@ function prefixNodeBuiltins() {
         };
       }
     },
+  };
+}
+
+// support node export conditions for SSR pages + API routes
+// https://github.com/ProjectEvergreen/greenwood/issues/1118
+// https://github.com/rollup/plugins/issues/362#issuecomment-873448461
+function getDefaultNodeExportConditionOptions() {
+  return {
+    exportConditions: ["node"],
+    preferBuiltins: true,
   };
 }
 
@@ -682,6 +693,7 @@ const getRollupConfigForBrowserScripts = async (compilation) => {
   const input = [...compilation.resources.values()]
     .filter((resource) => resource.type === "script")
     .map((resource) => normalizePathnameForWindows(resource.sourcePathURL).replace(/%20/g, " "));
+  const minify = compilation.config.optimization !== "none" ? [terser()] : [];
   const customRollupPlugins = compilation.config.plugins
     .filter((plugin) => {
       return plugin.type === "rollup";
@@ -707,9 +719,11 @@ const getRollupConfigForBrowserScripts = async (compilation) => {
       },
       plugins: [
         greenwoodResourceLoader(compilation, true),
+        nodeResolve(),
         greenwoodSyncPageResourceBundlesPlugin(compilation),
         greenwoodSyncImportAttributes(compilation),
         greenwoodImportMetaUrl(compilation),
+        ...minify,
         ...customRollupPlugins,
       ],
       context: "window",
@@ -765,13 +779,7 @@ const getRollupConfigForApiRoutes = async (compilation) => {
         },
         plugins: [
           greenwoodResourceLoader(compilation),
-          // support node export conditions for API routes
-          // https://github.com/ProjectEvergreen/greenwood/issues/1118
-          // https://github.com/rollup/plugins/issues/362#issuecomment-873448461
-          nodeResolve({
-            exportConditions: ["node"],
-            preferBuiltins: true,
-          }),
+          nodeResolve(getDefaultNodeExportConditionOptions()),
           commonjs(),
           greenwoodImportMetaUrl(compilation),
           greenwoodSyncApiRoutesOutputPath(compilation),
@@ -815,13 +823,7 @@ const getRollupConfigForSsrPages = async (compilation, inputs) => {
       },
       plugins: [
         greenwoodResourceLoader(compilation),
-        // support node export conditions for SSR pages
-        // https://github.com/ProjectEvergreen/greenwood/issues/1118
-        // https://github.com/rollup/plugins/issues/362#issuecomment-873448461
-        nodeResolve({
-          exportConditions: ["node"],
-          preferBuiltins: true,
-        }),
+        nodeResolve(getDefaultNodeExportConditionOptions()),
         commonjs(),
         greenwoodImportMetaUrl(compilation),
         greenwoodSyncSsrEntryPointsOutputPaths(compilation),
