@@ -20,6 +20,7 @@
  *       first-post.js
  *       index.js
  *     artists.js
+ *     page-object.js
  *     post.js
  *   layouts/
  *     app.html
@@ -158,6 +159,35 @@ describe("Develop Greenwood With: ", function () {
 
         expect(artistsPageGraphData.imports[0]).to.equal(`/components/${componentName}.js`);
         expect(counterScript.length).to.equal(1);
+      });
+    });
+
+    // https://github.com/ProjectEvergreen/greenwood/issues/1770
+    describe("Develop command with HTML route response using getBody for a page with no dynamic segment", function () {
+      let dom;
+      let pageObjectPageGraphData;
+
+      before(async function () {
+        const graph = JSON.parse(
+          await fs.promises.readFile(path.join(outputPath, ".greenwood/graph.json"), "utf-8"),
+        );
+        const response = await fetch(`${hostname}/page-object/`);
+
+        dom = new JSDOM(await response.text());
+        pageObjectPageGraphData = graph.filter((page) => page.route === "/page-object/")[0];
+      });
+
+      it("should provide getBody with the page from the graph, not an empty object", function () {
+        const id = dom.window.document.querySelectorAll("body h1.page-id");
+        const route = dom.window.document.querySelectorAll("body h2.page-route");
+        const title = dom.window.document.querySelectorAll("body h3.page-title");
+
+        expect(id.length).to.equal(1);
+        expect(id[0].textContent).to.equal(pageObjectPageGraphData.id);
+        expect(route.length).to.equal(1);
+        expect(route[0].textContent).to.equal(pageObjectPageGraphData.route);
+        expect(title.length).to.equal(1);
+        expect(title[0].textContent).to.equal(pageObjectPageGraphData.title);
       });
     });
 
