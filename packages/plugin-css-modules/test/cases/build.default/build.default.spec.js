@@ -33,7 +33,7 @@ import { JSDOM } from "jsdom";
 import fs from "node:fs";
 import glob from "glob-promise";
 import path from "node:path";
-import { parse, walk } from "css-tree";
+import { generate, parse, walk } from "css-tree";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { getOutputTeardownFiles, HASH_REGEX } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
@@ -109,7 +109,12 @@ describe("Build Greenwood With: ", function () {
             },
           });
 
-          expect(styleText).to.contain(expectedHeaderCss.replace(/\[placeholder]/g, scopedHash));
+          const normalizedExpectedCss = generate(
+            parse(expectedHeaderCss.replace(/\[placeholder]/g, scopedHash)),
+          );
+          const normalizedStyleText = generate(parse(styleText));
+
+          expect(normalizedStyleText).to.contain(normalizedExpectedCss);
         });
 
         it("should have the source <app-header> CSS class names as scoped class names inlined in a <style> tag", () => {
@@ -140,6 +145,15 @@ describe("Build Greenwood With: ", function () {
 
           expect(classes.length).to.equal(EXPECTED_HEADER_CLASS_NAMES);
           expect(styleText).not.to.contain("undefined");
+        });
+
+        // https://github.com/ProjectEvergreen/greenwood/issues/1792
+        it("should scope every class in compound and complex selector lists from a second CSS Modules import", function () {
+          const styleText = dom.window.document.querySelector("head style").textContent;
+
+          ["accent", "emphasis", "nestedAccent", "attributeAccent"].forEach((name) => {
+            expect(styleText).to.match(new RegExp(`theme-${HASH_REGEX}-${name}`));
+          });
         });
 
         describe("JavaScript bundling referencing a CSS Module", function () {
@@ -193,6 +207,14 @@ describe("Build Greenwood With: ", function () {
 
           it("should not have any references to 'undefined' in the JavaScript bundle", function () {
             expect(contents).to.not.contain("undefined");
+          });
+
+          // https://github.com/ProjectEvergreen/greenwood/issues/1792
+          it("should transform multiple CSS Module imports from one script", function () {
+            expect(contents).to.match(new RegExp(`class="theme-${HASH_REGEX}-accent"`));
+            expect(contents).to.not.contain("styles.container");
+            expect(contents).to.not.contain("theme.accent");
+            expect(contents).to.not.match(/theme\[["']accent["']\]/);
           });
         });
       });
