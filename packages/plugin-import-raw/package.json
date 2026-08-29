@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/plugin-import-raw",
-  "version": "0.35.0-alpha.0",
+  "version": "0.35.0-alpha.1",
   "description": "A Greenwood plugin to allow you to use ESM (import) syntax to load any file content as a string.",
   "repository": {
     "type": "git",
@@ -41,7 +41,7 @@
     "node-html-parser": "^7.0.1"
   },
   "devDependencies": {
-    "@greenwood/cli": "^0.35.0-alpha.0",
+    "@greenwood/cli": "^0.35.0-alpha.1",
     "@spectrum-web-components/styles": "^1.0.1"
   }
 }
