@@ -1,3 +1,4 @@
+/* eslint-disable import/no-duplicates */
 // import shadow from "./theme.css" with { type: "css" }; older commented-out example
 import withTheme from "./theme.css" with { type: "css" };
 import a from "./shared.css" with { type: "css" };
