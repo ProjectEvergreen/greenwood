@@ -1,0 +1,45 @@
+{
+  "name": "@greenwood/plugin-rss",
+  "version": "0.34.0",
+  "description": "A Greenwood plugin for generating an RSS feed from your content.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ProjectEvergreen/greenwood.git",
+    "directory": "packages/plugin-rss"
+  },
+  "homepage": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-rss",
+  "author": "Jonathan Stockdill",
+  "license": "MIT",
+  "keywords": [
+    "Greenwood",
+    "Static Site Generator",
+    "Server Side Rendering",
+    "Full Stack Web Development",
+    "Serverless",
+    "Web Components",
+    "RSS",
+    "Feed",
+    "Syndication"
+  ],
+  "type": "module",
+  "main": "./src/index.js",
+  "types": "./src/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/types/index.d.ts",
+      "import": "./src/index.js"
+    }
+  },
+  "files": [
+    "src/"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "@greenwood/cli": "^0.34.0"
+  },
+  "devDependencies": {
+    "@greenwood/cli": "^0.34.0"
+  }
+}
