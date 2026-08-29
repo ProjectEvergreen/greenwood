@@ -33,3 +33,4 @@ jobs:
       - name: Test
         run: |
           yarn test:loaders
+          yarn test:loaders:options

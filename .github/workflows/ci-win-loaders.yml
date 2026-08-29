@@ -30,3 +30,4 @@ jobs:
       - name: Test
         run: |
           yarn test:loaders:win
+          yarn test:loaders:win:options
