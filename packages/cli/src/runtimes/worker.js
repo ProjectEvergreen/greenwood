@@ -13,8 +13,8 @@ function serializeError(error) {
 
 function startLoaderWorker(loaderReady) {
   parentPort.once("message", ({ port }) => {
-    port.on("message", async ({ action, id, signal, url }) => {
-      const state = new Int32Array(signal);
+    port.on("message", async ({ action, id, completionSignal, url }) => {
+      const state = new Int32Array(completionSignal);
       let message;
 
       try {

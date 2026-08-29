@@ -37,13 +37,13 @@ class SyncLoaderBridge {
 
   dispatch(action, url) {
     const id = this.requestId++;
-    const signal = new SharedArrayBuffer(Int32Array.BYTES_PER_ELEMENT);
-    const state = new Int32Array(signal);
+    const completionSignal = new SharedArrayBuffer(Int32Array.BYTES_PER_ELEMENT);
+    const state = new Int32Array(completionSignal);
 
     this.port.postMessage({
       action,
       id,
-      signal,
+      completionSignal,
       url,
     });
 
@@ -66,7 +66,7 @@ class SyncLoaderBridge {
   }
 }
 
-function createSyncLoaderHooks(workerUrl, options = {}) {
+function initializeSyncWorkerBridge(workerUrl, options = {}) {
   const bridge = new SyncLoaderBridge(workerUrl, options.workerOptions, options.timeout);
 
   return {
@@ -133,4 +133,4 @@ function createSyncLoaderHooks(workerUrl, options = {}) {
   };
 }
 
-export { createSyncLoaderHooks };
+export { initializeSyncWorkerBridge };

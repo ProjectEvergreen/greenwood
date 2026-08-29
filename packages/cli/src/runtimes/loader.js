@@ -1,6 +1,6 @@
-// runtime-agnostic async service around Greenwood's resource plugin / transformation handling to be leveraged by all runtimes
-async function initializeLoader() {
-  // import Greenwood's internals dynamically to provide greater control to runtimes to when loader hooks are customized
+// runtime-agnostic utility service for accessing Greenwood's resource plugin / transformation handling to be leveraged by all runtime worker thread implementations
+async function getLoaderHooks() {
+  // import Greenwood's internals dynamically to provide greater control to runtimes as to when loader hooks are customized
   const [{ readAndMergeConfig }, { initContext }, { mergeResponse }] = await Promise.all([
     import("../lifecycles/config.js"),
     import("../lifecycles/context.js"),
@@ -123,4 +123,4 @@ async function initializeLoader() {
   };
 }
 
-export { initializeLoader };
+export { getLoaderHooks };
