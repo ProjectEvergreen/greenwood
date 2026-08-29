@@ -1,3 +1,7 @@
+// this is unprefixed to test automatic node: prefixing for builtins
+// eslint-disable-next-line import/enforce-node-protocol-usage
+import assert from "assert/strict";
+
 export default class PostPage extends HTMLElement {
   constructor({ request, compilation }) {
     super();
@@ -5,6 +9,8 @@ export default class PostPage extends HTMLElement {
     const params = new URLSearchParams(request.url.slice(request.url.indexOf("?")));
     this.postId = params.get("id");
     this.numPages = compilation.graph.filter((page) => page.route.startsWith("/blog/")).length;
+
+    assert(this.postId);
   }
 
   async connectedCallback() {
