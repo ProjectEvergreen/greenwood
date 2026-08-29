@@ -14,6 +14,17 @@ const importMap = {
   "wc-compiler/effect": "/node_modules/wc-compiler/src/effect.js",
 };
 
+const reportedObservabilityMismatches = new Set();
+
+function hasInferredObservabilityExport(tree) {
+  return tree.body.some(
+    (node) =>
+      node.type === "ExportNamedDeclaration" &&
+      node.declaration?.type === "VariableDeclaration" &&
+      node.declaration.declarations?.[0]?.id?.name === "inferredObservability",
+  );
+}
+
 class ImportJsxResource {
   constructor(compilation, options) {
     this.compilation = compilation;
@@ -35,6 +46,18 @@ class ImportJsxResource {
     // https://github.com/ProjectEvergreen/wcc/issues/116
     const tree = parseJsx(url);
     const result = generate(tree);
+
+    if (
+      !this.inferredObservability &&
+      !reportedObservabilityMismatches.has(url.pathname) &&
+      hasInferredObservabilityExport(tree)
+    ) {
+      reportedObservabilityMismatches.add(url.pathname);
+      console.warn(
+        "Configuration warning: a JSX module exports inferredObservability but the plugin option is not enabled, so the Signal polyfill will not be injected and the page will throw at runtime.  Please pass greenwoodPluginImportJsx({ inferredObservability: true }).",
+      );
+      console.debug(url.pathname);
+    }
 
     return new Response(result, {
       headers: new Headers({
