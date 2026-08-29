@@ -9,4 +9,5 @@ packages/cli/test/cases/develop.config.polyfills-import-attributes-edge-cases/sr
 packages/cli/test/cases/build.config.polyfills-import-attributes-edge-cases/src/main.js
 packages/cli/test/cases/develop.plugins.context/fixtures/my-layouts/app.html
 packages/cli/test/cases/**/wasm_hello_world.js
+packages/plugin-minify-html/test/cases/default/src/pages/index.html
 /.nx/workspace-data

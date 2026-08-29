@@ -1,0 +1,48 @@
+{
+  "name": "@greenwood/plugin-minify-html",
+  "version": "0.34.0",
+  "description": "A Greenwood plugin for minifying HTML output by stripping comments and collapsing whitespace.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ProjectEvergreen/greenwood.git",
+    "directory": "packages/plugin-minify-html"
+  },
+  "homepage": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-minify-html",
+  "author": "Jonathan Stockdill",
+  "license": "MIT",
+  "keywords": [
+    "Greenwood",
+    "Static Site Generator",
+    "Server Side Rendering",
+    "Full Stack Web Development",
+    "Serverless",
+    "Web Components",
+    "HTML",
+    "Minification",
+    "Optimization"
+  ],
+  "type": "module",
+  "main": "./src/index.js",
+  "types": "./src/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/types/index.d.ts",
+      "import": "./src/index.js"
+    }
+  },
+  "files": [
+    "src/"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "node-html-parser": "^7.0.1"
+  },
+  "peerDependencies": {
+    "@greenwood/cli": "^0.34.0"
+  },
+  "devDependencies": {
+    "@greenwood/cli": "^0.34.0"
+  }
+}
