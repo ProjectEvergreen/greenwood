@@ -1,0 +1,33 @@
+diff --git a/node_modules/gallinago/src/lib/runner.js b/node_modules/gallinago/src/lib/runner.js
+index 764742e..7d9f1ee 100644
+--- a/node_modules/gallinago/src/lib/runner.js
++++ b/node_modules/gallinago/src/lib/runner.js
+@@ -4,9 +4,10 @@ import path from 'path';
+ import { spawn } from 'child_process';
+ 
+ class Runner {
+-  constructor(enableStdOut = false, forwardParentArgs = false) {
++  constructor(enableStdOut = false, forwardParentArgs = false, runtimeArgs = process.execArgv) {
+     this.enableStdOut = enableStdOut; // debugging tests
+     this.forwardParentArgs = forwardParentArgs;
++    this.runtimeArgs = runtimeArgs;
+     this.setupFiles = [];
+     this.childProcess = null;
+   }
+@@ -42,11 +43,13 @@ class Runner {
+     }
+ 
+     return new Promise((resolve, reject) => {
+-      const executable = 'node';
++      const isDeno = Boolean(globalThis.Deno);
++      const executable = isDeno ? globalThis.Deno.execPath() : process.execPath;
+       const isWindows = os.platform() === 'win32';
+       const cliPath = binPath;
+-      const forwardArgs = this.forwardParentArgs ? process.execArgv : [];
+-      const finalArgs = [...forwardArgs, cliPath];
++      const commandArgs = isDeno ? ['run', '-A'] : [];
++      const forwardArgs = this.forwardParentArgs ? this.runtimeArgs : [];
++      const finalArgs = [...commandArgs, ...forwardArgs, cliPath];
+       let err = '';
+ 
+       if (Array.isArray(args)) {
