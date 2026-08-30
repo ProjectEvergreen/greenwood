@@ -99,9 +99,18 @@ describe("Build Greenwood With Custom Lit Renderer for SSG prerendering: ", func
         const style = wrapper.window.document.querySelectorAll("style");
 
         expect(style.length).to.equal(1);
-        expect(style[0].textContent.replace(/ /g, "").replace(/\n/g, "").trim()).to.equal(
-          "header{color:red;}",
-        );
+
+        // Lit registers its CSS hook with the asynchronous node:module.register() API, which Deno
+        // does not support. Deno therefore falls back to Greenwood's synchronous loader, whose CSS
+        // optimization removes the optional trailing declaration semicolon. Normalize both forms.
+        // TODO: Revisit once Lit can register its CSS hook with node:module.registerHooks().
+        const contents = style[0].textContent
+          .replace(/ /g, "")
+          .replace(/\n/g, "")
+          .replace(/;}/g, "}")
+          .trim();
+
+        expect(contents).to.equal("header{color:red}");
       });
     });
   });

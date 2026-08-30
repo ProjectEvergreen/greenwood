@@ -366,6 +366,9 @@ async function getStaticServer(compilation, composable) {
 async function getHybridServer(compilation) {
   const { graph, manifest, config } = compilation;
   const isolationMode = config.isolation;
+  const apiRouteWorkerUrl =
+    config.plugins.find((plugin) => plugin.type === "renderer").provider()?.apiRouteWorkerUrl ??
+    new URL("../lib/api-route-worker.js", import.meta.url);
   const app = await getStaticServer(compilation, true);
 
   app.use(koaBody());
@@ -463,7 +466,7 @@ async function getHybridServer(compilation) {
           const req = await requestAsObject(request);
 
           await new Promise((resolve, reject) => {
-            const worker = new Worker(new URL("../lib/api-route-worker.js", import.meta.url));
+            const worker = new Worker(apiRouteWorkerUrl);
 
             worker.on("message", (result) => {
               const responseAsObject = result;
