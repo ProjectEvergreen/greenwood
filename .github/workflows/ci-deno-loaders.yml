@@ -35,4 +35,4 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Test
-        run: yarn test:loaders:deno
+        run: deno task test:loaders:deno
