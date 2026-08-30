@@ -1,4 +1,4 @@
-name: Continuous Integration (Loaders - Deno)
+name: Continuous Integration (Deno - Loaders)
 
 on: [pull_request]
 
