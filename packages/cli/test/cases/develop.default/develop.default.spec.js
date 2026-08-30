@@ -820,7 +820,10 @@ describe("Develop Greenwood With: ", function () {
       });
 
       it("should return a custom status message", function (done) {
-        expect(response.statusText).to.equal("SUCCESS!!!");
+        // Deno's fetch implementation normalizes custom HTTP reason phrases to the standard text.
+        const expectedStatusText = "Deno" in globalThis ? "OK" : "SUCCESS!!!";
+
+        expect(response.statusText).to.equal(expectedStatusText);
         done();
       });
 
