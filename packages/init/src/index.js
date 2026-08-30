@@ -26,6 +26,10 @@ const PACKAGE_MANAGERS = [
     name: "Yarn",
     value: "yarn",
   },
+  {
+    name: "Deno",
+    value: "deno",
+  },
 ];
 
 async function init() {

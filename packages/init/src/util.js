@@ -64,7 +64,9 @@ function installDependencies(outputDirUrl, packageManager) {
   console.log(`installing dependencies using => ${packageManager}...`);
 
   const command = os.platform() === "win32" ? `${packageManager}.cmd` : packageManager;
-  const args = ["install", "--loglevel", "error"];
+  const options =
+    packageManager === "deno" ? ["--minimum-dependency-age", "0"] : ["--loglevel", "error"];
+  const args = ["install", ...options];
   let npmrcContents = "";
 
   switch (packageManager) {
