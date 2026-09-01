@@ -18,7 +18,9 @@ const greenwoodPlugins = (
       new URL("./server/", greenwoodPluginsDirectoryUrl),
     ],
     async (pluginDirectoryUrl) => {
-      const files = await fs.readdir(pluginDirectoryUrl);
+      // ensure plugin load order is deterministic by calling `.sort`
+      // https://github.com/ProjectEvergreen/greenwood/issues/1797
+      const files = (await fs.readdir(pluginDirectoryUrl)).sort();
 
       return await asyncMap(files, async (file) => {
         const importUrl = new URL(`./${file}`, pluginDirectoryUrl);
