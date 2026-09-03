@@ -102,7 +102,7 @@ describe("Build Greenwood With: ", function () {
 
         expect(img).to.have.lengthOf(1);
         expect(img[0].getAttribute("src")).to.be.equal(
-          "https://www.analogstudios.net/images/analog.png",
+          "https://www.analogstudiosri.com/images/analog.png",
         );
       });
     });

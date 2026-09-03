@@ -3,7 +3,7 @@ import "../components/card.js";
 export default class ArtistsPage extends HTMLElement {
   async connectedCallback() {
     const artists = [
-      { name: "Analog", imageUrl: "https://www.analogstudios.net/images/analog.png" },
+      { name: "Analog", imageUrl: "https://www.analogstudiosri.com/images/analog.png" },
     ];
     const html = artists
       .map((artist) => {
