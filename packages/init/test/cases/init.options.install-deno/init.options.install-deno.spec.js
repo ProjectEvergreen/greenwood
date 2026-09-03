@@ -1,0 +1,76 @@
+/*
+ * Use Case
+ * Scaffold from minimal template and install dependencies with Deno.
+ *
+ * User Result
+ * Should scaffold from template and with lockfile.
+ *
+ * User Command
+ * npx @greenwood/init --name=my-app --install deno
+ *
+ * User Workspace
+ * N / A
+ */
+import { expect } from "chai";
+import fs from "node:fs";
+import path from "node:path";
+import { Runner } from "gallinago";
+import { runSmokeTest } from "../../../../../test/smoke-test.js";
+import { fileURLToPath } from "node:url";
+
+describe("Initialize a new Greenwood project: ", function () {
+  const LABEL = "Scaffolding a new project with dependencies installed through Deno";
+  const APP_NAME = "my-app";
+  const initPath = path.join(process.cwd(), "packages/init/src/index.js");
+  const outputPath = path.dirname(fileURLToPath(new URL(import.meta.url)));
+  const initOutputPath = path.join(outputPath, `/${APP_NAME}`);
+  let initRunner;
+  let greenwoodRunner;
+
+  before(function () {
+    this.context = {
+      publicDir: path.join(initOutputPath, "public"),
+    };
+    initRunner = new Runner();
+    greenwoodRunner = new Runner();
+  });
+
+  describe(LABEL, function () {
+    before(async function () {
+      await initRunner.setup(outputPath, [], { create: false });
+      await initRunner.runCommand(initPath, [
+        "--name",
+        APP_NAME,
+        "--install",
+        "deno",
+        "--ts",
+        "no",
+      ]);
+    });
+
+    describe("should install with Deno", function () {
+      const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
+
+      before(async function () {
+        await greenwoodRunner.setup(initOutputPath);
+        await greenwoodRunner.runCommand(cliPath, "build");
+      });
+
+      runSmokeTest(["public", "index"], LABEL);
+
+      it("should generate a deno.lock file", function () {
+        expect(fs.existsSync(path.join(initOutputPath, "deno.lock"))).to.be.true;
+      });
+
+      it("should not generate a .npmrc file", function () {
+        const npmrcPath = path.join(initOutputPath, ".npmrc");
+
+        expect(fs.existsSync(npmrcPath)).to.be.false;
+      });
+    });
+  });
+
+  after(async function () {
+    await greenwoodRunner.teardown([initOutputPath]);
+  });
+});

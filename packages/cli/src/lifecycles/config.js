@@ -18,7 +18,10 @@ const greenwoodPlugins = (
       new URL("./server/", greenwoodPluginsDirectoryUrl),
     ],
     async (pluginDirectoryUrl) => {
-      const files = await fs.readdir(pluginDirectoryUrl);
+      // Plugin order determines resource precedence, so do not rely on the runtime-specific order
+      // returned by the filesystem. In particular, source maps must run after node_modules so their
+      // application/json content type is not overwritten by the broader package resource handler.
+      const files = (await fs.readdir(pluginDirectoryUrl)).sort();
 
       return await asyncMap(files, async (file) => {
         const importUrl = new URL(`./${file}`, pluginDirectoryUrl);

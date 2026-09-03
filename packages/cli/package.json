@@ -33,6 +33,7 @@
       "types": "./src/types/index.d.ts",
       "import": "./src/index.js"
     },
+    "./register/deno": "./src/runtimes/deno/register.js",
     "./register": "./src/runtimes/node/register.js",
     "./src/data/client": "./src/data/client.js",
     "./src/*": "./src/*"

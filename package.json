@@ -19,8 +19,10 @@
     "build": "yarn workspace www build",
     "serve": "yarn workspace www serve",
     "dev": "yarn workspace www dev",
-    "test": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true __GWD_ROLLUP_MODE__=strict NODE_NO_WARNINGS=1 c8 mocha --exclude \"./packages/**/test/cases/loaders-*/**\" \"./packages/**/**/*.spec.js\"",
-    "test:loaders": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true __GWD_ROLLUP_MODE__=strict NODE_NO_WARNINGS=1 node --import $(pwd)/test/test-register-node.js ./node_modules/mocha/bin/mocha \"./packages/**/**/*.spec.js\"",
+    "test": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true __GWD_ROLLUP_MODE__=strict NODE_NO_WARNINGS=1 c8 mocha --exclude \"./packages/init/test/cases/init.options.install-deno/**\" --exclude \"./packages/**/test/cases/loaders-*/**\" \"./packages/**/**/*.spec.js\"",
+    "test:deno": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true __GWD_ROLLUP_MODE__=strict NODE_NO_WARNINGS=1 deno run -A ./node_modules/mocha/bin/mocha --require ./test/test-register-deno.js --exclude \"./packages/**/test/cases/loaders-*/**\" \"./packages/**/**/*.spec.js\"",
+    "test:loaders": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true __GWD_ROLLUP_MODE__=strict NODE_NO_WARNINGS=1 node --import $(pwd)/test/test-register-node.js ./node_modules/mocha/bin/mocha --exclude \"./packages/init/test/cases/init.options.install-deno/**\" \"./packages/**/**/*.spec.js\"",
+    "test:loaders:deno": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true __GWD_ROLLUP_MODE__=strict NODE_NO_WARNINGS=1 deno run -A ./node_modules/mocha/bin/mocha --require ./test/test-register-deno.js \"./packages/**/**/*.spec.js\"",
     "test:loaders:win": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true __GWD_ROLLUP_MODE__=strict NODE_NO_WARNINGS=1 node --import file:\\\\%cd%\\test\\test-register-node.js ./node_modules/mocha/bin/mocha --exclude \"./packages/init/test/cases/**\" \"./packages/**/**/*.spec.js\"",
     "test:loaders:options": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true __GWD_ROLLUP_MODE__=strict NODE_NO_WARNINGS=1 NODE_OPTIONS=\"--import=$(pwd)/test/test-register-node.js\" ./node_modules/mocha/bin/mocha \"./packages/**/test/cases/loaders-*/*.spec.js\"",
     "test:loaders:win:options": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true __GWD_ROLLUP_MODE__=strict NODE_NO_WARNINGS=1 NODE_OPTIONS=\"--import=file:///%cd:\\=/%/test/test-register-node.js\" ./node_modules/mocha/bin/mocha \"./packages/**/test/cases/loaders-*/*.spec.js\"",
@@ -34,7 +36,8 @@
     "commit:edit": "commitlint --edit $1",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
-    "prepare": "husky"
+    "prepare": "husky",
+    "postinstall": "patch-package"
   },
   "resolutions": {
     "yauzl": "3.3.1",
@@ -50,6 +53,7 @@
     "@eslint/json": "^0.8.0",
     "@eslint/markdown": "^6.2.0",
     "@ls-lint/ls-lint": "^1.10.0",
+    "@rollup/wasm-node": "4.62.3",
     "@types/mocha": "^10.0.10",
     "@types/node": "^22.13.1",
     "c8": "^12.0.0",
@@ -74,5 +78,8 @@
     "prettier": "^3.4.2",
     "rimraf": "^5.0.10",
     "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "patch-package": "^8.0.1"
   }
 }

@@ -69,7 +69,7 @@ const generateGraph = async (compilation) => {
   let graph = [];
 
   const walkDirectoryForPages = async function (directory, pages = [], apiRoutes = new Map()) {
-    const files = (await fs.readdir(directory)).filter((file) => !file.startsWith("."));
+    const files = (await fs.readdir(directory)).filter((file) => !file.startsWith(".")).sort();
 
     for (const filename of files) {
       const filenameUrl = new URL(`./${filename}`, directory);
