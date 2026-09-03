@@ -69,7 +69,9 @@ const generateGraph = async (compilation) => {
   let graph = [];
 
   const walkDirectoryForPages = async function (directory, pages = [], apiRoutes = new Map()) {
-    const files = (await fs.readdir(directory)).filter((file) => !file.startsWith("."));
+    // ensure pages load order is deterministic by calling `.sort`
+    // https://github.com/ProjectEvergreen/greenwood/
+    const files = (await fs.readdir(directory)).filter((file) => !file.startsWith(".")).sort();
 
     for (const filename of files) {
       const filenameUrl = new URL(`./${filename}`, directory);
