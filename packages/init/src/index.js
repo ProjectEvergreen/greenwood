@@ -171,10 +171,10 @@ async function init() {
       });
     }
   } catch (e) {
-    console.log(
+    console.error(
       `${chalk.rgb(255, 0, 0)("Sorry, there was an error trying to initialize your project")}`,
     );
-    console.log(e);
+    console.error(e);
   }
 }
 

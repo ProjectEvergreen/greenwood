@@ -63,8 +63,9 @@ function installDependencies(outputDirUrl, packageManager) {
 
   console.log(`installing dependencies using => ${packageManager}...`);
 
-  const command = os.platform() === "win32" ? `${packageManager}.cmd` : packageManager;
+  const isWindows = os.platform() === "win32";
   const args = ["install", "--loglevel", "error"];
+  const spawnOptions = { stdio: "inherit", cwd: outputDirUrl };
   let npmrcContents = "";
 
   switch (packageManager) {
@@ -87,7 +88,17 @@ function installDependencies(outputDirUrl, packageManager) {
     fs.writeFileSync(new URL("./.npmrc", outputDirUrl), npmrcContents);
   }
 
-  spawnSync(command, args, { stdio: "inherit", cwd: outputDirUrl, shell: true });
+  const result = isWindows
+    ? spawnSync(`${packageManager}.cmd ${args.join(" ")}`, { ...spawnOptions, shell: true })
+    : spawnSync(packageManager, args, spawnOptions);
+
+  if (result.error) {
+    throw result.error;
+  }
+
+  if (result.status !== 0) {
+    throw new Error(`${packageManager} install failed with exit code ${result.status}`);
+  }
 }
 
 export { copyTemplate, installDependencies, setupPackageJson, setupGitIgnore };
