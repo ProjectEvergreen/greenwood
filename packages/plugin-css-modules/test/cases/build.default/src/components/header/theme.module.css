@@ -1,0 +1,5 @@
+.accent.emphasis,
+p .nestedAccent:hover,
+[data-state="active"] .attributeAccent {
+  color: rebeccapurple;
+}

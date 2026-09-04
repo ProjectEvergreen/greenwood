@@ -20,6 +20,9 @@
  *
  * User Workspace
  * src/
+ *   pages/
+ *     about.html
+ *     index.html
  *   components/
  *     footer/
  *       footer.js
@@ -37,7 +40,7 @@ import { JSDOM } from "jsdom";
 import fs from "node:fs";
 import glob from "glob-promise";
 import path from "node:path";
-import { parse, walk } from "css-tree";
+import { generate, parse, walk } from "css-tree";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { getOutputTeardownFiles, HASH_REGEX } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
@@ -100,6 +103,20 @@ describe("Build Greenwood With: ", function () {
         );
       });
 
+      // https://github.com/ProjectEvergreen/greenwood/issues/1792
+      it("should prerender CSS Modules across multiple pages (somewhat) validating that there are no concurrent build issues", async function () {
+        const aboutDom = await JSDOM.fromFile(
+          path.join(this.context.publicDir, "about/index.html"),
+        );
+        const styleText = aboutDom.window.document.querySelector("head style").textContent;
+        const bodyHtml = aboutDom.window.document.querySelector("body").innerHTML;
+
+        expect(styleText).to.match(new RegExp(`\\.header-${HASH_REGEX}-container`));
+        expect(styleText).to.match(new RegExp(`\\.footer-${HASH_REGEX}-footer`));
+        expect(bodyHtml).to.match(new RegExp(`class="header-${HASH_REGEX}-container"`));
+        expect(bodyHtml).to.match(new RegExp(`class="footer-${HASH_REGEX}-footer"`));
+      });
+
       describe("Header component with CSS Modules", () => {
         it("should have the expected scoped CSS inlined in a <style> tag", () => {
           const styles = dom.window.document.querySelectorAll("head style");
@@ -124,7 +141,12 @@ describe("Build Greenwood With: ", function () {
             },
           });
 
-          expect(styleText).to.contain(expectedHeaderCss.replace(/\[placeholder\]/g, scopedHash));
+          const normalizedExpectedCss = generate(
+            parse(expectedHeaderCss.replace(/\[placeholder\]/g, scopedHash)),
+          );
+          const normalizedStyleText = generate(parse(styleText));
+
+          expect(normalizedStyleText).to.contain(normalizedExpectedCss);
         });
 
         it("should have the source <app-header> CSS class names as scoped class names inlined in a <style> tag", () => {
@@ -265,7 +287,12 @@ describe("Build Greenwood With: ", function () {
             },
           });
 
-          expect(styleText).to.contain(expectedFooterCss.replace(/\[placeholder\]/g, scopedHash));
+          const normalizedExpectedCss = generate(
+            parse(expectedFooterCss.replace(/\[placeholder\]/g, scopedHash)),
+          );
+          const normalizedStyleText = generate(parse(styleText));
+
+          expect(normalizedStyleText).to.contain(normalizedExpectedCss);
         });
 
         it("should have the source <app-footer> CSS class names as scoped class names inlined in a <style> tag", () => {
@@ -351,29 +378,11 @@ describe("Build Greenwood With: ", function () {
           });
 
           it("should have transformed class names in the JavaScript bundle", function () {
-            const styles = dom.window.document.querySelectorAll("head style");
-            const styleText = styles[0].textContent;
-            let classes = [];
-
-            const ast = parse(styleText, {
-              onParseError(error) {
-                console.log(error.formattedMessage);
-              },
+            ["footer", "logo", "socialTray", "socialIcon"].forEach((name) => {
+              expect(contents).to.match(
+                new RegExp(String.raw`class="footer-${HASH_REGEX}-${name}"`),
+              );
             });
-
-            walk(ast, {
-              enter: function (node) {
-                const { type, name } = node;
-                if (type === "ClassSelector" && name.startsWith("footer")) {
-                  const scopedClassNameRegex = new RegExp(String.raw`class="${name}"`, "g");
-
-                  classes.push(name);
-                  expect(contents).to.match(scopedClassNameRegex);
-                }
-              },
-            });
-
-            expect(classes.length).to.equal(EXPECTED_FOOTER_CLASS_NAMES);
           });
 
           it("should not have any references to 'undefined' in the JavaScript bundle", function () {

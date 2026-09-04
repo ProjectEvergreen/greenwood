@@ -32,7 +32,7 @@ import { expect } from "chai";
 import { JSDOM } from "jsdom";
 import fs from "node:fs";
 import path from "node:path";
-import { parse, walk } from "css-tree";
+import { generate, parse, walk } from "css-tree";
 import { getOutputTeardownFiles, HASH_REGEX } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
@@ -120,7 +120,12 @@ describe("Develop Greenwood With: ", function () {
             },
           });
 
-          expect(styleText).to.contain(expectedHeaderCss.replace(/\[placeholder\]/g, scopedHash));
+          const normalizedExpectedCss = generate(
+            parse(expectedHeaderCss.replace(/\[placeholder\]/g, scopedHash)),
+          );
+          const normalizedStyleText = generate(parse(styleText));
+
+          expect(normalizedStyleText).to.contain(normalizedExpectedCss);
         });
 
         it("should have the source <app-header> CSS class names as scoped class names inlined in a <style> tag", () => {
@@ -207,7 +212,6 @@ describe("Develop Greenwood With: ", function () {
 
         describe("CSS module should be processed as ESM", function () {
           let headerModuleText;
-          let modulesMaps;
 
           before(async function () {
             const response = await fetch(
@@ -215,27 +219,20 @@ describe("Develop Greenwood With: ", function () {
             );
 
             headerModuleText = await response.text();
-            modulesMaps = await Array.fromAsync(
-              fs.promises.glob("*.map.json", {
-                cwd: new URL("./.greenwood/__css-modules-map/", import.meta.url),
-              }),
-            );
           });
 
-          it("the served content should be untouched", function () {
-            const headersMap = modulesMaps
-              .map((map) =>
-                JSON.parse(
-                  fs.readFileSync(
-                    new URL(`./.greenwood/__css-modules-map/${map}`, import.meta.url),
-                    "utf-8",
-                  ),
-                ),
-              )
-              .find((map) => map.contents.indexOf("header") >= 0);
-            const expected = `export default ${JSON.stringify(headersMap.module)}`;
+          it("should serve the CSS Module as ESM", function () {
+            const headerModule = JSON.parse(headerModuleText.replace("export default ", ""));
 
-            expect(headerModuleText).to.equal(expected);
+            expect(Object.keys(headerModule)).to.have.members([
+              "container",
+              "navBarMenu",
+              "navBarMenuItem",
+            ]);
+
+            Object.entries(headerModule).forEach(([name, scopedName]) => {
+              expect(scopedName).to.match(new RegExp(`header-${HASH_REGEX}-${name}`));
+            });
           });
         });
       });

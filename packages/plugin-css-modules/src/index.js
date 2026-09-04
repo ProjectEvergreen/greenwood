@@ -4,15 +4,12 @@
  *
  */
 import fs from "node:fs";
-import path from "node:path";
 import { parse as hparse } from "node-html-parser";
-import { parse, walk } from "css-tree";
+import { generate, parse, walk } from "css-tree";
 import * as acornWalk from "acorn-walk";
 import * as acorn from "acorn";
 import { hashString } from "@greenwood/cli/src/lib/hashing-utils.js";
 import { ACORN_OPTIONS } from "@greenwood/cli/src/lib/parsing-utils.js";
-
-const MODULES_MAP_DIR_NAME = "__css-modules-map";
 
 async function getTransformedScriptContents(scriptUrl, compilation) {
   const resourcePlugins = compilation.config.plugins
@@ -58,7 +55,48 @@ async function getTransformedScriptContents(scriptUrl, compilation) {
   return await response.text();
 }
 
-async function walkAllImportsForCssModules(cssModulesMap = {}, scriptUrl, sheets, compilation) {
+function transformCssModule(cssModuleUrl) {
+  const scope = cssModuleUrl.pathname.split("/").pop().split(".")[0];
+  const cssContents = fs.readFileSync(cssModuleUrl, "utf-8");
+  const hash = hashString(cssContents);
+  const classNameMap = {};
+
+  const ast = parse(cssContents, {
+    onParseError(error) {
+      console.log(error.formattedMessage);
+    },
+  });
+
+  walk(ast, {
+    enter: function (node) {
+      if (node.type === "ClassSelector") {
+        const originalName = node.name;
+        const scopedName = `${scope}-${hash}-${originalName}`;
+
+        classNameMap[originalName] = scopedName;
+        node.name = scopedName;
+      }
+    },
+  });
+
+  return {
+    module: classNameMap,
+    contents: generate(ast),
+  };
+}
+
+async function walkAllImportsForCssModules(
+  scriptUrl,
+  compilation,
+  cssModules = new Map(),
+  visitedScripts = new Set(),
+) {
+  if (visitedScripts.has(scriptUrl.href)) {
+    return cssModules;
+  }
+
+  visitedScripts.add(scriptUrl.href);
+
   const scriptContents = await getTransformedScriptContents(scriptUrl, compilation);
   const additionalScripts = [];
 
@@ -68,95 +106,12 @@ async function walkAllImportsForCssModules(cssModulesMap = {}, scriptUrl, sheets
       const { value = "" } = source;
 
       if (value.endsWith(".module.css") && specifiers.length === 1) {
-        const identifier = specifiers[0].local.name;
         const cssModuleUrl = new URL(value, scriptUrl);
-        const scope = cssModuleUrl.pathname.split("/").pop().split(".")[0];
-        const cssContents = fs.readFileSync(cssModuleUrl, "utf-8");
-        const hash = hashString(cssContents);
-        const classNameMap = {};
-        let scopedCssContents = cssContents;
-
-        const ast = parse(cssContents, {
-          onParseError(error) {
-            console.log(error.formattedMessage);
-          },
-        });
-
-        walk(ast, {
-          enter: function (node) {
-            // drill down from a SelectorList to its first Selector
-            // and check its first child to see if it is a ClassSelector
-            // and if so, hash that initial class selector
-
-            if (node.type === "SelectorList") {
-              if (node.children?.head?.data?.type === "Selector") {
-                if (node.children?.head?.data?.children?.head?.data?.type === "ClassSelector") {
-                  const { name } = node.children.head.data.children.head.data;
-                  const scopedClassName = `${scope}-${hash}-${name}`;
-                  classNameMap[name] = scopedClassName;
-
-                  /*
-                   * bit of a hacky solution since as we are walking class names one at a time, if we have multiple uses of .heading (for example)
-                   * then by the end we could have .my-component-111-header.my-component-111-header.etc, since we want to replace all instances (e.g. the g flag in Regex)
-                   *
-                   * csstree supports loc so we _could_ target the class replacement down to start / end points, but that unfortunately slows things down a lot
-                   */
-                  if (
-                    scopedCssContents.indexOf(`.${scopedClassName} `) < 0 &&
-                    scopedCssContents.indexOf(`.${scopedClassName} {`) < 0
-                  ) {
-                    scopedCssContents = scopedCssContents.replace(
-                      new RegExp(String.raw`.${name} `, "g"),
-                      `.${scope}-${hash}-${name} `,
-                    );
-                    scopedCssContents = scopedCssContents.replace(
-                      new RegExp(String.raw`.${name},`, "g"),
-                      `.${scope}-${hash}-${name},`,
-                    );
-                    scopedCssContents = scopedCssContents.replace(
-                      new RegExp(String.raw`.${name}:`, "g"),
-                      `.${scope}-${hash}-${name}:`,
-                    );
-                  }
-                }
-              }
-            }
-          },
-        });
-
-        const outputPathUrl = new URL(
-          `./${MODULES_MAP_DIR_NAME}/${hashString(scriptUrl.pathname)}.map.json`,
-          compilation.context.scratchDir,
-        );
-
-        if (!fs.existsSync(outputPathUrl)) {
-          fs.mkdirSync(new URL(`${path.dirname(scriptUrl.href)}/`), { recursive: true });
-        }
-
-        const moduleContents = {
-          module: classNameMap,
-          contents: scopedCssContents,
-          importer: scriptUrl,
-          identifier,
-        };
-
-        cssModulesMap[outputPathUrl] = moduleContents;
-
-        // output one file for transforming imports from CSS -> ESM
-        fs.writeFileSync(outputPathUrl, JSON.stringify(moduleContents));
-
-        // output one file for SSR / prerendering handling in loaders as ESM
-        fs.writeFileSync(
-          new URL(
-            `./${MODULES_MAP_DIR_NAME}/${hashString(cssModuleUrl.pathname)}.module.json`,
-            compilation.context.scratchDir,
-          ),
-          JSON.stringify(classNameMap),
-        );
+        cssModules.set(cssModuleUrl.href, transformCssModule(cssModuleUrl));
       } else {
         const recursiveScriptUrl = new URL(value, scriptUrl);
 
-        if (fs.existsSync(recursiveScriptUrl)) {
+        if (value && fs.existsSync(recursiveScriptUrl)) {
           additionalScripts.push(recursiveScriptUrl);
         }
       }
@@ -164,10 +119,10 @@ async function walkAllImportsForCssModules(cssModulesMap = {}, scriptUrl, sheets
   });
 
   for (const script of additionalScripts) {
-    await walkAllImportsForCssModules(cssModulesMap, script, sheets, compilation);
+    await walkAllImportsForCssModules(script, compilation, cssModules, visitedScripts);
   }
 
-  return cssModulesMap;
+  return cssModules;
 }
 
 // this happens 'first' as the HTML is returned, to find viable references to CSS Modules
@@ -177,11 +132,6 @@ class ScanForCssModulesResource {
     this.compilation = compilation;
     this.extensions = ["module.css"];
     this.contentType = "text/javascript";
-    const { scratchDir } = this.compilation.context;
-
-    if (!fs.existsSync(new URL(`./${MODULES_MAP_DIR_NAME}/`, scratchDir))) {
-      fs.mkdirSync(new URL(`./${MODULES_MAP_DIR_NAME}/`, scratchDir), { recursive: true });
-    }
   }
 
   async shouldIntercept(url) {
@@ -199,8 +149,7 @@ class ScanForCssModulesResource {
       const body = await response.text();
       const dom = hparse(body);
       const scripts = dom.querySelectorAll("head script");
-      const sheets = [];
-      let cssModulesMap = {};
+      const cssModules = new Map();
 
       for (const script of scripts) {
         const type = script.getAttribute("type") ?? "";
@@ -213,18 +162,11 @@ class ScanForCssModulesResource {
             this.compilation.context.userWorkspace,
           );
 
-          cssModulesMap = await walkAllImportsForCssModules(
-            cssModulesMap,
-            scriptUrl,
-            sheets,
-            this.compilation,
-          );
+          await walkAllImportsForCssModules(scriptUrl, this.compilation, cssModules);
         }
       }
 
-      Object.keys(cssModulesMap).forEach((key) => {
-        sheets.push(cssModulesMap[key].contents);
-      });
+      const sheets = [...cssModules.values()].map((cssModule) => cssModule.contents);
 
       const newBody = body.replace(
         "</head>",
@@ -239,14 +181,8 @@ class ScanForCssModulesResource {
       return new Response(newBody);
     } else if (protocol === "file:" && pathname.endsWith(this.extensions[0])) {
       // handle this primarily for SSR / prerendering use case
-      const cssModulesMap = fs.readFileSync(
-        new URL(
-          `./${MODULES_MAP_DIR_NAME}/${hashString(url.pathname)}.module.json`,
-          this.compilation.context.scratchDir,
-        ),
-        "utf-8",
-      );
-      const cssModule = `export default ${cssModulesMap}`;
+      const { module } = transformCssModule(url);
+      const cssModule = `export default ${JSON.stringify(module)}`;
 
       return new Response(cssModule, {
         headers: {
@@ -260,59 +196,88 @@ class ScanForCssModulesResource {
 // this process all files that have CssModules content used
 // and strip out the `import` and replace all the references in class attributes with static values
 class StripCssModulesResource {
-  constructor(compilation) {
-    this.compilation = compilation;
-    this.extensions = ["module.css"];
-    this.contentType = "text/javascript";
-  }
+  async shouldIntercept(url, request, response) {
+    const contentType = response.headers.get("Content-Type") ?? "";
+    const accept = request.headers.get("Accept") ?? "";
 
-  async shouldIntercept(url) {
-    return fs.existsSync(
-      new URL(
-        `./${MODULES_MAP_DIR_NAME}/${hashString(url.pathname)}.map.json`,
-        this.compilation.context.scratchDir,
-      ),
+    return (
+      url.protocol === "file:" &&
+      (contentType.includes("javascript") || accept.includes("javascript")) &&
+      (await response.text()).includes(".module.css")
     );
   }
 
   async intercept(url, request, response) {
-    const { context } = this.compilation;
     let contents = await response.text();
+    const cssModuleImports = [];
+    const ast = acorn.parse(contents, ACORN_OPTIONS);
 
-    acornWalk.simple(acorn.parse(contents, ACORN_OPTIONS), {
+    acornWalk.simple(ast, {
       ImportDeclaration(node) {
         const { specifiers = [], source = {}, start, end } = node;
         const { value = "" } = source;
 
         if (value.endsWith(".module.css") && specifiers.length === 1) {
-          contents = `${contents.slice(0, start)} \n ${contents.slice(end)}`;
-          const cssModulesMap = JSON.parse(
-            fs.readFileSync(
-              new URL(
-                `./${MODULES_MAP_DIR_NAME}/${hashString(url.pathname)}.map.json`,
-                context.scratchDir,
-              ),
-            ),
-          );
-          const { identifier, module } = cssModulesMap;
-
-          Object.keys(module).forEach((key) => {
-            const literalUsageRegex = new RegExp(String.raw`\$\{${identifier}.${key}\}`, "g");
-            // https://stackoverflow.com/a/20851557/417806
-            const expressionUsageRegex = new RegExp(
-              String.raw`(((?<![-\w\d\W])|(?<=[> \n\r\b]))${identifier}\.${key}((?![-\w\d\W])|(?=[ <.,:;!?\n\r\b])))`,
-              "g",
-            );
-
-            if (literalUsageRegex.test(contents)) {
-              contents = contents.replace(literalUsageRegex, module[key]);
-            } else if (expressionUsageRegex.test(contents)) {
-              contents = contents.replace(expressionUsageRegex, `'${module[key]}'`);
-            }
+          cssModuleImports.push({
+            start,
+            end,
+            identifier: specifiers[0].local.name,
+            cssModuleUrl: new URL(value, url),
           });
         }
       },
     });
+
+    // Build a class map for each CSS Module import, collect edit locations for replacements,
+    // and then apply the edits in reverse order to preserve AST offsets
+    const cssModulesByIdentifier = new Map();
+    const sourceEdits = cssModuleImports.map(({ start, end, identifier, cssModuleUrl }) => {
+      const { module } = transformCssModule(cssModuleUrl);
+
+      cssModulesByIdentifier.set(identifier, module);
+
+      return { start, end, replacement: " \n " };
+    });
+
+    acornWalk.ancestor(ast, {
+      MemberExpression(node, ancestors) {
+        if (node.object.type !== "Identifier") {
+          return;
+        }
+
+        const module = cssModulesByIdentifier.get(node.object.name);
+        const key = node.computed
+          ? node.property.type === "Literal" && typeof node.property.value === "string"
+            ? node.property.value
+            : null
+          : node.property.type === "Identifier"
+            ? node.property.name
+            : null;
+        const scopedName = key ? module?.[key] : null;
+
+        if (!scopedName) {
+          return;
+        }
+
+        const parent = ancestors.at(-2);
+        const interpolationStart = node.start - 2;
+        const interpolationEnd = node.end + 1;
+        const isDirectTemplateInterpolation =
+          parent?.type === "TemplateLiteral" &&
+          contents.slice(interpolationStart, node.start) === "${" &&
+          contents.slice(node.end, interpolationEnd) === "}";
+
+        sourceEdits.push({
+          start: isDirectTemplateInterpolation ? interpolationStart : node.start,
+          end: isDirectTemplateInterpolation ? interpolationEnd : node.end,
+          replacement: isDirectTemplateInterpolation ? scopedName : JSON.stringify(scopedName),
+        });
+      },
+    });
+
+    for (const { start, end, replacement } of sourceEdits.sort((a, b) => b.start - a.start)) {
+      contents = `${contents.slice(0, start)}${replacement}${contents.slice(end)}`;
+    }
 
     return new Response(contents);
   }
@@ -329,7 +294,7 @@ const greenwoodPluginCssModules = () => {
     {
       type: "resource",
       name: "plugin-css-modules-strip-modules",
-      provider: (compilation) => new StripCssModulesResource(compilation),
+      provider: () => new StripCssModulesResource(),
     },
   ];
 };
