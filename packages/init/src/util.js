@@ -64,12 +64,8 @@ function installDependencies(outputDirUrl, packageManager) {
   console.log(`installing dependencies using => ${packageManager}...`);
 
   const isWindows = os.platform() === "win32";
-  const configuredShell = process.env.SHELL;
-  const isWindowsPosixShell =
-    isWindows && configuredShell && /(?:^|[\\/])(?:ba|z|fi)?sh(?:\.exe)?$/i.test(configuredShell);
-  const shell = isWindowsPosixShell ? configuredShell.split(/[\\/]/).at(-1) : true;
-  const command = isWindows && !isWindowsPosixShell ? `${packageManager}.cmd` : packageManager;
   const args = ["install", "--loglevel", "error"];
+  const spawnOptions = { stdio: "inherit", cwd: outputDirUrl };
   let npmrcContents = "";
 
   switch (packageManager) {
@@ -92,11 +88,9 @@ function installDependencies(outputDirUrl, packageManager) {
     fs.writeFileSync(new URL("./.npmrc", outputDirUrl), npmrcContents);
   }
 
-  const result = spawnSync(`${command} ${args.join(" ")}`, {
-    stdio: "inherit",
-    cwd: outputDirUrl,
-    shell,
-  });
+  const result = isWindows
+    ? spawnSync(`${packageManager}.cmd ${args.join(" ")}`, { ...spawnOptions, shell: true })
+    : spawnSync(packageManager, args, spawnOptions);
 
   if (result.error) {
     throw result.error;
