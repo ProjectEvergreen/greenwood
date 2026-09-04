@@ -63,7 +63,12 @@ function installDependencies(outputDirUrl, packageManager) {
 
   console.log(`installing dependencies using => ${packageManager}...`);
 
-  const command = os.platform() === "win32" ? `${packageManager}.cmd` : packageManager;
+  const isWindows = os.platform() === "win32";
+  const configuredShell = process.env.SHELL;
+  const isWindowsPosixShell =
+    isWindows && configuredShell && /(?:^|[\\/])(?:ba|z|fi)?sh(?:\.exe)?$/i.test(configuredShell);
+  const shell = isWindowsPosixShell ? configuredShell.split(/[\\/]/).at(-1) : true;
+  const command = isWindows && !isWindowsPosixShell ? `${packageManager}.cmd` : packageManager;
   const args = ["install", "--loglevel", "error"];
   let npmrcContents = "";
 
@@ -87,7 +92,19 @@ function installDependencies(outputDirUrl, packageManager) {
     fs.writeFileSync(new URL("./.npmrc", outputDirUrl), npmrcContents);
   }
 
-  spawnSync(command, args, { stdio: "inherit", cwd: outputDirUrl, shell: true });
+  const result = spawnSync(`${command} ${args.join(" ")}`, {
+    stdio: "inherit",
+    cwd: outputDirUrl,
+    shell,
+  });
+
+  if (result.error) {
+    throw result.error;
+  }
+
+  if (result.status !== 0) {
+    throw new Error(`${packageManager} install failed with exit code ${result.status}`);
+  }
 }
 
 export { copyTemplate, installDependencies, setupPackageJson, setupGitIgnore };
