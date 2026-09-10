@@ -85,7 +85,11 @@ class NodeModulesResource {
     // walk the project's package.json for all its direct and transitive dependencies
     if (!generatedImportMap && Object.keys(userPackageJson.dependencies || []).length > 0) {
       console.log("Generating import map from project dependencies...");
-      const { importMap, diagnostics } = await walkPackageJson(userPackageJson);
+      const { importMap, diagnostics } = await walkPackageJson(
+        userPackageJson,
+        new Set(),
+        context.projectDirectory,
+      );
 
       if (diagnostics.size > 0) {
         console.log("****************************************************************************");

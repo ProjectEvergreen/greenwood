@@ -1,3 +1,14 @@
+import {
+  derivePackageRoot,
+  IMPORT_MAP_RESOLVED_PREFIX,
+  resolveBareSpecifier,
+} from "@greenwood/cli/src/lib/walker-package-ranger.js";
+
+const webComponentsRoot = derivePackageRoot(
+  resolveBareSpecifier("@webcomponents/webcomponentsjs", import.meta.url),
+);
+const webComponentsBundleUrl = `${IMPORT_MAP_RESOLVED_PREFIX}${webComponentsRoot.replace("file://", "")}webcomponents-bundle.js`;
+
 class PuppeteerResource {
   constructor(compilation, options) {
     this.compilation = compilation;
@@ -23,7 +34,7 @@ class PuppeteerResource {
       "<head>",
       `
       <head>
-        <script src="/node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
+        <script src="${webComponentsBundleUrl}"></script>
     `,
     );
 

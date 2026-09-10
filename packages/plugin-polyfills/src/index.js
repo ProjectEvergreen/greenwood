@@ -95,10 +95,13 @@ const greenwoodPluginPolyfills = (options = {}) => {
       provider: async (compilation) => {
         const { outputDir } = compilation.context;
         const polyfillSpecifier = "@webcomponents/webcomponentsjs";
-        const polyfillsResolved = resolveBareSpecifier(polyfillSpecifier);
+        const polyfillsResolved = resolveBareSpecifier(polyfillSpecifier, import.meta.url);
         const polyfillsRoot = derivePackageRoot(polyfillsResolved);
         const litSpecifier = "lit";
-        const litResolved = resolveBareSpecifier(litSpecifier);
+        const litResolved = resolveBareSpecifier(
+          litSpecifier,
+          compilation.context.projectDirectory,
+        );
         const litRoot = derivePackageRoot(litResolved);
 
         const standardPolyfills = [
