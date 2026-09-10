@@ -25,23 +25,23 @@ jobs:
           version: latest
       - name: Installing project dependencies
         run: |
-          yarn install --frozen-lockfile
+          pnpm i
         # use path installed by chromium-lib-install.sh
         env:
           PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true"
           PUPPETEER_EXECUTABLE_PATH: "/usr/bin/google-chrome-unstable"
       - name: Lint
         run: |
-          yarn lint
+          pnpm run lint
       - name: Check Formatting
         run: |
-          yarn run format:check
+          pnpm run format:check
       - name: Test
         run: |
-          yarn test
+          pnpm run test
       - name: Build
         run: |
-          yarn clean && yarn build
+          pnpm run clean && pnpm run build
       - name: Commitlint Check
         if: github.event_name == 'push'
-        run: yarn commit:lint
+        run: pnpm run commit:lint

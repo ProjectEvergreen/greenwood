@@ -38,6 +38,6 @@
     "@greenwood/cli": "^0.34.0"
   },
   "devDependencies": {
-    "@greenwood/cli": "^0.35.0-alpha.1"
+    "@greenwood/cli": "workspace:^"
   }
 }

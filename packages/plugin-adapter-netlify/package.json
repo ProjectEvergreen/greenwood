@@ -43,7 +43,8 @@
     "zip-a-folder": "^2.0.0"
   },
   "devDependencies": {
-    "@greenwood/cli": "^0.35.0-alpha.1",
-    "extract-zip": "^2.0.1"
+    "@greenwood/cli": "workspace:^",
+    "extract-zip": "^2.0.1",
+    "wc-compiler": "~0.22.2"
   }
 }

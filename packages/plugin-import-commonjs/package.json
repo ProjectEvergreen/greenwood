@@ -43,7 +43,7 @@
     "cjs-module-lexer": "^1.0.0"
   },
   "devDependencies": {
-    "@greenwood/cli": "^0.35.0-alpha.1",
+    "@greenwood/cli": "workspace:^",
     "lodash": "^4.17.20"
   }
 }

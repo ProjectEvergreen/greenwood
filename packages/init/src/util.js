@@ -76,10 +76,9 @@ function installDependencies(outputDirUrl, packageManager) {
       npmrcContents = npmrcContents.concat("legacy-peer-deps=true", os.EOL);
       break;
     case "pnpm":
-      // enable this since in some cases we need plugin dependencies installed "locally" to the project
-      // https://pnpm.io/settings#shamefullyhoist
-      // https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-renderer-lit#installation
-      npmrcContents = npmrcContents.concat("shamefully-hoist=true", os.EOL);
+      // A generated project may be nested inside an existing pnpm workspace but is installed
+      // independently unless the user explicitly adds it to that workspace.
+      args.push("--ignore-workspace");
       break;
   }
 

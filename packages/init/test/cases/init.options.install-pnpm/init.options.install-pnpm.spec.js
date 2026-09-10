@@ -62,12 +62,10 @@ describe("Initialize a new Greenwood project: ", function () {
         expect(fs.existsSync(path.join(initOutputPath, "pnpm-lock.yaml"))).to.be.true;
       });
 
-      it("should generate a .npmrc file with the expected contents", function () {
+      it("should not generate a .npmrc file", function () {
         const npmrcPath = path.join(initOutputPath, ".npmrc");
-        const contents = fs.readFileSync(npmrcPath, "utf-8");
 
-        expect(fs.existsSync(npmrcPath)).to.be.true;
-        expect(contents).contains("shamefully-hoist=true");
+        expect(fs.existsSync(npmrcPath)).to.be.false;
       });
     });
   });

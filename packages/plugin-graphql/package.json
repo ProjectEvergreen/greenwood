@@ -52,6 +52,8 @@
     "rxjs": "^7.8.2"
   },
   "devDependencies": {
-    "@greenwood/cli": "^0.35.0-alpha.1"
+    "@greenwood/cli": "workspace:^",
+    "@greenwood/plugin-renderer-puppeteer": "workspace:^",
+    "lit": "^3.1.0"
   }
 }
