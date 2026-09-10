@@ -39,6 +39,23 @@ async function getCustomPageLayoutsFromPlugins(compilation, layoutName) {
  * and a page template title would be prioritized over an app layout title
  *
  */
+// keep only the first occurrence of identical tags when merging app layout, page layout, and page
+function dedupeMergedResourceTags(tags) {
+  const seen = new Set();
+
+  return tags.filter((tag) => {
+    const key = tag.toString().replace(/\s+/g, " ").trim();
+
+    if (seen.has(key)) {
+      return false;
+    }
+
+    seen.add(key);
+
+    return true;
+  });
+}
+
 async function mergeContentIntoLayout(
   outletType,
   parentContents,
@@ -145,10 +162,10 @@ async function mergeContentIntoLayout(
       ...[...((childRoot && childRoot.querySelectorAll("head meta")) || [])],
     ].join("\n");
 
-    const mergedLinks = [
+    const mergedLinks = dedupeMergedResourceTags([
       ...((parentRoot && parentRoot?.querySelectorAll("head link")) ?? []),
       ...[...((childRoot && childRoot.querySelectorAll("head link")) || [])],
-    ].join("\n");
+    ]).join("\n");
 
     const mergedStyles = [
       ...((parentRoot && parentRoot?.querySelectorAll("head style")) ?? []),
@@ -188,7 +205,7 @@ async function mergeContentIntoLayout(
       }),
     ].join("\n");
 
-    const mergedScripts = [
+    const mergedScripts = dedupeMergedResourceTags([
       ...((parentRoot && parentRoot?.querySelectorAll("head script")) || []),
       ...[...((childRoot && childRoot.querySelectorAll("head script")) || [])],
       ...(
@@ -224,7 +241,7 @@ async function mergeContentIntoLayout(
 
         return `<script src="${src}" ${attrs}></script>`;
       }),
-    ].join("\n");
+    ]).join("\n");
 
     // // https://stackoverflow.com/a/51432792/417806
     const outletRegex =
