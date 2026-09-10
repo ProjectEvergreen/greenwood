@@ -36,7 +36,7 @@ async function getBody(compilation) {
   );
   const timestamp = new Date().getTime();
   const artistsListItems = artists
-    .filter((artist) => artist.isActive === 1)
+    .filter((artist) => Number(artist.isActive) === 1)
     .map((artist) => {
       const { id, name, bio, imageUrl } = artist;
 
