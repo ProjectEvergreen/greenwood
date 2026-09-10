@@ -1,5 +1,6 @@
 import fs from "node:fs";
-import { isBuiltin } from "node:module";
+import { findPackageJSON, isBuiltin } from "node:module";
+import { pathToFileURL } from "node:url";
 
 // priority if from L -> R
 const SUPPORTED_EXPORT_CONDITIONS = ["import", "module-sync", "default"];
@@ -14,15 +15,23 @@ function updateImportMap(key, value, resolvedRoot) {
   );
 }
 
-// wrapper around import.meta.resolve to provide graceful error handling / logging
-// as sometimes a package.json has no main field :/
+// Resolve from the package scope that owns the dependency.  Finding package.json is sufficient
+// here because all callers use the result to derive the package root, and it also supports packages
+// with no main entry point.
 // https://unpkg.com/browse/@types/trusted-types@2.0.7/package.json
-// https://github.com/nodejs/node/issues/49445#issuecomment-2484334036
-function resolveBareSpecifier(specifier) {
+function resolveBareSpecifier(specifier, parent = pathToFileURL(`${process.cwd()}/`)) {
   let resolvedPath;
 
   try {
-    resolvedPath = import.meta.resolve(specifier);
+    if (isBuiltin(specifier)) {
+      return specifier;
+    }
+
+    const packageJsonPath = findPackageJSON(specifier, parent);
+
+    resolvedPath = packageJsonPath
+      ? pathToFileURL(fs.realpathSync(packageJsonPath)).href
+      : undefined;
   } catch (e) {
     diagnostics.set(
       specifier,
@@ -34,7 +43,7 @@ function resolveBareSpecifier(specifier) {
 }
 
 /*
- * Find root directory for a package based on result of import.meta.resolve, since dependencyName could show in multiple places
+ * Find the root directory for a package based on its resolved URL, since dependencyName could show in multiple places
  * until this becomes a thing - https://github.com/nodejs/node/issues/49445
  * {
  *   dependencyName: 'lit-html',
@@ -283,12 +292,16 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot) {
 }
 
 // we recursively cache / memoize walkedPackages to account for scenarios where Greenwood can (pre)render concurrently
-async function walkPackageJson(packageJson = {}, walkedPackages = new Set()) {
+async function walkPackageJson(
+  packageJson = {},
+  walkedPackages = new Set(),
+  parent = pathToFileURL(`${process.cwd()}/`),
+) {
   try {
     const dependencies = Object.keys(packageJson.dependencies || {});
 
     for (const dependency of dependencies) {
-      const resolved = resolveBareSpecifier(dependency);
+      const resolved = resolveBareSpecifier(dependency, parent);
 
       if (resolved) {
         const resolvedRoot = derivePackageRoot(resolved);
@@ -305,7 +318,7 @@ async function walkPackageJson(packageJson = {}, walkedPackages = new Set()) {
           if (!walkedPackages.has(name)) {
             walkedPackages.add(name);
 
-            await walkPackageJson(resolvedPackageJson, walkedPackages);
+            await walkPackageJson(resolvedPackageJson, walkedPackages, resolved);
           }
         } else {
           // ignore built-ins since NodeJS resolves them automatically

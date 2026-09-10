@@ -1,0 +1,14 @@
+packages:
+  - "www"
+  - "packages/*"
+allowBuilds:
+  "@apollo/protobufjs": true
+  "@netlify/esbuild": true
+  "@parcel/watcher": true
+  core-js: true
+  esbuild: true
+  netlify-cli: true
+  nx: true
+  protobufjs: true
+  puppeteer: true
+  unix-dgram: true

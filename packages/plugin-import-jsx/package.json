@@ -41,9 +41,10 @@
   "dependencies": {
     "astring": "^1.9.0",
     "node-html-parser": "^7.0.1",
+    "signal-polyfill": "^0.2.2",
     "wc-compiler": "~0.22.2"
   },
   "devDependencies": {
-    "@greenwood/cli": "^0.35.0-alpha.1"
+    "@greenwood/cli": "workspace:^"
   }
 }

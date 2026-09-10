@@ -4,14 +4,7 @@ import type { Plugin as TRollupPlugin } from "rollup";
 
 // https://greenwoodjs.dev/docs/reference/plugins-api/#overview
 export type PLUGIN_TYPES =
-  | "adapter"
-  | "context"
-  | "copy"
-  | "renderer"
-  | "resource"
-  | "rollup"
-  | "server"
-  | "source";
+  "adapter" | "context" | "copy" | "renderer" | "resource" | "rollup" | "server" | "source";
 
 export type PLUGINS =
   | AdapterPlugin

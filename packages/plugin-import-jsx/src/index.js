@@ -7,12 +7,40 @@ import { generate } from "astring";
 import { parseJsx } from "wc-compiler/jsx-loader";
 import { mergeImportMap } from "@greenwood/cli/src/lib/node-modules-utils.js";
 import { getMatchingPageByRoute } from "@greenwood/cli/src/lib/graph-utils.js";
+import { normalizePathnameForWindows } from "@greenwood/cli/src/lib/resource-utils.js";
+import {
+  derivePackageRoot,
+  IMPORT_MAP_RESOLVED_PREFIX,
+  resolveBareSpecifier,
+} from "@greenwood/cli/src/lib/walker-package-ranger.js";
 import { parse } from "node-html-parser";
 
-const importMap = {
-  "signal-polyfill": "/node_modules/signal-polyfill/dist/index.js",
-  "wc-compiler/effect": "/node_modules/wc-compiler/src/effect.js",
+const pluginImports = {
+  "signal-polyfill": new URL(
+    "./dist/index.js",
+    derivePackageRoot(resolveBareSpecifier("signal-polyfill", import.meta.url)),
+  ),
+  "wc-compiler/effect": new URL(
+    "./src/effect.js",
+    derivePackageRoot(resolveBareSpecifier("wc-compiler", import.meta.url)),
+  ),
 };
+const importMap = Object.fromEntries(
+  Object.entries(pluginImports).map(([specifier, url]) => [
+    specifier,
+    `${IMPORT_MAP_RESOLVED_PREFIX}${url.pathname}`,
+  ]),
+);
+
+function resolvePluginImports(contents) {
+  let resolvedContents = contents;
+
+  for (const [specifier, url] of Object.entries(pluginImports)) {
+    resolvedContents = resolvedContents.replaceAll(specifier, normalizePathnameForWindows(url));
+  }
+
+  return resolvedContents;
+}
 
 class ImportJsxResource {
   constructor(compilation, options) {
@@ -34,7 +62,9 @@ class ImportJsxResource {
     // refactor when WCC refactors
     // https://github.com/ProjectEvergreen/wcc/issues/116
     const tree = parseJsx(url);
-    const result = generate(tree);
+    const generated = generate(tree);
+    const result =
+      process.env.__GWD_COMMAND__ === "develop" ? generated : resolvePluginImports(generated);
 
     return new Response(result, {
       headers: new Headers({
@@ -57,6 +87,10 @@ class ImportJsxResource {
     const { polyfills } = this.compilation.config;
     const body = await response.text();
     let newBody = body;
+    const signalPolyfillSpecifier =
+      process.env.__GWD_COMMAND__ === "develop"
+        ? "signal-polyfill"
+        : normalizePathnameForWindows(pluginImports["signal-polyfill"]);
 
     if (process.env.__GWD_COMMAND__ === "develop") {
       newBody = mergeImportMap(newBody, importMap, polyfills.importMaps);
@@ -65,7 +99,7 @@ class ImportJsxResource {
     const root = parse(newBody);
     const signalScript = parse(`
       <script type="module">
-        import { Signal } from 'signal-polyfill';
+        import { Signal } from '${signalPolyfillSpecifier}';
         globalThis.Signal = Signal;
         </script>
       `);

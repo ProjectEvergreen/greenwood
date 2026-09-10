@@ -42,6 +42,12 @@
     "puppeteer": "^24.0.0"
   },
   "devDependencies": {
-    "@greenwood/cli": "^0.35.0-alpha.1"
+    "@greenwood/cli": "workspace:^",
+    "lit": "^3.1.0",
+    "lodash-es": "^4.17.20",
+    "prismjs": "^1.21.0",
+    "pwa-helpers": "^0.9.1",
+    "redux": "^5.0.1",
+    "simpledotcss": "^1.0.0"
   }
 }

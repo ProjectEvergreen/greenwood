@@ -8,7 +8,7 @@ function getResolvedHrefFromPathnameShortcut(pathname, rootFallbackUrl) {
   const segments = pathname.replace("/node_modules/", "").split("/");
   const hasScope = segments[0].startsWith("@");
   const specifier = hasScope ? `${segments[0]}/${segments[1]}` : segments[0];
-  const resolved = resolveBareSpecifier(specifier);
+  const resolved = resolveBareSpecifier(specifier, rootFallbackUrl);
 
   if (resolved) {
     const root = derivePackageRoot(resolved);

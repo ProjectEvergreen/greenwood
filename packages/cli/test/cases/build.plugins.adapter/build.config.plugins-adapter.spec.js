@@ -216,7 +216,7 @@ describe("Build Greenwood With: ", function () {
       });
 
       it("should contain one javascript file in the output directory", async function () {
-        expect(chunks.length).to.equal(18);
+        expect(chunks.length).to.equal(19);
       });
     });
 
@@ -229,7 +229,7 @@ describe("Build Greenwood With: ", function () {
       });
 
       it("should contain one javascript file in the output directory", async function () {
-        expect(chunks.length).to.equal(19);
+        expect(chunks.length).to.equal(20);
       });
     });
   });

@@ -10,3 +10,4 @@ packages/cli/test/cases/build.config.polyfills-import-attributes-edge-cases/src/
 packages/cli/test/cases/develop.plugins.context/fixtures/my-layouts/app.html
 packages/cli/test/cases/**/wasm_hello_world.js
 /.nx/workspace-data
+pnpm-lock.yaml

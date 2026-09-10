@@ -44,17 +44,19 @@ class Button extends LitElement {
 
     return html`
       <style></style>
-      ${href
-        ? html`
-            <a class="btn btn-${size}" href="${href}">
-              <slot></slot>
-            </a>
-          `
-        : html`
-            <a class="btn btn-${size}" href="#" @click="${onClick}">
-              <slot></slot>
-            </a>
-          `}
+      ${
+        href
+          ? html`
+              <a class="btn btn-${size}" href="${href}">
+                <slot></slot>
+              </a>
+            `
+          : html`
+              <a class="btn btn-${size}" href="#" @click="${onClick}">
+                <slot></slot>
+              </a>
+            `
+      }
     `;
   }
 }
