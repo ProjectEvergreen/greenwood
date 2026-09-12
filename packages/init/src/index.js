@@ -4,7 +4,13 @@ import chalk from "chalk";
 import { program, Option } from "commander";
 import fs from "node:fs";
 import { input, select } from "@inquirer/prompts";
-import { copyTemplate, installDependencies, setupGitIgnore, setupPackageJson } from "./util.js";
+import {
+  copyTemplate,
+  installDependencies,
+  setupGitIgnore,
+  setupPackageJson,
+  setupDenoConfig,
+} from "./util.js";
 
 const DEFAULTS = {
   name: "my-app",
@@ -150,6 +156,10 @@ async function init() {
 
     // configure .gitignore file contents
     setupGitIgnore(outputDirUrl);
+
+    if (packageManager === "deno") {
+      setupDenoConfig(outputDirUrl);
+    }
 
     installDependencies(outputDirUrl, packageManager);
 

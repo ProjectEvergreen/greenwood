@@ -103,4 +103,16 @@ function installDependencies(outputDirUrl, packageManager) {
   }
 }
 
-export { copyTemplate, installDependencies, setupPackageJson, setupGitIgnore };
+function setupDenoConfig(outputDirUrl) {
+  console.log("creating a deno.jsonc file...");
+
+  const denoConfigOutputUrl = new URL("./deno.jsonc", outputDirUrl);
+  const denoConfig = {
+    preferPackageJson: true,
+    exclude: [".deno-deploy/", ".greenwood/", "public/"],
+  };
+
+  fs.writeFileSync(denoConfigOutputUrl, JSON.stringify(denoConfig, null, 2));
+}
+
+export { copyTemplate, installDependencies, setupPackageJson, setupGitIgnore, setupDenoConfig };
