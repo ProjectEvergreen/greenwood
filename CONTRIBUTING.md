@@ -12,6 +12,8 @@ To contribute to the project, you'll want to follow these steps:
 
 1. Install [NodeJS LTS](https://nodejs.org) or [NVM](https://github.com/nvm-sh/nvm) (recommended)
 1. Have [Yarn 1.x](https://yarnpkg.com/) installed
+1. Have the latest version of [PNPM](https://pnpm.io/) installed (for running PNPM based init package tests)
+1. Have the latest version of [Deno](https://deno.com/) installed (for running Deno related tests)
 1. Clone the repository
 1. For NVM users, run `nvm use`
 1. Run `yarn install`
@@ -89,17 +91,23 @@ Greenwood relies on a large set of test suites that are very behavior / outcome 
 
 ### Running Tests
 
+To verify compliance with coverage and watermark thresholds (what CI checks against), use:
+
+```shell
+$ yarn test
+$ yarn test:loaders
+```
+
 To run tests in watch mode, use:
 
 ```shell
 $ yarn test:tdd
 ```
 
-To verify compliance with coverage and watermark thresholds (what CI checks against), use:
-
-```shell
-$ yarn test
-$ yarn test:loaders
+To run tests for deno, use the deno specific commands and run them with `deno`
+```
+$ deno task test:deno
+$ deno task test:loaders:deno
 ```
 
 Below are some tips to help with running / debugging tests:

@@ -1,5 +1,8 @@
 // https://github.com/nodejs/modules/issues/307#issuecomment-858729422
 import { parentPort } from "node:worker_threads";
+import { initializeWorkerImports } from "../runtimes/worker-imports.js";
+
+const workerImportsReady = initializeWorkerImports();
 
 async function executeModule({ routeModuleUrl, request, compilation }) {
   const { handler } = await import(routeModuleUrl);
@@ -10,5 +13,6 @@ async function executeModule({ routeModuleUrl, request, compilation }) {
 }
 
 parentPort.on("message", async (task) => {
+  await workerImportsReady;
   await executeModule(task);
 });

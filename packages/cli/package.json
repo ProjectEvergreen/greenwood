@@ -24,7 +24,8 @@
     "NodeJS"
   ],
   "engines": {
-    "node": ">=24.13.1"
+    "node": ">=24.13.1",
+    "deno": "^2.8.0"
   },
   "main": "./src/index.js",
   "types": "./src/types/index.d.ts",
@@ -33,6 +34,7 @@
       "types": "./src/types/index.d.ts",
       "import": "./src/index.js"
     },
+    "./register/deno": "./src/runtimes/deno/register.js",
     "./register": "./src/runtimes/node/register.js",
     "./src/data/client": "./src/data/client.js",
     "./src/*": "./src/*"
