@@ -91,17 +91,23 @@ Greenwood relies on a large set of test suites that are very behavior / outcome 
 
 ### Running Tests
 
+To verify compliance with coverage and watermark thresholds (what CI checks against), use:
+
+```shell
+$ yarn test
+$ yarn test:loaders
+```
+
 To run tests in watch mode, use:
 
 ```shell
 $ yarn test:tdd
 ```
 
-To verify compliance with coverage and watermark thresholds (what CI checks against), use:
-
-```shell
-$ yarn test
-$ yarn test:loaders
+To run tests for deno, use the deno specific commands and run them with `deno`
+```
+$ deno task test:deno
+$ deno task test:loaders:deno
 ```
 
 Below are some tips to help with running / debugging tests:
