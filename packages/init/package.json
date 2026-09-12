@@ -12,7 +12,7 @@
   "license": "MIT",
   "engines": {
     "node": ">=24.13.1",
-    "deno": ">=2.8.0"
+    "deno": "^2.8.0"
   },
   "main": "src/index.js",
   "type": "module",
