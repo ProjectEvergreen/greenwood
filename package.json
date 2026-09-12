@@ -36,8 +36,7 @@
     "commit:edit": "commitlint --edit $1",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
-    "prepare": "husky",
-    "postinstall": "patch-package"
+    "prepare": "husky"
   },
   "resolutions": {
     "yauzl": "3.3.1",
@@ -78,8 +77,5 @@
     "prettier": "^3.4.2",
     "rimraf": "^5.0.10",
     "typescript": "^6.0.3"
-  },
-  "dependencies": {
-    "patch-package": "^8.0.1"
   }
 }
