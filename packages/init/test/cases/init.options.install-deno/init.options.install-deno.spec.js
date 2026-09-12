@@ -62,6 +62,19 @@ describe("Initialize a new Greenwood project: ", function () {
         expect(fs.existsSync(path.join(initOutputPath, "deno.lock"))).to.be.true;
       });
 
+      it("should generate a deno.jsonc file", function () {
+        const denoConfigPath = path.join(initOutputPath, "deno.jsonc");
+        const denoConfigContents = JSON.parse(fs.readFileSync(denoConfigPath, "utf-8"));
+
+        expect(fs.existsSync(denoConfigPath)).to.be.true;
+        expect(denoConfigContents.preferPackageJson).to.equal(true);
+        expect(denoConfigContents.exclude).to.deep.equal([
+          ".deno-deploy/",
+          ".greenwood/",
+          "public/",
+        ]);
+      });
+
       it("should not generate a .npmrc file", function () {
         const npmrcPath = path.join(initOutputPath, ".npmrc");
 
