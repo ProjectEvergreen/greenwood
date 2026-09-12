@@ -4,8 +4,8 @@ set -euo pipefail
 
 puppeteer_cache_dir="$(pwd)/.cache/puppeteer"
 
-# Install the Chrome for Testing revision declared by the repo's Puppeteer dependency,
-# along with the system libraries required to run it on Linux.
+# install from locally supplied version by puppeteer,
+# along with the system libraries required to run it on Linux
 sudo apt-get update
 sudo env "PATH=$PATH" PUPPETEER_CACHE_DIR="$puppeteer_cache_dir" \
   ./node_modules/.bin/puppeteer browsers install chrome --install-deps

@@ -23,7 +23,7 @@ jobs:
       - name: Installing project dependencies
         run: |
           yarn install --frozen-lockfile --network-timeout 1000000
-      - name: Install Puppeteer Browser
+      - name: Install Chrome from Puppeteer
         # manually install chrome binary
         run: |
           npx puppeteer browsers install chrome

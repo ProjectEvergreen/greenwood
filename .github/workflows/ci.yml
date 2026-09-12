@@ -23,7 +23,7 @@ jobs:
       - name: Installing project dependencies
         run: |
           yarn install --frozen-lockfile
-      - name: Install Puppeteer Browser and System Dependencies
+      - name: Install Chrome from Puppeteer
         run: |
           bash ./.github/workflows/chromium-lib-install.sh
       - name: Lint
