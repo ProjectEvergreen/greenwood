@@ -1,12 +1,10 @@
 // https://github.com/puppeteer/puppeteer/issues/10388#issuecomment-2323077561
-const { join } = require("node:path");
-
-const cacheDir = join(__dirname, ".cache", "puppeteer");
+const cacheDir = new URL("./cache/puppeteer", import.meta.url);
 
 /**
  * @type {import("puppeteer").Configuration}
  */
-module.exports = {
+export default {
   // Changes the cache location for Puppeteer.
-  cacheDirectory: process.env.CI ? cacheDir : undefined,
+  cacheDirectory: process.env.CI ? cacheDir.pathname : undefined,
 };
