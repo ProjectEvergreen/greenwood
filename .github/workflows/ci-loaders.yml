@@ -12,9 +12,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
-      - name: Install Chromium Library Dependencies
-        run: |
-          sh ./.github/workflows/chromium-lib-install.sh
       - name: Use Node.js ${{ matrix.node }}
         uses: actions/setup-node@v6
         with:
@@ -26,10 +23,9 @@ jobs:
       - name: Installing project dependencies
         run: |
           yarn install --frozen-lockfile
-        # use path installed by chromium-lib-install.sh
-        env:
-          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true"
-          PUPPETEER_EXECUTABLE_PATH: "/usr/bin/google-chrome-unstable"
+      - name: Install Puppeteer Browser and System Dependencies
+        run: |
+          bash ./.github/workflows/chromium-lib-install.sh
       - name: Test
         run: |
           yarn test:loaders

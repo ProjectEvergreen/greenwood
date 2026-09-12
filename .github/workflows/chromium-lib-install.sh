@@ -1,10 +1,12 @@
 #!/usr/bin/bash
 
-sudo apt-get update \
-  && sudo apt-get install -y wget --no-install-recommends \
-  && sudo wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add - \
-  && sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
-  && sudo apt-get update \
-  && sudo apt-get install -y google-chrome-unstable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf \
-      --no-install-recommends \
-  && sudo rm -rf /var/lib/apt/lists/*
+set -euo pipefail
+
+puppeteer_cache_dir="$(pwd)/.cache/puppeteer"
+
+# Install the Chrome for Testing revision declared by the repo's Puppeteer dependency,
+# along with the system libraries required to run it on Linux.
+sudo apt-get update
+sudo env "PATH=$PATH" PUPPETEER_CACHE_DIR="$puppeteer_cache_dir" \
+  ./node_modules/.bin/puppeteer browsers install chrome --install-deps
+sudo chown -R "$(id -u):$(id -g)" "$puppeteer_cache_dir"
