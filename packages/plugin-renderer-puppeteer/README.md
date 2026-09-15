@@ -39,6 +39,24 @@ export default {
 
 Now, when running `greenwood build`, all your pages will get run through Puppeteer and any JavaScript / Web Components that you author will get a one time pass execution and the resulting HTML generated from that process will be captured and further optimized through Greenwood's build pipeline.
 
+### Prerender Concurrency
+
+By default, Greenwood derives the number of pages to generate concurrently from the parallelism available to the runtime.However, as Puppeteer opens a browser page for every route being rendered, in constrained environments such as CI or on lower powered machines, this can lead to instability or even crashes of the Greenwood build process.  To mitigate / fine-tune this, you can override this with the [`concurrency` configuration option](https://greenwoodjs.dev/docs/reference/configuration/#concurrency). 
+
+For example, to generate one page at a time:
+
+```javascript
+import { greenwoodPluginRendererPuppeteer } from '@greenwood/plugin-renderer-puppeteer';
+
+export default {
+  prerender: true,
+  concurrency: 1,
+  plugins: [
+    greenwoodPluginRendererPuppeteer()
+  ]
+}
+```
+
 ## Types
 
 Types should automatically be inferred through this package's exports map, but can be referenced explicitly in both JavaScript (JSDoc) and TypeScript files if needed.

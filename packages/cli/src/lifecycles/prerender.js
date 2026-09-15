@@ -4,9 +4,8 @@ import {
   trackResourcesForRoute,
   mergeResponse,
 } from "../lib/resource-utils.js";
-import os from "node:os";
 import { WorkerPool } from "../lib/threadpool.js";
-import { asyncForEach } from "../lib/async-utils.js";
+import { runWithConcurrency } from "../lib/async-utils.js";
 import { getStaticPages } from "../lib/graph-utils.js";
 import {
   getParamsFromSegment,
@@ -81,12 +80,12 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
   console.info("pages to generate", `\n ${pages.map((page) => page.route).join("\n ")}`);
 
   const pool = new WorkerPool(
-    os.cpus().length,
+    config.concurrency,
     new URL("../lib/ssr-route-worker.js", import.meta.url),
   );
 
   // we could try and refactor / consolidate here some of the duplicate logic
-  await asyncForEach(pages, async (page) => {
+  await runWithConcurrency(pages, config.concurrency, async (page) => {
     if (page.staticPaths) {
       for (const staticPath of page.staticPaths) {
         const { route, outputHref, segment } = page;
@@ -273,7 +272,7 @@ async function staticRenderCompilation(compilation) {
 
   console.info("pages to generate", `\n ${pages.map((page) => page.route).join("\n ")}`);
 
-  await asyncForEach(pages, async (page) => {
+  await runWithConcurrency(pages, config.concurrency, async (page) => {
     const { route, outputHref } = page;
     const scratchUrl = toScratchUrl(outputHref, context);
     const url = new URL(`http://localhost:${config.port}${route}`);
