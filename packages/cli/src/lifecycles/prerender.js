@@ -254,9 +254,6 @@ async function preRenderCompilationCustom(compilation, customPrerender) {
       body = body.replace(/<script type="importmap">.*?<\/script>/s, "");
     }
 
-    // clean this up to avoid sending webcomponents-bundle to rollup
-    body = body.replace(/<script src="(.*webcomponents-bundle.js)"><\/script>/, "");
-
     await trackResourcesForRoute(body, compilation, route);
     await createOutputDirectory(new URL(scratchUrl.href.replace("index.html", "")));
     await fs.writeFile(scratchUrl, body);
