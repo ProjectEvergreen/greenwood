@@ -1,11 +1,11 @@
-import { asyncMap } from "../../cli/src/lib/async-utils.js";
+import { runWithConcurrency } from "../../cli/src/lib/async-utils.js";
 
 export default async function (compilation, callback) {
   const BrowserRunner = (await import("./lib/browser.js")).BrowserRunner;
   const browserRunner = new BrowserRunner();
 
   const runBrowser = async (serverUrl, pages) => {
-    return asyncMap(pages, async (page) => {
+    return runWithConcurrency(pages, compilation.config.concurrency, async (page) => {
       const { route } = page;
       console.info("prerendering page...", route);
 

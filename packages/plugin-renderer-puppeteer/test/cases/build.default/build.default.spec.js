@@ -10,6 +10,8 @@
  *
  * User Config
  * {
+ *   prerender: true,
+ *   concurrency: 1,
  *   plugins: [
  *     ...greenwoodPluginRendererPuppeteer()
  *   ]

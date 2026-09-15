@@ -13,6 +13,7 @@ export default {
   staticRouter: true,
   activeContent: true,
   prerender: true,
+  concurrency: 1,
   plugins: [
     greenwoodPluginMarkdown({
       plugins: ["@mapbox/rehype-prism", "rehype-slug", "rehype-autolink-headings", "remark-github"],
