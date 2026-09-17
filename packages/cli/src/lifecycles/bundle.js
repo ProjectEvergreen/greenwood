@@ -16,7 +16,7 @@ import {
 import path from "node:path";
 import { rollup } from "rollup";
 import { pruneGraph } from "../lib/content-utils.js";
-import { asyncForEach } from "../lib/async-utils.js";
+import { asyncForEach, runWithConcurrency } from "../lib/async-utils.js";
 import { getDynamicPages, getStaticPages } from "../lib/graph-utils.js";
 import { getStaticRouteFromDynamicRoute, getOutputHrefForStaticPath } from "../lib/url-utils.js";
 
@@ -120,7 +120,7 @@ async function optimizeStaticPages(compilation, plugins) {
   const { scratchDir, outputDir } = compilation.context;
   const pages = getStaticPages(compilation);
 
-  await asyncForEach(pages, async (page) => {
+  await runWithConcurrency(pages, compilation.config.concurrency, async (page) => {
     const { outputHref, route, segment, staticPaths } = page;
 
     if (staticPaths) {
@@ -313,7 +313,7 @@ async function bundleApiRoutes(compilation) {
 
   if (apiConfigs.length > 0 && apiConfigs[0].input.length !== 0) {
     console.info("bundling API routes...");
-    await asyncForEach(apiConfigs, async (rollupConfig) => {
+    await runWithConcurrency(apiConfigs, compilation.config.concurrency, async (rollupConfig) => {
       const bundle = await rollup(rollupConfig);
       await bundle.write(rollupConfig.output);
     });
@@ -338,7 +338,7 @@ async function bundleSsrPages(compilation, optimizePlugins) {
     // one pass to generate initial static HTML and to track all combined static resources across layouts
     // and before we optimize so that all bundled assets can tracked up front
     // would be nice to see if this can be done in a single pass though...
-    await asyncForEach(ssrPages, async (page) => {
+    await runWithConcurrency(ssrPages, config.concurrency, async (page) => {
       const { route } = page;
       let staticHtml = `<output for="content"></output>`;
 
@@ -366,7 +366,7 @@ async function bundleSsrPages(compilation, optimizePlugins) {
     await bundleStyleResources(compilation, optimizePlugins);
 
     // second pass to link all bundled assets to their resources before optimizing and generating SSR bundles
-    await asyncForEach(ssrPages, async (page) => {
+    await runWithConcurrency(ssrPages, config.concurrency, async (page) => {
       const { id, route, pageHref } = page;
       const pagePath = new URL(pageHref).pathname.replace(pagesDir.pathname, "./");
       const entryFileUrl = new URL(pageHref);
@@ -440,7 +440,7 @@ async function bundleSsrPages(compilation, optimizePlugins) {
 
     if (ssrConfigs.length > 0 && ssrConfigs[0].input !== "") {
       console.info("bundling dynamic pages...");
-      await asyncForEach(ssrConfigs, async (rollupConfig) => {
+      await runWithConcurrency(ssrConfigs, config.concurrency, async (rollupConfig) => {
         const bundle = await rollup(rollupConfig);
         await bundle.write(rollupConfig.output);
       });
