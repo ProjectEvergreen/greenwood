@@ -1,5 +1,6 @@
 // @ts-nocheck
 import fs from "node:fs/promises";
+import os from "node:os";
 import { checkResourceExists } from "../lib/resource-utils.js";
 import { asyncMap } from "../lib/async-utils.js";
 
@@ -77,6 +78,7 @@ const defaultConfig = {
   },
   port: 8080,
   prerender: false,
+  concurrency: os.availableParallelism(),
   useTsc: false,
   workspace: new URL("./src/", cwd),
 };
@@ -112,6 +114,7 @@ const readAndMergeConfig = async () => {
       plugins,
       port,
       prerender,
+      concurrency,
       basePath,
       staticRouter,
       pagesDirectory,
@@ -280,6 +283,16 @@ const readAndMergeConfig = async () => {
       } else {
         return Promise.reject(
           `Configuration error: prerender must be a boolean; true or false.  Passed value was typeof: ${typeof prerender}`,
+        );
+      }
+    }
+
+    if (concurrency !== undefined) {
+      if (Number.isInteger(concurrency) && concurrency > 0) {
+        customConfig.concurrency = concurrency;
+      } else {
+        return Promise.reject(
+          `Configuration error: concurrency must be an integer greater than zero.  Passed value was: ${concurrency}`,
         );
       }
     }

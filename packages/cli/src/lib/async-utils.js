@@ -30,4 +30,31 @@ async function asyncForEach(items, callback) {
   await asyncMap(items, callback);
 }
 
-export { asyncFilter, asyncMap, asyncForEach };
+async function runWithConcurrency(items, concurrency, callback) {
+  let nextItemIndex = 0;
+  let failure;
+
+  const runNext = async () => {
+    while (nextItemIndex < items.length && !failure) {
+      const item = items[nextItemIndex];
+
+      nextItemIndex += 1;
+
+      try {
+        await callback(item);
+      } catch (error) {
+        failure = { error };
+      }
+    }
+  };
+
+  const workerCount = Math.min(concurrency, items.length);
+
+  await Promise.all(Array.from({ length: workerCount }, runNext));
+
+  if (failure) {
+    throw failure.error;
+  }
+}
+
+export { asyncFilter, asyncMap, asyncForEach, runWithConcurrency };
