@@ -47,8 +47,8 @@ describe("Serve Greenwood With: ", function () {
       const htmlFiles = await Array.fromAsync(fs.glob("*/index.html", { cwd: publicDir }));
 
       expect(htmlFiles).to.have.members([
-        "prerender-static-export/index.html",
-        "static-export/index.html",
+        path.join("prerender-static-export", "index.html"),
+        path.join("static-export", "index.html"),
       ]);
     });
 
