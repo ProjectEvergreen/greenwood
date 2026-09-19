@@ -52,7 +52,6 @@
     "@eslint/json": "^0.8.0",
     "@eslint/markdown": "^6.2.0",
     "@ls-lint/ls-lint": "^1.10.0",
-    "@rollup/wasm-node": "4.62.3",
     "@types/mocha": "^10.0.10",
     "@types/node": "^22.13.1",
     "c8": "^12.0.0",

@@ -108,6 +108,11 @@ describe("Initialize a new Greenwood project: ", function () {
 
         expect(pkgJson.devDependencies["@greenwood/cli"]).to.equal(`~${scriptPkg.version}`);
       });
+
+      // https://github.com/ProjectEvergreen/greenwood/discussions/1810
+      it("should not install @rollup/wasm-node", function () {
+        expect(pkgJson.devDependencies).not.to.have.property("@rollup/wasm-node");
+      });
     });
 
     describe("home page contents", function () {

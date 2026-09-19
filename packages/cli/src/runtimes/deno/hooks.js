@@ -2,12 +2,18 @@
 
 const denoLoaderHooks = {
   resolve(specifier, context, nextResolve) {
-    // Work around the native-addon half of the same Deno loader-hooks issue.
-    // Rollup's native `.node` binding is otherwise compiled as JavaScript.
-    // https://github.com/denoland/deno/pull/36243
-    // TODO: need to figure out how to manage this dependency
+    // Work around for Deno .node binding resolution issue with rollup
+    // https://github.com/ProjectEvergreen/greenwood/discussions/1810
     if (specifier === "rollup") {
-      return nextResolve("npm:@rollup/wasm-node@4.62.3", context);
+      try {
+        return nextResolve("@rollup/wasm-node", context);
+      } catch (error) {
+        throw new Error(
+          "Greenwood's Deno runtime requires @rollup/wasm-node. " +
+            "Install it with `deno add --dev npm:@rollup/wasm-node@^4.59.0`.",
+          { cause: error },
+        );
+      }
     }
 
     const resolution = nextResolve(specifier, context);

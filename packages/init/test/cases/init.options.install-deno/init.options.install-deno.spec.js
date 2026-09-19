@@ -75,6 +75,14 @@ describe("Initialize a new Greenwood project: ", function () {
         ]);
       });
 
+      // https://github.com/ProjectEvergreen/greenwood/discussions/1810
+      it("should install @rollup/wasm-node", function () {
+        const packageJsonPath = path.join(initOutputPath, "package.json");
+        const packageJsonContents = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
+
+        expect(packageJsonContents.devDependencies["@rollup/wasm-node"]).to.equal("^4.59.0");
+      });
+
       it("should not generate a .npmrc file", function () {
         const npmrcPath = path.join(initOutputPath, ".npmrc");
 

@@ -21,7 +21,7 @@ function copyTemplate(templateDirUrl, outputDirUrl) {
   });
 }
 
-function setupPackageJson(outputDirUrl, { name, version }) {
+function setupPackageJson(outputDirUrl, { name, version, packageManager }) {
   console.log("setting up package.json...");
 
   const packageJsonOutputUrl = new URL("./package.json", outputDirUrl);
@@ -37,6 +37,9 @@ function setupPackageJson(outputDirUrl, { name, version }) {
   // add / merge Greenwood dependencies (first)
   json.devDependencies = {
     "@greenwood/cli": `~${version}`,
+    // pre-install @rollup/wasm-node for Deno users
+    // https://github.com/ProjectEvergreen/greenwood/discussions/1810
+    ...(packageManager === "deno" ? { "@rollup/wasm-node": "^4.59.0" } : {}),
     ...(pkgJson.devDependencies ?? {}),
   };
 

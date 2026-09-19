@@ -152,6 +152,7 @@ async function init() {
     setupPackageJson(outputDirUrl, {
       name: appName,
       version,
+      packageManager,
     });
 
     // configure .gitignore file contents
