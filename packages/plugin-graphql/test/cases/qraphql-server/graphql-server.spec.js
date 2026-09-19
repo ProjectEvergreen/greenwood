@@ -40,7 +40,11 @@ describe("Develop Greenwood With: ", function () {
           .runCommand(cliPath, "develop", {
             onStdOut: (message) => {
               // here we are waiting for the _GraphQL_ server to be started
-              if (message.includes(`GraphQLServer started at http://${hostname}:${port}/`)) {
+              // ignore hostname and port as they can be different in CI vs local dev, e.g. `localhost` vs `0.0.0.0`
+              if (
+                message.includes("GraphQLServer started at http://") &&
+                message.includes(`:${port}/`)
+              ) {
                 resolve();
               }
             },
