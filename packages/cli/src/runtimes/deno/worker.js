@@ -4,13 +4,15 @@ import { startLoaderWorker } from "../worker.js";
 import { denoLoaderHooks } from "./hooks.js";
 
 const loaderReady = (() => {
-  // This worker does not inherit the hooks registered by register.js, so apply
-  // Deno compatibility before initializing the Greenwood loader engine.
+  // Loader hooks are scoped to each worker isolate, so apply Deno compatibility in this worker
+  // before initializing the Greenwood loader engine.
+  // https://github.com/ProjectEvergreen/greenwood/discussions/1810
   module.registerHooks(denoLoaderHooks);
 
   return getLoaderHooks();
 })();
 
-// Deno can drop messages sent before a worker attaches its listener, so start
-// the protocol synchronously while loader initialization continues separately.
+// Deno 2.9.7 drops messages sent before a node:worker_threads listener is attached, so start the
+// protocol synchronously while loader initialization continues separately.
+// https://github.com/ProjectEvergreen/greenwood/discussions/1810
 startLoaderWorker(loaderReady);

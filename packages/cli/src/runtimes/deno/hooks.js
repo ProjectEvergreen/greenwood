@@ -1,8 +1,6 @@
-/* global Deno */
-
 const denoLoaderHooks = {
   resolve(specifier, context, nextResolve) {
-    // Work around for Deno .node binding resolution issue with rollup
+    // Deno compiles Rollup's native `.node` binding as JavaScript when a load hook is registered.
     // https://github.com/ProjectEvergreen/greenwood/discussions/1810
     if (specifier === "rollup") {
       try {
@@ -16,44 +14,13 @@ const denoLoaderHooks = {
       }
     }
 
-    const resolution = nextResolve(specifier, context);
-    const resolvedUrl = new URL(resolution.url);
-    const isLegacyEsmJson =
-      resolvedUrl.pathname.endsWith(".json") &&
-      context.conditions.includes("import") &&
-      context.importAttributes.type !== "json";
-
-    // Older registerHooks() implementations lose JSON import attributes and
-    // otherwise compile the JSON source as JavaScript.
-    if (isLegacyEsmJson) {
-      return {
-        ...resolution,
-        format: "module",
-      };
-    }
-
-    return resolution;
+    return nextResolve(specifier, context);
   },
 
   load(url, context, nextLoad) {
-    const moduleUrl = new URL(url);
-
-    if (
-      moduleUrl.pathname.endsWith(".json") &&
-      context.conditions.includes("import") &&
-      context.importAttributes.type !== "json"
-    ) {
-      const contents = Deno.readTextFileSync(moduleUrl);
-
-      return {
-        format: "module",
-        source: `export default JSON.parse(${JSON.stringify(contents)});`,
-        shortCircuit: true,
-      };
-    }
-
-    // Deno's default hook currently leaves the format undefined for JSON loaded
-    // through CommonJS require(), which gives the JSON value the wrong shape.
+    // Deno leaves the format undefined for CommonJS loader hooks, causing JSON source to be
+    // compiled as JavaScript instead of passing through the registered JSON extension handler.
+    // https://github.com/ProjectEvergreen/greenwood/discussions/1810
     if (url.endsWith(".json") && context.conditions.includes("require")) {
       return {
         ...nextLoad(url, context),
