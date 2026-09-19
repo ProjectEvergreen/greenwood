@@ -64,7 +64,8 @@ function installDependencies(outputDirUrl, packageManager) {
   console.log(`installing dependencies using => ${packageManager}...`);
 
   const isWindows = os.platform() === "win32";
-  const args = ["install", "--loglevel", "error"];
+  const options = packageManager === "deno" ? [] : ["--loglevel", "error"];
+  const args = ["install", ...options];
   const spawnOptions = { stdio: "inherit", cwd: outputDirUrl };
   let npmrcContents = "";
 
@@ -101,4 +102,16 @@ function installDependencies(outputDirUrl, packageManager) {
   }
 }
 
-export { copyTemplate, installDependencies, setupPackageJson, setupGitIgnore };
+function setupDenoConfig(outputDirUrl) {
+  console.log("creating a deno.jsonc file...");
+
+  const denoConfigOutputUrl = new URL("./deno.jsonc", outputDirUrl);
+  const denoConfig = {
+    preferPackageJson: true,
+    exclude: [".deno-deploy/", ".greenwood/", "public/"],
+  };
+
+  fs.writeFileSync(denoConfigOutputUrl, JSON.stringify(denoConfig, null, 2));
+}
+
+export { copyTemplate, installDependencies, setupPackageJson, setupGitIgnore, setupDenoConfig };

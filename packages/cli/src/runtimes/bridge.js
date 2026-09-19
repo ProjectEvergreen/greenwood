@@ -3,6 +3,9 @@
 import { MessageChannel, receiveMessageOnPort, Worker } from "node:worker_threads";
 
 const DEFAULT_TIMEOUT = 30_000;
+// Carries the fact that Greenwood claimed a bare specifier from resolve() into load(). The marker
+// is internal to the bridge and is removed before the URL reaches Greenwood's resource plugins.
+const HANDLED_RESOLUTION_PARAM = "__greenwood";
 const FALLBACK_LOAD_ERROR_CODES = new Set([
   "ERR_IMPORT_ATTRIBUTE_MISSING",
   "ERR_IMPORT_ATTRIBUTE_UNSUPPORTED",
@@ -11,6 +14,17 @@ const FALLBACK_LOAD_ERROR_CODES = new Set([
 
 function hasCondition(context, condition) {
   return context.conditions?.includes?.(condition) ?? context.conditions?.has?.(condition) ?? false;
+}
+
+// Node identifies unsupported loader inputs with stable error codes, while Deno reports an
+// untagged TypeError for unsupported import attributes. Recognize both forms so Greenwood's
+// resource pipeline gets the same opportunity to transform the input in either runtime.
+function isFallbackLoadError(error) {
+  return (
+    FALLBACK_LOAD_ERROR_CODES.has(error.code) ||
+    (error.name === "TypeError" &&
+      /^The import attribute type of ".+" is unsupported\./.test(error.message))
+  );
 }
 
 function deserializeError(serializedError) {
@@ -77,24 +91,50 @@ function initializeSyncWorkerBridge(workerUrl, options = {}) {
       }
 
       const { parentURL } = context;
-      const url = specifier.startsWith("file://")
+      let resolution;
+      let url = specifier.startsWith("file://")
         ? new URL(specifier)
         : specifier.startsWith(".") && parentURL
           ? new URL(specifier, parentURL)
           : undefined;
+
+      // File and relative specifiers can be checked directly, but bare package specifiers must
+      // first go through the runtime resolver before Greenwood can inspect their resolved file URL.
+      if (!url && options.resolveBareSpecifiers) {
+        resolution = nextResolve(specifier, context);
+
+        if (resolution.url?.startsWith("file://")) {
+          url = new URL(resolution.url);
+        }
+      }
+
       const shouldDispatch = url && (options.shouldResolve?.(url, context) ?? true);
 
       if (shouldDispatch && bridge.dispatch("resolve", url.href).shouldHandle) {
+        // Preserve the resolved package metadata while marking the URL as owned by Greenwood. Some
+        // runtimes otherwise validate the resolved file type before invoking Greenwood's load hook.
+        if (resolution && options.markHandledResolutions) {
+          url.searchParams.set(HANDLED_RESOLUTION_PARAM, "");
+        }
+
         return {
+          ...resolution,
           url: url.href,
           shortCircuit: true,
         };
       }
 
-      return nextResolve(specifier, context);
+      return resolution ?? nextResolve(specifier, context);
     },
     load(url, context, nextLoad) {
       const moduleUrl = new URL(url);
+      const loaderUrl = new URL(moduleUrl);
+      const isHandledResolution = loaderUrl.searchParams.has(HANDLED_RESOLUTION_PARAM);
+      let downstreamResult;
+
+      // Downstream hooks still receive the module's marked identity, while Greenwood reads and
+      // transforms the original URL so query metadata never leaks into resource handling.
+      loaderUrl.searchParams.delete(HANDLED_RESOLUTION_PARAM);
 
       // delegate node internals the loader system
       if (moduleUrl.protocol === "node:") {
@@ -111,12 +151,19 @@ function initializeSyncWorkerBridge(workerUrl, options = {}) {
 
       // Synchronous hooks always run before asynchronous hooks. Give a downstream hook (such as
       // Lit's CSS import hook) the first chance to handle explicit import attributes, preserving
-      // the effective LIFO behavior Greenwood had when all hooks were asynchronous.
-      if (Object.keys(context.importAttributes ?? {}).length > 0) {
+      // the effective LIFO behavior Greenwood had when all hooks were asynchronous. A marked
+      // resolution has already been claimed by Greenwood and must skip runtime validation here.
+      if (!isHandledResolution && Object.keys(context.importAttributes ?? {}).length > 0) {
         try {
-          return nextLoad(url, context);
+          downstreamResult = nextLoad(url, context);
+
+          // Deno returns unhandled resources with their raw source and no format. Continue through
+          // Greenwood's resource pipeline so files such as CSS are transformed into modules.
+          if (downstreamResult.format) {
+            return downstreamResult;
+          }
         } catch (error) {
-          if (!FALLBACK_LOAD_ERROR_CODES.has(error.code)) {
+          if (!isFallbackLoadError(error)) {
             throw error;
           }
         }
@@ -126,9 +173,9 @@ function initializeSyncWorkerBridge(workerUrl, options = {}) {
         return nextLoad(url, context);
       }
 
-      const result = bridge.dispatch("load", url);
+      const result = bridge.dispatch("load", loaderUrl.href);
 
-      return result ?? nextLoad(url, context);
+      return result ?? downstreamResult ?? nextLoad(url, context);
     },
   };
 }

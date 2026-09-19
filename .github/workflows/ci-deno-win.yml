@@ -1,0 +1,39 @@
+name: Continuous Integration Windows (Deno)
+
+on: [pull_request]
+
+jobs:
+  deno:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: yarn
+
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+          cache-hash: ${{ hashFiles('yarn.lock') }}
+
+      - uses: pnpm/action-setup@v6
+        name: Install pnpm
+        with:
+          version: latest
+
+      - name: Installing project dependencies
+        run: yarn install --frozen-lockfile --network-timeout 1000000
+
+      - name: Install Chrome from Puppeteer
+        run: npx puppeteer browsers install chrome
+
+      - name: Test
+        run: deno task test:deno
+
+      - name: Build
+        working-directory: www
+        run: deno run -A --import ../packages/cli/src/runtimes/deno/register.js ../packages/cli/src/bin.js build
