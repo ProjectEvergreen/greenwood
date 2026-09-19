@@ -8,4 +8,4 @@ export default class ContactPage extends HTMLElement {
   }
 }
 
-export const prerender = true;
+export const staticExport = true;

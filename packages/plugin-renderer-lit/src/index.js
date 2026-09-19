@@ -1,4 +1,4 @@
-import { getMatchingPageByRoute } from "@greenwood/cli/src/lib/graph-utils.js";
+import { getMatchingPageByRoute, shouldPrerender } from "@greenwood/cli/src/lib/graph-utils.js";
 
 class LitHydrationResource {
   constructor(compilation, options) {
@@ -17,7 +17,8 @@ class LitHydrationResource {
 
     return (
       matchingRoute &&
-      ((matchingRoute.isSSR && matchingRoute.hydration) || this.compilation.config.prerender)
+      ((matchingRoute.isSSR && matchingRoute.hydration) ||
+        shouldPrerender(matchingRoute, this.compilation.config))
     );
   }
 

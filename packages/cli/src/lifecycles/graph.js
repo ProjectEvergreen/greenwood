@@ -57,6 +57,16 @@ function trackCollectionsForPage(page, collections) {
   }
 }
 
+function getBooleanPageOption(name, ...values) {
+  const value = values.find((val) => val !== undefined && val !== null);
+
+  if (value !== undefined && value !== null && typeof value !== "boolean") {
+    throw new Error(`Page option "${name}" must be a boolean; true or false.`);
+  }
+
+  return value ?? null;
+}
+
 const generateGraph = async (compilation) => {
   const { context, config } = compilation;
   const { basePath } = config;
@@ -148,7 +158,8 @@ const generateGraph = async (compilation) => {
           let label = getLabelFromRoute(`${route}/`);
           let imports = [];
           let customData = {};
-          let prerender = isStatic === true ? true : null;
+          let prerender = null;
+          let staticExport = null;
           let isolation = false;
           let hydration = false;
           let staticPaths = null;
@@ -188,6 +199,8 @@ const generateGraph = async (compilation) => {
             title = attributes.title || title;
             label = attributes.label || label;
             imports = attributes.imports || [];
+            prerender = getBooleanPageOption("prerender", attributes.prerender);
+            staticExport = getBooleanPageOption("staticExport", attributes.staticExport);
 
             customData = attributes;
           } else if (isDynamic) {
@@ -201,25 +214,37 @@ const generateGraph = async (compilation) => {
               const worker = new Worker(new URL("../lib/ssr-route-worker.js", import.meta.url));
 
               worker.on("message", (result) => {
-                prerender =
-                  result.prerender === true || result.prerender === false ? result.prerender : null;
-                isolation = result.isolation ?? isolation;
-                hydration = result.hydration ?? hydration;
+                try {
+                  prerender = getBooleanPageOption(
+                    "prerender",
+                    result.prerender,
+                    result.frontmatter?.prerender,
+                  );
+                  staticExport = getBooleanPageOption(
+                    "staticExport",
+                    result.staticExport,
+                    result.frontmatter?.staticExport,
+                  );
+                  isolation = result.isolation ?? isolation;
+                  hydration = result.hydration ?? hydration;
 
-                if (result.frontmatter) {
-                  result.frontmatter.imports = result.frontmatter.imports || [];
-                  ssrFrontmatter = result.frontmatter;
+                  if (result.frontmatter) {
+                    result.frontmatter.imports = result.frontmatter.imports || [];
+                    ssrFrontmatter = result.frontmatter;
+                  }
+
+                  if (result.staticPaths) {
+                    staticPaths = result.staticPaths;
+                  }
+
+                  if (result.hasStaticParams) {
+                    hasStaticParams = result.hasStaticParams;
+                  }
+
+                  resolve();
+                } catch (error) {
+                  reject(error);
                 }
-
-                if (result.staticPaths) {
-                  staticPaths = result.staticPaths;
-                }
-
-                if (result.hasStaticParams) {
-                  hasStaticParams = result.hasStaticParams;
-                }
-
-                resolve();
               });
               worker.on("error", reject);
               worker.on("exit", (code) => {
@@ -256,7 +281,7 @@ const generateGraph = async (compilation) => {
           }
 
           // prune "reserved" frontmatter that are supported by Greenwood
-          [...activeFrontmatterKeys, "layout"].forEach((key) => {
+          [...activeFrontmatterKeys, "layout", "prerender", "staticExport"].forEach((key) => {
             delete customData[key];
           });
 
@@ -274,7 +299,8 @@ const generateGraph = async (compilation) => {
            * outputHref: href to the file in the output folder
            * pageHref: href to the page's filesystem file
            * isSSR: if this is a server side route
-           * prerender: if this page should be statically exported
+           * prerender: if this page should execute browser JavaScript at build time
+           * staticExport: if this SSR page should be emitted as static HTML
            * isolation: if this page should be run in isolated mode
            * hydration: if this page needs hydration support
            * servePage: signal that this is a custom page file type (static | dynamic)
@@ -301,6 +327,7 @@ const generateGraph = async (compilation) => {
                 : new URL(`.${route}index.html`, outputDir).href,
             isSSR: isDynamic,
             prerender,
+            staticExport,
             isolation,
             hydration,
             servePage: isCustom ? isCustom : isDynamic ? "dynamic" : "static",
@@ -336,7 +363,8 @@ const generateGraph = async (compilation) => {
       data: {},
       imports: [],
       resources: [],
-      prerender: false,
+      prerender: null,
+      staticExport: false,
       isolation: false,
       pageHref: new URL("./index.html", userWorkspace).href,
       isSPA: true,

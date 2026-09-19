@@ -80,6 +80,6 @@ async function getFrontmatter() {
   };
 }
 
-export const prerender = true;
+export const staticExport = true;
 
 export { getLayout, getBody, getFrontmatter };

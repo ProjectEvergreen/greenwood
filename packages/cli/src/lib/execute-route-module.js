@@ -18,6 +18,7 @@ async function executeRouteModule({
     html: null,
     staticPaths: null,
     hasStaticParams: null,
+    staticExport: null,
   };
 
   if (prerender) {
@@ -30,6 +31,7 @@ async function executeRouteModule({
     const { body, layout, frontmatter, statics } = contentOptions;
     const {
       prerender = null,
+      staticExport = null,
       getLayout = null,
       getBody = null,
       getFrontmatter = null,
@@ -102,6 +104,7 @@ async function executeRouteModule({
     }
 
     data.prerender = prerender;
+    data.staticExport = staticExport;
     data.isolation = isolation;
   }
 
