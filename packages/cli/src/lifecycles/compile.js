@@ -1,4 +1,4 @@
-import { checkResourceExists } from "../lib/resource-utils.js";
+import { checkResourceExists, mapJsonReplacer, mapJsonReviver } from "../lib/resource-utils.js";
 import { generateGraph } from "./graph.js";
 import { initContext } from "./context.js";
 import { readAndMergeConfig } from "./config.js";
@@ -67,18 +67,10 @@ const generateCompilation = async () => {
 
     if (await checkResourceExists(new URL("./manifest.json", outputDir))) {
       console.info("Loading manifest from build output...");
-      // TODO put reviver into a utility?
       const manifest = JSON.parse(
         // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
         await fs.readFile(new URL("./manifest.json", outputDir)),
-        function reviver(key, value) {
-          if (typeof value === "object" && value !== null) {
-            if (value.dataType === "Map") {
-              return new Map(value.value);
-            }
-          }
-          return value;
-        },
+        mapJsonReviver,
       );
 
       compilation.manifest = manifest;
@@ -113,19 +105,9 @@ const generateCompilation = async () => {
     compilation = await generateGraph(compilation);
 
     // https://stackoverflow.com/a/56150320/417806
-    // TODO put reviver into a util?
     await fs.writeFile(
       new URL("./manifest.json", scratchDir),
-      JSON.stringify(compilation.manifest, (key, value) => {
-        if (value instanceof Map) {
-          return {
-            dataType: "Map",
-            value: [...value],
-          };
-        } else {
-          return value;
-        }
-      }),
+      JSON.stringify(compilation.manifest, mapJsonReplacer),
     );
 
     await fs.writeFile(new URL("./graph.json", scratchDir), JSON.stringify(compilation.graph));

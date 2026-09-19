@@ -3,12 +3,15 @@ import fs from "node:fs/promises";
 import {
   getRollupConfigForApiRoutes,
   getRollupConfigForBrowserScripts,
+  getRollupConfigForSitemap,
   getRollupConfigForSsrPages,
 } from "../config/rollup.config.js";
 import { getAppLayout, getPageLayout, getGreenwoodScripts } from "../lib/layout-utils.js";
 import { hashString } from "../lib/hashing-utils.js";
 import {
   checkResourceExists,
+  mapJsonReplacer,
+  mapJsonReviver,
   mergeResponse,
   normalizePathnameForWindows,
   trackResourcesForRoute,
@@ -72,30 +75,12 @@ async function emitResources(compilation) {
   // https://stackoverflow.com/a/56150320/417806
   await fs.writeFile(
     new URL("./resources.json", outputDir),
-    JSON.stringify(resources, (key, value) => {
-      if (value instanceof Map) {
-        return {
-          dataType: "Map",
-          value: [...value],
-        };
-      } else {
-        return value;
-      }
-    }),
+    JSON.stringify(resources, mapJsonReplacer),
   );
 
   await fs.writeFile(
     new URL("./manifest.json", scratchDir),
-    JSON.stringify(manifest, (key, value) => {
-      if (value instanceof Map) {
-        return {
-          dataType: "Map",
-          value: [...value],
-        };
-      } else {
-        return value;
-      }
-    }),
+    JSON.stringify(manifest, mapJsonReplacer),
   );
 
   await fs.writeFile(new URL("./graph.json", outputDir), JSON.stringify(graph));
@@ -320,6 +305,46 @@ async function bundleApiRoutes(compilation) {
   }
 }
 
+async function bundleSitemap(compilation) {
+  // a static sitemap.xml takes precedence over a dynamic module and is emitted by the copy plugin
+  if (!compilation.manifest.sitemap || compilation.manifest.sitemap.static) {
+    return;
+  }
+
+  console.info("bundling sitemap...");
+
+  const [sitemapConfig] = await getRollupConfigForSitemap(compilation);
+  const bundle = await rollup(sitemapConfig);
+  await bundle.write(sitemapConfig.output);
+
+  // execute the bundled module to also emit the sitemap as a static asset
+  const { outputDir } = compilation.context;
+  const { outputHref, pageHref, route } = compilation.manifest.sitemap;
+  const { handler } = await import(outputHref);
+
+  if (typeof handler !== "function") {
+    throw new Error(
+      `provided sitemap file => ${new URL(pageHref).pathname} does not export a handler function.`,
+    );
+  }
+
+  const response = await handler(
+    new Request(new URL(`http://localhost:${compilation.config.port}${route}`)),
+    {
+      // match the JSON serialization the sitemap handler sees when run from a worker during development
+      compilation: JSON.parse(JSON.stringify(compilation, mapJsonReplacer), mapJsonReviver),
+    },
+  );
+
+  if (!(response instanceof Response)) {
+    throw new Error(
+      `provided sitemap file => ${new URL(pageHref).pathname} handler must return a Response object.`,
+    );
+  }
+
+  await fs.writeFile(new URL("./sitemap.xml", outputDir), await response.text());
+}
+
 async function bundleSsrPages(compilation, optimizePlugins) {
   const { context, config } = compilation;
   const ssrPages = getDynamicPages(compilation);
@@ -476,6 +501,8 @@ const bundleCompilation = async (compilation) => {
   await bundleSsrPages(compilation, optimizeResourcePlugins);
   // then bundle everything else
   await Promise.all([await bundleApiRoutes(compilation), await bundleScriptResources(compilation)]);
+  // needs the final graph and must run before emitResources so the manifest tracks the bundled sitemap
+  await bundleSitemap(compilation);
 
   console.info("optimizing static pages....");
   await optimizeStaticPages(compilation, optimizeResourcePlugins);
