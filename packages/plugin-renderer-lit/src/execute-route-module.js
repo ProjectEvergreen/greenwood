@@ -24,6 +24,8 @@ async function executeRouteModule({
     hydration: false,
     staticPaths: null,
     hasStaticParams: null,
+    prerender: null,
+    staticExport: null,
   };
 
   // prerender static content
@@ -39,6 +41,8 @@ async function executeRouteModule({
     const module = await import(moduleUrl).then((module) => module);
     const { body, layout, frontmatter, statics } = contentOptions;
     const {
+      prerender = null,
+      staticExport = null,
       getLayout = null,
       getBody = null,
       getFrontmatter = null,
@@ -186,6 +190,9 @@ async function executeRouteModule({
     if (frontmatter && getFrontmatter) {
       data.frontmatter = await getFrontmatter(compilation, page);
     }
+
+    data.prerender = prerender;
+    data.staticExport = staticExport;
   }
 
   return data;

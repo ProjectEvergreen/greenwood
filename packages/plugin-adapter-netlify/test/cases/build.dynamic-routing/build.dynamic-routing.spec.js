@@ -28,7 +28,7 @@
  *     blog/
  *       [slug].js
  *     event/
- *       title.js # has prerender = true
+ *       title.js # has staticExport = true
  */
 import { expect } from "chai";
 import fs from "node:fs/promises";

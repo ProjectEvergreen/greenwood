@@ -23,6 +23,7 @@ export type Config = {
   };
   port?: number;
   prerender?: boolean;
+  staticExport?: boolean;
   concurrency?: number;
   staticRouter?: boolean;
   useTsc?: boolean;

@@ -126,6 +126,14 @@ describe("Serve Greenwood With: ", function () {
         expect(footerScript[0].type).to.be.equal("module");
       });
 
+      it("should not prerender the footer component", function () {
+        const footer = dom.window.document.querySelectorAll(
+          'app-footer template[shadowrootmode="open"]',
+        );
+
+        expect(footer.length).to.equal(0);
+      });
+
       it("should have the expected number of table rows of content", function () {
         const rows = dom.window.document.querySelectorAll("body > table tr");
 

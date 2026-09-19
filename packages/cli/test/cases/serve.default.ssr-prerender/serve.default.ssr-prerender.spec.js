@@ -3,7 +3,7 @@
  * Run Greenwood with an SSR route that is prerender using configuration.
  *
  * User Result
- * Should generate a bare bones Greenwood build for hosting a prerender SSR application.
+ * Should generate a Greenwood build with a prerendered application shell and runtime SSR content.
  *
  * User Command
  * greenwood build
@@ -65,7 +65,7 @@ describe("Serve Greenwood With: ", function () {
       });
     });
 
-    runSmokeTest(["public", "index", "serve"], LABEL);
+    runSmokeTest(["public", "serve"], LABEL);
 
     describe("Serve command that prerenders SSR pages", function () {
       let dom;
@@ -122,12 +122,18 @@ describe("Serve Greenwood With: ", function () {
           expect(links.length).to.equal(6);
         });
 
-        it("should have no bundled SSR output for the page", async function () {
-          const scriptFiles = (
-            await glob.promise(path.join(this.context.publicDir, "*.js"))
-          ).filter((file) => file.indexOf("index.js") >= 0);
+        it("should have the expected bundled SSR output for the page", async function () {
+          const scriptFiles = await glob.promise(
+            path.join(this.context.publicDir, "index.route*.js"),
+          );
 
-          expect(scriptFiles.length).to.equal(0);
+          expect(scriptFiles.length).to.equal(2);
+        });
+
+        it("should not emit static HTML for the SSR page", async function () {
+          const htmlFiles = await glob.promise(path.join(this.context.publicDir, "index.html"));
+
+          expect(htmlFiles.length).to.equal(0);
         });
 
         it("should have no _layouts/ output directory for the app", async function () {
