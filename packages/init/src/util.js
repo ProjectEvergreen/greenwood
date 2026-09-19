@@ -89,8 +89,11 @@ function installDependencies(outputDirUrl, packageManager) {
     fs.writeFileSync(new URL("./.npmrc", outputDirUrl), npmrcContents);
   }
 
+  // Deno's native Windows install is an executable, while the rest use cmd shims
+  // https://docs.deno.com/runtime/getting_started/installation/#manual-download
+  const windowsCommand = packageManager === "deno" ? packageManager : `${packageManager}.cmd`;
   const result = isWindows
-    ? spawnSync(`${packageManager}.cmd ${args.join(" ")}`, { ...spawnOptions, shell: true })
+    ? spawnSync(`${windowsCommand} ${args.join(" ")}`, { ...spawnOptions, shell: true })
     : spawnSync(packageManager, args, spawnOptions);
 
   if (result.error) {
