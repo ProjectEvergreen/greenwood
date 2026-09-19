@@ -78,6 +78,7 @@ const defaultConfig = {
   },
   port: 8080,
   prerender: false,
+  staticExport: false,
   concurrency: os.availableParallelism(),
   useTsc: false,
   workspace: new URL("./src/", cwd),
@@ -114,6 +115,7 @@ const readAndMergeConfig = async () => {
       plugins,
       port,
       prerender,
+      staticExport,
       concurrency,
       basePath,
       staticRouter,
@@ -283,6 +285,16 @@ const readAndMergeConfig = async () => {
       } else {
         return Promise.reject(
           `Configuration error: prerender must be a boolean; true or false.  Passed value was typeof: ${typeof prerender}`,
+        );
+      }
+    }
+
+    if (staticExport !== undefined) {
+      if (typeof staticExport === "boolean") {
+        customConfig.staticExport = staticExport;
+      } else {
+        return Promise.reject(
+          `Configuration error: staticExport must be a boolean; true or false.  Passed value was typeof: ${typeof staticExport}`,
         );
       }
     }

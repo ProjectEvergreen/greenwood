@@ -17,7 +17,9 @@ import path from "node:path";
 import { rollup } from "rollup";
 import { pruneGraph } from "../lib/content-utils.js";
 import { asyncForEach, runWithConcurrency } from "../lib/async-utils.js";
-import { getDynamicPages, getStaticPages } from "../lib/graph-utils.js";
+import { getDynamicPages, getStaticPages, shouldPrerender } from "../lib/graph-utils.js";
+import { executePageScripts } from "./prerender.js";
+import { WorkerPool } from "../lib/threadpool.js";
 import { getStaticRouteFromDynamicRoute, getOutputHrefForStaticPath } from "../lib/url-utils.js";
 
 async function interceptPage(url, request, plugins, body) {
@@ -327,9 +329,18 @@ async function bundleSsrPages(compilation, optimizePlugins) {
   const input = [];
 
   if (ssrPages.length > 0) {
-    const { executeModuleUrl } = config.plugins
-      .find((plugin) => plugin.type === "renderer")
-      .provider();
+    const renderer = config.plugins.find((plugin) => plugin.type === "renderer").provider();
+    const { executeModuleUrl } = renderer;
+    const prerenderSsrPages = ssrPages.filter((page) => shouldPrerender(page, config));
+
+    if (prerenderSsrPages.length > 0 && !executeModuleUrl) {
+      throw new Error("The configured renderer does not support prerendering runtime SSR routes.");
+    }
+
+    const prerenderPool =
+      prerenderSsrPages.length > 0
+        ? new WorkerPool(config.concurrency, new URL("../lib/ssr-route-worker.js", import.meta.url))
+        : null;
     const { pagesDir, scratchDir } = context;
     // SSR pages do not support static / SPA routing (yet)
     // https://github.com/ProjectEvergreen/greenwood/discussions/1033
@@ -356,6 +367,16 @@ async function bundleSsrPages(compilation, optimizePlugins) {
       ).text();
 
       await trackResourcesForRoute(staticHtml, compilation, route);
+
+      if (shouldPrerender(page, config)) {
+        staticHtml = await executePageScripts(
+          compilation,
+          renderer,
+          prerenderPool,
+          page,
+          staticHtml,
+        );
+      }
 
       ssrPrerenderPagesRouteMapper[route] = staticHtml;
     });

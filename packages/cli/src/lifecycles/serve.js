@@ -16,6 +16,7 @@ import {
 } from "../lib/url-utils.js";
 import { Readable } from "node:stream";
 import { Worker } from "node:worker_threads";
+import { isStaticPage } from "../lib/graph-utils.js";
 
 async function getDevServer(compilation) {
   const app = new Koa();
@@ -322,13 +323,8 @@ async function getStaticServer(compilation, composable) {
         compilation.graph.find((page) => page.route === url.pathname) ||
         getMatchingDynamicSsrRoute(compilation, url.pathname);
       const isSPA = compilation.graph.find((page) => page.isSPA);
-      const { isSSR, staticPaths } = matchingRoute || {};
       const extension = url.pathname.split(".").pop();
-      const isStatic =
-        !!staticPaths ||
-        (matchingRoute && !isSSR) ||
-        (isSSR && compilation.config.prerender) ||
-        (isSSR && matchingRoute.prerender);
+      const isStatic = matchingRoute && isStaticPage(matchingRoute, compilation.config);
 
       if (
         ctx.response.status === 404 &&
@@ -385,18 +381,8 @@ async function getHybridServer(compilation) {
         pathname,
       );
       const matchingRouteWithSegment = getMatchingDynamicSsrRoute(compilation, pathname) || {};
-      let isDynamicRoute =
-        (matchingRoute.isSSR || matchingRouteWithSegment.isSSR) &&
-        !matchingRouteWithSegment.staticPaths;
-
-      if (
-        (matchingRoute.isSSR && config.prerender === true && matchingRoute.prerender !== false) ||
-        (matchingApiRouteWithSegment?.isSSR &&
-          config.prerender === true &&
-          matchingRouteWithSegment?.prerender !== false)
-      ) {
-        isDynamicRoute = false;
-      }
+      const dynamicPage = matchingRoute.isSSR ? matchingRoute : matchingRouteWithSegment;
+      const isDynamicRoute = dynamicPage.isSSR && !isStaticPage(dynamicPage, config);
 
       if (isDynamicRoute) {
         const entryPointUrl = new URL(
