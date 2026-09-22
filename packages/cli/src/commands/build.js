@@ -21,17 +21,16 @@ const runProductionBuild = async (compilation) => {
   const prerenderPages = getPrerenderPages(compilation);
   const staticPages = getStaticPages(compilation);
 
-  // Custom renderers such as Puppeteer generate their own HTML, so exclude their non-SSR pages
-  // from the static render pass to avoid processing the same resources twice.
+  // Custom renderers such as Puppeteer generate their own HTML,
   const customPrerenderPages = new Set(
     prerenderPlugin.executeModuleUrl
       ? []
       : prerenderPages.filter((page) => staticPages.includes(page) && !page.isSSR),
   );
+  // and exclude their non-SSR pages from the static render pass to avoid processing the same resources twice.
   const staticRenderPages = staticPages.filter((page) => !customPrerenderPages.has(page));
 
-  // Prerendering may need a browser-facing server, and static SSR routes must execute their route modules at build time.
-  // Plain static pages need neither.
+  // Prerendering may need access to server plugins, and static SSR routes must execute their route bundles at build time
   const needsServerPlugins = prerenderPages.length > 0 || staticPages.some((page) => page.isSSR);
 
   if (needsServerPlugins) {
@@ -59,7 +58,7 @@ const runProductionBuild = async (compilation) => {
     await Promise.all(servers.map((server) => server.start()));
   }
 
-  // Generate all static pages that emits HTML.
+  // Generate all static pages that emit HTML.
   // This also provides the input HTML consumed by the worker prerenderer in the next phase.
   await staticRenderCompilation(compilation, staticRenderPages);
 
