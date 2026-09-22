@@ -1,17 +1,17 @@
-// determines whether browser JavaScript should run during the build.
-// A page-level value, including an explicit false, takes precedence over the project-wide default.
+// determines whether browser JavaScript should run during the build
+// page-level config takes precedence over project-level config
 function shouldPrerender(page, config) {
   return page.prerender ?? config.prerender;
 }
 
-// determines whether an SSR route should be exported as HTML instead of bundled for request-time rendering.
-// This is intentionally independent from prerender configuration (`shouldPrerender`).
+// determines whether an SSR route should be exported as static HTML instead of an SSR bundle
+// page-level config takes precedence over project-level config
 function shouldStaticExport(page, config) {
   return page.staticExport ?? config.staticExport;
 }
 
-// Static source pages (HTML, markdown, etc) and getStaticPaths routes always emit HTML.
-// Other SSR routes only emit HTML when `staticExport` is enabled for the route or project.
+// determines whether a page should emit static HTML during the static render phase
+// page-level config takes precedence over project-level config
 function isStaticPage(page, config) {
   return !page.isSSR || !!page.staticPaths || shouldStaticExport(page, config);
 }
@@ -30,8 +30,7 @@ function getStaticPages(compilation) {
   return graph.filter((page) => isStaticPage(page, config));
 }
 
-// Select every page whose browser JavaScript should be executed during the build. Whether these
-// pages emit HTML or remain runtime SSR routes is decided separately.
+// Select every page whose browser JavaScript should be executed during the build.
 function getPrerenderPages(compilation) {
   const { config, graph } = compilation;
 
@@ -39,7 +38,6 @@ function getPrerenderPages(compilation) {
 }
 
 // get a page by route; including getStaticPaths or dynamic SSR pages
-// not sure if there's a better way to filter through all the possible matches in one-shot?
 function getMatchingPageByRoute(compilation, route) {
   const { graph, config } = compilation;
 
