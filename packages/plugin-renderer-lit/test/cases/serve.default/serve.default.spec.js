@@ -529,7 +529,7 @@ describe("Serve Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
     await runner.stopCommand();
+    await runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });
