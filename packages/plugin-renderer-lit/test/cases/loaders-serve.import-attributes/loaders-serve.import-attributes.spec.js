@@ -112,7 +112,7 @@ describe("Build Greenwood With Custom Lit Renderer for SSR: ", function () {
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
     await runner.stopCommand();
+    await runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });
