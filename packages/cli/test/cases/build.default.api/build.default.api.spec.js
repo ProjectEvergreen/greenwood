@@ -3,7 +3,7 @@
  * Run Greenwood build command with no config.
  *
  * User Result
- * Should generate a bare bones Greenwood build and not error on generating API routes (that have side-effects).
+ * Should generate a bare bones Greenwood build
  *
  * User Command
  * greenwood build
@@ -69,6 +69,16 @@ describe("Build Greenwood With: ", function () {
         );
 
         expect(contents).to.contain("node:assert/strict");
+      });
+
+      // https://github.com/ProjectEvergreen/greenwood/issues/1811
+      it("should bundle CommonJS dependencies backed by Rollup virtual modules", async function () {
+        const contents = await fs.readFile(
+          new URL("./public/api/greeting.js", import.meta.url),
+          "utf-8",
+        );
+
+        expect(contents).to.contain("multipart/form-data");
       });
     });
   });
