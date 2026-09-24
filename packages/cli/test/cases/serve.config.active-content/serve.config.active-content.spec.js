@@ -207,13 +207,7 @@ describe("Serve Greenwood With: ", function () {
   });
 
   after(async function () {
-    const childProcess = runner.childProcess;
-
-    // Gallinago's stopCommand waits for a future exit event, so skip it if the child already exited.
-    if (childProcess?.exitCode === null && childProcess.signalCode === null) {
-      await runner.stopCommand();
-    }
-
+    await runner.stopCommand();
     await runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });
