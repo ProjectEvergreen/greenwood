@@ -16,10 +16,10 @@ const externalizedResources = ["css", "json"];
 // one-time conversion of the builtins array to a Set for quicker lookup
 const NODE_BUILTINS = new Set(builtinModules);
 
-// https://github.com/rollup/rollup/issues/2121
-// would be nice to get rid of this
-function cleanRollupId(id = "") {
-  return id.replace("\x00", "").replace("?commonjs-proxy", "");
+// Rollup prefixes virtual module IDs with a null byte so they are not treated as files,
+// and so we should not try and resolve / bundle them
+function isRollupVirtualModule(id) {
+  return id?.startsWith("\x00") ?? false;
 }
 
 function prefixNodeBuiltins() {
@@ -59,16 +59,19 @@ function greenwoodResourceLoader(compilation, browser = false) {
   return {
     name: "greenwood-resource-loader",
     async resolveId(id, importer, options) {
+      if (isRollupVirtualModule(id) || isRollupVirtualModule(importer)) {
+        return null;
+      }
+
       const { userWorkspace, scratchDir } = compilation.context;
-      const normalizedId = cleanRollupId(id);
-      const importerUrl = new URL(`file://${cleanRollupId(importer) ?? ""}`);
+      const importerUrl = new URL(`file://${importer ?? ""}`);
       const isUserWorkspaceImporter = importerUrl?.pathname?.startsWith(userWorkspace.pathname);
       const isScratchDirImporter = importerUrl?.pathname?.startsWith(scratchDir.pathname);
 
       // check for relative paths and resolve them to the user's workspace or Greenwood's scratch dir
       // like when bundling inline <script> tags with relative paths
       if (id.startsWith(".") && (isUserWorkspaceImporter || isScratchDirImporter)) {
-        const normalizedIdImporterUrl = new URL(normalizedId, importerUrl);
+        const normalizedIdImporterUrl = new URL(id, importerUrl);
         const type = options.attributes?.type ?? "";
         // if we are polyfilling import attributes for the browser we will want Rollup to bundles these as JS files
         // instead of externalizing as their native content-type
@@ -78,11 +81,11 @@ function greenwoodResourceLoader(compilation, browser = false) {
           externalizedResources.includes(type) &&
           browser &&
           !normalizedIdImporterUrl.searchParams.has("type");
-        const prefix = normalizedId.startsWith("..") ? "./" : "";
+        const prefix = id.startsWith("..") ? "./" : "";
         // if its not in the users workspace, we clean up the dot-dots and check that against the user's workspace
         const resolvedUrl = isUserWorkspaceImporter
           ? normalizedIdImporterUrl
-          : new URL(`${prefix}${normalizedId.replace(/\.\.\//g, "")}`, userWorkspace);
+          : new URL(`${prefix}${id.replace(/\.\.\//g, "")}`, userWorkspace);
 
         if (await checkResourceExists(resolvedUrl)) {
           return {
@@ -95,7 +98,11 @@ function greenwoodResourceLoader(compilation, browser = false) {
       }
     },
     async load(id) {
-      let idUrl = new URL(`file://${cleanRollupId(id)}`);
+      if (isRollupVirtualModule(id)) {
+        return null;
+      }
+
+      let idUrl = new URL(`file://${id}`);
       const { pathname } = idUrl;
       const extension = pathname.split(".").pop();
       const headers = {
@@ -103,7 +110,7 @@ function greenwoodResourceLoader(compilation, browser = false) {
       };
 
       // filter first for any bare specifiers
-      if ((await checkResourceExists(idUrl)) && !id.startsWith("\x00")) {
+      if (await checkResourceExists(idUrl)) {
         if (extension !== "js") {
           for (const plugin of resourcePlugins) {
             if (plugin.shouldResolve && (await plugin.shouldResolve(idUrl))) {
@@ -287,6 +294,10 @@ function greenwoodImportMetaUrl(compilation) {
     name: "greenwood-import-meta-url",
 
     async transform(code, id) {
+      if (isRollupVirtualModule(id)) {
+        return null;
+      }
+
       const resourcePlugins = compilation.config.plugins
         .filter((plugin) => {
           return plugin.type === "resource";
@@ -303,7 +314,7 @@ function greenwoodImportMetaUrl(compilation) {
         });
       const idAssetName = path.basename(id);
       const normalizedId = id.replace(/\\\\/g, "/").replace(/\\/g, "/"); // windows shenanigans...
-      let idUrl = new URL(`file://${cleanRollupId(id)}`);
+      let idUrl = new URL(`file://${id}`);
       const headers = {
         Accept: "text/javascript",
       };

@@ -76,6 +76,7 @@
     "call-bind": "^1.0.8",
     "d3": "^7.9.0",
     "font-awesome": "^4.6.3",
+    "form-data": "^4.0.5",
     "geist": "^1.2.0",
     "lit": "^3.1.0",
     "lit-redux-router": "~0.20.0",
