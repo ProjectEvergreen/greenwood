@@ -449,8 +449,8 @@ function greenwoodImportMetaUrl(compilation) {
         for (const replacement of replacements) {
           const { relativeAssetPath, importRef } = replacement;
 
-          modifiedCode = modifiedCode.replace(`'${relativeAssetPath}'`, importRef);
-          modifiedCode = modifiedCode.replace(`"${relativeAssetPath}"`, importRef);
+          modifiedCode = modifiedCode.replace(`'${relativeAssetPath}'`, () => importRef);
+          modifiedCode = modifiedCode.replace(`"${relativeAssetPath}"`, () => importRef);
         }
       }
 
