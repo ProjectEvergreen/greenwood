@@ -25,6 +25,7 @@
  *   components/
  *     counter.jsx
  *   pages/
+ *     about.jsx
  *     index.html
  */
 import { expect } from "chai";
@@ -121,6 +122,35 @@ describe("Build Greenwood With: ", function () {
 
         expect(countText).to.equal("The count is 0 (even)");
         expect(isLargeText).to.equal("(Keep Going...)");
+      });
+    });
+
+    // https://github.com/ProjectEvergreen/greenwood/issues/1814
+    describe("An SSR page that should emit the Signals setup script when using inferred observability", function () {
+      let dom;
+
+      before(async function () {
+        const { handler } = await import(new URL("./public/about.route.js", import.meta.url));
+        const response = await handler(new Request("http://localhost:8080/about/"));
+
+        dom = new JSDOM(await response.text());
+      });
+
+      it("should have the expected dynamic page content", function () {
+        const heading = dom.window.document.querySelector("body h1");
+
+        expect(heading.textContent).to.equal("About Page");
+      });
+
+      it("should include the Signal setup script in the page", function () {
+        const scripts = Array.from(
+          dom.window.document.querySelectorAll('head script[type="module"]'),
+        );
+        const signalSetupScript = scripts.find((script) =>
+          script.textContent.includes("globalThis.Signal"),
+        );
+
+        expect(signalSetupScript).to.not.be.undefined;
       });
     });
   });
