@@ -83,11 +83,7 @@ class ImportJsxResource {
 
     newBody = root.toString();
 
-    return new Response(newBody, {
-      headers: new Headers({
-        "Content-Type": "text/html",
-      }),
-    });
+    return new Response(newBody);
   }
 }
 

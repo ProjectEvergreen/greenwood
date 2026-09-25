@@ -239,11 +239,7 @@ class ScanForCssModulesResource {
       `,
       );
 
-      return new Response(newBody, {
-        headers: new Headers({
-          "Content-Type": "text/html",
-        }),
-      });
+      return new Response(newBody);
     } else if (protocol === "file:" && pathname.endsWith(this.extensions[0])) {
       // handle this primarily for SSR / prerendering use case
       const cssModulesMap = fs.readFileSync(
