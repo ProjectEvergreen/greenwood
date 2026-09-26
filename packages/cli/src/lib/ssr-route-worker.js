@@ -1,5 +1,6 @@
 // https://github.com/nodejs/modules/issues/307#issuecomment-858729422
 import { parentPort } from "node:worker_threads";
+import { registerWorkerHandler } from "../runtimes/worker.js";
 
 async function executeModule({
   executeModuleUrl,
@@ -29,6 +30,4 @@ async function executeModule({
   parentPort.postMessage(data);
 }
 
-parentPort.on("message", async (task) => {
-  await executeModule(task);
-});
+registerWorkerHandler(executeModule);

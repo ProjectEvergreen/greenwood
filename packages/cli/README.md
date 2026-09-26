@@ -17,7 +17,12 @@ $ yarn add @greenwood/cli --dev
 
 # pnpm
 $ pnpm add -D @greenwood/cli
+
+# Deno
+$ deno add --dev npm:@greenwood/cli npm:@rollup/wasm-node@^4.59.0
 ```
+
+> _When running Greenwood with Deno, `@rollup/wasm-node` provides Rollup's WebAssembly implementation in place of Deno's native Node.js bindings.  It is only required for the Deno runtime and is therefore not installed automatically with `@greenwood/cli`._
 
 ## Usage
 

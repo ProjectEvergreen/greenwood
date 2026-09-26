@@ -1,5 +1,6 @@
 // https://github.com/nodejs/modules/issues/307#issuecomment-858729422
 import { parentPort } from "node:worker_threads";
+import { registerWorkerHandler } from "../runtimes/worker.js";
 import { transformKoaRequestIntoStandardRequest, responseAsObject } from "./resource-utils.js";
 
 async function executeRouteModule({ href, request, params }) {
@@ -28,6 +29,4 @@ async function executeRouteModule({ href, request, params }) {
   parentPort.postMessage(await responseAsObject(response));
 }
 
-parentPort.on("message", async (task) => {
-  await executeRouteModule(task);
-});
+registerWorkerHandler(executeRouteModule);

@@ -4369,6 +4369,15 @@
   resolved "https://registry.yarnpkg.com/@rollup/stream/-/stream-3.0.1.tgz#485452d6f1016ac1b0513060f90ff02aaca3e1c0"
   integrity sha512-wdzoakLc9UiPOFa1k17ukfEtvQ0p7JuNFvOZT1DhO5Z5CrTf71An01U9+v+aebYcaLCwy3tLwpCSUF7K7xVN0A==
 
+"@rollup/wasm-node@4.62.3":
+  version "4.62.3"
+  resolved "https://registry.yarnpkg.com/@rollup/wasm-node/-/wasm-node-4.62.3.tgz#a302a335e148a8a37a32bd999868396ebc3b1cb7"
+  integrity sha512-sEOQWamme1YgXeVcE1JkB1k44RwtPWcpYpGUW1Lso7bOj+Ay9lN2Pak/CcfNeC4xqIPNhYSabQNaWYkJJR7m8Q==
+  dependencies:
+    "@types/estree" "1.0.9"
+  optionalDependencies:
+    fsevents "~2.3.2"
+
 "@rtsao/scc@^1.1.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@rtsao/scc/-/scc-1.1.0.tgz#927dd2fae9bc3361403ac2c7a00c32ddce9ad7e8"
@@ -4942,7 +4951,7 @@
   dependencies:
     "@types/ms" "*"
 
-"@types/estree@*", "@types/estree@^1.0.0", "@types/estree@^1.0.6":
+"@types/estree@*", "@types/estree@1.0.9", "@types/estree@^1.0.0", "@types/estree@^1.0.6":
   version "1.0.9"
   resolved "https://registry.yarnpkg.com/@types/estree/-/estree-1.0.9.tgz#cf3f0e876d7bee15a93ab925b82bf570a3904a24"
   integrity sha512-GhdPgy1el4/ImP05X05Uw4cw2/M93BCUmnEvWZNStlCzEKME4Fkk+YpoA5OiHNQmoS7Cafb8Xa3Pya8m1Qrzeg==

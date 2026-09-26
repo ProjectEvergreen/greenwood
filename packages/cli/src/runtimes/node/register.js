@@ -5,9 +5,9 @@ import { initializeSyncWorkerBridge } from "../bridge.js";
 
 const GREENWOOD_LOADER_NODE_REGISTER = "greenwood-loader-node-register";
 
-// Node propagates `--import` preloads from `NODE_OPTIONS` into workers,
-// and Greenwood’s register module creates its own worker so that worker preloads the register module again and the synchronous bridge deadlocks.
-// we use a guard here to prevent the worker backing the bridge from registering another bridge when this module is preloaded through `NODE_OPTIONS`
+// Node propagates `--import` preloads from `NODE_OPTIONS` into workers (Deno does not),,
+// Because Greenwood’s register module creates its own worker that worker preloads the register module again and the synchronous bridge deadlocks.
+// So we use a "guard" here to prevent the worker backing the bridge from registering another bridge when this module is preloaded through `NODE_OPTIONS`
 // https://nodejs.org/download/release/v24.13.1/docs/api/cli.html#--importmodule
 // https://github.com/ProjectEvergreen/greenwood/pull/1795
 if (workerData !== GREENWOOD_LOADER_NODE_REGISTER) {

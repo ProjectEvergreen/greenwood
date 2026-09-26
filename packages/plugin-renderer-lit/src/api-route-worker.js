@@ -1,10 +1,11 @@
 // https://github.com/nodejs/modules/issues/307#issuecomment-858729422
 import { parentPort } from "node:worker_threads";
+import { registerWorkerHandler } from "@greenwood/cli/src/runtimes/worker.js";
 import {
-  transformKoaRequestIntoStandardRequest,
   responseAsObject,
+  transformKoaRequestIntoStandardRequest,
 } from "@greenwood/cli/src/lib/resource-utils.js";
-import "@lit-labs/ssr-dom-shim/register-css-hook.js";
+import "./register-css-hook.js";
 
 async function executeRouteModule({ href, request, params }) {
   const { body, headers = {}, method, url } = request;
@@ -32,6 +33,4 @@ async function executeRouteModule({ href, request, params }) {
   parentPort.postMessage(await responseAsObject(response));
 }
 
-parentPort.on("message", async (task) => {
-  await executeRouteModule(task);
-});
+registerWorkerHandler(executeRouteModule);

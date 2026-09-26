@@ -21,7 +21,7 @@ function copyTemplate(templateDirUrl, outputDirUrl) {
   });
 }
 
-function setupPackageJson(outputDirUrl, { name, version }) {
+function setupPackageJson(outputDirUrl, { name, version, packageManager }) {
   console.log("setting up package.json...");
 
   const packageJsonOutputUrl = new URL("./package.json", outputDirUrl);
@@ -37,6 +37,9 @@ function setupPackageJson(outputDirUrl, { name, version }) {
   // add / merge Greenwood dependencies (first)
   json.devDependencies = {
     "@greenwood/cli": `~${version}`,
+    // pre-install @rollup/wasm-node for Deno users
+    // https://github.com/ProjectEvergreen/greenwood/discussions/1810
+    ...(packageManager === "deno" ? { "@rollup/wasm-node": "^4.59.0" } : {}),
     ...(pkgJson.devDependencies ?? {}),
   };
 
@@ -64,7 +67,8 @@ function installDependencies(outputDirUrl, packageManager) {
   console.log(`installing dependencies using => ${packageManager}...`);
 
   const isWindows = os.platform() === "win32";
-  const args = ["install", "--loglevel", "error"];
+  const options = packageManager === "deno" ? [] : ["--loglevel", "error"];
+  const args = ["install", ...options];
   const spawnOptions = { stdio: "inherit", cwd: outputDirUrl };
   let npmrcContents = "";
 
@@ -88,8 +92,11 @@ function installDependencies(outputDirUrl, packageManager) {
     fs.writeFileSync(new URL("./.npmrc", outputDirUrl), npmrcContents);
   }
 
+  // Deno's native Windows install is an executable, while the rest use cmd shims
+  // https://docs.deno.com/runtime/getting_started/installation/#manual-download
+  const windowsCommand = packageManager === "deno" ? packageManager : `${packageManager}.cmd`;
   const result = isWindows
-    ? spawnSync(`${packageManager}.cmd ${args.join(" ")}`, { ...spawnOptions, shell: true })
+    ? spawnSync(`${windowsCommand} ${args.join(" ")}`, { ...spawnOptions, shell: true })
     : spawnSync(packageManager, args, spawnOptions);
 
   if (result.error) {
@@ -101,4 +108,16 @@ function installDependencies(outputDirUrl, packageManager) {
   }
 }
 
-export { copyTemplate, installDependencies, setupPackageJson, setupGitIgnore };
+function setupDenoConfig(outputDirUrl) {
+  console.log("creating a deno.jsonc file...");
+
+  const denoConfigOutputUrl = new URL("./deno.jsonc", outputDirUrl);
+  const denoConfig = {
+    preferPackageJson: true,
+    exclude: [".deno-deploy/", ".greenwood/", "public/"],
+  };
+
+  fs.writeFileSync(denoConfigOutputUrl, JSON.stringify(denoConfig, null, 2));
+}
+
+export { copyTemplate, installDependencies, setupPackageJson, setupGitIgnore, setupDenoConfig };
