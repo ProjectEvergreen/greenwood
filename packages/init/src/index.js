@@ -174,6 +174,8 @@ async function init() {
     if (packageManager === "no") {
       instructions.push(`Install dependencies with your preferred package manager`);
       instructions.push(`Run the dev script`);
+    } else if (packageManager === "deno") {
+      instructions.push(`Run \`deno task dev\` to start the dev server`);
     } else {
       instructions.push(`Run \`${packageManager} run dev\` to start the dev server`);
     }
@@ -190,6 +192,7 @@ async function init() {
       `${chalk.rgb(255, 0, 0)("Sorry, there was an error trying to initialize your project")}`,
     );
     console.error(e);
+    process.exitCode = 1;
   }
 }
 

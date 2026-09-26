@@ -32,7 +32,29 @@ function setupPackageJson(outputDirUrl, { name, version, packageManager }) {
   json.name = name === "." ? path.basename(outputDirUrl.pathname) : name;
   json.version = "0.1.0";
   json.type = "module";
-  json.scripts = pkgJson.scripts;
+  json.scripts =
+    // for Deno, we need to add the appropriate permissions to the Greenwood commands
+    packageManager === "deno"
+      ? Object.fromEntries(
+          Object.entries(pkgJson.scripts).map(([name, script]) => {
+            if (!script.startsWith("greenwood ")) {
+              return [name, script];
+            }
+
+            const command = script.slice("greenwood ".length);
+            if (command === "serve") {
+              return [name, script];
+            }
+
+            const permissions =
+              command === "build"
+                ? "--allow-read --allow-sys --allow-env --allow-write --allow-ffi"
+                : "--allow-read --allow-sys --allow-env --allow-write --allow-net";
+
+            return [name, `deno run ${permissions} npm:@greenwood/cli ${command}`];
+          }),
+        )
+      : pkgJson.scripts;
 
   // add / merge Greenwood dependencies (first)
   json.devDependencies = {
@@ -112,8 +134,20 @@ function setupDenoConfig(outputDirUrl) {
   console.log("creating a deno.jsonc file...");
 
   const denoConfigOutputUrl = new URL("./deno.jsonc", outputDirUrl);
+  const packageJsonOutputUrl = new URL("./package.json", outputDirUrl);
+  const { dependencies = {}, devDependencies = {} } = JSON.parse(
+    fs.readFileSync(packageJsonOutputUrl, "utf-8"),
+  );
+  const greenwoodPackages = Object.keys({ ...dependencies, ...devDependencies }).filter((name) =>
+    name.startsWith("@greenwood/"),
+  );
   const denoConfig = {
     preferPackageJson: true,
+    // allow users to install Greenwood packages immediately after a release
+    minimumDependencyAge: {
+      age: "P1D", // per ISO 8601 duration format, 1 day
+      exclude: greenwoodPackages.map((name) => `npm:${name}`),
+    },
     exclude: [".deno-deploy/", ".greenwood/", "public/"],
   };
 
