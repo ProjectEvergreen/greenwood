@@ -1,9 +1,6 @@
 // https://github.com/nodejs/modules/issues/307#issuecomment-858729422
 import { parentPort } from "node:worker_threads";
-import { initializeWorkerImports } from "../runtimes/worker-imports.js";
-
-// Start loader setup without delaying the message listener.
-const workerImportsReady = initializeWorkerImports();
+import { registerWorkerHandler } from "../runtimes/worker.js";
 
 async function executeModule({
   executeModuleUrl,
@@ -33,7 +30,4 @@ async function executeModule({
   parentPort.postMessage(data);
 }
 
-parentPort.on("message", async (task) => {
-  await workerImportsReady;
-  await executeModule(task);
-});
+registerWorkerHandler(executeModule);

@@ -1,5 +1,30 @@
-// shared worker implementation to be leveraged by all runtimes
-import { parentPort } from "node:worker_threads";
+import { getEnvironmentData, parentPort } from "node:worker_threads";
+
+const WORKER_IMPORTS_KEY = "@greenwood/worker-imports";
+
+/**
+ * Starts runtime-specific imports inside a route worker.
+ *
+ * Deno publishes its registration URL in worker environment data; its preloads do not reach workers.
+ * https://github.com/ProjectEvergreen/greenwood/discussions/1810
+ */
+async function initializeWorkerImports() {
+  const workerImports = getEnvironmentData(WORKER_IMPORTS_KEY) ?? [];
+
+  for (const specifier of workerImports) {
+    await import(specifier);
+  }
+}
+
+/** Attach the listener before waiting for imports; some runtimes drop earlier messages. */
+function registerWorkerHandler(runTask) {
+  const workerImportsReady = initializeWorkerImports();
+
+  parentPort.on("message", async (task) => {
+    await workerImportsReady;
+    await runTask(task);
+  });
+}
 
 function serializeError(error) {
   const normalizedError = error instanceof Error ? error : new Error(String(error));
@@ -46,4 +71,4 @@ function startLoaderWorker(loaderReady) {
   });
 }
 
-export { startLoaderWorker };
+export { registerWorkerHandler, startLoaderWorker, WORKER_IMPORTS_KEY };

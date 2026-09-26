@@ -1,7 +1,7 @@
 import module from "node:module";
 import { setEnvironmentData } from "node:worker_threads";
 import { initializeSyncWorkerBridge } from "../bridge.js";
-import { WORKER_IMPORTS_KEY } from "../worker-imports.js";
+import { WORKER_IMPORTS_KEY } from "../worker.js";
 import { denoLoaderHooks } from "./hooks.js";
 
 // Deno does not pass preloads to route workers,

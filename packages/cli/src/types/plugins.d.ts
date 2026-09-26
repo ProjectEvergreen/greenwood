@@ -50,9 +50,13 @@ export interface CopyPlugin extends Plugin {
 // https://greenwoodjs.dev/docs/reference/plugins-api/#renderer
 export interface RendererPlugin extends Plugin {
   type: Extract<PLUGIN_TYPES, "renderer">;
-  provider: (
-    compilation: Compilation,
-  ) => { executeModuleUrl: URL; apiRouteWorkerUrl?: URL } | { customUrl: URL };
+  provider: (compilation: Compilation) =>
+    | {
+        executeModuleUrl: URL;
+        /** Custom workers must use `registerWorkerHandler` before importing route code. */
+        apiRouteWorkerUrl?: URL;
+      }
+    | { customUrl: URL };
 }
 
 // https://greenwoodjs.dev/docs/reference/plugins-api/#resource
