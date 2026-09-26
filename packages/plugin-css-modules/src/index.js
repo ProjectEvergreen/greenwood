@@ -184,18 +184,21 @@ class ScanForCssModulesResource {
     }
   }
 
-  async shouldIntercept(url) {
+  async shouldIntercept(url, request, response) {
     const { pathname, protocol } = url;
+    const isHtmlResponse = response.headers.get("Content-Type")?.includes("text/html");
 
     return (
-      url.pathname.endsWith("/") || (protocol === "file:" && pathname.endsWith(this.extensions[0]))
+      (pathname.endsWith("/") && isHtmlResponse) ||
+      (protocol === "file:" && pathname.endsWith(this.extensions[0]))
     );
   }
 
   async intercept(url, request, response) {
     const { pathname, protocol } = url;
+    const isHtmlResponse = response.headers.get("Content-Type")?.includes("text/html");
 
-    if (url.pathname.endsWith("/")) {
+    if (url.pathname.endsWith("/") && isHtmlResponse) {
       const body = await response.text();
       const dom = hparse(body);
       const scripts = dom.querySelectorAll("head script");
