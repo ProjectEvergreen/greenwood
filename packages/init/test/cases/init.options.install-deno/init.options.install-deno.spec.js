@@ -31,7 +31,7 @@ describe("Initialize a new Greenwood project: ", function () {
     this.context = {
       publicDir: path.join(initOutputPath, "public"),
     };
-    initRunner = new Runner();
+    initRunner = new Runner(true);
     greenwoodRunner = new Runner();
   });
 
@@ -68,6 +68,10 @@ describe("Initialize a new Greenwood project: ", function () {
 
         expect(fs.existsSync(denoConfigPath)).to.be.true;
         expect(denoConfigContents.preferPackageJson).to.equal(true);
+        expect(denoConfigContents.minimumDependencyAge).to.deep.equal({
+          age: "P1D",
+          exclude: ["npm:@greenwood/cli"],
+        });
         expect(denoConfigContents.exclude).to.deep.equal([
           ".deno-deploy/",
           ".greenwood/",

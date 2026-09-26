@@ -190,6 +190,7 @@ async function init() {
       `${chalk.rgb(255, 0, 0)("Sorry, there was an error trying to initialize your project")}`,
     );
     console.error(e);
+    process.exitCode = 1;
   }
 }
 

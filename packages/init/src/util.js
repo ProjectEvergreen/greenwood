@@ -114,6 +114,11 @@ function setupDenoConfig(outputDirUrl) {
   const denoConfigOutputUrl = new URL("./deno.jsonc", outputDirUrl);
   const denoConfig = {
     preferPackageJson: true,
+    // allow users to install Greenwood immediately after a release
+    minimumDependencyAge: {
+      age: "P1D",
+      exclude: ["npm:@greenwood/cli"],
+    },
     exclude: [".deno-deploy/", ".greenwood/", "public/"],
   };
 
