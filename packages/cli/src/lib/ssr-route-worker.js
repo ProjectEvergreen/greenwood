@@ -2,6 +2,7 @@
 import { parentPort } from "node:worker_threads";
 import { initializeWorkerImports } from "../runtimes/worker-imports.js";
 
+// Start loader setup without delaying the message listener.
 const workerImportsReady = initializeWorkerImports();
 
 async function executeModule({

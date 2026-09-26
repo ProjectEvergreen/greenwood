@@ -7,6 +7,7 @@ import {
 } from "@greenwood/cli/src/lib/resource-utils.js";
 import "./register-css-hook.js";
 
+// Start loader setup without delaying the message listener.
 const workerImportsReady = initializeWorkerImports();
 
 async function executeRouteModule({ href, request, params }) {

@@ -1,5 +1,5 @@
-// bridge inspired by feedback / examples provided in this GitHub issue
-// https://github.com/nodejs/loaders/issues/201
+// registerHooks() is synchronous, but Greenwood's resource plugins are async.
+// Run them in a worker and wait for its response from the hook. See https://github.com/nodejs/loaders/issues/201.
 import { MessageChannel, receiveMessageOnPort, Worker } from "node:worker_threads";
 
 const DEFAULT_TIMEOUT = 30_000;

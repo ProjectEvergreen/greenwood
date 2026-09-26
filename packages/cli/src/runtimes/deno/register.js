@@ -4,19 +4,18 @@ import { initializeSyncWorkerBridge } from "../bridge.js";
 import { WORKER_IMPORTS_KEY } from "../worker-imports.js";
 import { denoLoaderHooks } from "./hooks.js";
 
-// Deno does not propagate --import/--preload modules to node:worker_threads, so publish this
-// registration module for Greenwood's route workers to import explicitly.
+// Deno does not pass preloads to route workers,
+// so publish this module's URL so each worker can register the same loader hooks before importing user code.
 // https://github.com/ProjectEvergreen/greenwood/discussions/1810
 setEnvironmentData(WORKER_IMPORTS_KEY, [import.meta.url]);
 
 module.registerHooks(
   initializeSyncWorkerBridge(new URL("./worker.js", import.meta.url), {
-    // Let the outer Deno hook preserve the runtime's native ESM JSON handling.
-    // Deno pre-validates bare CSS package imports before running load hooks, including on 2.9.7.
-    // Resolve them first and mark URLs claimed by Greenwood so its load hook runs before validation.
+    // Deno validates bare CSS imports before load(), so mark resolved URLs that get handled by Greenwood
     // https://github.com/ProjectEvergreen/greenwood/discussions/1810
     markHandledResolutions: true,
     resolveBareSpecifiers: true,
+    // Leave JSON imports to Deno's native ESM handling
     shouldLoad: (url) => !url.pathname.endsWith(".json"),
     shouldResolve: (url) => !url.pathname.endsWith(".json"),
     workerOptions: {
@@ -25,7 +24,6 @@ module.registerHooks(
   }),
 );
 
-// registerHooks() chains run last-in, first-out. Register these last so Deno-specific cases run
-// before the generic Greenwood resource pipeline and can short-circuit it when necessary.
+// Hooks run last-in, first-out; Deno's fixes must run before Greenwood's resource hooks.
 // https://github.com/ProjectEvergreen/greenwood/discussions/1810
 module.registerHooks(denoLoaderHooks);

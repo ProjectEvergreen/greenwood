@@ -3,11 +3,12 @@ import { getEnvironmentData } from "node:worker_threads";
 const WORKER_IMPORTS_KEY = "@greenwood/worker-imports";
 
 /**
- * Registers runtime-specific imports inside a worker thread.
+ * Starts runtime-specific imports inside a route worker.
  *
- * Runtime entry points publish module specifiers through worker environment data when the runtime
- * does not propagate preload imports to child workers. Importing each specifier initializes its
- * loader hooks before the worker executes a route module.
+ * Deno publishes its registration URL in worker environment data; its preloads do not reach workers.
+ * Callers attach the message listener immediately, then await this before importing route code;
+ * Deno can drop messages sent before the listener exists.
+ * https://github.com/ProjectEvergreen/greenwood/discussions/1810
  */
 async function initializeWorkerImports() {
   const workerImports = getEnvironmentData(WORKER_IMPORTS_KEY) ?? [];

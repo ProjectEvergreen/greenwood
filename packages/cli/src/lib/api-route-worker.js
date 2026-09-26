@@ -3,6 +3,7 @@ import { parentPort } from "node:worker_threads";
 import { initializeWorkerImports } from "../runtimes/worker-imports.js";
 import { transformKoaRequestIntoStandardRequest, responseAsObject } from "./resource-utils.js";
 
+// Start loader setup without delaying the message listener.
 const workerImportsReady = initializeWorkerImports();
 
 async function executeRouteModule({ href, request, params }) {

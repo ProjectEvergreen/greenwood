@@ -18,8 +18,7 @@ const denoLoaderHooks = {
   },
 
   load(url, context, nextLoad) {
-    // Deno leaves the format undefined for CommonJS loader hooks, causing JSON source to be
-    // compiled as JavaScript instead of passing through the registered JSON extension handler.
+    // Deno may leave CommonJS JSON unformatted, then parse its source as JavaScript.
     // https://github.com/ProjectEvergreen/greenwood/discussions/1810
     if (url.endsWith(".json") && context.conditions.includes("require")) {
       return {
