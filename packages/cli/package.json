@@ -1,6 +1,6 @@
 {
   "name": "@greenwood/cli",
-  "version": "0.35.0-alpha.1",
+  "version": "0.35.0-alpha.2",
   "description": "Greenwood CLI.",
   "type": "module",
   "repository": {
@@ -77,8 +77,8 @@
     "@awesome.me/webawesome": "3.0.0",
     "@aws-sdk/client-cloudfront": "^3.726.0",
     "@beforesemicolon/markup": "^1.14.1",
-    "@rollup/wasm-node": "4.62.3",
     "@jridgewell/gen-mapping": "^0.3.13",
+    "@rollup/wasm-node": "4.62.3",
     "@shoelace-style/shoelace": "^2.18.0",
     "@spectrum-css/card": "^9.3.0",
     "@spectrum-web-components/action-menu": "^1.0.1",
