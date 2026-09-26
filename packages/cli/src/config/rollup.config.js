@@ -449,8 +449,8 @@ function greenwoodImportMetaUrl(compilation) {
         for (const replacement of replacements) {
           const { relativeAssetPath, importRef } = replacement;
 
-          modifiedCode = modifiedCode.replace(`'${relativeAssetPath}'`, importRef);
-          modifiedCode = modifiedCode.replace(`"${relativeAssetPath}"`, importRef);
+          modifiedCode = modifiedCode.replace(`'${relativeAssetPath}'`, () => importRef);
+          modifiedCode = modifiedCode.replace(`"${relativeAssetPath}"`, () => importRef);
         }
       }
 
@@ -583,7 +583,7 @@ function greenwoodSyncImportAttributes(compilation) {
 
                 bundles[bundle].code = bundles[bundle].code.replace(
                   value,
-                  `${basePath}/${importRef}`,
+                  () => `${basePath}/${importRef}`,
                 );
 
                 if (!unbundledAssetsRefMapper[emitConfig.name]) {
