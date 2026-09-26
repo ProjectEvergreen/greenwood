@@ -16,6 +16,7 @@
  *    assets/
  *     blog-images/
  *       wcc-logo.png
+ *     asset-$-148.svg
  *     greenwood-logo.png
  *     nodejs.svg
  *   components/
@@ -77,6 +78,17 @@ describe("Build Greenwood With: ", function () {
 
         expect(headerContents).to.contain(bundleName);
       });
+
+      // https://github.com/ProjectEvergreen/greenwood/issues/1818
+      it("should bundle an asset whose Rollup reference ID contains two dollar signs", async function () {
+        // Rollup hashes asset-$-148.svg to CsD--SOK and converts the hyphens to CsD$$SOK.
+        const assets = await Array.fromAsync(
+          fs.glob("asset-_-148.*.svg", { cwd: new URL("./public/", import.meta.url) }),
+        );
+
+        expect(assets.length).to.equal(1);
+        expect(headerContents).to.contain(assets[0]);
+      });
     });
 
     describe("Default file output for auto copied assets directory", function () {
@@ -91,7 +103,7 @@ describe("Build Greenwood With: ", function () {
       });
 
       it("should have the expected number of copied static assets", function () {
-        expect(assets.length).to.equal(3);
+        expect(assets.length).to.equal(4);
       });
     });
   });

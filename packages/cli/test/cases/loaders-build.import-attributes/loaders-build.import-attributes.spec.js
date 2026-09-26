@@ -15,6 +15,7 @@
  * src/
  *   components/
  *     card/
+ *       asset-927.css
  *       card.css
  *       card.js
  *       card.json
@@ -53,10 +54,12 @@ describe("Build Greenwood With: ", function () {
     describe("Custom Element Importing CSS w/ Constructable Stylesheet", function () {
       let scripts;
       let styles;
+      let dollarSignStyles;
 
       before(async function () {
         scripts = await glob.promise(path.join(outputPath, "public/card.*.js"));
         styles = await glob.promise(path.join(outputPath, `public/card.*.css`));
+        dollarSignStyles = await glob.promise(path.join(outputPath, "public/asset-927.*.css"));
       });
 
       it("should have the expected import attribute for importing theme.css as a Constructable Stylesheet in the card.js bundle", function () {
@@ -77,11 +80,20 @@ describe("Build Greenwood With: ", function () {
         );
       });
 
+      // This filename consistently produces the Rollup reference ID BAdZ7Z$$ across operating systems.
+      // https://github.com/ProjectEvergreen/greenwood/issues/1816
+      it("should bundle an import attribute whose Rollup reference ID contains two dollar signs", function () {
+        const scriptContents = fs.readFileSync(scripts[0], "utf-8");
+
+        expect(dollarSignStyles.length).to.equal(1);
+        expect(scriptContents).to.contain(`/${path.basename(dollarSignStyles[0])}`);
+      });
+
       it("should have the expected import attribute for importing @spectrum-css/card as a Constructable Stylesheet in the card.js bundle", function () {
         const scriptContents = fs.readFileSync(scripts[0], "utf-8");
 
-        expect(scriptContents).to.contain(
-          'const d=new CSSStyleSheet;d.replaceSync(".spectrum-Card{--spectrum-card-background-color',
+        expect(scriptContents).to.match(
+          /const ([A-Za-z_$][\w$]*)=new CSSStyleSheet;\1\.replaceSync\("\.spectrum-Card\{--spectrum-card-background-color/,
         );
       });
 
