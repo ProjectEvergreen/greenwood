@@ -3,7 +3,8 @@
  * Run Greenwood with an SSR route that uses prerender configuration and also uses API routes.
  *
  * User Result
- * Should generate a bare bones Greenwood build for hosting a prerender SSR application with API route handling.
+ * Should generate a Greenwood build with a prerendered application shell, runtime SSR content,
+ * and API route handling.
  *
  * User Command
  * greenwood build
@@ -67,7 +68,7 @@ describe("Serve Greenwood With: ", function () {
       });
     });
 
-    runSmokeTest(["public", "index", "serve"], LABEL);
+    runSmokeTest(["public", "serve"], LABEL);
 
     describe("Serve command that prerenders SSR pages", function () {
       let dom;
@@ -103,17 +104,22 @@ describe("Serve Greenwood With: ", function () {
           expect(headings[0].textContent).to.equal("This is the home page.");
         });
 
-        it("should have no bundled SSR output for the page", async function () {
-          const scriptFiles = (
-            await glob.promise(path.join(this.context.publicDir, "*.js"))
-          ).filter((file) => file.indexOf("index.js") >= 0);
+        it("should have the expected bundled SSR output for the page", async function () {
+          const scriptFiles = await glob.promise(
+            path.join(this.context.publicDir, "index.route*.js"),
+          );
 
-          expect(scriptFiles.length).to.equal(0);
+          expect(scriptFiles.length).to.equal(2);
+        });
+
+        it("should not emit static HTML for the SSR page", async function () {
+          const htmlFiles = await glob.promise(path.join(this.context.publicDir, "index.html"));
+
+          expect(htmlFiles.length).to.equal(0);
         });
       });
 
-      // TODO no page.js output
-      describe("Serve command for static HTML response with bundled home page <script> tag", function () {
+      describe("Serve command for runtime HTML response with bundled home page <script> tag", function () {
         it("should have the expected <script> tags in <head>", function (done) {
           const scripts = Array.from(dom.window.document.querySelectorAll("head > script")).filter(
             (tag) => !tag.getAttribute("data-gwd"),

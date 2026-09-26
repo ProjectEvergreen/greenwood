@@ -93,6 +93,7 @@ const config: Config = {
   },
   port,
   prerender: true,
+  staticExport: true,
   staticRouter: true,
   useTsc: true,
   workspace: import.meta.url,

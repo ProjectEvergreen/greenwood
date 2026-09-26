@@ -15,4 +15,4 @@ export default class AboutPage extends HTMLElement {
   }
 }
 
-export const prerender = true;
+export const staticExport = true;

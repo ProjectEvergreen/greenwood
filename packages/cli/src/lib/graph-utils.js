@@ -1,34 +1,43 @@
-// pages that are pure SSR
+// determines whether browser JavaScript should run during the build
+// page-level config takes precedence over project-level config
+function shouldPrerender(page, config) {
+  return page.prerender ?? config.prerender;
+}
+
+// determines whether an SSR route should be exported as static HTML instead of an SSR bundle
+// page-level config takes precedence over project-level config
+function shouldStaticExport(page, config) {
+  return page.staticExport ?? config.staticExport;
+}
+
+// determines whether a page should emit static HTML during the static render phase
+// page-level config takes precedence over project-level config
+function isStaticPage(page, config) {
+  return !page.isSSR || !!page.staticPaths || shouldStaticExport(page, config);
+}
+
+// Select SSR routes that still need request-time route bundles.
 function getDynamicPages(compilation) {
   const { config, graph } = compilation;
 
-  // would be nice to do this without the extra conditional (good first issue)
-  return graph.filter((page) => {
-    let isSsrRoute = page.isSSR && !page.staticPaths && page.prerender !== true;
-
-    if (isSsrRoute && config.prerender && page.prerender !== false) {
-      isSsrRoute = false;
-    }
-
-    return isSsrRoute;
-  });
+  return graph.filter((page) => page.isSSR && !isStaticPage(page, config));
 }
 
-// pages that emit an HTML file
+// Select every page that should emit an HTML file during the static render phase.
 function getStaticPages(compilation) {
   const { config, graph } = compilation;
 
-  return graph.filter(
-    (page) =>
-      !page.isSSR ||
-      (page.isSSR && page.prerender) ||
-      (page.isSSR && page.prerender !== false && config.prerender) ||
-      page.staticPaths,
-  );
+  return graph.filter((page) => isStaticPage(page, config));
+}
+
+// Select every page whose browser JavaScript should be executed during the build.
+function getPrerenderPages(compilation) {
+  const { config, graph } = compilation;
+
+  return graph.filter((page) => shouldPrerender(page, config));
 }
 
 // get a page by route; including getStaticPaths or dynamic SSR pages
-// not sure if there's a better way to filter through all the possible matches in one-shot?
 function getMatchingPageByRoute(compilation, route) {
   const { graph, config } = compilation;
 
@@ -66,4 +75,12 @@ function getMatchingPageByRoute(compilation, route) {
   }
 }
 
-export { getDynamicPages, getStaticPages, getMatchingPageByRoute };
+export {
+  getDynamicPages,
+  getStaticPages,
+  getPrerenderPages,
+  getMatchingPageByRoute,
+  isStaticPage,
+  shouldPrerender,
+  shouldStaticExport,
+};

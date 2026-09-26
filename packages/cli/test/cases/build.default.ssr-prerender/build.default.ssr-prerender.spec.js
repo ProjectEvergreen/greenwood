@@ -3,7 +3,7 @@
  * Run Greenwood with an SSR route that is prerendered using configuration and checks for double SSR rendering.
  *
  * User Result
- * Should generate a bare bones Greenwood build for hosting a prerender SSR application.
+ * Should generate a Greenwood build with prerendered application shells for runtime SSR routes.
  *
  * User Command
  * greenwood build
@@ -58,15 +58,23 @@ describe("Build Greenwood With: ", function () {
       await runner.runCommand(cliPath, "build");
     });
 
-    runSmokeTest(["public", "index"], LABEL);
+    runSmokeTest(["public"], LABEL);
 
     describe("Build Output", function () {
-      it("should not have any ssr page outputs", async function () {
-        const files = (
-          await Array.fromAsync(fs.glob("*.js", { cwd: new URL("./public", import.meta.url) }))
-        ).filter((file) => file.startsWith("about.route") || file.startsWith("index.route"));
+      it("should emit SSR page bundles", async function () {
+        const files = await Array.fromAsync(
+          fs.glob("*.route.js", { cwd: new URL("./public", import.meta.url) }),
+        );
 
-        expect(files.length).to.equal(0);
+        expect(files).to.have.members(["about.route.js", "index.route.js"]);
+      });
+
+      it("should not emit static HTML for the SSR pages", async function () {
+        const files = await Array.fromAsync(
+          fs.glob("**/index.html", { cwd: new URL("./public", import.meta.url) }),
+        );
+
+        expect(files).to.have.lengthOf(0);
       });
     });
 
@@ -74,7 +82,10 @@ describe("Build Greenwood With: ", function () {
       let dom;
 
       before(async function () {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "index.html"));
+        const { handler } = await import(new URL("./public/index.route.js", import.meta.url));
+        const response = await handler(new Request("http://localhost:8080/"), {});
+
+        dom = new JSDOM(await response.text());
       });
 
       it("should have the expected SSR page content in the HTML", function () {
@@ -119,7 +130,10 @@ describe("Build Greenwood With: ", function () {
       let dom;
 
       before(async function () {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "./about/index.html"));
+        const { handler } = await import(new URL("./public/about.route.js", import.meta.url));
+        const response = await handler(new Request("http://localhost:8080/about/"), {});
+
+        dom = new JSDOM(await response.text());
       });
 
       it("should have the expected SSR page content in the HTML", function () {

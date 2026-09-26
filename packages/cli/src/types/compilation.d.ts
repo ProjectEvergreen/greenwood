@@ -23,6 +23,8 @@ export type Frontmatter = {
   layout?: string;
   title?: string;
   imports?: string[];
+  prerender?: boolean;
+  staticExport?: boolean;
   data?: {
     [key: string]: string;
   };
