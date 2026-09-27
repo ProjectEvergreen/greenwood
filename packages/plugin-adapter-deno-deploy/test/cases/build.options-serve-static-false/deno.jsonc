@@ -1,0 +1,9 @@
+{
+  "deploy": {
+    "runtime": {
+      "type": "dynamic",
+      "entrypoint": "./.deno-deploy/server.js",
+      "cwd": ".",
+    },
+  },
+}

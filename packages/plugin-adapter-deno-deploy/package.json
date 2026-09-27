@@ -1,0 +1,43 @@
+{
+  "name": "@greenwood/plugin-adapter-deno-deploy",
+  "version": "0.35.0-alpha.2",
+  "description": "A Greenwood plugin for deploying static and full-stack applications to Deno Deploy.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ProjectEvergreen/greenwood.git",
+    "directory": "packages/plugin-adapter-deno-deploy"
+  },
+  "homepage": "https://github.com/ProjectEvergreen/greenwood/tree/master/packages/plugin-adapter-deno-deploy",
+  "author": "Owen Buckley <owen@thegreenhouse.io>",
+  "license": "MIT",
+  "keywords": [
+    "Greenwood",
+    "Static Site Generator",
+    "Server Side Rendering",
+    "Full Stack Web Development",
+    "Serverless",
+    "Deno",
+    "Deno Deploy"
+  ],
+  "type": "module",
+  "main": "./src/index.js",
+  "types": "./src/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/types/index.d.ts",
+      "import": "./src/index.js"
+    }
+  },
+  "files": [
+    "src/"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "@greenwood/cli": "^0.34.0"
+  },
+  "devDependencies": {
+    "@greenwood/cli": "^0.35.0-alpha.2"
+  }
+}

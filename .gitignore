@@ -17,4 +17,5 @@ packages/**/test/**/.vercel
 public/
 adapter-output/
 .aws-output/
+.deno-deploy/
 /.nx/workspace-data
