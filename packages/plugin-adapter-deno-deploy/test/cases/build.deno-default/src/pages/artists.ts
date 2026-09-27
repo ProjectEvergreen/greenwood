@@ -1,5 +1,5 @@
-import "../components/card.js";
-import { getArtists } from "../services/artists.js";
+import "../components/card.ts";
+import { getArtists } from "../services/artists.ts";
 
 export default class ArtistsPage extends HTMLElement {
   connectedCallback() {

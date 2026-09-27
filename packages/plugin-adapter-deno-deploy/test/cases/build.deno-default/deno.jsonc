@@ -1,4 +1,7 @@
 {
+  "compilerOptions": {
+    "lib": ["deno.ns", "dom", "dom.iterable"],
+  },
   "deploy": {
     "runtime": {
       "type": "dynamic",

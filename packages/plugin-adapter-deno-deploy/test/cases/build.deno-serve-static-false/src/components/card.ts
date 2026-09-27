@@ -12,8 +12,8 @@ export default class Card extends HTMLElement {
         </article>
       `;
 
-      this.attachShadow({ mode: "open" });
-      this.shadowRoot.appendChild(template.content.cloneNode(true));
+      const shadowRoot = this.attachShadow({ mode: "open" });
+      shadowRoot.appendChild(template.content.cloneNode(true));
     }
   }
 }

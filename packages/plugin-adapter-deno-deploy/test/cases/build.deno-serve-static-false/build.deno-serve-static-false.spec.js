@@ -18,23 +18,23 @@
  *
  * User Workspace
  * deno.jsonc
- * greenwood.config.js
+ * greenwood.config.ts
  * src/
  *   components/
- *     card.js
+ *     card.ts
  *   pages/
  *     api/
- *       fragment.js
- *       greeting.js
+ *       fragment.ts
+ *       greeting.ts
  *       nested/
- *         endpoint.js
+ *         endpoint.ts
  *       product/
- *         [id].js
- *       search.js
- *       submit-form-data.js
- *       submit-json.js
+ *         [id].ts
+ *       search.ts
+ *       submit-form-data.ts
+ *       submit-json.ts
  *   services/
- *     artists.js
+ *     artists.ts
  */
 import { expect } from "chai";
 import fs from "node:fs/promises";

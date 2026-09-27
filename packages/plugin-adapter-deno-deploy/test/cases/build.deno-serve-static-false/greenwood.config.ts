@@ -1,5 +1,8 @@
+import type { Config } from "@greenwood/cli";
 import { greenwoodPluginAdapterDenoDeploy } from "../../../src/index.js";
 
-export default {
+const config: Config = {
   plugins: [greenwoodPluginAdapterDenoDeploy({ serveStatic: false })],
 };
+
+export default config;

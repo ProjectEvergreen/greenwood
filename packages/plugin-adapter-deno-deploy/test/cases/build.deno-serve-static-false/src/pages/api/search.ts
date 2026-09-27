@@ -1,8 +1,8 @@
 import { renderFromHTML } from "wc-compiler";
-import { getArtists } from "../../services/artists.js";
+import { getArtists } from "../../services/artists.ts";
 
-export async function handler(request) {
-  const term = (await request.formData()).get("term")?.toLowerCase() ?? "";
+export async function handler(request: Request) {
+  const term = String((await request.formData()).get("term") ?? "").toLowerCase();
   const matches = getArtists().filter(({ name }) => name.toLowerCase().includes(term));
   const html = matches.length
     ? matches
@@ -12,7 +12,7 @@ export async function handler(request) {
         .join("")
     : "No results found.";
   const body = matches.length
-    ? (await renderFromHTML(html, [new URL("../../components/card.js", import.meta.url)])).html
+    ? (await renderFromHTML(html, [new URL("../../components/card.ts", import.meta.url)])).html
     : html;
 
   return new Response(body, {

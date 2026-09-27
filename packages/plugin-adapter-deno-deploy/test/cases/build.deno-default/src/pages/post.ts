@@ -1,5 +1,7 @@
 export default class PostPage extends HTMLElement {
-  constructor({ request }) {
+  postId: string | null;
+
+  constructor({ request }: { request: Request }) {
     super();
     this.postId = new URL(request.url).searchParams.get("id");
   }

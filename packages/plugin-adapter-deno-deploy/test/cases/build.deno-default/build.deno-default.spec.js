@@ -19,32 +19,32 @@
  *
  * User Workspace
  * deno.jsonc
- * greenwood.config.js
+ * greenwood.config.ts
  * src/
  *   components/
- *     card.js
+ *     card.ts
  *   pages/
  *     api/
- *       greeting.js
+ *       greeting.ts
  *       nested/
- *         endpoint.js
+ *         endpoint.ts
  *       product/
- *         [id].js
- *     artists.js
+ *         [id].ts
+ *     artists.ts
  *     blog/
- *       first-post.js
- *       index.js
+ *       first-post.ts
+ *       index.ts
  *     event/
- *       title.js # prerendered
+ *       title.ts # prerendered
  *     index.html
- *     post.js
+ *     post.ts
  *     stories/
- *       [slug].js
+ *       [slug].ts
  *     topics/
- *       [topic].js # getStaticPaths
- *     users.js
+ *       [topic].ts # getStaticPaths
+ *     users.ts
  *   services/
- *     artists.js
+ *     artists.ts
  */
 import { expect } from "chai";
 import fs from "node:fs/promises";

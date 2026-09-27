@@ -1,5 +1,7 @@
 export default class StoryPage extends HTMLElement {
-  constructor({ params }) {
+  slug: string;
+
+  constructor({ params }: { params: { slug: string } }) {
     super();
     this.slug = params.slug;
   }
