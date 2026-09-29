@@ -2,22 +2,32 @@ import fs from "node:fs/promises";
 import { getDynamicPages } from "@greenwood/cli/src/lib/graph-utils.js";
 
 const ADAPTER_OUTPUT_DIR = ".deno-deploy";
+const ROUTE_WORKER_FILE = "route-worker.js";
 
 function generateServer(compilation, serveStatic) {
   const { outputDir } = compilation.context;
-  const { basePath } = compilation.config;
+  const { basePath, isolation: isolationMode } = compilation.config;
   const dynamicPages = getDynamicPages(compilation);
   const imports = [];
   const routes = [];
 
-  const addRoute = ({ id, outputHref, route, segment }, type, index) => {
+  const addRoute = ({ id, outputHref, route, segment, isolation }, type, index) => {
     const handlerAlias = `$handler${index}`;
     const outputPath = type === "api" ? `api/${id}.js` : outputHref.replace(outputDir.href, "");
     const pathname = segment ? `${basePath}${segment.pathname}` : route;
+    const shouldIsolate = isolation || isolationMode;
+    const target = shouldIsolate
+      ? `moduleUrl: new URL("../public/${outputPath}", import.meta.url).href, isolation: true`
+      : `handler: ${handlerAlias}, isolation: false`;
 
-    imports.push(`import { handler as ${handlerAlias} } from "../public/${outputPath}";`);
+    if (!shouldIsolate) {
+      imports.push(`import { handler as ${handlerAlias} } from "../public/${outputPath}";`);
+    }
+
     routes.push(
-      `  { pattern: new URLPattern({ pathname: ${JSON.stringify(pathname)} }), handler: ${handlerAlias}, type: "${type}", hasParams: ${Boolean(segment)} },`,
+      `  { pattern: new URLPattern({ pathname: ${JSON.stringify(
+        pathname,
+      )} }), ${target}, type: "${type}", hasParams: ${Boolean(segment)} },`,
     );
   };
 
@@ -46,18 +56,81 @@ const routes = [
 ${routes.join("\n")}
 ];
 
+async function invokeIsolatedRoute(route, request, params) {
+  const body = ["GET", "HEAD"].includes(request.method.toUpperCase())
+    ? null
+    : await request.arrayBuffer();
+  const worker = new Worker(new URL("./${ROUTE_WORKER_FILE}", import.meta.url).href, {
+    type: "module",
+  });
+
+  return await new Promise((resolve, reject) => {
+    const cleanup = () => {
+      worker.terminate();
+    };
+
+    worker.addEventListener("message", ({ data }) => {
+      cleanup();
+
+      if (!data.ok) {
+        const error = new Error(data.error.message);
+
+        error.name = data.error.name;
+        error.stack = data.error.stack;
+        reject(error);
+        return;
+      }
+
+      const { response } = data;
+
+      resolve(new Response(response.body, {
+        headers: response.headers,
+        status: response.status,
+        statusText: response.statusText,
+      }));
+    }, { once: true });
+    worker.addEventListener("error", (event) => {
+      cleanup();
+      reject(event.error ?? new Error(event.message));
+    }, { once: true });
+
+    const message = {
+      moduleUrl: route.moduleUrl,
+      type: route.type,
+      params,
+      request: {
+        url: request.url,
+        method: request.method,
+        headers: [...request.headers.entries()],
+        body,
+      },
+    };
+
+    try {
+      worker.postMessage(message, body ? [body] : []);
+    } catch (error) {
+      cleanup();
+      reject(error);
+    }
+  });
+}
+
 Deno.serve(async (request) => {
   const url = new URL(request.url);
 
-  for (const { pattern, handler, type, hasParams } of routes) {
-    const match = pattern.exec(url);
+  for (const route of routes) {
+    const match = route.pattern.exec(url);
 
     if (match) {
-      const params = hasParams ? match.pathname.groups : undefined;
+      const params = route.hasParams ? match.pathname.groups : undefined;
 
-      return type === "page"
-        ? await handler(request, params)
-        : await handler(request, { params });
+      if (route.isolation) {
+        return await invokeIsolatedRoute(route, request, params);
+      }
+
+      return route.type === "page"
+        ? await route.handler(request, params)
+        : await route.handler(request, { params });
     }
   }
 
@@ -66,6 +139,53 @@ Deno.serve(async (request) => {
   }
 
   ${fallback}
+});
+`;
+}
+
+function generateRouteWorker() {
+  return `self.addEventListener("message", async ({ data }) => {
+  try {
+    const { moduleUrl, type, params, request: requestData } = data;
+    const { handler } = await import(moduleUrl);
+    const request = new Request(requestData.url, {
+      method: requestData.method,
+      headers: requestData.headers,
+      body: requestData.body,
+    });
+    const response = type === "page"
+      ? await handler(request, params)
+      : await handler(request, { params });
+
+    if (!(response instanceof Response)) {
+      throw new TypeError("Isolated route handlers must return a Response object");
+    }
+
+    const body = response.body === null ? null : await response.arrayBuffer();
+
+    self.postMessage({
+      ok: true,
+      response: {
+        body,
+        headers: [...response.headers.entries()],
+        status: response.status,
+        statusText: response.statusText,
+      },
+    }, body ? [body] : []);
+  } catch (cause) {
+    const error = cause instanceof Error
+      ? cause
+      : new Error(String(cause));
+
+    self.postMessage({
+      ok: false,
+      error: {
+        name: error.name,
+        message: error.message,
+        stack: error.stack,
+      },
+    });
+  }
 });
 `;
 }
@@ -81,9 +201,10 @@ async function denoDeployAdapter(compilation, options) {
     new URL("./server.js", adapterOutputUrl),
     generateServer(compilation, serveStatic),
   );
+  await fs.writeFile(new URL(`./${ROUTE_WORKER_FILE}`, adapterOutputUrl), generateRouteWorker());
 }
 
-/** @type {import('./types/index.d.ts').DenoDeployAdapter} */
+/** @type {import('deno-deploy.d.ts').DenoDeployAdapter} */
 const greenwoodPluginAdapterDenoDeploy = (options = {}) => [
   {
     type: "adapter",

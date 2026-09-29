@@ -8,7 +8,7 @@ Enables [Deno Deploy](https://deno.com/deploy) hosting for Greenwood static asse
 
 ## Features
 
-The plugin creates a `.deno-deploy/server.js` entrypoint during `greenwood build`. It imports Greenwood's built API routes and dynamic SSR pages, then serves files from `public/` for other non-API requests. The entrypoint is needed when you choose Deno Deploy's **dynamic** runtime. For a site containing only static output, Deno Deploy can serve `public/` directly using its **static** runtime.
+The plugin creates a `.deno-deploy/server.js` entrypoint during `greenwood build`. It routes requests to Greenwood's built API routes and dynamic SSR pages, then serves files from `public/` for other non-API requests. The entrypoint is needed when you choose Deno Deploy's **dynamic** runtime. For a site containing only static output, Deno Deploy can serve `public/` directly using its **static** runtime.
 
 > _**Note:** You can see a working example of this plugin [here](https://github.com/ProjectEvergreen/greenwood-demo-adapter-deno-deploy)_.
 
@@ -134,3 +134,13 @@ import type { DenoDeployAdapter, DenoDeployAdapterOptions } from '@greenwood/plu
 ## Caveats
 
 1. [CSS and bytes import attributes](https://docs.deno.com/runtime/fundamentals/modules/#import-attributes) remain experimental in Deno. If your server side code uses `with { type: 'css' }` or `with { type: 'bytes' }`, verify support in the Deno Deploy runtime. Deno Deploy [does not accept custom runtime flags](https://docs.deno.com/deploy/reference/runtime/), including `--unstable-*` flags.
+1. Due to Deno Deploy executing within a single entrypoint server handler, if multiple server side routes register the same custom element, `customElements.define` may throw when those modules load in the same process (like for Lit SSR). Set `isolation: true` in _greenwood.config.ts_, or add `export const isolation = true;` to affected routes, to load each route handler on demand in a separate worker. You can also opt to guard registration in the component instead:
+    ```ts
+    export default Class extends HTMLElement {
+      // ...
+    }
+
+    if (!customElements.get("app-card")) {
+      customElements.define("app-card", Card);
+    }
+    ```
