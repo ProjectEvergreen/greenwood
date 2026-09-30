@@ -16,6 +16,16 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node }}
+      - name: Enable Node crash dumps
+        shell: pwsh
+        run: |
+          $dumpDir = Join-Path $env:RUNNER_TEMP 'node-dumps'
+          $regKey = 'HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\node.exe'
+          New-Item -ItemType Directory -Path $dumpDir -Force | Out-Null
+          New-Item -Path $regKey -Force | Out-Null
+          New-ItemProperty -Path $regKey -Name DumpFolder -Value $dumpDir -PropertyType ExpandString -Force | Out-Null
+          New-ItemProperty -Path $regKey -Name DumpType -Value 1 -PropertyType DWord -Force | Out-Null
+          New-ItemProperty -Path $regKey -Name DumpCount -Value 5 -PropertyType DWord -Force | Out-Null
       - uses: pnpm/action-setup@v6
         name: Install pnpm
         with:
@@ -33,3 +43,11 @@ jobs:
       - name: Build
         run: |
           yarn clean && yarn build
+      - name: Upload Node crash dumps
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: node-crash-dumps-${{ matrix.node }}
+          path: ${{ runner.temp }}/node-dumps/
+          if-no-files-found: ignore
+          retention-days: 1
