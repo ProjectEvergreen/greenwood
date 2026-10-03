@@ -1,7 +1,7 @@
-export const prerender = true;
+export const staticExport = true;
 
 export default class EventPage extends HTMLElement {
   connectedCallback() {
-    this.innerHTML = "<h1>Prerendered event</h1>";
+    this.innerHTML = "<h1>Static event</h1>";
   }
 }

@@ -35,14 +35,14 @@
  *       first-post.ts
  *       index.ts
  *     event/
- *       title.ts # prerendered
+ *       title.ts # static export
  *     index.html
  *     post.ts
  *     stories/
  *       [slug].ts
  *     topics/
  *       [topic].ts # getStaticPaths
- *     users.ts
+ *     users.ts # prerendered SSR (remains dynamic)
  *   services/
  *     artists.ts
  */
@@ -125,16 +125,17 @@ describe("Build Greenwood With: Deno Deploy adapter and static files", function 
     const response = await requestHandler(new Request("http://localhost/my-app/users/"));
     const dom = new JSDOM(await response.text());
     const cards = dom.window.document.querySelectorAll("app-card");
+    const user = "Analog";
 
     expect(response.status).to.equal(200);
     expect(response.headers.get("content-type")).to.include("text/html");
     expect(dom.window.document.querySelector("h1").textContent).to.equal("Users");
     expect(cards.length).to.equal(1);
-    expect(cards[0].getAttribute("title")).to.equal("Analog");
+    expect(cards[0].getAttribute("title")).to.equal(user);
     expect(
       cards[0].querySelector('template[shadowrootmode="open"]').content.querySelector("h2")
         .textContent,
-    ).to.equal("Analog");
+    ).to.equal(user);
   });
 
   it("renders a collection of custom elements on an SSR page", async function () {
@@ -217,7 +218,7 @@ describe("Build Greenwood With: Deno Deploy adapter and static files", function 
     }
   });
 
-  it("serves prerendered and getStaticPaths pages from static output", async function () {
+  it("serves a static export page from static output", async function () {
     const deno = globalThis.Deno;
     const previousDirectory = deno.cwd();
 
@@ -225,10 +226,23 @@ describe("Build Greenwood With: Deno Deploy adapter and static files", function 
 
     try {
       const event = await requestHandler(new Request("http://localhost/my-app/event/title/"));
-      const topic = await requestHandler(new Request("http://localhost/my-app/topics/greenwood/"));
 
       expect(event.status).to.equal(200);
-      expect(await event.text()).to.include("<h1>Prerendered event</h1>");
+      expect(await event.text()).to.include("<h1>Static event</h1>");
+    } finally {
+      deno.chdir(previousDirectory);
+    }
+  });
+
+  it("serves a getStaticPaths page from static output", async function () {
+    const deno = globalThis.Deno;
+    const previousDirectory = deno.cwd();
+
+    deno.chdir(outputPath);
+
+    try {
+      const topic = await requestHandler(new Request("http://localhost/my-app/topics/greenwood/"));
+
       expect(topic.status).to.equal(200);
       expect(await topic.text()).to.include("<h1>Static topic</h1>");
     } finally {
