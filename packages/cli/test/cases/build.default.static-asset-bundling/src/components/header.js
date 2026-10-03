@@ -1,6 +1,7 @@
 const template = document.createElement("template");
 
 export default class HeaderComponent extends HTMLElement {
+  #dollarSignAsset = new URL("../assets/asset-$-148.svg", import.meta.url);
   #logo = new URL("../assets/greenwood-logo.png", import.meta.url);
   #node = new URL("../assets/nodejs.svg", import.meta.url);
 
@@ -49,6 +50,7 @@ export default class HeaderComponent extends HTMLElement {
               </a>
             </div>
             <img src="${this.#node.pathname.replace(globalThis.location.pathname, "/")}" alt="NodeJS Logo"/>
+            <img src="${this.#dollarSignAsset.pathname.replace(globalThis.location.pathname, "/")}" alt="Dollar Sign"/>
           </div>
         </header>
       `;
