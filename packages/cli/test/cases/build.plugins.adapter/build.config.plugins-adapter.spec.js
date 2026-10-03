@@ -35,7 +35,7 @@
  *       first-post.js
  *       index.js
  *     event/
- *       title.js # has prerender = true
+ *       title.js # has staticExport = true
  *     about.js
  *     index.js
  */

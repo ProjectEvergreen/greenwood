@@ -6,5 +6,5 @@ export default class EventDetailsPage extends HTMLElement {
   }
 }
 
-// make sure prerendering does not get treated as a serverless function
-export const prerender = true;
+// make sure static exports do not get treated as a serverless function
+export const staticExport = true;

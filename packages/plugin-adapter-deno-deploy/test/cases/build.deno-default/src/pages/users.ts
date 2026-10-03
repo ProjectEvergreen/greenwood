@@ -1,6 +1,8 @@
 import "../components/card.ts";
 import { getArtists } from "../services/artists.ts";
 
+export const prerender = true;
+
 export default class UsersPage extends HTMLElement {
   connectedCallback() {
     const { name, imageUrl } = getArtists()[0];
