@@ -11099,9 +11099,9 @@ internal-slot@^1.1.0:
   integrity sha512-5Hh7Y1wQbvY5ooGgPbDaL5iYLAPzMTUrjMulskHLH6wnv/A+1q5rgEaiuqEjB+oxGXIVZs1FF+R/KPN3ZSQYYg==
 
 ip-address@^10.1.1:
-  version "10.5.0"
-  resolved "https://registry.yarnpkg.com/ip-address/-/ip-address-10.5.0.tgz#fcd6d7dfe9e68416b7cb71afe9bc960b3e38c13b"
-  integrity sha512-R5SnVLJmgYYvf2F2ZgwSBnelz5G4q5AxIC277GDfUaNbrZKNANcBC7RHqYYePlszf4kBolVkJauG0ZjHHFh55g==
+  version "10.7.3"
+  resolved "https://registry.yarnpkg.com/ip-address/-/ip-address-10.7.3.tgz#4cb77d274a4e2484a3ea438cfe98dbe0c502e8c5"
+  integrity sha512-A1kdq/tSb5QjvKvAMgIoEvDBIgL7qaqVP/jkvSwYYRZ9iEzvPpopxp2wQfu3SuZRHtpHNxMn8Fs0bS+gf5Xmwg==
 
 ipaddr.js@1.9.1:
   version "1.9.1"
