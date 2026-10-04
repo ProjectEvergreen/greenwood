@@ -1,10 +1,15 @@
 import fs from "node:fs/promises";
 import livereload from "livereload";
+import { startServerOnAvailablePort } from "../../lib/server-utils.js";
+
+const DEFAULT_PORT = 35729;
+const serverState = {
+  port: DEFAULT_PORT,
+};
 
 class LiveReloadServer {
-  constructor(compilation, options = {}) {
+  constructor(compilation) {
     this.compilation = compilation;
-    this.options = options;
   }
 
   async start() {
@@ -46,32 +51,46 @@ class LiveReloadServer {
       .filter((ext, idx, array) => array.indexOf(ext) === idx) // dedupe
       .map((ext) => (ext.startsWith(".") ? ext.replace(".", "") : ext)); // trim . from all entries
 
-    const liveReloadServer = livereload.createServer(
-      {
-        exts: allExtensions,
-        applyCSSLive: false, // https://github.com/napcs/node-livereload/issues/33#issuecomment-693707006
-        applyImgLive: false, // https://github.com/ProjectEvergreen/greenwood/issues/1263
-      },
-      () => {
-        const abridgedWorkspacePath = userWorkspace.pathname
-          .replace(projectDirectory.pathname, "")
-          .replace("/", "");
+    const { port, server: liveReloadServer } = await startServerOnAvailablePort((port) => {
+      return new Promise((resolve, reject) => {
+        let server;
+        const onError = (error) => {
+          server.off("error", onError);
+          reject(error);
+        };
 
-        console.info(
-          `Now watching workspace directory (./${abridgedWorkspacePath}) for changes...`,
+        server = livereload.createServer(
+          {
+            port,
+            exts: allExtensions,
+            applyCSSLive: false, // https://github.com/napcs/node-livereload/issues/33#issuecomment-693707006
+            applyImgLive: false, // https://github.com/ProjectEvergreen/greenwood/issues/1263
+          },
+          () => {
+            server.off("error", onError);
+            resolve(server);
+          },
         );
-      },
-    );
+        server.once("error", onError);
+      });
+    }, DEFAULT_PORT);
 
-    // don't crash the whole dev server if the live reload port (35729) is already in use,
-    // e.g. a second concurrent `greenwood develop`; degrade gracefully and keep serving
-    // https://github.com/ProjectEvergreen/greenwood/issues/1717
+    serverState.port = port;
+
+    if (port !== DEFAULT_PORT) {
+      console.warn(
+        `Live reload port ${DEFAULT_PORT} is already in use, using next available port of ${port} instead.`,
+      );
+    }
+
+    const abridgedWorkspacePath = userWorkspace.pathname
+      .replace(projectDirectory.pathname, "")
+      .replace("/", "");
+
+    console.info(`Now watching workspace directory (./${abridgedWorkspacePath}) for changes...`);
+
     liveReloadServer.on("error", (error) => {
-      if (error.code === "EADDRINUSE") {
-        console.warn("live reload port 35729 is in use — live reload disabled for this session.");
-      } else {
-        throw error;
-      }
+      throw error;
     });
 
     liveReloadServer.watch(userWorkspace.pathname);
@@ -91,7 +110,7 @@ class LiveReloadResource {
     body = body.replace(
       "</head>",
       `
-        <script src="http://localhost:35729/livereload.js?snipver=1"></script>
+        <script src="http://localhost:${serverState.port}/livereload.js?snipver=1"></script>
       </head>
     `,
     );

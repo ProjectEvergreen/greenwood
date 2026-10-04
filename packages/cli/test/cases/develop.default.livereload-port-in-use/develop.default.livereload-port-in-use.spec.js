@@ -5,7 +5,7 @@
  *
  * User Result
  * Should start the development server on the configured devServer.port and keep serving
- * pages, gracefully disabling live reload with a warning instead of crashing the process.
+ * pages, using the next available port for live reload.
  *
  * User Command
  * greenwood develop
@@ -34,6 +34,7 @@ describe("Develop Greenwood With: ", function () {
   const hostname = "http://localhost";
   const port = 1988;
   const liveReloadPort = 35729;
+  const availableLiveReloadPort = liveReloadPort + 1;
   let runner;
   let blocker;
 
@@ -46,7 +47,7 @@ describe("Develop Greenwood With: ", function () {
 
   describe(LABEL, function () {
     before(async function () {
-      // occupy the hardcoded live reload port before Greenwood starts so its bind fails
+      // occupy the default live reload port before Greenwood starts
       blocker = net.createServer();
       await new Promise((resolve, reject) => {
         blocker.once("error", reject);
@@ -70,19 +71,20 @@ describe("Develop Greenwood With: ", function () {
       });
     });
 
-    describe("Develop command still serving despite live reload port conflict", function () {
+    describe("Develop command using the next available live reload port", function () {
       let response = {};
+      let liveReloadResponse = {};
       let body;
 
       before(async function () {
-        // give the (unpatched) server a moment to crash on the unhandled EADDRINUSE if it is going to
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
         response = await fetch(`${hostname}:${port}/`);
         body = await response.clone().text();
+        liveReloadResponse = await fetch(
+          `${hostname}:${availableLiveReloadPort}/livereload.js?snipver=1`,
+        );
       });
 
-      it("should return a 200 status (dev server did not crash)", function (done) {
+      it("should return a 200 status", function (done) {
         expect(response.status).to.equal(200);
         done();
       });
@@ -94,6 +96,18 @@ describe("Develop Greenwood With: ", function () {
 
       it("should return the expected page content", function (done) {
         expect(body).to.contain("<h1>Hello World</h1>");
+        done();
+      });
+
+      it("should inject the next available live reload port", function (done) {
+        expect(body).to.contain(
+          `http://localhost:${availableLiveReloadPort}/livereload.js?snipver=1`,
+        );
+        done();
+      });
+
+      it("should serve the live reload client from the next available port", function (done) {
+        expect(liveReloadResponse.status).to.equal(200);
         done();
       });
     });
