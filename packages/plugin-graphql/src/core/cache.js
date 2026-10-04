@@ -8,10 +8,10 @@ import { gql } from "graphql-tag";
 import { getQueryHash } from "./common.js";
 
 /* Extract cache server-side */
-const createCache = async (req, context) => {
+const createCache = async (req, context, port) => {
   const client = await new ApolloClient({
     link: new HttpLink({
-      uri: "http://localhost:4000?q=internal" /* internal flag to prevent looping cache on request */,
+      uri: `http://localhost:${port}?q=internal`, // internal flag to prevent looping cache on request
       fetch,
     }),
     cache: new InMemoryCache(),
