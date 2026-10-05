@@ -12,7 +12,7 @@ const greenwoodPluginRendererPuppeteer = (options = {}) => {
     {
       type: "server",
       name: "plugin-renderer-puppeteer:server",
-      provider: (compilation) => new PuppeteerServer(compilation, options),
+      provider: (compilation) => new PuppeteerServer(compilation),
     },
     {
       type: "renderer",

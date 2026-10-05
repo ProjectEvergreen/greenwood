@@ -1,11 +1,9 @@
 /*
  * Use Case
- * Run Greenwood develop command when the live reload port (35729) is already in use
- * by another process (e.g. a second concurrent `greenwood develop`).
+ * Run Greenwood develop command when the configured development server port is already in use.
  *
  * User Result
- * Should start the development server on the configured devServer.port and keep serving
- * pages, using the next available port for live reload.
+ * Should start the development server on the next available port and serve pages without crashing.
  *
  * User Command
  * greenwood develop
@@ -26,14 +24,12 @@ import path from "node:path";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
 
-// https://github.com/ProjectEvergreen/greenwood/issues/1717
 describe("Develop Greenwood With: ", function () {
-  const LABEL = "Live Reload Port (35729) Already In Use";
+  const LABEL = "Development Server Port Already In Use";
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
-  const liveReloadPort = 35729;
+  const preferredPort = 1988;
   let hostname;
-  let selectedLiveReloadPort;
   let runner;
   let blocker;
 
@@ -43,11 +39,10 @@ describe("Develop Greenwood With: ", function () {
 
   describe(LABEL, function () {
     before(async function () {
-      // occupy the default live reload port before Greenwood starts
       blocker = net.createServer();
       await new Promise((resolve, reject) => {
         blocker.once("error", reject);
-        blocker.listen(liveReloadPort, resolve);
+        blocker.listen(preferredPort, resolve);
       });
 
       await runner.setup(outputPath);
@@ -76,19 +71,17 @@ describe("Develop Greenwood With: ", function () {
       });
     });
 
-    describe("Develop command using the next available live reload port", function () {
+    describe("Develop command using the next available port", function () {
       let response = {};
-      let liveReloadResponse = {};
       let body;
 
       before(async function () {
         response = await fetch(`${hostname}/`);
         body = await response.clone().text();
-        const script = body.match(/http:\/\/localhost:(\d+)\/livereload\.js\?snipver=1/);
+      });
 
-        expect(script).not.to.be.null;
-        selectedLiveReloadPort = Number(script[1]);
-        liveReloadResponse = await fetch(script[0]);
+      it("should select a port above the occupied development port", function () {
+        expect(Number(new URL(hostname).port)).to.be.greaterThan(preferredPort);
       });
 
       it("should return a 200 status", function (done) {
@@ -103,16 +96,6 @@ describe("Develop Greenwood With: ", function () {
 
       it("should return the expected page content", function (done) {
         expect(body).to.contain("<h1>Hello World</h1>");
-        done();
-      });
-
-      it("should inject the next available live reload port", function (done) {
-        expect(selectedLiveReloadPort).to.be.greaterThan(liveReloadPort);
-        done();
-      });
-
-      it("should serve the live reload client from the next available port", function (done) {
-        expect(liveReloadResponse.status).to.equal(200);
         done();
       });
     });

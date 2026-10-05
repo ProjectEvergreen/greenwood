@@ -1,8 +1,19 @@
 import fs from "node:fs/promises";
 import { graphqlServer } from "./core/server.js";
+import { getAvailablePort } from "@greenwood/cli/src/lib/server-utils.js";
 import { mergeImportMap } from "@greenwood/cli/src/lib/node-modules-utils.js";
 import { startStandaloneServer } from "@apollo/server/standalone";
 import { createCache } from "./core/cache.js";
+
+const DEFAULT_PORT = 4000;
+const serverState = {
+  port: DEFAULT_PORT,
+};
+const getPortScript = (port) => {
+  return `<script data-gwd-opt="none" data-graphql-port>
+          globalThis.__GWD_GRAPHQL_PORT__ = ${port};
+        </script>`;
+};
 
 const importMap = {
   "@greenwood/plugin-graphql/src/core/client.js":
@@ -47,10 +58,12 @@ class GraphQLResource {
 
   async intercept(url, request, response) {
     const body = await response.text();
-    const newBody = mergeImportMap(
-      body,
-      importMap,
-      this.compilation?.config?.polyfills?.importMaps,
+    let newBody = mergeImportMap(body, importMap, this.compilation?.config?.polyfills?.importMaps);
+
+    newBody = newBody.replace(
+      "<head>",
+      `<head>
+        ${getPortScript(serverState.port)}`,
     );
 
     return new Response(newBody);
@@ -63,6 +76,7 @@ class GraphQLResource {
   async optimize(url, response) {
     let body = await response.text();
 
+    body = body.replace(getPortScript(serverState.port), "");
     body = body.replace(
       "<head>",
       `
@@ -83,9 +97,17 @@ class GraphQLServer {
   }
 
   async start() {
+    const port = await getAvailablePort(DEFAULT_PORT);
+
+    if (port !== DEFAULT_PORT) {
+      console.warn(
+        `GraphQL port ${DEFAULT_PORT} is already in use, using next available port of ${port} instead.`,
+      );
+    }
+
     // https://www.apollographql.com/docs/apollo-server/api/standalone
     const { url } = await startStandaloneServer(await graphqlServer(this.compilation), {
-      listen: { port: 4000 },
+      listen: { port },
       context: async (integrationContext) => {
         const { req } = integrationContext;
         const { config, graph, context } = this.compilation;
@@ -97,7 +119,7 @@ class GraphQLServer {
           !req?.url.endsWith("?q=internal") &&
           req?.body?.operationName !== "IntrospectionQuery"
         ) {
-          await createCache(req, context);
+          await createCache(req, context, port);
         }
 
         return {
@@ -106,6 +128,11 @@ class GraphQLServer {
         };
       },
     });
+
+    serverState.port = port;
+    globalThis.__GWD_GRAPHQL_PORT__ = port;
+    // worker threads inherit the environment when they are created.
+    process.env.__GWD_GRAPHQL_PORT__ = String(port);
 
     console.log(`GraphQLServer started at ${url}`);
   }
