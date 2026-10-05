@@ -99,9 +99,6 @@ class GraphQLServer {
   async start() {
     const port = await getAvailablePort(DEFAULT_PORT);
 
-    serverState.port = port;
-    globalThis.__GWD_GRAPHQL_PORT__ = port;
-
     if (port !== DEFAULT_PORT) {
       console.warn(
         `GraphQL port ${DEFAULT_PORT} is already in use, using next available port of ${port} instead.`,
@@ -131,6 +128,11 @@ class GraphQLServer {
         };
       },
     });
+
+    serverState.port = port;
+    globalThis.__GWD_GRAPHQL_PORT__ = port;
+    // worker threads inherit the environment when they are created.
+    process.env.__GWD_GRAPHQL_PORT__ = String(port);
 
     console.log(`GraphQLServer started at ${url}`);
   }

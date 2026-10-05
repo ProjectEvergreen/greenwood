@@ -1,4 +1,5 @@
 import { runWithConcurrency } from "../../cli/src/lib/async-utils.js";
+import { serverState } from "./plugins/server.js";
 
 export default async function (compilation, callback) {
   const BrowserRunner = (await import("./lib/browser.js")).BrowserRunner;
@@ -45,9 +46,7 @@ export default async function (compilation, callback) {
   }
 
   const pages = compilation.graph.filter((page) => !page.isSSR);
-  const port = compilation.config.devServer.port;
-  const offsetPort = port + 1; // don't try and start the dev server on the same port as the CLI
-  const serverAddress = `http://127.0.0.1:${offsetPort}`;
+  const serverAddress = `http://127.0.0.1:${serverState.port}`;
 
   try {
     await runBrowser(serverAddress, pages);
