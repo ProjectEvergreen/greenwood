@@ -34,10 +34,12 @@ describe("Build Greenwood With: GraphQL Port Already In Use", function () {
   });
 
   it("should select a port above the occupied GraphQL port", function () {
-    const server = output.match(/GraphQLServer started at http:\/\/localhost:(\d+)\//);
+    // Apollo derives the hostname from the bind address, which can be 0.0.0.0 on Deno/Windows.
+    // Parse the reported URL instead of assuming localhost.
+    const server = output.match(/GraphQLServer started at (http:\/\/\S+)\r?\n/);
 
     expect(server).not.to.be.null;
-    expect(Number(server[1])).to.be.greaterThan(preferredPort);
+    expect(Number(new URL(server[1]).port)).to.be.greaterThan(preferredPort);
   });
 
   it("should query the fallback GraphQL port from a render worker", async function () {
