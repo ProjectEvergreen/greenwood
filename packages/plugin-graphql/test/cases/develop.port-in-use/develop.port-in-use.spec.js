@@ -51,9 +51,9 @@ describe("Develop Greenwood With: ", function () {
               );
 
               if (ready) {
-                const graphql = output.match(
-                  /GraphQLServer started at http:\/\/localhost:(\d+)\/\r?\n/,
-                );
+                // Apollo derives the hostname from the bind address, which can be 0.0.0.0 on Deno/Windows.
+                // Parse the reported URL instead of assuming localhost.
+                const graphql = output.match(/GraphQLServer started at (http:\/\/\S+)\r?\n/);
 
                 if (!graphql) {
                   reject(
@@ -63,7 +63,7 @@ describe("Develop Greenwood With: ", function () {
                 }
 
                 devServerUrl = ready[1];
-                selectedPort = Number(graphql[1]);
+                selectedPort = Number(new URL(graphql[1]).port);
                 resolve();
               }
             },
