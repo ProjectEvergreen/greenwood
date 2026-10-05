@@ -7,7 +7,8 @@ const client = {
   query: (params) => {
     const { query, variables = {} } = params;
 
-    const port = globalThis.__GWD_GRAPHQL_PORT__ ?? 4000;
+    const port =
+      globalThis.__GWD_GRAPHQL_PORT__ ?? globalThis.process?.env?.__GWD_GRAPHQL_PORT__ ?? 4000;
 
     return fetch(`http://localhost:${port}/graphql`, {
       method: "POST",
