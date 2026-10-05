@@ -9,8 +9,7 @@ describe("Serve Greenwood With: Production Server Port Already In Use", function
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
   const preferredPort = 8183;
-  const availablePort = preferredPort + 1;
-  const hostname = `http://localhost:${availablePort}`;
+  let hostname;
   const runner = new Runner();
   let blocker;
 
@@ -25,16 +24,29 @@ describe("Serve Greenwood With: Production Server Port Already In Use", function
     });
 
     await new Promise((resolve, reject) => {
+      let output = "";
+
       runner
         .runCommand(cliPath, "serve", {
           onStdOut: (message) => {
-            if (message.includes(`Started server at ${hostname}`)) {
+            output += message;
+            const ready = output.match(/Started server at (http:\/\/localhost:\d+)\/?\r?\n/);
+
+            if (ready) {
+              hostname = ready[1];
               resolve();
             }
           },
         })
-        .catch(reject);
+        .then(
+          () => reject(new Error(`Serve command exited before server readiness:\n${output}`)),
+          reject,
+        );
     });
+  });
+
+  it("should select a port above the occupied production port", function () {
+    expect(Number(new URL(hostname).port)).to.be.greaterThan(preferredPort);
   });
 
   it("should serve static pages on the next available port", async function () {
@@ -52,7 +64,9 @@ describe("Serve Greenwood With: Production Server Port Already In Use", function
   });
 
   after(async function () {
-    await runner.stopCommand();
+    if (runner.childProcess?.exitCode === null && runner.childProcess?.signalCode === null) {
+      await runner.stopCommand();
+    }
     if (blocker?.listening) {
       await new Promise((resolve) => blocker.close(resolve));
     }

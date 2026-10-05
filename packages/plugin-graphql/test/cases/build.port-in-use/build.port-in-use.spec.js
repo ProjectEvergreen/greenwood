@@ -14,17 +14,30 @@ describe("Build Greenwood With: GraphQL Port Already In Use", function () {
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
   const runner = new Runner();
+  const preferredPort = 4000;
+  let output = "";
   let blocker;
 
   before(async function () {
     blocker = net.createServer();
     await new Promise((resolve, reject) => {
       blocker.once("error", reject);
-      blocker.listen(4000, resolve);
+      blocker.listen(preferredPort, resolve);
     });
 
     await runner.setup(outputPath);
-    await runner.runCommand(cliPath, "build");
+    await runner.runCommand(cliPath, "build", {
+      onStdOut: (message) => {
+        output += message;
+      },
+    });
+  });
+
+  it("should select a port above the occupied GraphQL port", function () {
+    const server = output.match(/GraphQLServer started at http:\/\/localhost:(\d+)\//);
+
+    expect(server).not.to.be.null;
+    expect(Number(server[1])).to.be.greaterThan(preferredPort);
   });
 
   it("should query the fallback GraphQL port from a render worker", async function () {

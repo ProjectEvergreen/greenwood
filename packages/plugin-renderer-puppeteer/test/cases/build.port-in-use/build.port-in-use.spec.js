@@ -16,19 +16,19 @@ describe("Build Greenwood With: Puppeteer and Active Content Ports Already In Us
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
   const runner = new Runner();
-  const blockers = [];
+  const preferredContentPort = 1990;
+  let blocker;
+  let preferredPrerenderPort;
+  let selectedPrerenderPort;
   let output = "";
 
   before(async function () {
-    // Active content falls back from 1990 to 1991; Puppeteer then tries 1992 and uses 1993.
-    for (const port of [1990, 1992]) {
-      const blocker = net.createServer();
-      blockers.push(blocker);
-      await new Promise((resolve, reject) => {
-        blocker.once("error", reject);
-        blocker.listen(port, resolve);
-      });
-    }
+    // The fixture occupies Puppeteer's preferred port after active content selects its port.
+    blocker = net.createServer();
+    await new Promise((resolve, reject) => {
+      blocker.once("error", reject);
+      blocker.listen(preferredContentPort, resolve);
+    });
 
     await runner.setup(outputPath);
     await runner.runCommand(cliPath, "build", {
@@ -36,11 +36,21 @@ describe("Build Greenwood With: Puppeteer and Active Content Ports Already In Us
         output += message;
       },
     });
+
+    const preferred = output.match(/Puppeteer preferred port: (\d+)/);
+    const selected = output.match(
+      /Started puppeteer prerender server at http:\/\/localhost:(\d+)\r?\n/,
+    );
+
+    expect(preferred).not.to.be.null;
+    expect(selected).not.to.be.null;
+    preferredPrerenderPort = Number(preferred[1]);
+    selectedPrerenderPort = Number(selected[1]);
   });
 
   it("should start one prerender server on the next available port", function () {
     expect(output.match(/Started puppeteer prerender server at/g)).to.have.lengthOf(1);
-    expect(output).to.contain("Started puppeteer prerender server at http://localhost:1993");
+    expect(selectedPrerenderPort).to.be.greaterThan(preferredPrerenderPort);
   });
 
   for (const page of ["index.html", "about/index.html"]) {
@@ -49,18 +59,19 @@ describe("Build Greenwood With: Puppeteer and Active Content Ports Already In Us
       const { document } = new JSDOM(html).window;
 
       expect(document.querySelector("#server-origin").textContent).to.equal(
-        "http://127.0.0.1:1993",
+        `http://127.0.0.1:${selectedPrerenderPort}`,
       );
-      expect(document.querySelector("#content-port").textContent).to.equal("1991");
+      const contentPort = Number(document.querySelector("#content-port").textContent);
+
+      expect(contentPort).to.be.greaterThan(preferredContentPort);
+      expect(contentPort).to.equal(preferredPrerenderPort - 1);
       expect(document.querySelector("#content-count").textContent).to.equal("2");
     });
   }
 
   after(async function () {
-    for (const blocker of blockers) {
-      if (blocker.listening) {
-        await new Promise((resolve) => blocker.close(resolve));
-      }
+    if (blocker?.listening) {
+      await new Promise((resolve) => blocker.close(resolve));
     }
     await runner.teardown(getOutputTeardownFiles(outputPath));
   });
