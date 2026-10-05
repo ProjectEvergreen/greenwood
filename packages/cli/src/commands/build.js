@@ -1,3 +1,4 @@
+import http from "node:http";
 import { bundleCompilation } from "../lifecycles/bundle.js";
 import { copyAssets } from "../lifecycles/copy.js";
 import { getDevServer } from "../lifecycles/serve.js";
@@ -7,6 +8,7 @@ import {
   staticRenderCompilation,
 } from "../lifecycles/prerender.js";
 import { getPrerenderPages, getStaticPages } from "../lib/graph-utils.js";
+import { listenOnAvailablePort } from "../lib/server-utils.js";
 
 const runProductionBuild = async (compilation) => {
   const { activeContent, plugins } = compilation.config;
@@ -44,15 +46,27 @@ const runProductionBuild = async (compilation) => {
     ];
 
     if (activeContent) {
-      (
-        await getDevServer({
-          ...compilation,
-          // prune for the content as data plugin and start the dev server with only that plugin enabled
+      const preferredPort = compilation.config.devServer.port;
+      const app = await getDevServer({
+        ...compilation,
+        config: {
+          ...compilation.config,
+          // only the content as data plugin is needed for this build-time server
           plugins: [plugins.find((plugin) => plugin.name === "plugin-active-content")],
-        })
-      ).listen(compilation.config.devServer.port, () => {
-        console.info("Initializing active content...");
+        },
       });
+      const server = http.createServer(app.callback());
+      const port = await listenOnAvailablePort(server, preferredPort);
+
+      compilation.config.devServer.port = port;
+
+      if (port !== preferredPort) {
+        console.warn(
+          `Active content port ${preferredPort} is already in use, using next available port of ${port} instead.`,
+        );
+      }
+
+      console.info("Initializing active content...");
     }
 
     await Promise.all(servers.map((server) => server.start()));
