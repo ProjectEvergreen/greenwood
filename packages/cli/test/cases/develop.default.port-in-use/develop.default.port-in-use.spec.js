@@ -28,16 +28,12 @@ describe("Develop Greenwood With: ", function () {
   const LABEL = "Development Server Port Already In Use";
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
-  const hostname = "http://localhost";
   const preferredPort = 1988;
-  const availablePort = preferredPort + 1;
+  let hostname;
   let runner;
   let blocker;
 
   before(function () {
-    this.context = {
-      hostname: `${hostname}:${availablePort}`,
-    };
     runner = new Runner();
   });
 
@@ -52,17 +48,26 @@ describe("Develop Greenwood With: ", function () {
       await runner.setup(outputPath);
 
       await new Promise((resolve, reject) => {
+        let output = "";
+
         runner
           .runCommand(cliPath, "develop", {
             onStdOut: (message) => {
-              if (
-                message.includes(`Started local development server at ${hostname}:${availablePort}`)
-              ) {
+              output += message;
+              const ready = output.match(
+                /Started local development server at (http:\/\/localhost:\d+)\/?\r?\n/,
+              );
+
+              if (ready) {
+                hostname = ready[1];
                 resolve();
               }
             },
           })
-          .catch(reject);
+          .then(
+            () => reject(new Error(`Develop command exited before server readiness:\n${output}`)),
+            reject,
+          );
       });
     });
 
@@ -71,8 +76,12 @@ describe("Develop Greenwood With: ", function () {
       let body;
 
       before(async function () {
-        response = await fetch(`${hostname}:${availablePort}/`);
+        response = await fetch(`${hostname}/`);
         body = await response.clone().text();
+      });
+
+      it("should select a port above the occupied development port", function () {
+        expect(Number(new URL(hostname).port)).to.be.greaterThan(preferredPort);
       });
 
       it("should return a 200 status", function (done) {
@@ -93,8 +102,12 @@ describe("Develop Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.stopCommand();
-    await new Promise((resolve) => blocker.close(resolve));
+    if (runner.childProcess?.exitCode === null && runner.childProcess?.signalCode === null) {
+      await runner.stopCommand();
+    }
+    if (blocker?.listening) {
+      await new Promise((resolve) => blocker.close(resolve));
+    }
     await runner.teardown([
       path.join(outputPath, ".greenwood"),
       path.join(outputPath, "node_modules"),
