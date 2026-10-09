@@ -1,5 +1,4 @@
 import fs from "node:fs/promises";
-import { asyncForEach } from "../lib/async-utils.js";
 
 async function copyFile(source, target, projectDirectory) {
   try {
@@ -24,10 +23,10 @@ const copyAssets = async (compilation) => {
   const copyPlugins = compilation.config.plugins.filter((plugin) => plugin.type === "copy");
   const { projectDirectory } = compilation.context;
 
-  await asyncForEach(copyPlugins, async (plugin) => {
+  for (const plugin of copyPlugins) {
     const locations = await plugin.provider(compilation);
 
-    await asyncForEach(locations, async (location) => {
+    for (const location of locations) {
       const { from, to } = location;
 
       if (from.pathname.endsWith("/")) {
@@ -35,8 +34,8 @@ const copyAssets = async (compilation) => {
       } else {
         await copyFile(from, to, projectDirectory);
       }
-    });
-  });
+    }
+  }
 };
 
 export { copyAssets };
