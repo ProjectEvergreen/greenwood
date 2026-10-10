@@ -1,5 +1,3 @@
-interface User { }
-
 export async function handler(request) {
   const params = new URLSearchParams(request.url.slice(request.url.indexOf('?')));
   const name = params.has('name') ? params.get('name') : 'World';
