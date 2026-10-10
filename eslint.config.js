@@ -7,6 +7,7 @@ import globals from "globals";
 import noOnlyTests from "eslint-plugin-no-only-tests";
 import importPlugin from "eslint-plugin-import";
 import unicorn from "eslint-plugin-unicorn";
+import testRunnerCleanupOrder from "./eslint-test-runner-cleanup-order-plugin.js";
 
 export default [
   importPlugin.flatConfigs.recommended,
@@ -56,6 +57,19 @@ export default [
     plugins: {
       "no-only-tests": noOnlyTests,
       unicorn,
+    },
+  },
+  {
+    files: ["packages/**/test/**/*.spec.js"],
+    plugins: {
+      "@greenwood/eslint": {
+        rules: {
+          "test-runner-cleanup-order": testRunnerCleanupOrder,
+        },
+      },
+    },
+    rules: {
+      "@greenwood/eslint/test-runner-cleanup-order": "error",
     },
   },
   {
