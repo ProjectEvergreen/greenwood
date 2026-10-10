@@ -125,6 +125,24 @@ describe("Build Greenwood With: ", function () {
       });
     });
 
+    // https://github.com/ProjectEvergreen/greenwood/issues/1831
+    describe("A static SSR page with a shadow component and inferred observability", function () {
+      let dom;
+
+      before(async function () {
+        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "./welcome/index.html"));
+      });
+
+      it("should render the component shadow root only once during prerendering", function () {
+        const greetings = dom.window.document.querySelectorAll("wcc-greeting");
+        const shadowRoots = greetings[0].querySelectorAll('template[shadowrootmode="open"]');
+
+        expect(greetings.length).to.equal(1);
+        expect(shadowRoots.length).to.equal(1);
+        expect(shadowRoots[0].content.querySelector("p").textContent).to.equal("Hello from SSR");
+      });
+    });
+
     // https://github.com/ProjectEvergreen/greenwood/issues/1814
     describe("An SSR page that should emit the Signals setup script when using inferred observability", function () {
       let dom;
