@@ -71,7 +71,7 @@
     "livereload": "^0.9.1",
     "node-html-parser": "^7.0.1",
     "rollup": "^4.59.0",
-    "wc-compiler": "~0.22.2"
+    "wc-compiler": "~0.22.3"
   },
   "devDependencies": {
     "@awesome.me/webawesome": "3.0.0",
