@@ -189,6 +189,8 @@ describe('Build Greenwood With: ', function() {
 });
 ```
 
+> _For `develop` and `serve` tests, call `stopCommand()` before `teardown()` so the server releases its files before cleanup._
+
 ### Custom Loaders
 
 Test cases that exercise custom loaders for SSR and pre-rendering use cases will need to do a couple of things:

@@ -92,8 +92,8 @@ xdescribe("Serve Greenwood With: ", function () {
     });
   });
 
-  after(function () {
-    runner.teardown(getOutputTeardownFiles(outputPath));
-    runner.stopCommand();
+  after(async function () {
+    await runner.stopCommand();
+    await runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });

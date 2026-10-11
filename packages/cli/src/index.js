@@ -1,4 +1,6 @@
 import { generateCompilation } from "./lifecycles/compile.js";
+import { writeSync } from "node:fs";
+import { format } from "node:util";
 
 async function run(command) {
   process.env.__GWD_COMMAND__ = command;
@@ -30,7 +32,8 @@ async function run(command) {
     }
     process.exit(0);
   } catch (err) {
-    console.error(err);
+    // TODO: remove this once we have a better error handling strategy in place for the CLI
+    writeSync(process.stderr.fd, `${format(err)}\n`);
     process.exit(1);
   }
 }
