@@ -224,7 +224,7 @@ async function getDevServer(compilation) {
 async function getStaticServer(compilation, composable) {
   const app = new Koa();
   const { outputDir } = compilation.context;
-  const { port, basePath } = compilation.config;
+  const { basePath } = compilation.config;
   const standardResourcePlugins = compilation.config.plugins.filter((plugin) => {
     return plugin.type === "resource" && plugin.isGreenwoodDefaultPlugin;
   });
@@ -285,7 +285,7 @@ async function getStaticServer(compilation, composable) {
   // should it be renamed?  should this be a middleware?
   app.use(async (ctx, next) => {
     try {
-      const url = new URL(`http://localhost:${port}${ctx.url}`);
+      const url = new URL(`http://localhost:${compilation.config.port}${ctx.url}`);
       const request = new Request(url, {
         method: ctx.request.method,
         headers: ctx.request.header,
@@ -318,7 +318,7 @@ async function getStaticServer(compilation, composable) {
   // resolve pages / SPAs last
   app.use(async (ctx, next) => {
     try {
-      const url = new URL(`http://localhost:${port}${ctx.url}`);
+      const url = new URL(`http://localhost:${compilation.config.port}${ctx.url}`);
       const matchingRoute =
         compilation.graph.find((page) => page.route === url.pathname) ||
         getMatchingDynamicSsrRoute(compilation, url.pathname);
