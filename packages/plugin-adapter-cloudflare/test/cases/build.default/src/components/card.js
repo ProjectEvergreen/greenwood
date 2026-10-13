@@ -1,0 +1,23 @@
+export default class Card extends HTMLElement {
+  connectedCallback() {
+    if (!this.shadowRoot) {
+      const title = this.getAttribute("title");
+      const thumbnail = this.getAttribute("thumbnail");
+      const template = document.createElement("template");
+
+      template.innerHTML = `
+        <article>
+          <h2>${title}</h2>
+          <img src="${thumbnail}" alt="${title}" loading="lazy">
+        </article>
+      `;
+
+      const shadowRoot = this.attachShadow({ mode: "open" });
+      shadowRoot.appendChild(template.content.cloneNode(true));
+    }
+  }
+}
+
+if (!customElements.get("app-cloudflare-card")) {
+  customElements.define("app-cloudflare-card", Card);
+}

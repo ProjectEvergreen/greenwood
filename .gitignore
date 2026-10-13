@@ -14,6 +14,7 @@ packages/**/test/**/package-lock.json
 packages/**/test/**/netlify
 packages/**/test/**/.netlify
 packages/**/test/**/.vercel
+packages/**/test/**/functions
 public/
 adapter-output/
 .aws-output/
