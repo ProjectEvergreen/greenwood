@@ -1,0 +1,8 @@
+{
+  "name": "test-develop-command-import-map-array-pattern-exports",
+  "type": "module",
+  "dependencies": {
+    "fake-array-pattern-exports": "*",
+    "fake-subsequent-dependency": "*"
+  }
+}
