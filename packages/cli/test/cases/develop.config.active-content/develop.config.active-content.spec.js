@@ -31,6 +31,7 @@
  */
 
 import { expect } from "chai";
+import { fileUrlToResolvedPrefixPath } from "@greenwood/cli/src/lib/package-resolution.js";
 import { JSDOM } from "jsdom";
 import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
@@ -89,7 +90,7 @@ describe("Develop Greenwood With: ", function () {
         const contents = JSON.parse(map[0].textContent);
 
         expect(contents.imports["@greenwood/cli/src/data/client.js"]).to.equal(
-          "/node_modules/@greenwood/cli/src/data/client.js",
+          fileUrlToResolvedPrefixPath(new URL("../../../src/data/client.js", import.meta.url)),
         );
       });
     });

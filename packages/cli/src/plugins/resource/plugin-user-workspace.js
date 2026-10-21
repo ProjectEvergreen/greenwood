@@ -5,7 +5,7 @@
  *
  */
 import { resolveForRelativeUrl } from "../../lib/resource-utils.js";
-import { IMPORT_MAP_RESOLVED_PREFIX } from "../../lib/walker-package-ranger.js";
+import { isPackageResourcePath } from "../../lib/package-resolution.js";
 
 class UserWorkspaceResource {
   constructor(compilation) {
@@ -20,8 +20,7 @@ class UserWorkspaceResource {
 
     return (
       hasExtension &&
-      !pathname.startsWith("/node_modules") &&
-      !pathname.startsWith(IMPORT_MAP_RESOLVED_PREFIX) &&
+      !isPackageResourcePath(pathname) &&
       (await resolveForRelativeUrl(url, userWorkspace))
     );
   }

@@ -3,6 +3,8 @@
  * Detects and fully resolves import requests for CommonJS files in node_modules.
  *
  */
+import { isNodeModulesPath } from "@greenwood/cli/src/lib/package-resolution.js";
+import { fileURLToPath } from "node:url";
 import commonjs from "@rollup/plugin-commonjs";
 import fs from "node:fs/promises";
 import { parse, init } from "cjs-module-lexer";
@@ -15,8 +17,9 @@ const testForCjsModule = async (url) => {
   let isCommonJs = false;
 
   if (
-    pathname.split(".").pop() === ".js" &&
-    pathname.startsWith("/node_modules/") &&
+    url.protocol === "file:" &&
+    ["js", "cjs"].includes(pathname.split(".").pop()) &&
+    isNodeModulesPath(pathname) &&
     pathname.indexOf("es-module-shims.js") < 0
   ) {
     try {
@@ -56,7 +59,7 @@ class ImportCommonJsResource {
     return new Promise((resolve, reject) => {
       try {
         const options = {
-          input: pathname,
+          input: fileURLToPath(url),
           output: { format: "esm" },
           plugins: [commonjs()],
         };

@@ -10,9 +10,18 @@ import {
   getResolvedHrefFromPathnameShortcut,
   mergeImportMap,
 } from "../../lib/node-modules-utils.js";
-import { walkPackageJson, IMPORT_MAP_RESOLVED_PREFIX } from "../../lib/walker-package-ranger.js";
+import { walkPackageJson } from "../../lib/walker-package-ranger.js";
+import {
+  fileUrlToResolvedPrefixPath,
+  getPackageRoot,
+  isNodeModulesPath,
+  isPackageResourcePath,
+} from "../../lib/package-resolution.js";
 
 let generatedImportMap;
+const importMapShimUrl = fileUrlToResolvedPrefixPath(
+  new URL("./dist/es-module-shims.js", getPackageRoot("es-module-shims", import.meta.url)),
+);
 
 class NodeModulesResource {
   constructor(compilation) {
@@ -24,19 +33,18 @@ class NodeModulesResource {
   async shouldResolve(url) {
     const { pathname } = url;
 
-    return pathname.startsWith(IMPORT_MAP_RESOLVED_PREFIX) || pathname.startsWith("/node_modules/");
+    return isPackageResourcePath(pathname);
   }
 
   async resolve(url) {
     const { projectDirectory } = this.compilation.context;
-    const { pathname, searchParams } = url;
-    const fromImportMap = pathname.startsWith(IMPORT_MAP_RESOLVED_PREFIX);
-    const resolvedHref = fromImportMap
-      ? pathname.replace(IMPORT_MAP_RESOLVED_PREFIX, "file://")
-      : getResolvedHrefFromPathnameShortcut(pathname, projectDirectory);
-    const params = searchParams.size > 0 ? `?${searchParams.toString()}` : "";
+    const { pathname } = url;
+    const resolvedHref = getResolvedHrefFromPathnameShortcut(
+      `${pathname}${url.search}`,
+      projectDirectory,
+    );
 
-    return new Request(`${resolvedHref}${params}`);
+    return new Request(resolvedHref);
   }
 
   async shouldServe(url) {
@@ -44,7 +52,7 @@ class NodeModulesResource {
 
     return (
       protocol === "file:" &&
-      pathname.indexOf("/node_modules/") >= 0 &&
+      (isNodeModulesPath(pathname) || this.extensions.includes(pathname.split(".").pop())) &&
       (await checkResourceExists(new URL(href)))
     );
   }
@@ -68,7 +76,7 @@ class NodeModulesResource {
     const { context, config } = this.compilation;
     const { importMaps } = config.polyfills;
     const importMapShimScript = importMaps
-      ? '<script defer src="/node_modules/es-module-shims/dist/es-module-shims.js"></script>'
+      ? `<script defer src="${importMapShimUrl}"></script>`
       : "";
     let body = await response.text();
     const hasHead = body.match(/<head>(.*)<\/head>/s);
@@ -79,28 +87,27 @@ class NodeModulesResource {
       body = body.replace(/<head>(.*)<\/head>/s, contents.replace(/\$/g, "$$$")); // https://github.com/ProjectEvergreen/greenwood/issues/656);
     }
 
-    const userPackageJson = await getPackageJsonForProject(context);
+    const { packageJson, packageJsonUrl } = await getPackageJsonForProject(context);
 
-    // if there are dependencies and we haven't generated the importMap already
-    // walk the project's package.json for all its direct and transitive dependencies
-    if (!generatedImportMap && Object.keys(userPackageJson.dependencies || []).length > 0) {
+    // Walk the project's dependencies once and cache the completed import map.
+    if (!generatedImportMap && Object.keys(packageJson.dependencies || {}).length > 0) {
       console.log("Generating import map from project dependencies...");
-      const { importMap, diagnostics } = await walkPackageJson(userPackageJson);
+      const { importMap, diagnostics, scopes } = await walkPackageJson(
+        packageJson,
+        new Set(),
+        packageJsonUrl,
+      );
 
       if (diagnostics.size > 0) {
         console.log("****************************************************************************");
-
-        diagnostics.forEach((value) => {
-          console.warn(`- ${value}\n`);
-        });
-
+        diagnostics.forEach((value) => console.warn(`- ${value}\n`));
         console.log(
-          "\n>>> Some issue were detected, learn more about these warnings at https://greenwoodjs.dev/docs/introduction/web-standards/#import-maps",
+          "\n>>> Some issues were detected, learn more at https://greenwoodjs.dev/docs/introduction/web-standards/#import-maps",
         );
         console.log("****************************************************************************");
       }
 
-      generatedImportMap = Object.fromEntries(importMap);
+      generatedImportMap = { imports: Object.fromEntries(importMap), scopes };
     } else {
       generatedImportMap = generatedImportMap || {};
     }

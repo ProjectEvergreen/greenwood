@@ -84,10 +84,8 @@ describe("Develop Greenwood With: ", function () {
         const importMapTag = importMapTags[0];
         const importMap = JSON.parse(importMapTag.textContent).imports;
 
-        expect(importMap["signal-polyfill"]).to.equal(
-          "/node_modules/signal-polyfill/dist/index.js",
-        );
-        expect(importMap["wc-compiler/effect"]).to.equal("/node_modules/wc-compiler/src/effect.js");
+        expect(importMap["signal-polyfill"]).to.match(/^\/~.*\/signal-polyfill\/dist\/index\.js$/);
+        expect(importMap["wc-compiler/effect"]).to.match(/^\/~.*\/wc-compiler\/src\/effect\.js$/);
 
         done();
       });

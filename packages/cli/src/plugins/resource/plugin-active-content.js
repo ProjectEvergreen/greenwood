@@ -1,3 +1,4 @@
+import { fileUrlToResolvedPrefixPath } from "../../lib/package-resolution.js";
 import { mergeImportMap } from "../../lib/node-modules-utils.js";
 import { checkResourceExists } from "../../lib/resource-utils.js";
 import {
@@ -11,9 +12,12 @@ import { getMatchingPageByRoute } from "../../lib/graph-utils.js";
 import fs from "node:fs/promises";
 
 const importMap = {
-  "@greenwood/cli/src/data/client.js": "/node_modules/@greenwood/cli/src/data/client.js",
-  "@greenwood/cli/src/lib/content-utils.js":
-    "/node_modules/@greenwood/cli/src/lib/content-utils.js",
+  "@greenwood/cli/src/data/client.js": fileUrlToResolvedPrefixPath(
+    new URL("../../data/client.js", import.meta.url),
+  ),
+  "@greenwood/cli/src/lib/content-utils.js": fileUrlToResolvedPrefixPath(
+    new URL("../../lib/content-utils.js", import.meta.url),
+  ),
 };
 
 // escape regex metacharacters in user provided key / collection names
@@ -93,7 +97,7 @@ class ContentAsDataResource {
     let newBody = body;
 
     if (process.env.__GWD_COMMAND__ === "develop") {
-      newBody = mergeImportMap(body, importMap, polyfills.importMaps);
+      newBody = mergeImportMap(body, { imports: importMap }, polyfills.importMaps);
     }
 
     newBody = newBody.replace(
