@@ -1,4 +1,5 @@
 import fs from "node:fs/promises";
+import { fileUrlToResolvedPrefixPath } from "@greenwood/cli/src/lib/package-resolution.js";
 import { graphqlServer } from "./core/server.js";
 import { getAvailablePort } from "@greenwood/cli/src/lib/server-utils.js";
 import { mergeImportMap } from "@greenwood/cli/src/lib/node-modules-utils.js";
@@ -15,18 +16,18 @@ const getPortScript = (port) => {
         </script>`;
 };
 
-const importMap = {
-  "@greenwood/plugin-graphql/src/core/client.js":
-    "/node_modules/@greenwood/plugin-graphql/src/core/client.js",
-  "@greenwood/plugin-graphql/src/core/common.js":
-    "/node_modules/@greenwood/plugin-graphql/src/core/common.js",
-  "@greenwood/plugin-graphql/src/queries/children.gql":
-    "/node_modules/@greenwood/plugin-graphql/src/queries/children.gql",
-  "@greenwood/plugin-graphql/src/queries/graph.gql":
-    "/node_modules/@greenwood/plugin-graphql/src/queries/graph.gql",
-  "@greenwood/plugin-graphql/src/queries/collection.gql":
-    "/node_modules/@greenwood/plugin-graphql/src/queries/collection.gql",
-};
+const importMap = Object.fromEntries(
+  [
+    "core/client.js",
+    "core/common.js",
+    "queries/children.gql",
+    "queries/graph.gql",
+    "queries/collection.gql",
+  ].map((path) => [
+    `@greenwood/plugin-graphql/src/${path}`,
+    fileUrlToResolvedPrefixPath(new URL(`./${path}`, import.meta.url)),
+  ]),
+);
 
 class GraphQLResource {
   constructor(compilation) {
@@ -58,7 +59,11 @@ class GraphQLResource {
 
   async intercept(url, request, response) {
     const body = await response.text();
-    let newBody = mergeImportMap(body, importMap, this.compilation?.config?.polyfills?.importMaps);
+    let newBody = mergeImportMap(
+      body,
+      { imports: importMap },
+      this.compilation?.config?.polyfills?.importMaps,
+    );
 
     newBody = newBody.replace(
       "<head>",

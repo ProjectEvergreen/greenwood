@@ -20,6 +20,7 @@
  *     index.html
  */
 import { expect } from "chai";
+import { fileUrlToResolvedPrefixPath } from "@greenwood/cli/src/lib/package-resolution.js";
 import { JSDOM } from "jsdom";
 import path from "node:path";
 import { Runner } from "gallinago";
@@ -83,19 +84,23 @@ describe("Develop Greenwood With: ", function () {
         const importMap = JSON.parse(importMapTag.textContent).imports;
 
         expect(importMap["@greenwood/plugin-graphql/src/core/client.js"]).to.equal(
-          "/node_modules/@greenwood/plugin-graphql/src/core/client.js",
+          fileUrlToResolvedPrefixPath(new URL("../../../src/core/client.js", import.meta.url)),
         );
         expect(importMap["@greenwood/plugin-graphql/src/core/common.js"]).to.equal(
-          "/node_modules/@greenwood/plugin-graphql/src/core/common.js",
+          fileUrlToResolvedPrefixPath(new URL("../../../src/core/common.js", import.meta.url)),
         );
         expect(importMap["@greenwood/plugin-graphql/src/queries/children.gql"]).to.equal(
-          "/node_modules/@greenwood/plugin-graphql/src/queries/children.gql",
+          fileUrlToResolvedPrefixPath(
+            new URL("../../../src/queries/children.gql", import.meta.url),
+          ),
         );
         expect(importMap["@greenwood/plugin-graphql/src/queries/graph.gql"]).to.equal(
-          "/node_modules/@greenwood/plugin-graphql/src/queries/graph.gql",
+          fileUrlToResolvedPrefixPath(new URL("../../../src/queries/graph.gql", import.meta.url)),
         );
         expect(importMap["@greenwood/plugin-graphql/src/queries/collection.gql"]).to.equal(
-          "/node_modules/@greenwood/plugin-graphql/src/queries/collection.gql",
+          fileUrlToResolvedPrefixPath(
+            new URL("../../../src/queries/collection.gql", import.meta.url),
+          ),
         );
 
         done();

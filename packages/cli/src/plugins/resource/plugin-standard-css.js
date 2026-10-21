@@ -11,6 +11,10 @@ import { hashString } from "../../lib/hashing-utils.js";
 import { getResolvedHrefFromPathnameShortcut } from "../../lib/node-modules-utils.js";
 import { isLocalLink } from "../../lib/resource-utils.js";
 import { derivePackageRoot } from "../../lib/walker-package-ranger.js";
+import {
+  fileUrlToResolvedPrefixPath,
+  isPackageResourcePath,
+} from "../../lib/package-resolution.js";
 
 function bundleCss(body, sourceUrl, compilation, workingUrl) {
   const { projectDirectory, outputDir, userWorkspace, scratchDir } = compilation.context;
@@ -37,10 +41,12 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
           (!segments[0].startsWith(".") && !segments[0].startsWith("/"));
 
         if (isLocalLink(value)) {
-          if (value.startsWith(".") || value.indexOf("/node_modules") === 0) {
-            const resolvedUrl = value.startsWith("/node_modules")
+          if (value.startsWith(".") || value.startsWith("/") || isPackageResourcePath(value)) {
+            const resolvedUrl = isPackageResourcePath(value)
               ? new URL(getResolvedHrefFromPathnameShortcut(value, projectDirectory))
-              : new URL(value, workingUrl ?? sourceUrl);
+              : value.startsWith("/")
+                ? new URL(`.${value}`, userWorkspace)
+                : new URL(value, workingUrl ?? sourceUrl);
 
             const importContents = fs.readFileSync(resolvedUrl, "utf-8");
 
@@ -84,7 +90,7 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
          * 5. Lastly, match the current value with the current source file
          */
         const urlPrefix = value.startsWith(".") ? "" : "./";
-        const resolvedUrl = value.startsWith("/node_modules/")
+        const resolvedUrl = isPackageResourcePath(value)
           ? new URL(getResolvedHrefFromPathnameShortcut(value, projectDirectory))
           : value.startsWith("/")
             ? new URL(`.${value}`, userWorkspace)
@@ -101,24 +107,19 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
           if (resolvedUrl.href.startsWith(userWorkspace.href)) {
             // truncate to just get /path/in/users/workspace.png
             finalValue = resolvedUrl.href.replace(userWorkspace.href, "/");
-          } else if (value.startsWith("/node_modules/")) {
-            // if it's a node modules shortcut alias, just use that
-            finalValue = value;
-          } else if (value.indexOf("../node_modules/") >= 0) {
-            // if it's a relative node_modules path, convert it to a shortcut alias
-            finalValue = `/${value.replace(/\.\.\//g, "")}`;
-          } else if (resolvedUrl.href.indexOf("/node_modules/") >= 0) {
-            // if we are deep in node_modules land, use resolution logic to figure out the specifier
+          } else {
             const resolvedRoot = derivePackageRoot(resolvedUrl.href);
-            const resolvedRootSegments = resolvedRoot
-              .split("/")
-              .reverse()
-              .filter((segment) => segment !== "");
-            const specifier = resolvedRootSegments[1].startsWith("@")
-              ? `${resolvedRootSegments[0]}/${resolvedRootSegments[1]}`
-              : resolvedRootSegments[0];
 
-            finalValue = `/node_modules/${specifier}/${value.replace(/\.\.\//g, "").replace("./", "")}`;
+            if (isDev) {
+              finalValue = fileUrlToResolvedPrefixPath(resolvedUrl);
+            } else if (resolvedRoot) {
+              const { name } = JSON.parse(
+                fs.readFileSync(new URL("./package.json", resolvedRoot), "utf-8"),
+              );
+              finalValue = `/node_modules/${name}/${resolvedUrl.href.slice(resolvedRoot.length)}`;
+            } else {
+              finalValue = `/assets/${resolvedUrl.pathname.split("/").pop()}`;
+            }
           }
 
           if (!isDev) {

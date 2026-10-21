@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import { hashString } from "./hashing-utils.js";
 import { getResolvedHrefFromPathnameShortcut } from "../lib/node-modules-utils.js";
+import { isPackageResourcePath } from "./package-resolution.js";
 import { getMatchingPageByRoute } from "../lib/graph-utils.js";
 import { parse } from "node-html-parser";
 import { asyncMap } from "./async-utils.js";
@@ -18,7 +19,7 @@ async function modelResource(
   let sourcePathURL;
 
   if (src) {
-    sourcePathURL = src.startsWith("/node_modules/")
+    sourcePathURL = isPackageResourcePath(src)
       ? new URL(getResolvedHrefFromPathnameShortcut(src, projectDirectory))
       : src.startsWith("/")
         ? new URL(`.${src}`, userWorkspace)

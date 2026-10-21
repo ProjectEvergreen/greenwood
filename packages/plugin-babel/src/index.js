@@ -4,6 +4,7 @@
  *
  */
 import babel from "@babel/core";
+import { isNodeModulesPath } from "@greenwood/cli/src/lib/package-resolution.js";
 import { checkResourceExists } from "@greenwood/cli/src/lib/resource-utils.js";
 import rollupBabelPlugin from "@rollup/plugin-babel";
 
@@ -45,7 +46,7 @@ class BabelResource {
 
     return (
       protocol === "file:" &&
-      !pathname.startsWith("/node_modules/") &&
+      !isNodeModulesPath(pathname) &&
       response.headers.get("Content-Type").indexOf(this.contentType) >= 0
     );
   }

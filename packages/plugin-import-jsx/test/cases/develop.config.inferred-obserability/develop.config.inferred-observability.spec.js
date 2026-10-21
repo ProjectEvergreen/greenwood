@@ -81,12 +81,8 @@ describe("Develop Greenwood With: ", function () {
       });
 
       it("should contain an import map for Signals polyfill and WCC effect.js", function (done) {
-        expect(importMap["signal-polyfill"]).to.equal(
-          "/node_modules/signal-polyfill/dist/index.js",
-        );
-        expect(importMap["wc-compiler/effect"]).to.equal(
-          "/node_modules/wc-compiler/dist/effect.js",
-        );
+        expect(importMap["signal-polyfill"]).to.match(/^\/~.*\/signal-polyfill\/dist\/index\.js$/);
+        expect(importMap["wc-compiler/effect"]).to.match(/^\/~.*\/wc-compiler\/dist\/effect\.js$/);
 
         done();
       });
