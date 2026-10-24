@@ -62,7 +62,9 @@ class ImportJsxResource {
       newBody = mergeImportMap(newBody, importMap, polyfills.importMaps);
     }
 
-    const root = parse(newBody);
+    // ensure we preserve the existing comments in the HTML
+    // https://github.com/ProjectEvergreen/greenwood/issues/1831
+    const root = parse(newBody, { comment: true });
     const signalScript = parse(`
       <script type="module">
         import { Signal } from 'signal-polyfill';
