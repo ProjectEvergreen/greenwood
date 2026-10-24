@@ -1,19 +1,28 @@
-import {
-  derivePackageRoot,
-  resolveBareSpecifier,
-} from "@greenwood/cli/src/lib/walker-package-ranger.js";
+import { getPackageRoot } from "@greenwood/cli/src/lib/node-modules-utils.js";
+import { fileUrlToResolvedPrefixPath } from "@greenwood/cli/src/lib/resource-utils.js";
+
+function getOptions(options = {}) {
+  return { wc: true, lit: false, dsd: false, ...options };
+}
+
+function getPolyfillLocations(compilation, options) {
+  const wcRoot = options.wc
+    ? getPackageRoot("@webcomponents/webcomponentsjs", import.meta.url)
+    : null;
+  const litRoot = options.lit ? getPackageRoot("lit", compilation.context.projectDirectory) : null;
+
+  return {
+    wcLoader: wcRoot ? new URL("./webcomponents-loader.js", wcRoot) : null,
+    wcBundles: wcRoot ? new URL("./bundles/", wcRoot) : null,
+    litSupport: litRoot ? new URL("./polyfill-support.js", litRoot) : null,
+  };
+}
 
 class PolyfillsResource {
   constructor(compilation, options = {}) {
     this.compilation = compilation;
-    this.options = options;
     this.contentType = "text/html";
-    this.options = {
-      wc: true,
-      dsd: false,
-      lit: false,
-      ...options,
-    };
+    this.options = getOptions(options);
   }
 
   async shouldIntercept(url, request, response) {
@@ -30,6 +39,7 @@ class PolyfillsResource {
 
   async intercept(url, request, response) {
     const { wc, lit, dsd } = this.options;
+    const locations = getPolyfillLocations(this.compilation, this.options);
     let body = await response.text();
 
     // standard WC polyfill
@@ -38,7 +48,7 @@ class PolyfillsResource {
         "<head>",
         `
         <head>
-          <script src="/node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+          <script src="${fileUrlToResolvedPrefixPath(locations.wcLoader)}"></script>
       `,
       );
     }
@@ -49,7 +59,7 @@ class PolyfillsResource {
         "<head>",
         `
         <head>
-          <script src="/node_modules/lit/polyfill-support.js"></script>
+          <script src="${fileUrlToResolvedPrefixPath(locations.litSupport)}"></script>
       `,
       );
     }
@@ -94,33 +104,21 @@ const greenwoodPluginPolyfills = (options = {}) => {
       name: "plugin-copy-polyfills",
       provider: async (compilation) => {
         const { outputDir } = compilation.context;
-        const polyfillSpecifier = "@webcomponents/webcomponentsjs";
-        const polyfillsResolved = resolveBareSpecifier(polyfillSpecifier);
-        const polyfillsRoot = derivePackageRoot(polyfillsResolved);
-        const litSpecifier = "lit";
-        const litResolved = resolveBareSpecifier(litSpecifier);
-        const litRoot = derivePackageRoot(litResolved);
-
-        const standardPolyfills = [
-          {
-            from: new URL("./webcomponents-loader.js", polyfillsRoot),
-            to: new URL("./webcomponents-loader.js", outputDir),
-          },
-          {
-            from: new URL("./bundles/", polyfillsRoot),
-            to: new URL("./bundles/", outputDir),
-          },
-        ];
-        const litPolyfills = [
-          {
-            from: new URL("./polyfill-support.js", litRoot),
-            to: new URL("./polyfill-support.js", outputDir),
-          },
-        ];
+        const { wcLoader, wcBundles, litSupport } = getPolyfillLocations(
+          compilation,
+          getOptions(options),
+        );
 
         return [
-          ...(!!options.wc ? [] : standardPolyfills), // eslint-disable-line no-extra-boolean-cast
-          ...(options.lit ? litPolyfills : []),
+          ...(wcLoader
+            ? [
+                { from: wcLoader, to: new URL("./webcomponents-loader.js", outputDir) },
+                { from: wcBundles, to: new URL("./bundles/", outputDir) },
+              ]
+            : []),
+          ...(litSupport
+            ? [{ from: litSupport, to: new URL("./polyfill-support.js", outputDir) }]
+            : []),
         ];
       },
     },

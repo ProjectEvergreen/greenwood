@@ -11,6 +11,7 @@
  * Default Config
  *
  * Custom Workspace
+ * package.json (exports my-project/theme to ./src/styles/theme.css)
  * src/
  *   components/
  *     header.js
@@ -23,7 +24,7 @@
  *   styles/
  *     main.css
  *     theme.css
- *   system
+ *   system/
  *     variables.css
  */
 import { expect } from "chai";

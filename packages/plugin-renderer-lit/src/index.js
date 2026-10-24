@@ -1,4 +1,11 @@
 import { getMatchingPageByRoute, shouldPrerender } from "@greenwood/cli/src/lib/graph-utils.js";
+import { getPackageRoot, insertAfterImportMap } from "@greenwood/cli/src/lib/node-modules-utils.js";
+import { fileUrlToResolvedPrefixPath } from "@greenwood/cli/src/lib/resource-utils.js";
+
+const hydrationSupportUrl = new URL(
+  "./lit-element-hydrate-support.js",
+  getPackageRoot("@lit-labs/ssr-client", import.meta.url),
+);
 
 class LitHydrationResource {
   constructor(compilation, options) {
@@ -26,46 +33,26 @@ class LitHydrationResource {
     const { importMaps } = this.compilation.config.polyfills;
     const isDevelopment = process.env.__GWD_COMMAND__ === "develop";
     const importType = isDevelopment && importMaps ? "module-shim" : "module";
-    const importMapType = isDevelopment && importMaps ? "importmap-shim" : "importmap";
-    const headSelector = isDevelopment ? `<script type="${importMapType}">` : "<head>";
-    const hydrationSupportScriptBasePath = "@lit-labs/ssr-client/lit-element-hydrate-support.js";
     let body = await response.text();
 
-    // this needs to come first before any userland code, but before any import maps
+    // Hydration must follow import maps and precede user module scripts.
     // https://github.com/ProjectEvergreen/greenwood/pull/1289
     if (isDevelopment) {
-      // quick way to find the ending position of the importmap <script> tag
-      // and append the hydration support <script> right after it
-      const scriptEndPattern = /<\/script>/g;
-      const importMapStartPos = body.indexOf(headSelector) ?? "";
-      let importMapEndPos = 0;
-      let match;
-
-      while ((match = scriptEndPattern.exec(body)) !== null) {
-        const position = match.index;
-        if (position > importMapStartPos) {
-          importMapEndPos = position;
-          break;
-        }
-      }
-
-      body = `
-        ${body.slice(0, importMapEndPos)}
-        </script>
-        <script type="${importType}" src="/node_modules/${hydrationSupportScriptBasePath}"></script>
-        ${body.slice(importMapEndPos + 9)}
-      `;
+      body = insertAfterImportMap(
+        body,
+        `<script type="${importType}" src="${fileUrlToResolvedPrefixPath(hydrationSupportUrl)}"></script>`,
+      );
     } else {
       // Note: in production builds we have to inline the hydration support script
       // due to how Rollup bundles dependencies. If we try to load it as an external
       // module, it leads to this issue in our monorepo tests
       // https://github.com/ProjectEvergreen/greenwood/issues/1463
       body = body.replace(
-        headSelector,
+        "<head>",
         `
-        ${headSelector}
+        <head>
           <script type="module">
-            import '${hydrationSupportScriptBasePath}';
+            import '${hydrationSupportUrl.href}';
           </script>
       `,
       );

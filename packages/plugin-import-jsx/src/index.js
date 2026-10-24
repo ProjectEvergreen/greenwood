@@ -5,14 +5,49 @@
  */
 import { generate } from "astring";
 import { parseJsx } from "wc-compiler/jsx-loader";
-import { mergeImportMap } from "@greenwood/cli/src/lib/node-modules-utils.js";
+import {
+  mergeImportMap,
+  insertAfterImportMap,
+  getPackageRoot,
+} from "@greenwood/cli/src/lib/node-modules-utils.js";
 import { getMatchingPageByRoute } from "@greenwood/cli/src/lib/graph-utils.js";
-import { parse } from "node-html-parser";
+import { fileUrlToResolvedPrefixPath } from "@greenwood/cli/src/lib/resource-utils.js";
 
-const importMap = {
-  "signal-polyfill": "/node_modules/signal-polyfill/dist/index.js",
-  "wc-compiler/effect": "/node_modules/wc-compiler/src/effect.js",
+const compilerRoot = getPackageRoot("wc-compiler", import.meta.url);
+const pluginImports = {
+  "signal-polyfill": new URL(
+    "./dist/index.js",
+    getPackageRoot("signal-polyfill", new URL("./package.json", compilerRoot)),
+  ),
+  "wc-compiler/effect": new URL("./src/effect.js", compilerRoot),
 };
+const importMap = Object.fromEntries(
+  Object.entries(pluginImports).map(([specifier, url]) => [
+    specifier,
+    fileUrlToResolvedPrefixPath(url),
+  ]),
+);
+
+// Rewrite only import/export sources, leaving strings and component text unchanged.
+function resolvePluginImports(tree) {
+  const resolveSource = (node) => {
+    const specifier = node.source?.value;
+    const url = Object.hasOwn(pluginImports, specifier) ? pluginImports[specifier] : null;
+
+    if (url) {
+      node.source.value = url.href;
+      delete node.source.raw;
+    }
+  };
+
+  for (const node of tree.body) {
+    if (
+      ["ImportDeclaration", "ExportNamedDeclaration", "ExportAllDeclaration"].includes(node.type)
+    ) {
+      resolveSource(node);
+    }
+  }
+}
 
 class ImportJsxResource {
   constructor(compilation, options) {
@@ -34,6 +69,12 @@ class ImportJsxResource {
     // refactor when WCC refactors
     // https://github.com/ProjectEvergreen/wcc/issues/116
     const tree = parseJsx(url);
+    // Development uses import maps; file URLs pin runtime imports to the plugin's compiler installation,
+    // for both prerendering and bundling
+    if (process.env.__GWD_COMMAND__ !== "develop") {
+      resolvePluginImports(tree);
+    }
+
     const result = generate(tree);
 
     return new Response(result, {
@@ -57,32 +98,23 @@ class ImportJsxResource {
     const { polyfills } = this.compilation.config;
     const body = await response.text();
     let newBody = body;
+    const signalPolyfillSpecifier =
+      process.env.__GWD_COMMAND__ === "develop"
+        ? "signal-polyfill"
+        : pluginImports["signal-polyfill"].href;
 
     if (process.env.__GWD_COMMAND__ === "develop") {
-      newBody = mergeImportMap(newBody, importMap, polyfills.importMaps);
+      newBody = mergeImportMap(newBody, { imports: importMap }, polyfills.importMaps);
     }
 
-    const root = parse(newBody);
-    const signalScript = parse(`
-      <script type="module">
-        import { Signal } from 'signal-polyfill';
-        globalThis.Signal = Signal;
-        </script>
-      `);
+    const scriptType =
+      process.env.__GWD_COMMAND__ === "develop" && polyfills.importMaps ? "module-shim" : "module";
+    const signalScript = `<script type="${scriptType}">
+      import { Signal } from '${signalPolyfillSpecifier}';
+      globalThis.Signal = Signal;
+    </script>`;
 
-    // find the import map script in root and insert the signal polyfill script after it
-    const importMapScript = root.querySelector(
-      'script[type="importmap"], script[type="importmap-shim"]',
-    );
-
-    if (importMapScript) {
-      importMapScript.after(signalScript);
-    } else {
-      root.querySelector("head").prepend(signalScript);
-    }
-
-    newBody = root.toString();
-
+    newBody = insertAfterImportMap(newBody, signalScript);
     return new Response(newBody);
   }
 }

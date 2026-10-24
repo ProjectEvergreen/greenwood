@@ -104,9 +104,11 @@ export default {
 
 ## Standalone Usage
 
-For cases where you may want to manually process markdown _not_ in your pages directory, but leverage all the logic Greenwood uses to process markdown, you can programmatically call the exported function `processMarkdown`, which has two parameters:
+For cases where you may want to manually process markdown _not_ in your pages directory, but leverage all the logic Greenwood uses to process markdown, you can programmatically call the exported function `processMarkdown`:
+
 - `contents` - Your markdown as a string
 - `plugins` - The same plugins you would pass in as options to the markdown plugin
+- `parent` - An optional `URL` instance identifying the module or directory used to resolve plugins. Pass `new URL(import.meta.url)` to resolve from the calling module. Greenwood passes the project directory when processing pages; standalone calls that omit it retain resolution from the Markdown plugin.
 
 This function will return the processed markdown as an HTML string.
 
@@ -125,7 +127,7 @@ const plugins = [
   },
 ];
 
-const html = await processMarkdown(contents, plugins);
+const html = await processMarkdown(contents, plugins, new URL(import.meta.url));
 
 console.log({ html });
 ```

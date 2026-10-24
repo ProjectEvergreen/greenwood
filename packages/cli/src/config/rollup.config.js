@@ -2,7 +2,11 @@
 import fs from "node:fs";
 import { builtinModules } from "node:module";
 import path from "node:path";
-import { checkResourceExists, normalizePathnameForWindows } from "../lib/resource-utils.js";
+import {
+  checkResourceExists,
+  fileUrlToModulePath,
+  normalizePathnameForWindows,
+} from "../lib/resource-utils.js";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import terser from "@rollup/plugin-terser";
@@ -61,6 +65,11 @@ function greenwoodResourceLoader(compilation, browser = false) {
     async resolveId(id, importer, options) {
       if (isRollupVirtualModule(id) || isRollupVirtualModule(importer)) {
         return null;
+      }
+
+      // Runtime imports use file URLs on Windows, convert them only when Rollup resolves them.
+      if (id.startsWith("file:")) {
+        return this.resolve(fileUrlToModulePath(id), importer, { ...options, skipSelf: true });
       }
 
       const { userWorkspace, scratchDir } = compilation.context;

@@ -1,9 +1,51 @@
 import fs from "node:fs/promises";
+import { fileURLToPath } from "node:url";
 import { hashString } from "./hashing-utils.js";
-import { getResolvedHrefFromPathnameShortcut } from "../lib/node-modules-utils.js";
+import {
+  getResolvedHrefFromPathnameShortcut,
+  isPackageResourcePath,
+} from "./node-modules-utils.js";
 import { getMatchingPageByRoute } from "../lib/graph-utils.js";
 import { parse } from "node-html-parser";
 import { asyncMap } from "./async-utils.js";
+
+const IMPORT_MAP_RESOLVED_PREFIX = "/~";
+
+// Encode a file URL as a browser resource path with Greenwood's resolved /~ prefix.
+function fileUrlToResolvedPrefixPath(url) {
+  const fileUrl = new URL(url);
+
+  if (fileUrl.protocol !== "file:") {
+    throw new TypeError("A resolved resource must be a file URL");
+  }
+
+  return `${IMPORT_MAP_RESOLVED_PREFIX}${fileUrl.pathname}${fileUrl.search}${fileUrl.hash}`;
+}
+
+// Rollup expects filesystem paths for absolute module imports, rather than file: URLs.
+function fileUrlToModulePath(value) {
+  const url = new URL(value);
+
+  return `${fileURLToPath(url).replaceAll("\\", "/")}${url.search}${url.hash}`;
+}
+
+// Recognize /~ paths that preserve an already resolved filesystem location.
+function isResolvedPrefixPath(pathname) {
+  return pathname.startsWith(`${IMPORT_MAP_RESOLVED_PREFIX}/`);
+}
+
+// Decode a /~ browser resource path back to a file URL, preserving its query and fragment.
+function resourcePathToFileUrl(value) {
+  const url = new URL(value, "http://localhost");
+
+  if (!isResolvedPrefixPath(url.pathname)) {
+    throw new TypeError("Expected a resolved Greenwood resource URL");
+  }
+
+  return new URL(
+    `file://${url.pathname.slice(IMPORT_MAP_RESOLVED_PREFIX.length)}${url.search}${url.hash}`,
+  );
+}
 
 async function modelResource(
   context,
@@ -18,7 +60,7 @@ async function modelResource(
   let sourcePathURL;
 
   if (src) {
-    sourcePathURL = src.startsWith("/node_modules/")
+    sourcePathURL = isPackageResourcePath(src)
       ? new URL(getResolvedHrefFromPathnameShortcut(src, projectDirectory))
       : src.startsWith("/")
         ? new URL(`.${src}`, userWorkspace)
@@ -327,6 +369,11 @@ async function responseAsObject(response) {
 }
 
 export {
+  IMPORT_MAP_RESOLVED_PREFIX,
+  fileUrlToResolvedPrefixPath,
+  fileUrlToModulePath,
+  isResolvedPrefixPath,
+  resourcePathToFileUrl,
   checkResourceExists,
   mergeResponse,
   modelResource,

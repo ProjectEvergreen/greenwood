@@ -6,6 +6,7 @@ import remarkFrontmatter from "remark-frontmatter";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
+import { resolve } from "@greenwood/cli/src/lib/vendor/import-meta-resolve.js";
 
 // unless we want to support hot reloading?
 // https://github.com/ProjectEvergreen/greenwood/issues/1278
@@ -48,7 +49,11 @@ async function trackAllTocHeadings(compilation) {
 
 // extracted for standalone usage
 // https://github.com/ProjectEvergreen/greenwood/issues/1247#issuecomment-2721881358
-async function processMarkdown(contents, plugins = []) {
+async function processMarkdown(contents, plugins = [], parent = new URL(import.meta.url)) {
+  if (!(parent instanceof URL)) {
+    throw new TypeError("processMarkdown parent must be a URL");
+  }
+
   const rehypePlugins = [];
   const remarkPlugins = [];
   let processedMarkdown;
@@ -58,7 +63,7 @@ async function processMarkdown(contents, plugins = []) {
     const name = typeof plugin === "string" ? plugin : plugin.name;
     const options = plugin?.options ?? null;
     const pluginTypeArray = name.indexOf("rehype-") >= 0 ? rehypePlugins : remarkPlugins;
-    const pluginImport = (await import(name)).default;
+    const pluginImport = (await import(resolve(name, parent))).default;
 
     if (options) {
       pluginTypeArray.push([pluginImport, options]);
@@ -125,7 +130,11 @@ class MarkdownResource {
       await trackAllTocHeadings(this.compilation);
     }
 
-    const html = await processMarkdown(markdownContents, this?.options?.plugins);
+    const html = await processMarkdown(
+      markdownContents,
+      this?.options?.plugins,
+      this.compilation.context.projectDirectory,
+    );
 
     return new Response(html, {
       headers: new Headers({
