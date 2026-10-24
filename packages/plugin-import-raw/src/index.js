@@ -6,8 +6,9 @@
 import {
   isPackageResourcePath,
   resolveResourceUrl,
-} from "@greenwood/cli/src/lib/package-resolution.js";
-import { mergeImportMap, getImportMap } from "@greenwood/cli/src/lib/node-modules-utils.js";
+  mergeImportMap,
+  getImportMap,
+} from "@greenwood/cli/src/lib/node-modules-utils.js";
 import { getMatchingPageByRoute } from "@greenwood/cli/src/lib/graph-utils.js";
 
 function withRawType(value) {

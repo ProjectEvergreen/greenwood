@@ -3,20 +3,17 @@
  * Detects and fully resolves requests to node_modules and handles creating an importMap.
  *
  */
-import { checkResourceExists } from "../../lib/resource-utils.js";
+import { checkResourceExists, fileUrlToResolvedPrefixPath } from "../../lib/resource-utils.js";
 import fs from "node:fs/promises";
 import {
   getPackageJsonForProject,
   getResolvedHrefFromPathnameShortcut,
   mergeImportMap,
-} from "../../lib/node-modules-utils.js";
-import { walkPackageJson } from "../../lib/walker-package-ranger.js";
-import {
-  fileUrlToResolvedPrefixPath,
   getPackageRoot,
   isNodeModulesPath,
   isPackageResourcePath,
-} from "../../lib/package-resolution.js";
+} from "../../lib/node-modules-utils.js";
+import { walkPackageJson } from "../../lib/walker-package-ranger.js";
 
 let generatedImportMap;
 const importMapShimUrl = fileUrlToResolvedPrefixPath(

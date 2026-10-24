@@ -5,8 +5,7 @@
  * This is a Greenwood default plugin.
  *
  */
-import { fileUrlToResolvedPrefixPath } from "../../lib/package-resolution.js";
-import { checkResourceExists } from "../../lib/resource-utils.js";
+import { fileUrlToResolvedPrefixPath, checkResourceExists } from "../../lib/resource-utils.js";
 import { getStaticPages, getMatchingPageByRoute } from "../../lib/graph-utils.js";
 import { getStaticRouteFromDynamicRoute } from "../../lib/url-utils.js";
 import fs from "node:fs/promises";

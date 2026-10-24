@@ -1,5 +1,5 @@
 import fs from "node:fs/promises";
-import { fileUrlToResolvedPrefixPath } from "@greenwood/cli/src/lib/package-resolution.js";
+import { fileUrlToResolvedPrefixPath } from "@greenwood/cli/src/lib/resource-utils.js";
 import { graphqlServer } from "./core/server.js";
 import { getAvailablePort } from "@greenwood/cli/src/lib/server-utils.js";
 import { mergeImportMap } from "@greenwood/cli/src/lib/node-modules-utils.js";

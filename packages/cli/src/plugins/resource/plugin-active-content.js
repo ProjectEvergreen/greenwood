@@ -1,6 +1,5 @@
-import { fileUrlToResolvedPrefixPath } from "../../lib/package-resolution.js";
+import { fileUrlToResolvedPrefixPath, checkResourceExists } from "../../lib/resource-utils.js";
 import { mergeImportMap } from "../../lib/node-modules-utils.js";
-import { checkResourceExists } from "../../lib/resource-utils.js";
 import {
   activeFrontmatterKeys,
   cleanContentCollection,

@@ -1,7 +1,57 @@
-import { checkResourceExists } from "./resource-utils.js";
-import { isPackageResourcePath, resolveResourceUrl } from "./package-resolution.js";
+import {
+  checkResourceExists,
+  isResolvedPrefixPath,
+  resourcePathToFileUrl,
+} from "./resource-utils.js";
 import fs from "node:fs/promises";
+import { realpathSync } from "node:fs";
+import { findPackageJSON } from "node:module";
+import { pathToFileURL } from "node:url";
 import { parse } from "node-html-parser";
+
+// Find a package's real directory from its manifest, including packages with no module entry point.
+// The caller supplies the URL of the project or module that owns the dependency.
+function getPackageRoot(specifier, parent) {
+  const packageJsonPath = findPackageJSON(specifier, new URL(parent));
+
+  if (!packageJsonPath) {
+    throw new Error(`Unable to locate package.json for ${specifier}`);
+  }
+
+  return new URL("./", pathToFileURL(realpathSync(packageJsonPath)));
+}
+
+// Resolved filesystem paths may contain node_modules at any depth; normalize Windows separators.
+function isNodeModulesPath(pathname) {
+  return pathname.replaceAll("\\", "/").includes("/node_modules/");
+}
+
+// Browser shortcuts must start with /node_modules/ or /~; nested node_modules segments are ordinary paths.
+// A /~ path can also point to a linked package outside node_modules.
+function isPackageResourcePath(pathname) {
+  return pathname.startsWith("/node_modules/") || isResolvedPrefixPath(pathname);
+}
+
+// Decode /~ paths, locate /node_modules/ assets from the caller's context, or resolve relative URLs.
+function resolveResourceUrl(value, parent) {
+  const url = new URL(value, "http://localhost");
+
+  if (isResolvedPrefixPath(url.pathname)) {
+    return resourcePathToFileUrl(url);
+  }
+
+  if (url.pathname.startsWith("/node_modules/")) {
+    const segments = url.pathname.slice("/node_modules/".length).split("/");
+    const packageSegments = segments[0].startsWith("@") ? 2 : 1;
+    const specifier = segments.slice(0, packageSegments).join("/");
+    const root = getPackageRoot(specifier, parent);
+
+    return new URL(`./${segments.slice(packageSegments).join("/")}${url.search}${url.hash}`, root);
+  }
+
+  // Ordinary resource paths are URL-relative; bare package entry resolution is deferred.
+  return new URL(value, parent);
+}
 
 // Resolve the public /node_modules/ shortcut from the project, regardless of install layout.
 function getResolvedHrefFromPathnameShortcut(pathname, parent) {
@@ -87,6 +137,9 @@ function insertAfterImportMap(html, scriptContents) {
 }
 
 export {
+  getPackageRoot,
+  isNodeModulesPath,
+  resolveResourceUrl,
   getImportMap,
   getPackageJsonForProject,
   getResolvedHrefFromPathnameShortcut,

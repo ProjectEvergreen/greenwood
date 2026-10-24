@@ -5,13 +5,16 @@
  */
 import { generate } from "astring";
 import { parseJsx } from "wc-compiler/jsx-loader";
-import { mergeImportMap, insertAfterImportMap } from "@greenwood/cli/src/lib/node-modules-utils.js";
+import {
+  mergeImportMap,
+  insertAfterImportMap,
+  getPackageRoot,
+} from "@greenwood/cli/src/lib/node-modules-utils.js";
 import { getMatchingPageByRoute } from "@greenwood/cli/src/lib/graph-utils.js";
 import {
-  getPackageRoot,
   fileUrlToResolvedPrefixPath,
   fileUrlToModulePath,
-} from "@greenwood/cli/src/lib/package-resolution.js";
+} from "@greenwood/cli/src/lib/resource-utils.js";
 
 const compilerRoot = getPackageRoot("wc-compiler", import.meta.url);
 const pluginImports = {

@@ -5,7 +5,7 @@
  *
  */
 import { resolveForRelativeUrl } from "../../lib/resource-utils.js";
-import { isPackageResourcePath } from "../../lib/package-resolution.js";
+import { isPackageResourcePath } from "../../lib/node-modules-utils.js";
 
 class UserWorkspaceResource {
   constructor(compilation) {

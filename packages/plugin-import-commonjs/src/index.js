@@ -3,7 +3,7 @@
  * Detects and fully resolves import requests for CommonJS files in node_modules.
  *
  */
-import { isNodeModulesPath } from "@greenwood/cli/src/lib/package-resolution.js";
+import { isNodeModulesPath } from "@greenwood/cli/src/lib/node-modules-utils.js";
 import { fileURLToPath } from "node:url";
 import commonjs from "@rollup/plugin-commonjs";
 import fs from "node:fs/promises";

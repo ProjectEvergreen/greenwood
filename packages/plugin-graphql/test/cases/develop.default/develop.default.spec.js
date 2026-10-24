@@ -20,7 +20,7 @@
  *     index.html
  */
 import { expect } from "chai";
-import { fileUrlToResolvedPrefixPath } from "@greenwood/cli/src/lib/package-resolution.js";
+import { fileUrlToResolvedPrefixPath } from "@greenwood/cli/src/lib/resource-utils.js";
 import { JSDOM } from "jsdom";
 import path from "node:path";
 import { Runner } from "gallinago";

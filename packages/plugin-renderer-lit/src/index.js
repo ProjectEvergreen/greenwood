@@ -1,10 +1,9 @@
 import { getMatchingPageByRoute, shouldPrerender } from "@greenwood/cli/src/lib/graph-utils.js";
+import { getPackageRoot, insertAfterImportMap } from "@greenwood/cli/src/lib/node-modules-utils.js";
 import {
-  getPackageRoot,
   fileUrlToResolvedPrefixPath,
   fileUrlToModulePath,
-} from "@greenwood/cli/src/lib/package-resolution.js";
-import { insertAfterImportMap } from "@greenwood/cli/src/lib/node-modules-utils.js";
+} from "@greenwood/cli/src/lib/resource-utils.js";
 
 const hydrationSupportUrl = new URL(
   "./lit-element-hydrate-support.js",

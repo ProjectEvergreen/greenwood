@@ -1,7 +1,5 @@
-import {
-  getPackageRoot,
-  fileUrlToResolvedPrefixPath,
-} from "@greenwood/cli/src/lib/package-resolution.js";
+import { getPackageRoot } from "@greenwood/cli/src/lib/node-modules-utils.js";
+import { fileUrlToResolvedPrefixPath } from "@greenwood/cli/src/lib/resource-utils.js";
 
 function getOptions(options = {}) {
   return { wc: true, lit: false, dsd: false, ...options };
