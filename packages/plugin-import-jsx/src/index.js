@@ -11,10 +11,7 @@ import {
   getPackageRoot,
 } from "@greenwood/cli/src/lib/node-modules-utils.js";
 import { getMatchingPageByRoute } from "@greenwood/cli/src/lib/graph-utils.js";
-import {
-  fileUrlToResolvedPrefixPath,
-  fileUrlToModulePath,
-} from "@greenwood/cli/src/lib/resource-utils.js";
+import { fileUrlToResolvedPrefixPath } from "@greenwood/cli/src/lib/resource-utils.js";
 
 const compilerRoot = getPackageRoot("wc-compiler", import.meta.url);
 const pluginImports = {
@@ -38,7 +35,7 @@ function resolvePluginImports(tree) {
     const url = Object.hasOwn(pluginImports, specifier) ? pluginImports[specifier] : null;
 
     if (url) {
-      node.source.value = fileUrlToModulePath(url);
+      node.source.value = url.href;
       delete node.source.raw;
     }
   };
@@ -72,7 +69,8 @@ class ImportJsxResource {
     // refactor when WCC refactors
     // https://github.com/ProjectEvergreen/wcc/issues/116
     const tree = parseJsx(url);
-    // Development uses import maps; pin runtime imports for bundling to the plugin's compiler installation.
+    // Development uses import maps; file URLs pin runtime imports to the plugin's compiler installation,
+    // for both prerendering and bundling
     if (process.env.__GWD_COMMAND__ !== "develop") {
       resolvePluginImports(tree);
     }
@@ -103,7 +101,7 @@ class ImportJsxResource {
     const signalPolyfillSpecifier =
       process.env.__GWD_COMMAND__ === "develop"
         ? "signal-polyfill"
-        : fileUrlToModulePath(pluginImports["signal-polyfill"]);
+        : pluginImports["signal-polyfill"].href;
 
     if (process.env.__GWD_COMMAND__ === "develop") {
       newBody = mergeImportMap(newBody, { imports: importMap }, polyfills.importMaps);
