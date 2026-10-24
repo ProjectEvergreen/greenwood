@@ -8,6 +8,7 @@ import { realpathSync } from "node:fs";
 import { findPackageJSON } from "node:module";
 import { pathToFileURL } from "node:url";
 import { parse } from "node-html-parser";
+import { resolve } from "./vendor/import-meta-resolve.js";
 
 // Find a package's real directory from its manifest, including packages with no module entry point.
 // The caller supplies the URL of the project or module that owns the dependency.
@@ -49,8 +50,7 @@ function resolveResourceUrl(value, parent) {
     return new URL(`./${segments.slice(packageSegments).join("/")}${url.search}${url.hash}`, root);
   }
 
-  // Ordinary resource paths are URL-relative; bare package entry resolution is deferred.
-  return new URL(value, parent);
+  return new URL(resolve(value, parent));
 }
 
 // Resolve the public /node_modules/ shortcut from the project, regardless of install layout.

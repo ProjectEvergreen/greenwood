@@ -14,7 +14,8 @@
  * }
  *
  * User Workspace
- *  src/
+ * package.json (exports my-project/logo to ./src/components/logo.js)
+ * src/
  *   components/
  *     footer.js
  *     header.js

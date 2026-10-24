@@ -1,5 +1,5 @@
 @import "open-props/sizes";
-@import './theme.css';
+@import 'my-project/theme'; /* exports map test */
 
 * {
   margin: 0;
