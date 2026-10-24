@@ -4,6 +4,7 @@ export default {
   plugins: [
     greenwoodPluginMarkdown({
       plugins: [
+        "my-markdown-project/my-custom-rehype-plugin",
         "@mapbox/rehype-prism",
         "rehype-slug",
         {

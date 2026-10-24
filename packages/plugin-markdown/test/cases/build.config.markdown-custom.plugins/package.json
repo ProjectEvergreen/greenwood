@@ -1,0 +1,8 @@
+{
+  "name": "my-markdown-project",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./my-custom-rehype-plugin": "./my-custom-rehype-plugin.js"
+  }
+}

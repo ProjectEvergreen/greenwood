@@ -1,0 +1,8 @@
+{
+  "name": "my-project",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./theme": "./src/styles/theme.css"
+  }
+}

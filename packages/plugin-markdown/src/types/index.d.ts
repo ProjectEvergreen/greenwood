@@ -13,5 +13,6 @@ declare module "@greenwood/plugin-markdown" {
   export const processMarkdown: (
     contents: string,
     plugins?: MarkdownPluginItem[],
+    parent?: URL,
   ) => Promise<string>;
 }

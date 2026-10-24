@@ -12,6 +12,7 @@ import {
   getResolvedHrefFromPathnameShortcut,
   isPackageResourcePath,
 } from "../../lib/node-modules-utils.js";
+import { resolve } from "../../lib/vendor/import-meta-resolve.js";
 import { isLocalLink, fileUrlToResolvedPrefixPath } from "../../lib/resource-utils.js";
 import { derivePackageRoot } from "../../lib/walker-package-ranger.js";
 
@@ -50,22 +51,16 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
             const importContents = fs.readFileSync(resolvedUrl, "utf-8");
 
             optimizedCss += bundleCss(importContents, sourceUrl, compilation, resolvedUrl);
-          } else if (workingUrl) {
-            const urlPrefix = value.startsWith(".") ? "" : "./";
-            const resolvedUrl = new URL(`${urlPrefix}${value}`, workingUrl);
+          } else if (isBareSpecifier) {
+            const parent = workingUrl ?? sourceUrl;
+            const relativeUrl = new URL(`./${value}`, parent);
+            const resolvedUrl =
+              workingUrl && fs.existsSync(relativeUrl)
+                ? relativeUrl
+                : new URL(resolve(value, parent));
             const importContents = fs.readFileSync(resolvedUrl, "utf-8");
 
-            optimizedCss += bundleCss(importContents, workingUrl, compilation);
-          } else if (isBareSpecifier) {
-            // gracefully / silently account for `import.meta.resolve` caveat when using loader hooks
-            // https://nodejs.org/api/esm.html#importmetaresolvespecifier
-            // https://github.com/ProjectEvergreen/greenwood/pull/1511#discussion_r2122365577
-            if (import.meta?.resolve) {
-              const resolvedUrl = import.meta.resolve(value);
-              const importContents = fs.readFileSync(new URL(resolvedUrl), "utf-8");
-
-              optimizedCss += bundleCss(importContents, sourceUrl, compilation, resolvedUrl);
-            }
+            optimizedCss += bundleCss(importContents, sourceUrl, compilation, resolvedUrl);
           } else {
             console.warn(`Unable to resolve ${value} from file => ${sourceUrl}`);
           }

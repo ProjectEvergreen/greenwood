@@ -11,6 +11,7 @@
  * User Config
  * plugins: [greenwoodPluginMarkdown({
  *   plugins: [
+ *     'my-markdown-project/my-custom-rehype-plugin',
  *     '@mapbox/rehype-prism',
  *     'rehype-slug',
  *     {
@@ -21,6 +22,8 @@
  * })]
  *
  * User Workspace
+ * package.json (exports the project's ESM rehype plugin)
+ * my-custom-rehype-plugin.js
  * src/
  *   pages/
  *     index.md
@@ -77,6 +80,14 @@ describe("Build Greenwood With: ", function () {
 
         expect(heading.getAttribute("href")).to.equal(
           "#greenwood-markdown-syntax-highlighting-test",
+        );
+      });
+
+      it("should resolve a project-owned extension through its ESM export", function () {
+        const heading = dom.window.document.querySelector("h1");
+
+        expect(heading.getAttribute("data-project-plugin")).to.equal(
+          "my-custom-rehype-plugin resolved!",
         );
       });
 
