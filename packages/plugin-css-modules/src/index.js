@@ -7,7 +7,7 @@ import fs from "node:fs";
 import {
   resolveResourceUrl,
   isPackageResourcePath,
-} from "@greenwood/cli/src/lib/package-resolution.js";
+} from "@greenwood/cli/src/lib/node-modules-utils.js";
 import { parse as hparse } from "node-html-parser";
 import { generate, parse, walk } from "css-tree";
 import * as acornWalk from "acorn-walk";

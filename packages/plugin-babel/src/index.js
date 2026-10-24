@@ -4,7 +4,7 @@
  *
  */
 import babel from "@babel/core";
-import { isNodeModulesPath } from "@greenwood/cli/src/lib/package-resolution.js";
+import { isNodeModulesPath } from "@greenwood/cli/src/lib/node-modules-utils.js";
 import { checkResourceExists } from "@greenwood/cli/src/lib/resource-utils.js";
 import rollupBabelPlugin from "@rollup/plugin-babel";
 

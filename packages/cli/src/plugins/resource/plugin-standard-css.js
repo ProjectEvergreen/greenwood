@@ -8,13 +8,12 @@ import fs from "node:fs";
 import path from "node:path";
 import { parse, walk } from "css-tree";
 import { hashString } from "../../lib/hashing-utils.js";
-import { getResolvedHrefFromPathnameShortcut } from "../../lib/node-modules-utils.js";
-import { isLocalLink } from "../../lib/resource-utils.js";
-import { derivePackageRoot } from "../../lib/walker-package-ranger.js";
 import {
-  fileUrlToResolvedPrefixPath,
+  getResolvedHrefFromPathnameShortcut,
   isPackageResourcePath,
-} from "../../lib/package-resolution.js";
+} from "../../lib/node-modules-utils.js";
+import { isLocalLink, fileUrlToResolvedPrefixPath } from "../../lib/resource-utils.js";
+import { derivePackageRoot } from "../../lib/walker-package-ranger.js";
 
 function bundleCss(body, sourceUrl, compilation, workingUrl) {
   const { projectDirectory, outputDir, userWorkspace, scratchDir } = compilation.context;

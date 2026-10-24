@@ -1,11 +1,7 @@
 import fs from "node:fs";
-import { findPackageJSON, isBuiltin } from "node:module";
-import { pathToFileURL } from "node:url";
-import {
-  getPackageRoot,
-  fileUrlToResolvedPrefixPath,
-  IMPORT_MAP_RESOLVED_PREFIX,
-} from "./package-resolution.js";
+import { isBuiltin } from "node:module";
+import { getPackageRoot } from "./node-modules-utils.js";
+import { fileUrlToResolvedPrefixPath, IMPORT_MAP_RESOLVED_PREFIX } from "./resource-utils.js";
 
 // priority is from L -> R
 const SUPPORTED_EXPORT_CONDITIONS = ["import", "module-sync", "default"];
@@ -14,11 +10,7 @@ const SUPPORTED_EXPORT_CONDITIONS = ["import", "module-sync", "default"];
 // here because all callers use the result to derive the package root, and it also supports packages with no main entry point.
 // https://unpkg.com/browse/@types/trusted-types@2.0.7/package.json
 // Compatibility helper for callers expecting the package.json URL.
-function resolveBareSpecifier(
-  specifier,
-  parent = pathToFileURL(`${process.cwd()}/`),
-  diagnostics = new Map(),
-) {
+function resolveBareSpecifier(specifier, parent, diagnostics = new Map()) {
   let resolvedPath;
 
   try {
@@ -26,11 +18,7 @@ function resolveBareSpecifier(
       return specifier;
     }
 
-    const packageJsonPath = findPackageJSON(specifier, parent);
-
-    resolvedPath = packageJsonPath
-      ? pathToFileURL(fs.realpathSync(packageJsonPath)).href
-      : undefined;
+    resolvedPath = new URL("./package.json", getPackageRoot(specifier, parent)).href;
   } catch (e) {
     diagnostics.set(
       specifier,
@@ -314,7 +302,7 @@ async function walkPackageDependencies(packageJson, walkedPackages, parent, stat
       const resolved = resolveBareSpecifier(dependency, parent, diagnostics);
 
       if (resolved) {
-        const resolvedRoot = isBuiltin(resolved) ? null : getPackageRoot(dependency, parent).href;
+        const resolvedRoot = isBuiltin(resolved) ? null : new URL("./", resolved).href;
 
         if (resolvedRoot) {
           const resolvedPackageJson =
@@ -349,11 +337,7 @@ async function walkPackageDependencies(packageJson, walkedPackages, parent, stat
   }
 }
 
-async function walkPackageJson(
-  packageJson = {},
-  walkedPackages = new Set(),
-  parent = pathToFileURL(`${process.cwd()}/`),
-) {
+async function walkPackageJson(packageJson = {}, walkedPackages = new Set(), parent) {
   const state = {
     importMap: new Map(),
     diagnostics: new Map(),

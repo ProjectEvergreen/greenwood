@@ -9,9 +9,9 @@ export default {
       type: "copy",
       name: "plugin-copy-prismjs",
       provider: (compilation) => {
-        const { outputDir } = compilation.context;
+        const { outputDir, projectDirectory } = compilation.context;
         const prismSpecifier = "prismjs";
-        const prismResolved = resolveBareSpecifier(prismSpecifier);
+        const prismResolved = resolveBareSpecifier(prismSpecifier, projectDirectory);
         const prismRoot = derivePackageRoot(prismResolved);
 
         const from = new URL("./themes/", prismRoot);
