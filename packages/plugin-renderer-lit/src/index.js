@@ -1,9 +1,6 @@
 import { getMatchingPageByRoute, shouldPrerender } from "@greenwood/cli/src/lib/graph-utils.js";
 import { getPackageRoot, insertAfterImportMap } from "@greenwood/cli/src/lib/node-modules-utils.js";
-import {
-  fileUrlToResolvedPrefixPath,
-  fileUrlToModulePath,
-} from "@greenwood/cli/src/lib/resource-utils.js";
+import { fileUrlToResolvedPrefixPath } from "@greenwood/cli/src/lib/resource-utils.js";
 
 const hydrationSupportUrl = new URL(
   "./lit-element-hydrate-support.js",
@@ -55,7 +52,7 @@ class LitHydrationResource {
         `
         <head>
           <script type="module">
-            import '${fileUrlToModulePath(hydrationSupportUrl)}';
+            import '${hydrationSupportUrl.href}';
           </script>
       `,
       );
