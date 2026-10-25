@@ -1,0 +1,14 @@
+name = "greenwood-cloudflare-base-path"
+main = "./functions/worker.js"
+compatibility_date = "2026-10-03"
+compatibility_flags = ["new_module_registry"]
+no_bundle = true
+
+[[rules]]
+type = "ESModule"
+globs = ["**/*.js"]
+fallthrough = true
+
+[assets]
+directory = "./public"
+binding = "ASSETS"

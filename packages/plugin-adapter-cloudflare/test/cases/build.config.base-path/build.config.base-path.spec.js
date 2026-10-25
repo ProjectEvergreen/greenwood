@@ -19,6 +19,7 @@
  *
  * User Workspace
  * greenwood.config.js
+ * wrangler.toml
  * src/
  *   pages/
  *     api/
