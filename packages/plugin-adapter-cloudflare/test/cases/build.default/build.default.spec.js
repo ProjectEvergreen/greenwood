@@ -18,6 +18,7 @@
  *
  * User Workspace
  * greenwood.config.js
+ * wrangler.toml
  * src/
  *   components/
  *     card.js
