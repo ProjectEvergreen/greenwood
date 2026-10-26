@@ -35,19 +35,19 @@ import { expect } from "chai";
 import path from "node:path";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
+import { startServer, stopServer } from "../../../../../test/server.js";
 
 // https://github.com/ProjectEvergreen/greenwood/issues/1721
 describe("Develop Greenwood With: ", function () {
   const LABEL = "Import Attributes Polyfill Edge Cases Configuration";
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
-  const hostname = "http://localhost";
-  const port = 1985;
+  let hostname;
   let runner;
 
   before(function () {
     this.context = {
-      hostname: `${hostname}:${port}`,
+      hostname,
     };
     runner = new Runner();
   });
@@ -56,19 +56,8 @@ describe("Develop Greenwood With: ", function () {
     before(async function () {
       await runner.setup(outputPath);
 
-      await new Promise((resolve, reject) => {
-        runner
-          .runCommand(cliPath, "develop", {
-            onStdOut: (message) => {
-              if (
-                message.includes(`Started local development server at http://localhost:${port}`)
-              ) {
-                resolve();
-              }
-            },
-          })
-          .catch(reject);
-      });
+      hostname = await startServer(runner, cliPath, "develop");
+      this.context.hostname = hostname;
     });
 
     describe("Import Attributes Polyfill Behaviors for the tricky JavaScript file (main.js)", function () {
@@ -77,7 +66,7 @@ describe("Develop Greenwood With: ", function () {
       let stripped;
 
       before(async function () {
-        response = await fetch(`${hostname}:${port}/main.js`, {
+        response = await fetch(`${hostname}/main.js`, {
           headers: {
             accept: "text/html",
           },
@@ -145,7 +134,7 @@ describe("Develop Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.stopCommand();
+    await stopServer(runner);
     await runner.teardown([
       path.join(outputPath, ".greenwood"),
       path.join(outputPath, "node_modules"),

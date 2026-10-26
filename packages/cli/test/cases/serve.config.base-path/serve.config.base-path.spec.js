@@ -46,13 +46,14 @@ import path from "node:path";
 import { getOutputTeardownFiles, HASH_REGEX } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
+import { startServer, stopServer } from "../../../../../test/server.js";
 
 describe("Serve Greenwood With: ", function () {
   const LABEL = "Base Path Configuration";
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
   const publicPath = path.join(outputPath, "public/");
-  const hostname = "http://127.0.0.1:8080";
+  let hostname;
   const basePath = "/my-path";
   const jsHash = "eCbOYUm_";
   let runner;
@@ -69,17 +70,8 @@ describe("Serve Greenwood With: ", function () {
       await runner.setup(outputPath);
       await runner.runCommand(cliPath, "build");
 
-      await new Promise((resolve, reject) => {
-        runner
-          .runCommand(cliPath, "serve", {
-            onStdOut: (message) => {
-              if (message.includes("Started server at http://localhost:8080")) {
-                resolve();
-              }
-            },
-          })
-          .catch(reject);
-      });
+      hostname = await startServer(runner, cliPath, "serve");
+      this.context.hostname = hostname;
     });
 
     describe("Serve command specific HTML behaviors", function () {
@@ -536,7 +528,7 @@ describe("Serve Greenwood With: ", function () {
   });
 
   after(async function () {
+    await stopServer(runner);
     await runner.teardown(getOutputTeardownFiles(outputPath));
-    await runner.stopCommand();
   });
 });

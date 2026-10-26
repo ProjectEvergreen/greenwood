@@ -31,6 +31,7 @@ import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
+import { startServer, stopServer } from "../../../../../test/server.js";
 
 // fetch()/WHATWG URL normalize `..` client-side, so use a raw socket to send the
 // literal request target an attacker would send (e.g. curl --path-as-is).
@@ -54,8 +55,8 @@ describe("Serve Greenwood With: ", function () {
   const LABEL = "Path traversal protection for the static file handler";
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
-  const hostname = "http://localhost:8182";
-  const port = 8182;
+  let hostname;
+  let port;
   let runner;
 
   before(function () {
@@ -70,17 +71,9 @@ describe("Serve Greenwood With: ", function () {
       await runner.setup(outputPath);
       await runner.runCommand(cliPath, "build");
 
-      await new Promise((resolve, reject) => {
-        runner
-          .runCommand(cliPath, "serve", {
-            onStdOut: (message) => {
-              if (message.includes(`Started server at ${hostname}`)) {
-                resolve();
-              }
-            },
-          })
-          .catch(reject);
-      });
+      hostname = await startServer(runner, cliPath, "serve");
+      this.context.hostname = hostname;
+      port = Number(new URL(hostname).port);
     });
 
     describe("a legitimate in-root static asset", function () {
@@ -133,7 +126,7 @@ describe("Serve Greenwood With: ", function () {
   });
 
   after(async function () {
+    await stopServer(runner);
     await runner.teardown(getOutputTeardownFiles(outputPath));
-    await runner.stopCommand();
   });
 });

@@ -1,5 +1,5 @@
 export default {
   devServer: {
-    port: 1988,
+    port: Number(process.env.__GWD_TEST_PORT__ ?? 1988),
   },
 };

@@ -29,12 +29,13 @@ import { JSDOM } from "jsdom";
 import path from "node:path";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
+import { startServer, stopServer } from "../../../../../test/server.js";
 
 describe("Develop Greenwood With: ", function () {
   const LABEL = "Import Attributes used in API Routes and SSR Pages";
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
-  const hostname = "http://127.0.0.1:1984";
+  let hostname;
   let runner;
 
   before(function () {
@@ -48,17 +49,8 @@ describe("Develop Greenwood With: ", function () {
     before(async function () {
       await runner.setup(outputPath);
 
-      await new Promise((resolve, reject) => {
-        runner
-          .runCommand(cliPath, "develop", {
-            onStdOut: (message) => {
-              if (message.includes("Started local development server at http://localhost:1984")) {
-                resolve();
-              }
-            },
-          })
-          .catch(reject);
-      });
+      hostname = await startServer(runner, cliPath, "develop");
+      this.context.hostname = hostname;
     });
 
     describe("CSS file is returned as CSS (text/css)", function () {
@@ -184,7 +176,7 @@ describe("Develop Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.stopCommand();
+    await stopServer(runner);
     await runner.teardown([
       path.join(outputPath, ".greenwood"),
       path.join(outputPath, "node_modules"),

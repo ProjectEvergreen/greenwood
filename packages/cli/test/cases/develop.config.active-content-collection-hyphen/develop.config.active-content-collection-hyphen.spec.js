@@ -35,18 +35,18 @@ import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
+import { startServer, stopServer } from "../../../../../test/server.js";
 
 describe("Develop Greenwood With: ", function () {
   const LABEL = "Active Content with a hyphenated collection name";
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
-  const hostname = "http://localhost";
-  const port = 1988;
+  let hostname;
   let runner;
 
   before(function () {
     this.context = {
-      hostname: `${hostname}:${port}`,
+      hostname,
     };
     runner = new Runner();
   });
@@ -55,19 +55,8 @@ describe("Develop Greenwood With: ", function () {
     before(async function () {
       await runner.setup(outputPath);
 
-      await new Promise((resolve, reject) => {
-        runner
-          .runCommand(cliPath, "develop", {
-            onStdOut: (message) => {
-              if (
-                message.includes(`Started local development server at http://localhost:${port}`)
-              ) {
-                resolve();
-              }
-            },
-          })
-          .catch(reject);
-      });
+      hostname = await startServer(runner, cliPath, "develop");
+      this.context.hostname = hostname;
     });
 
     describe("Content Request Types", () => {
@@ -75,7 +64,7 @@ describe("Develop Greenwood With: ", function () {
         let response;
 
         before(async function () {
-          response = await fetch(`${hostname}:${port}/___graph.json`, {
+          response = await fetch(`${hostname}/___graph.json`, {
             headers: {
               "x-content-key": "collection-my-posts",
             },
@@ -93,7 +82,7 @@ describe("Develop Greenwood With: ", function () {
         let response;
 
         before(async function () {
-          response = await fetch(`${hostname}:${port}/___graph.json`, {
+          response = await fetch(`${hostname}/___graph.json`, {
             headers: {
               "x-content-key": "collection-nav",
             },
@@ -111,7 +100,7 @@ describe("Develop Greenwood With: ", function () {
         let response;
 
         before(async function () {
-          response = await fetch(`${hostname}:${port}/___graph.json`, {
+          response = await fetch(`${hostname}/___graph.json`, {
             headers: {
               "x-content-key": "route-/my-blog",
             },
@@ -128,7 +117,7 @@ describe("Develop Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.stopCommand();
+    await stopServer(runner);
     await runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });
