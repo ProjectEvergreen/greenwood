@@ -7,6 +7,7 @@
  */
 import amaro from "amaro";
 import fs from "node:fs/promises";
+import { fileURLToPath } from "node:url";
 import { checkResourceExists } from "../../lib/resource-utils.js";
 
 const defaultCompilerOptions = {
@@ -24,9 +25,7 @@ async function getCompilerOptions(projectDirectory, tsc) {
   let options = defaultCompilerOptions;
 
   if (await checkResourceExists(userConfigUrl)) {
-    // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
-    const text = await fs.readFile(userConfigUrl, "utf-8");
-    const { config, error } = tsc.parseConfigFileTextToJson(projectDirectory.pathname, text);
+    const { config, error } = await tsc.readConfigFile({ uri: userConfigUrl.href });
 
     if (error) {
       console.error("ERROR parsing tsconfig.json", error);
@@ -35,7 +34,13 @@ async function getCompilerOptions(projectDirectory, tsc) {
     }
   }
 
-  return options;
+  // Convert tsconfig strings to API enum values without discovering or compiling project files.
+  const { options: compilerOptions } = await tsc.parseJsonConfigFileContent(
+    { compilerOptions: options, files: [] },
+    { configDirectory: fileURLToPath(projectDirectory) },
+  );
+
+  return compilerOptions;
 }
 
 class StandardTypeScriptResource {
@@ -55,13 +60,19 @@ class StandardTypeScriptResource {
     let code = "";
 
     if (useTsc) {
-      const tsc = (await import("typescript").then((mod) => mod)).default;
-      const compilerOptions = await getCompilerOptions(
-        this.compilation.context.projectDirectory,
-        tsc,
-      );
+      const { API } = await import("typescript/async");
+      const tsc = new API();
 
-      code = tsc.transpileModule(body, { compilerOptions }).outputText;
+      try {
+        const compilerOptions = await getCompilerOptions(
+          this.compilation.context.projectDirectory,
+          tsc,
+        );
+
+        code = (await tsc.transpileModule(body, { compilerOptions })).outputText;
+      } finally {
+        await tsc.close();
+      }
     } else {
       code = amaro.transformSync(body, { mode: "strip-only" }).code;
     }

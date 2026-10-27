@@ -35,7 +35,7 @@
     "@greenwood/cli": "^0.31.0"
   },
   "dependencies": {
-    "typescript": "^6.0.3"
+    "typescript": "^7.1.0-beta"
   },
   "devDependencies": {
     "@greenwood/cli": "^0.35.0-alpha.3"
