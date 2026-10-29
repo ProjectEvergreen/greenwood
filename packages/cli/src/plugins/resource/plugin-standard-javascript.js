@@ -83,6 +83,13 @@ class StandardJavaScriptResource {
           edits.push({ start: node.source.end, end: closeBrace + 1, replacement: "" });
         },
         ImportExpression(node) {
+          // Lit SSR uses Expression for CSS import attributes
+          // Preserve both the expression and its import attributes instead of assuming a string
+          // https://github.com/ProjectEvergreen/greenwood/issues/1840
+          if (node.source.type !== "Literal" || typeof node.source.value !== "string") {
+            return;
+          }
+
           if (node.options?.type !== "ObjectExpression") {
             return;
           }
