@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Static page with Lit SSR cards</title>
+    <script type="module" src="../components/card.js"></script>
+    <script type="module">
+      document.querySelector("form").addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const response = await fetch("/api/search", {
+          method: "POST",
+          body: new URLSearchParams(new FormData(event.currentTarget)),
+        });
+
+        // Preserve declarative shadow roots and Lit SSR comments.
+        document.querySelector("#search-output").setHTMLUnsafe(await response.text());
+      });
+    </script>
+  </head>
+  <body>
+    <h1>Static page with Lit SSR cards</h1>
+    <form>
+      <label>Artist <input name="term" value="Analog" required /></label>
+      <button type="submit">Search</button>
+    </form>
+    <div id="search-output"></div>
+  </body>
+</html>

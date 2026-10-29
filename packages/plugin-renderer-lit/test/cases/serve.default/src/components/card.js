@@ -1,6 +1,11 @@
 import { LitElement, html, css } from "lit";
 
 export default class Card extends LitElement {
+  static properties = {
+    title: { type: String },
+    thumbnail: { type: String },
+  };
+
   static styles = css`
     h3 {
       font-size: 1.85rem;
