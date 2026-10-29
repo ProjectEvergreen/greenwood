@@ -34,6 +34,7 @@
  *       [id].js
  *     artists.js
  *     products.js
+ *     search.html # static page fetching Lit SSR cards from /api/search
  *     users.js (isolation = false)
  *   layouts/
  *     app.html
@@ -494,13 +495,35 @@ describe("Serve Greenwood With: ", function () {
         const cardDom = new JSDOM(cards[0].innerHTML);
 
         expect(cards.length).to.equal(1);
-        // TODO this should be using real data from attributes (see issue with static in card.js)
-        expect(cardDom.window.document.querySelectorAll("h3")[0].textContent).to.equal("Foo");
+        expect(cardDom.window.document.querySelectorAll("h3")[0].textContent).to.equal("1) Analog");
         expect(cardDom.window.document.querySelectorAll("img")[0].getAttribute("src")).to.equal(
-          "bar.png",
+          "//d34k5cjnk2rcze.cloudfront.net/images/artists/analog.jpg",
         );
 
         done();
+      });
+    });
+
+    describe("Serve command with a static HTML page fetching server-rendered <app-card> components", function () {
+      let resp;
+      let dom;
+
+      before(async function () {
+        resp = await fetch(`${hostname}/search/`);
+        dom = new JSDOM(await resp.text());
+      });
+
+      it("should load hydration support before card definitions on a static page", function () {
+        const scripts = Array.from(dom.window.document.querySelectorAll("head script"));
+        const hydrationScripts = scripts.filter((script) =>
+          script.textContent.includes("globalThis.litElementHydrateSupport"),
+        );
+
+        expect(resp.status).to.equal(200);
+        expect(hydrationScripts.length).to.equal(1);
+        expect(scripts.findIndex((script) => script.src.includes("card."))).to.be.greaterThan(
+          scripts.indexOf(hydrationScripts[0]),
+        );
       });
     });
   });
