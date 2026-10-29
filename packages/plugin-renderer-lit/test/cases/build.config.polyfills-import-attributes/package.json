@@ -1,0 +1,7 @@
+{
+  "name": "plugin-renderer-lit-build-polyfills-import-attributes",
+  "type": "module",
+  "dependencies": {
+    "lit": "^3.3.3"
+  }
+}
