@@ -1,0 +1,28 @@
+{
+  "name": "greenwood-cloudflare-isolation",
+  "main": "./functions/worker.js",
+  "compatibility_date": "2026-10-02",
+  "compatibility_flags": ["new_module_registry"],
+  "no_bundle": true,
+  "rules": [
+    {
+      "type": "ESModule",
+      "globs": ["**/*.js"],
+      "fallthrough": true,
+    },
+  ],
+  "assets": {
+    "directory": "./public",
+    "binding": "STATIC_FILES",
+  },
+  // Required for Greenwood's isolation mode.
+  "worker_loaders": [
+    {
+      "binding": "GREENWOOD_ISOLATION",
+    },
+  ],
+  // Retain logs forwarded from isolated route Workers.
+  "observability": {
+    "enabled": true,
+  },
+}
