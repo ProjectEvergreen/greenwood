@@ -123,7 +123,7 @@ The adapter forwards child Worker logs and exceptions to the parent Worker's obs
 
 The adapter automatically reads the first available Wrangler configuration file in your project directory, checking _wrangler.json_, _wrangler.jsonc_, then _wrangler.toml_, in the same order as Wrangler.  You can override individual values through the plugin's `wrangler` options. Overrides affect generated code and do not rewrite your Wrangler file, so keep deployment settings consistent when overriding.
 
-> _Precedence is: explicit plugin options, then file values, then the defaults below. Flag arrays replace the file's flags rather than being combined; an empty array is preserved._
+> _Precedence is: explicit plugin options, userland configuration file, then the defaults below. Flag arrays replace the file's flags rather than being combined; an empty array is preserved._
 
 | Option | Fallback default | Description |
 | --- | --- | --- |
@@ -145,7 +145,7 @@ greenwoodPluginAdapterCloudflare({
 });
 ```
 
-> _Keep deployment settings such as domains, `observability`, `assets.run_worker_first`, and resource bindings in your Wrangler file. The adapter continues to generate _functions/worker.js_ and uses Greenwood's _public/_ output; configure `main` and `assets.directory` accordingly. Isolation requires a Worker Loader binding named `GREENWOOD_ISOLATION`._
+> _Keep deployment settings such as domains, `observability`, `assets.run_worker_first`, and resource bindings in your Wrangler file. The adapter continues to generate a _functions/worker.js_ file and uses Greenwood's _public/_ output; configure `main` and `assets.directory` accordingly. Isolation requires a Worker Loader binding named `GREENWOOD_ISOLATION`._
 
 ## Types
 
