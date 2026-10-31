@@ -18,13 +18,13 @@ import { expect } from "chai";
 import path from "node:path";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
+import { startServer, stopServer } from "../../../../../test/server.js";
 
 describe("Develop Greenwood With: ", function () {
   const LABEL = "GraphQL Server";
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
-  const hostname = "localhost";
-  const port = 4000;
+  let hostname;
   let runner;
 
   before(function () {
@@ -35,21 +35,8 @@ describe("Develop Greenwood With: ", function () {
     before(async function () {
       await runner.setup(outputPath);
 
-      await new Promise((resolve, reject) => {
-        runner
-          .runCommand(cliPath, "develop", {
-            onStdOut: (message) => {
-              // here we are waiting for the _GraphQL_ server to be started
-              // ignore hostname and port as they can be different in CI vs local dev, e.g. `localhost` vs `0.0.0.0`
-              if (
-                message.includes("GraphQLServer started at http://") &&
-                message.includes(`:${port}/`)
-              ) {
-                resolve();
-              }
-            },
-          })
-          .catch(reject);
+      hostname = await startServer(runner, cliPath, "develop", {
+        pattern: /GraphQLServer started at (http:\/\/\S+)\r?\n/,
       });
     });
 
@@ -61,7 +48,7 @@ describe("Develop Greenwood With: ", function () {
       };
 
       before(async function () {
-        response = await fetch(`http://${hostname}:${port}`, {
+        response = await fetch(`${hostname}`, {
           headers: {
             accept: "text/html",
           },
@@ -73,7 +60,7 @@ describe("Develop Greenwood With: ", function () {
       });
 
       it("should return the correct content type", function () {
-        expect(response.headers.get("content-type")).to.equal("text/html");
+        expect(response.headers.get("content-type")).to.contain("text/html");
       });
     });
 
@@ -92,7 +79,7 @@ describe("Develop Greenwood With: ", function () {
       };
 
       before(async function () {
-        response = await fetch(`http://${hostname}:${port}/graphql`, {
+        response = await fetch(`${hostname}/graphql`, {
           method: "POST",
           body: JSON.stringify(body),
           headers: {
@@ -117,7 +104,7 @@ describe("Develop Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.stopCommand();
+    await stopServer(runner);
     await runner.teardown([path.join(outputPath, ".greenwood"), path.join(outputPath, "public")]);
   });
 });

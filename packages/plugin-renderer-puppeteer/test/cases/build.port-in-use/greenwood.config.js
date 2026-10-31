@@ -47,7 +47,7 @@ export default {
   prerender: true,
   concurrency: 2,
   devServer: {
-    port: 1990,
+    port: Number(process.env.__GWD_TEST_PORT__ ?? 1990),
   },
   plugins,
 };

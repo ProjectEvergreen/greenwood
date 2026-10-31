@@ -9,7 +9,7 @@
  * greenwood develop
  */
 import { expect } from "chai";
-import net from "node:net";
+import { occupyPort, stopServer } from "../../../../../test/server.js";
 import path from "node:path";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
@@ -30,11 +30,7 @@ describe("Develop Greenwood With: ", function () {
 
   describe(LABEL, function () {
     before(async function () {
-      blocker = net.createServer();
-      await new Promise((resolve, reject) => {
-        blocker.once("error", reject);
-        blocker.listen(preferredPort, resolve);
-      });
+      blocker = await occupyPort(preferredPort);
 
       await runner.setup(outputPath);
 
@@ -108,9 +104,7 @@ describe("Develop Greenwood With: ", function () {
   });
 
   after(async function () {
-    if (runner.childProcess?.exitCode === null && runner.childProcess?.signalCode === null) {
-      await runner.stopCommand();
-    }
+    await stopServer(runner);
     if (blocker?.listening) {
       await new Promise((resolve) => blocker.close(resolve));
     }

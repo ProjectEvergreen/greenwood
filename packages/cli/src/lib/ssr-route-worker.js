@@ -14,10 +14,22 @@ async function executeModule({
   contentOptions = "{}",
   params,
 }) {
+  const parsedCompilation = JSON.parse(compilation);
+
+  // Browser globals are not executed when rendering in a worker. Publish the
+  // resolved build-time endpoint before importing components that use the client.
+  if (parsedCompilation.config?.activeContent) {
+    globalThis.__CONTENT_OPTIONS__ = {
+      PORT: parsedCompilation.config.devServer.port,
+      PRERENDER: "false",
+    };
+    globalThis.__GWD_BASE_PATH__ = parsedCompilation.config.basePath;
+  }
+
   const { executeRouteModule } = await import(executeModuleUrl);
   const data = await executeRouteModule({
     moduleUrl,
-    compilation: JSON.parse(compilation),
+    compilation: parsedCompilation,
     page: JSON.parse(page),
     prerender,
     htmlContents,
