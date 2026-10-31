@@ -121,21 +121,31 @@ The adapter forwards child Worker logs and exceptions to the parent Worker's obs
 
 ### Options
 
-These options configure the generated isolated route Workers. If you override them, match the compatibility settings in your _wrangler.toml_:
+The adapter automatically reads the first available Wrangler configuration file in your project directory, checking _wrangler.json_, _wrangler.jsonc_, then _wrangler.toml_, in the same order as Wrangler.  You can override individual values through the plugin's `wrangler` options. Overrides affect generated code and do not rewrite your Wrangler file, so keep deployment settings consistent when overriding.
 
-| Option | Default | Description |
+> _Precedence is: explicit plugin options, then file values, then the defaults below. Flag arrays replace the file's flags rather than being combined; an empty array is preserved._
+
+| Option | Fallback default | Description |
 | --- | --- | --- |
-| `compatibilityDate` | `"2026-10-03"` | Compatibility date for isolated Workers. |
-| `compatibilityFlags` | `["new_module_registry"]` | Compatibility flags for isolated Workers. |
+| `wrangler.compatibilityDate` | `"2026-10-03"` | Overrides `compatibility_date` for isolated Workers. |
+| `wrangler.compatibilityFlags` | `["new_module_registry"]` | Overrides `compatibility_flags` for isolated Workers. |
+| `wrangler.assets.binding` | `"ASSETS"` | Overrides the static asset binding name. |
 
 ```javascript
 import { greenwoodPluginAdapterCloudflare } from '@greenwood/plugin-adapter-cloudflare';
 
 greenwoodPluginAdapterCloudflare({
-  compatibilityDate: '2026-10-03',
-  compatibilityFlags: ['new_module_registry']
+  wrangler: {
+    compatibilityDate: '2026-10-03',
+    compatibilityFlags: ['new_module_registry'],
+    assets: {
+      binding: 'ASSETS'
+    }
+  }
 });
 ```
+
+> _Keep deployment settings such as domains, `observability`, `assets.run_worker_first`, and resource bindings in your Wrangler file. The adapter continues to generate _functions/worker.js_ and uses Greenwood's _public/_ output; configure `main` and `assets.directory` accordingly. Isolation requires a Worker Loader binding named `GREENWOOD_ISOLATION`._
 
 ## Types
 

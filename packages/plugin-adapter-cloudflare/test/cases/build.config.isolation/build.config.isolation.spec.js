@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood with the Cloudflare adapter and global isolation mode enabled.
+ * Run Greenwood with the Cloudflare adapter, JSONC Wrangler config, and global isolation mode enabled.
  *
  * User Result
  * Should run each SSR and API request in a fresh Worker, preserving request
@@ -19,7 +19,7 @@
  *
  * User Workspace
  * greenwood.config.js
- * wrangler.toml
+ * wrangler.jsonc
  * src/
  *   components/
  *     card.js
@@ -69,12 +69,12 @@ describe("Build Greenwood With: Cloudflare adapter and global route isolation", 
         {
           config: {
             name: "greenwood",
-            compatibilityDate: "2026-10-03",
+            compatibilityDate: "2026-10-02",
             compatibilityFlags: ["new_module_registry"],
             manifest: { mainModule: "worker.js", modules },
             env: {
               GREENWOOD_ISOLATION: { type: "worker-loader" },
-              ASSETS: {
+              STATIC_FILES: {
                 type: "fetcher",
                 handler: async () =>
                   new Response("Static asset", { headers: { "x-static": "true" } }),
@@ -87,7 +87,7 @@ describe("Build Greenwood With: Cloudflare adapter and global route isolation", 
     await runtime.ready;
   });
 
-  it("should package module source without evaluating isolated SSR and API routes in the parent Worker", async function () {
+  it("should read JSONC Wrangler compatibility settings when packaging isolated SSR and API routes", async function () {
     const source = await fs.readFile(new URL("worker.js", functionsDir), "utf8");
     expect(source).to.include("GreenwoodAssets");
 
@@ -100,7 +100,7 @@ describe("Build Greenwood With: Cloudflare adapter and global route isolation", 
       const { default: code } = await import(new URL(module, functionsDir));
 
       expect(source).to.include(`./${module}`);
-      expect(code.compatibilityDate).to.equal("2026-10-03");
+      expect(code.compatibilityDate).to.equal("2026-10-02");
       expect(code.compatibilityFlags).to.deep.equal(["new_module_registry"]);
       expect(code.modules).to.have.property(code.mainModule);
       expect(Object.keys(code.modules).length).to.be.greaterThan(1);
@@ -196,7 +196,7 @@ describe("Build Greenwood With: Cloudflare adapter and global route isolation", 
     expect(await response.text()).to.equal("Not Found");
   });
 
-  it("should forward a static request to the asset binding with isolation enabled", async function () {
+  it("should forward a static request to the asset binding named in Wrangler with isolation enabled", async function () {
     const response = await runtime.dispatchFetch("http://localhost/about/");
     expect(response.status).to.equal(200);
     expect(response.headers.get("x-static")).to.equal("true");

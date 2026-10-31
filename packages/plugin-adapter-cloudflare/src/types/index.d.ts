@@ -1,10 +1,17 @@
 import type { AdapterPlugin } from "@greenwood/cli";
 
 export type CloudflareAdapterOptions = {
-  /** Compatibility date for isolated route Workers. Match wrangler.toml when overriding. */
-  compatibilityDate?: string;
-  /** Compatibility flags for isolated route Workers. Match wrangler.toml when overriding. */
-  compatibilityFlags?: string[];
+  /** Overrides settings discovered in the workspace's Wrangler config file. */
+  wrangler?: {
+    /** Compatibility date for isolated route Workers. Defaults to the Wrangler config value. */
+    compatibilityDate?: string;
+    /** Compatibility flags for isolated route Workers. Defaults to the Wrangler config value. */
+    compatibilityFlags?: string[];
+    assets?: {
+      /** Static asset binding name. Defaults to the Wrangler config value, or ASSETS. */
+      binding?: string;
+    };
+  };
 };
 
 export type CloudflareAdapter = (options?: CloudflareAdapterOptions) => [AdapterPlugin];

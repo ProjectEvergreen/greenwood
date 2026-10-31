@@ -2,11 +2,12 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { getDynamicPages } from "@greenwood/cli/src/lib/graph-utils.js";
+import { resolveWranglerConfig } from "./wrangler-config.js";
 
 const ISOLATION_BINDING = "GREENWOOD_ISOLATION";
 const ISOLATED_ENTRY = "__greenwood-route-worker.js";
 
-function generateWorker(routes, basePath) {
+function generateWorker(routes, basePath, assetsBinding) {
   const hasIsolation = routes.some((route) => route.isolation);
   const entries = routes.map(
     ({ pathname, specifier, type, isolation }) => `  {
@@ -24,7 +25,7 @@ function generateWorker(routes, basePath) {
 // https://developers.cloudflare.com/dynamic-workers/usage/bindings/
 export class GreenwoodAssets extends WorkerEntrypoint {
   fetch(request) {
-    return this.env.ASSETS.fetch(request);
+    return this.env[${JSON.stringify(assetsBinding)}].fetch(request);
   }
 }
 
@@ -44,7 +45,7 @@ export class GreenwoodRouteLogs extends WorkerEntrypoint {
 }
 
 async function invokeIsolatedRoute(route, request, params, env, ctx) {
-  const { ${ISOLATION_BINDING}: loader, ASSETS, ...bindings } = env;
+  const { ${ISOLATION_BINDING}: loader, [${JSON.stringify(assetsBinding)}]: assetBinding, ...bindings } = env;
 
   if (!loader) {
     throw new Error('Route isolation requires a Worker Loader binding named ${ISOLATION_BINDING}');
@@ -57,7 +58,7 @@ async function invokeIsolatedRoute(route, request, params, env, ctx) {
     // Import code as strings, without evaluating route modules in the parent isolate.
     const { default: code } = await route.load();
     stage = 'prepare bindings';
-    const assets = ASSETS ? { ASSETS: ctx.exports.GreenwoodAssets({}) } : {};
+    const assets = assetBinding ? { [${JSON.stringify(assetsBinding)}]: ctx.exports.GreenwoodAssets({}) } : {};
     const tails = [ctx.exports.GreenwoodRouteLogs({ props: { route: pathname } })];
 
     stage = 'create worker';
@@ -123,7 +124,7 @@ ${
       return new Response('Not Found', { status: 404 });
     }
 
-    return env.ASSETS.fetch(request);
+    return env[${JSON.stringify(assetsBinding)}].fetch(request);
   },
 };
 `;
@@ -164,9 +165,11 @@ function compareRoutes(left, right) {
 }
 
 async function cloudflareAdapter(compilation, options) {
-  const { compatibilityDate = "2026-10-03", compatibilityFlags = ["new_module_registry"] } =
-    options;
   const { outputDir, projectDirectory } = compilation.context;
+  const { compatibilityDate, compatibilityFlags, assetsBinding } = await resolveWranglerConfig(
+    projectDirectory,
+    options.wrangler,
+  );
   const functionsDir = new URL("./functions/", projectDirectory);
   const pages = getDynamicPages(compilation);
   const apis = [...compilation.manifest.apis.values()];
@@ -274,7 +277,10 @@ async function cloudflareAdapter(compilation, options) {
     await copyFunction(entry, entry.type);
   }
 
-  await fs.writeFile(new URL("./worker.js", functionsDir), generateWorker(routes, basePath));
+  await fs.writeFile(
+    new URL("./worker.js", functionsDir),
+    generateWorker(routes, basePath, assetsBinding),
+  );
 
   // Keep Greenwood's server bundles available for local serve, but exclude them from static hosting.
   await fs.appendFile(
