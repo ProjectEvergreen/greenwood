@@ -1,6 +1,6 @@
 import { css, html, LitElement, unsafeCSS } from "lit";
-import bannerCss from "./banner.css?type=raw";
-import buttonCss from "./button.css?type=raw";
+import bannerCss from "./banner.css?type=text";
+import buttonCss from "./button.css?type=text";
 import "./eve-button.js";
 
 class Banner extends LitElement {

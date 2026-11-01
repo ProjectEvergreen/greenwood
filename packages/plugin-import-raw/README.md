@@ -2,6 +2,8 @@
 
 ## Overview
 
+> _**THIS PACKAGE HAS BEEN DEPRECATED**.  You can use [**@greenwood/plugin-import-text**](https://greenwoodjs.dev/docs/plugins/text/) to achieve the same result.
+
 A Greenwood plugin to use ESM (`import`) syntax to load any file contents as a string exported as a JavaScript module.  Inspired by **webpack**'s [raw loader](https://v4.webpack.js.org/loaders/raw-loader/).  For more information and complete docs on Greenwood, please visit [our website](https://www.greenwoodjs.dev).
 
 > This package assumes you already have `@greenwood/cli` installed.

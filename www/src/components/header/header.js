@@ -1,7 +1,7 @@
 import { css, html, LitElement, unsafeCSS } from "lit";
 import client from "@greenwood/plugin-graphql/src/core/client.js";
 import CollectionQuery from "@greenwood/plugin-graphql/src/queries/collection.gql";
-import headerCss from "./header.css?type=raw";
+import headerCss from "./header.css?type=text";
 import "../social-icons/social-icons.js";
 
 class HeaderComponent extends LitElement {

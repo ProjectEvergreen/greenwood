@@ -1,0 +1,82 @@
+/*
+ * Use Case
+ * Run Greenwood and be able to load arbitrary content as a string using ESM.
+ *
+ * User Result
+ * Should generate a bare bones Greenwood build without erroring when using ESM (import) as a string value.
+ *
+ * User Command
+ * greenwood build
+ *
+ * User Config
+ * import { greenwoodPluginImportText } from '@greenwood/plugin-import-text';
+ *
+ * {
+ *   plugins: [{
+ *     greenwoodPluginImportText({
+ *      matches: [
+ *        'eve-container.css'
+ *      ]
+ *    })
+ *   }]
+ * }
+ *
+ * User Workspace
+ * src/
+ *   pages/
+ *     index.html
+ *   main.js
+ */
+import { expect } from "chai";
+import fs from "node:fs";
+import glob from "glob-promise";
+import path from "node:path";
+import { runSmokeTest } from "../../../../../test/smoke-test.js";
+import { getOutputTeardownFiles } from "../../../../../test/utils.js";
+import { Runner } from "gallinago";
+import { fileURLToPath } from "node:url";
+
+describe("Build Greenwood With: ", function () {
+  const LABEL = "Import Text Plugin with matchers configuration";
+  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
+  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  let runner;
+
+  before(function () {
+    this.context = {
+      publicDir: path.join(outputPath, "public"),
+    };
+    runner = new Runner();
+  });
+
+  describe(LABEL, function () {
+    before(async function () {
+      await runner.setup(outputPath);
+      await runner.runCommand(cliPath, "build");
+    });
+
+    runSmokeTest(["public", "index"], LABEL);
+
+    describe("Importing a string of CSS using ESM (import)", function () {
+      let scripts;
+
+      before(async function () {
+        scripts = await glob.promise(path.join(this.context.publicDir, "*.js"));
+      });
+
+      it("should contain one (CSS-in) JavaScript file in the output directory", function () {
+        expect(scripts.length).to.be.equal(1);
+      });
+
+      it("should have the expected output from importing styles.css in main.js", function () {
+        const contents = fs.readFileSync(scripts[0], "utf-8");
+
+        expect(contents).to.contain('console.log({css:"@custom-media --screen-xs');
+      });
+    });
+  });
+
+  after(async function () {
+    await runner.teardown(getOutputTeardownFiles(outputPath));
+  });
+});

@@ -1,7 +1,7 @@
 import { css, html, LitElement, unsafeCSS } from "lit";
 import client from "@greenwood/plugin-graphql/src/core/client.js";
 import CollectionQuery from "@greenwood/plugin-graphql/src/queries/collection.gql";
-import shelfCss from "./shelf.css?type=raw";
+import shelfCss from "./shelf.css?type=text";
 import chevronRt from "../icons/chevron-right.js";
 import chevronDwn from "../icons/chevron-down.js";
 
