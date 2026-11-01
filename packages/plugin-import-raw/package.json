@@ -1,6 +1,7 @@
 {
   "name": "@greenwood/plugin-import-raw",
   "version": "0.35.0-alpha.3",
+  "private": true,
   "description": "A Greenwood plugin to allow you to use ESM (import) syntax to load any file content as a string.",
   "repository": {
     "type": "git",

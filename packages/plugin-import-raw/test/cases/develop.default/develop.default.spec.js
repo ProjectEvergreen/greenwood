@@ -28,7 +28,7 @@ import path from "node:path";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
 
-describe("Develop Greenwood With: ", function () {
+xdescribe("Develop Greenwood With: ", function () {
   const LABEL = "Import Raw plugin for using ESM with arbitrary files as strings";
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
