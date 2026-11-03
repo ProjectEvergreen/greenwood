@@ -16,11 +16,18 @@ import {
 } from "../lib/url-utils.js";
 import { Readable } from "node:stream";
 import { Worker } from "node:worker_threads";
-import { isStaticPage } from "../lib/graph-utils.js";
+import { getMatchingPageByRoute, isStaticPage, shouldPrerender } from "../lib/graph-utils.js";
+import { executePageScripts } from "./prerender.js";
 
 async function getDevServer(compilation) {
   const app = new Koa();
   const compilationCopy = Object.assign({}, compilation);
+  const renderer =
+    process.env.__GWD_COMMAND__ === "develop"
+      ? compilation.config.plugins
+          .find((plugin) => plugin.type === "renderer")
+          ?.provider(compilationCopy)
+      : null;
   const resourcePlugins = [
     ...compilation.config.plugins
       .filter((plugin) => {
@@ -174,6 +181,43 @@ async function getDevServer(compilation) {
     } catch (e) {
       ctx.status = 500;
       console.error(e);
+    }
+
+    await next();
+  });
+
+  // support prerendering of pages during development
+  // Browser-based custom renderers (like Puppeteer) currently only support build-time prerendering.
+  app.use(async (ctx, next) => {
+    if (
+      renderer?.executeModuleUrl &&
+      ctx.status >= 200 &&
+      ctx.status < 300 &&
+      ctx.response.is("html")
+    ) {
+      const url = new URL(ctx.url);
+      const page =
+        getMatchingPageByRoute(compilationCopy, url.pathname) ??
+        (url.protocol.startsWith("http") &&
+        !url.pathname.includes(".") &&
+        !url.pathname.startsWith(`${compilationCopy.config.basePath}/api/`)
+          ? compilationCopy.graph.find((page) => page.isSPA)
+          : undefined);
+
+      if (page && shouldPrerender(page, compilationCopy.config)) {
+        try {
+          const html = await new Response(ctx.body).text();
+          const params = page.segment
+            ? getParamsFromSegment(compilationCopy, page.segment, url.pathname)
+            : undefined;
+
+          ctx.body = await executePageScripts(compilationCopy, renderer, null, page, html, params);
+        } catch (error) {
+          ctx.status = 500;
+          ctx.body = "Error prerendering page. Check the terminal for details.";
+          console.error(error);
+        }
+      }
     }
 
     await next();

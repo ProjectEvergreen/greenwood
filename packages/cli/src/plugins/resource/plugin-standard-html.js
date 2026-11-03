@@ -39,8 +39,14 @@ class StandardHtmlResource {
     const { userWorkspace } = context;
     const { pathname } = url;
     const isSpaRoute = this.compilation.graph.find((node) => node.isSPA);
-    const matchingRoute = this.compilation.graph.find((node) => node.route === pathname) || {};
     const matchingRouteWithSegment = getMatchingDynamicSsrRoute(this.compilation, pathname);
+    const matchingRoute =
+      this.compilation.graph.find((node) => node.route === pathname) ??
+      matchingRouteWithSegment ??
+      {};
+    const params = matchingRoute.segment
+      ? getParamsFromSegment(this.compilation, matchingRoute.segment, pathname)
+      : undefined;
     const { pageHref } = matchingRoute;
     const filePath =
       !matchingRoute.external && pageHref
@@ -93,10 +99,6 @@ class StandardHtmlResource {
         .find((plugin) => plugin.type === "renderer")
         .provider().executeModuleUrl;
       const req = await requestAsObject(request);
-      let params =
-        matchingRouteWithSegment && matchingRouteWithSegment.segment
-          ? getParamsFromSegment(this.compilation, matchingRouteWithSegment.segment, pathname)
-          : undefined;
 
       await new Promise((resolve, reject) => {
         const worker = new Worker(new URL("../../lib/ssr-route-worker.js", import.meta.url));
@@ -138,7 +140,12 @@ class StandardHtmlResource {
     if (isSpaRoute) {
       html = await fs.readFile(new URL(isSpaRoute.pageHref), "utf-8");
     } else {
-      const mergedPageLayoutContents = await getPageLayout(body, this.compilation, matchingRoute);
+      const mergedPageLayoutContents = await getPageLayout(
+        body,
+        this.compilation,
+        matchingRoute,
+        params,
+      );
       const mergedAppLayoutContents = await getAppLayout(
         mergedPageLayoutContents,
         this.compilation,

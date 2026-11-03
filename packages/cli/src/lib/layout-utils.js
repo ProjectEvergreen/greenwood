@@ -3,6 +3,7 @@ import { parse, valid } from "node-html-parser";
 import { checkResourceExists } from "./resource-utils.js";
 import { Worker } from "node:worker_threads";
 import { asyncFilter } from "./async-utils.js";
+import { shouldPrerender } from "./graph-utils.js";
 
 async function getCustomPageLayoutsFromPlugins(compilation, layoutName) {
   const contextPlugins = compilation.config.plugins
@@ -255,9 +256,9 @@ async function mergeContentIntoLayout(
     // https://github.com/ProjectEvergreen/greenwood/pull/1527
     let finalBody =
       parentBody && parentBody.match(outletRegex)
-        ? parentBody.replace(outletRegex, childBody ?? childContents)
+        ? parentBody.replace(outletRegex, () => childBody ?? childContents)
         : parentContents && parentContents.match(outletRegex) && outletType === "content"
-          ? parentContents.replace(outletRegex, childBody ?? childContents)
+          ? parentContents.replace(outletRegex, () => childBody ?? childContents)
           : parentBody
             ? parentBody
             : childRoot.querySelector("html") && childBody
@@ -268,11 +269,15 @@ async function mergeContentIntoLayout(
                   : childContents
                 : "";
 
-    // we wrap SSR content in comments so we can extract it during prerendering to avoid double pre-rendering
+    // Only pages that prerender need these temporary markers to protect already-rendered SSR content.
     // https://github.com/ProjectEvergreen/greenwood/issues/1044
     // https://github.com/ProjectEvergreen/greenwood/issues/988#issuecomment-1288168858
     // https://github.com/ProjectEvergreen/greenwood/pull/1559
-    if (matchingRoute.isSSR && outletType === "content") {
+    if (
+      matchingRoute.isSSR &&
+      outletType === "content" &&
+      shouldPrerender(matchingRoute, compilation.config)
+    ) {
       finalBody = `<!-- greenwood-ssr-start -->${finalBody}<!-- greenwood-ssr-end -->`;
     }
 
@@ -297,7 +302,7 @@ async function mergeContentIntoLayout(
 
 // merges provided page content into a page layout
 // optionally using an already acquired SSR layout to avoid executing an SSR route worker
-async function getPageLayout(pageContents, compilation, matchingRoute) {
+async function getPageLayout(pageContents, compilation, matchingRoute, params = undefined) {
   const { context } = compilation;
   const { layoutsDir } = context;
   const { layout, pageHref } = matchingRoute;
@@ -359,6 +364,7 @@ async function getPageLayout(pageContents, compilation, matchingRoute) {
           layout: true,
         }),
         page: JSON.stringify(matchingRoute),
+        params: params ? JSON.stringify(params) : params,
       });
     });
   }

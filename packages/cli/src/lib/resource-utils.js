@@ -120,8 +120,22 @@ async function resolveForRelativeUrl(url, rootUrl) {
   return reducedUrl;
 }
 
-async function trackResourcesForRoute(html, compilation, route) {
-  const { context } = compilation;
+// checks if a script tag is eligible for prerendering when `prerender` true is enabled
+function isPrerenderScript(script) {
+  const src = script.getAttribute("src");
+
+  return (
+    (!src || isLocalLink(src)) &&
+    !script.hasAttribute("data-gwd") &&
+    script.getAttribute("id") !== "data-client-options" &&
+    // The parser returns undefined for a missing type; missing and empty types both mean classic JavaScript.
+    [undefined, "", "module", "module-shim", "text/javascript", "application/javascript"].includes(
+      script.getAttribute("type"),
+    )
+  );
+}
+
+async function getScriptResources(html, context, development = false) {
   const root = parse(html, {
     blockTextElements: {
       noscript: false,
@@ -130,12 +144,13 @@ async function trackResourcesForRoute(html, compilation, route) {
   });
 
   // intentionally support <script> tags from the <head> or <body>
-  const scripts = await asyncMap(
+  return await asyncMap(
     Array.from(root.querySelectorAll("script")).filter(
       (script) =>
         (isLocalLink(script.getAttribute("src")) || script.rawText) &&
         script.rawAttrs.indexOf("importmap") < 0 &&
-        script.getAttribute("type") !== "application/json",
+        script.getAttribute("type") !== "application/json" &&
+        (!development || isPrerenderScript(script)),
     ),
     async (script) => {
       const src = script.getAttribute("src");
@@ -158,7 +173,17 @@ async function trackResourcesForRoute(html, compilation, route) {
       }
     },
   );
+}
 
+async function trackResourcesForRoute(html, compilation, route) {
+  const { context } = compilation;
+  const root = parse(html, {
+    blockTextElements: {
+      noscript: false,
+      pre: false,
+    },
+  });
+  const scripts = await getScriptResources(html, context);
   const styles = await asyncMap(
     Array.from(root.querySelectorAll("style")).filter(
       (style) => !/\$/.test(style.rawText) && !/<!-- Shady DOM styles for -->/.test(style.rawText),
@@ -334,6 +359,8 @@ export {
   requestAsObject,
   responseAsObject,
   resolveForRelativeUrl,
+  getScriptResources,
+  isPrerenderScript,
   trackResourcesForRoute,
   transformKoaRequestIntoStandardRequest,
   isLocalLink,
