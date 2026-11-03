@@ -107,10 +107,11 @@ class LiveReloadResource {
   async intercept(url, request, response) {
     let body = await response.text();
 
+    // Mark the browser-only live reload client so development prerendering skips it.
     body = body.replace(
       "</head>",
       `
-        <script src="http://localhost:${serverState.port}/livereload.js?snipver=1"></script>
+        <script data-gwd="livereload" src="http://localhost:${serverState.port}/livereload.js?snipver=1"></script>
       </head>
     `,
     );
