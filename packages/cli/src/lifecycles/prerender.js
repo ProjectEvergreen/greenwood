@@ -11,12 +11,15 @@ import {
 import { WorkerPool } from "../lib/threadpool.js";
 import { runWithConcurrency } from "../lib/async-utils.js";
 import { getPrerenderPages, getStaticPages } from "../lib/graph-utils.js";
-import { SSR_START_MARKER, SSR_END_MARKER } from "../lib/layout-utils.js";
 import {
   getParamsFromSegment,
   getStaticRouteFromDynamicRoute,
   getOutputHrefForStaticPath,
 } from "../lib/url-utils.js";
+
+// Temporary boundaries used to protect already-rendered SSR content during prerendering.
+const SSR_START_MARKER = "<!-- greenwood-ssr-start -->";
+const SSR_END_MARKER = "<!-- greenwood-ssr-end -->";
 
 async function createOutputDirectory(outputDir) {
   // ignore creating directory for 404 pages since they live at the root of the output directory
@@ -267,6 +270,8 @@ async function staticRenderCompilation(compilation, pages = getStaticPages(compi
 }
 
 export {
+  SSR_START_MARKER,
+  SSR_END_MARKER,
   preRenderCompilationWorker,
   preRenderCompilationCustom,
   executePageScripts,
