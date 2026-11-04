@@ -136,7 +136,7 @@ describe("Develop Greenwood With: ", function () {
           dom.window.document.querySelector('script[src="/components/client.js"]'),
         ).not.to.equal(null);
         expect(
-          dom.window.document.querySelectorAll('script[data-gwd="livereload"]'),
+          dom.window.document.querySelectorAll('script[src*="/livereload.js"]'),
         ).to.have.length(1);
         expect(dom.window.document.querySelectorAll('script[data-gwd="base-path"]')).to.have.length(
           1,
