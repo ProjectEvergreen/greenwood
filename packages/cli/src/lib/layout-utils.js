@@ -5,6 +5,10 @@ import { Worker } from "node:worker_threads";
 import { asyncFilter } from "./async-utils.js";
 import { shouldPrerender } from "./graph-utils.js";
 
+// Temporary boundaries used to protect already-rendered SSR content during prerendering.
+const SSR_START_MARKER = "<!-- greenwood-ssr-start -->";
+const SSR_END_MARKER = "<!-- greenwood-ssr-end -->";
+
 async function getCustomPageLayoutsFromPlugins(compilation, layoutName) {
   const contextPlugins = compilation.config.plugins
     .filter((plugin) => {
@@ -278,7 +282,7 @@ async function mergeContentIntoLayout(
       outletType === "content" &&
       shouldPrerender(matchingRoute, compilation.config)
     ) {
-      finalBody = `<!-- greenwood-ssr-start -->${finalBody}<!-- greenwood-ssr-end -->`;
+      finalBody = `${SSR_START_MARKER}${finalBody}${SSR_END_MARKER}`;
     }
 
     mergedContents = `<!DOCTYPE html>
@@ -466,4 +470,4 @@ async function getGreenwoodScripts(contents, compilation) {
   return contents;
 }
 
-export { getAppLayout, getPageLayout, getGreenwoodScripts };
+export { getAppLayout, getPageLayout, getGreenwoodScripts, SSR_START_MARKER, SSR_END_MARKER };

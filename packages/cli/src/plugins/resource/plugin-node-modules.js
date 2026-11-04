@@ -67,9 +67,8 @@ class NodeModulesResource {
   async intercept(url, request, response) {
     const { context, config } = this.compilation;
     const { importMaps } = config.polyfills;
-    // Mark the browser-only shim so development prerendering skips it, preserving existing build markup.
     const importMapShimScript = importMaps
-      ? `<script ${process.env.__GWD_COMMAND__ === "develop" ? 'data-gwd="import-maps" ' : ""}defer src="/node_modules/es-module-shims/dist/es-module-shims.js"></script>`
+      ? '<script defer src="/node_modules/es-module-shims/dist/es-module-shims.js"></script>'
       : "";
     let body = await response.text();
     const hasHead = body.match(/<head>(.*)<\/head>/s);

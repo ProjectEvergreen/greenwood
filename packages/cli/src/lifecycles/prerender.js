@@ -11,6 +11,7 @@ import {
 import { WorkerPool } from "../lib/threadpool.js";
 import { runWithConcurrency } from "../lib/async-utils.js";
 import { getPrerenderPages, getStaticPages } from "../lib/graph-utils.js";
+import { SSR_START_MARKER, SSR_END_MARKER } from "../lib/layout-utils.js";
 import {
   getParamsFromSegment,
   getStaticRouteFromDynamicRoute,
@@ -80,16 +81,11 @@ function toScratchUrl(outputHref, context) {
 // For SSR pages, preserve the route content and only transform the surrounding application shell.
 async function executePageScripts(compilation, workerPrerender, pool, page, html, params) {
   const development = process.env.__GWD_COMMAND__ === "develop";
-  const ssrContentsMatch = /<!-- greenwood-ssr-start -->(.*?)<!-- greenwood-ssr-end -->/s;
+  const ssrContentsMatch = new RegExp(`${SSR_START_MARKER}(.*?)${SSR_END_MARKER}`, "s");
+  const ssrPlaceholder = `${SSR_START_MARKER}${SSR_END_MARKER}`;
   const ssrMatch = page.isSSR ? html.match(ssrContentsMatch) : null;
-  const ssrContents = ssrMatch
-    ? ssrMatch[0]
-        .replace("<!-- greenwood-ssr-start -->", "")
-        .replace("<!-- greenwood-ssr-end -->", "")
-    : null;
-  let body = ssrMatch
-    ? html.replace(ssrMatch[0], "<!-- greenwood-ssr-start --><!-- greenwood-ssr-end -->")
-    : html;
+  const ssrContents = ssrMatch ? ssrMatch[1] : null;
+  let body = ssrMatch ? html.replace(ssrMatch[0], ssrPlaceholder) : html;
   const resources = development
     ? await getScriptResources(body, compilation.context, true)
     : await trackResourcesForRoute(body, compilation, page.route);
@@ -153,9 +149,7 @@ async function executePageScripts(compilation, workerPrerender, pool, page, html
     body = root.toString();
   }
 
-  return ssrContents === null
-    ? body
-    : body.replace("<!-- greenwood-ssr-start --><!-- greenwood-ssr-end -->", () => ssrContents);
+  return ssrContents === null ? body : body.replace(ssrPlaceholder, () => ssrContents);
 }
 
 async function preRenderCompilationWorker(compilation, workerPrerender) {

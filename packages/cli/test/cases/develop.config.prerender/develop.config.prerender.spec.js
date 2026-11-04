@@ -1,6 +1,6 @@
 /*
  * Use Case
- * Run Greenwood develop with prerendering, Content-as-Data, a base path, and import-map shims.
+ * Run Greenwood develop with prerendering, Content-as-Data, a base path, import-map shims, and a resource interceptor.
  *
  * User Result
  * Should prerender HTML pages and SSR layouts, preserve request-time SSR content,
@@ -18,6 +18,7 @@
  *   devServer: { port: 21984 },
  *   polyfills: { importMaps: true }
  * }
+ * A custom resource interceptor also adds an app-badge to the index page before prerendering.
  *
  * User Workspace
  * src/
@@ -125,12 +126,18 @@ describe("Develop Greenwood With: ", function () {
         );
       });
 
-      it("should execute and remove external and inline static scripts", function () {
+      it("should execute and remove static scripts regardless of unrelated data-gwd attributes", function () {
         expect(dom.window.document.querySelector('script[src="/components/header.js"]')).to.equal(
           null,
         );
         expect(dom.window.document.querySelector('script[data-gwd-opt="static"]')).to.equal(null);
         expect(dom.window.document.querySelector("app-badge").textContent).to.equal("Inline badge");
+      });
+
+      it("should prerender content added by resource interceptors", function () {
+        expect(
+          dom.window.document.querySelector("app-badge.from-interceptor").textContent,
+        ).to.equal("Inline badge");
       });
 
       it("should retain client scripts alongside declarative shadow DOM", function () {
@@ -145,10 +152,12 @@ describe("Develop Greenwood With: ", function () {
 
       it("should retain live reload, import-map shims, framework state, and structured data", function () {
         expect(
-          dom.window.document.querySelectorAll('script[data-gwd="livereload"]'),
+          dom.window.document.querySelectorAll('script[src*="/livereload.js"]'),
         ).to.have.length(1);
         expect(
-          dom.window.document.querySelectorAll('script[data-gwd="import-maps"]'),
+          dom.window.document.querySelectorAll(
+            'script[src="/node_modules/es-module-shims/dist/es-module-shims.js"]',
+          ),
         ).to.have.length(1);
         expect(
           dom.window.document.querySelectorAll('script[type="importmap-shim"]'),

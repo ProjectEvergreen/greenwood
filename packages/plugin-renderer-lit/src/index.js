@@ -52,7 +52,7 @@ class LitHydrationResource {
       body = `
         ${body.slice(0, importMapEndPos)}
         </script>
-        <script data-gwd="hydration" type="${importType}" src="/node_modules/${hydrationSupportScriptBasePath}"></script>
+        <script type="${importType}" src="/node_modules/${hydrationSupportScriptBasePath}"></script>
         ${body.slice(importMapEndPos + 9)}
       `;
     } else {
