@@ -5830,10 +5830,10 @@ all-node-versions@^11.3.0:
     semver "^7.3.7"
     write-file-atomic "^4.0.1"
 
-amaro@^1.1.1:
-  version "1.1.10"
-  resolved "https://registry.yarnpkg.com/amaro/-/amaro-1.1.10.tgz#d5d74148a2d081400590dd70dc10f73ea4133ab7"
-  integrity sha512-ceFv+QA3SlhFsn0hu8Q8oyj36YZdIgoJFpyS2sGJGK2dyncwcMWuBlNzhXfc1oLWtbDWM2Ol2rrzOYa+HNyEjg==
+amaro@^1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/amaro/-/amaro-1.3.0.tgz#3aff2af94e69a67986e9c7361298328e707352ae"
+  integrity sha512-AuQra8VNxiToMaXpQWLEeDZZqo13unyNvKq81VhdtIh0cO9ZE+fElw+rpwrdVwjzomaqB40bin8ycHmoLlhvoQ==
 
 ansi-align@^3.0.1:
   version "3.0.1"
