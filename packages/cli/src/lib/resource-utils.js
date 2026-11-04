@@ -120,13 +120,16 @@ async function resolveForRelativeUrl(url, rootUrl) {
   return reducedUrl;
 }
 
-// checks if a script tag is eligible for prerendering when `prerender` true is enabled
+// Select local executable scripts for development prerendering and static optimization.
+// Greenwood's browser bootstrap scripts stay in the response and do not execute in the worker.
 function isPrerenderScript(script) {
   const src = script.getAttribute("src");
 
   return (
     (!src || isLocalLink(src)) &&
-    !script.hasAttribute("data-gwd") &&
+    src !== "/node_modules/es-module-shims/dist/es-module-shims.js" &&
+    // Exclude CLI-generated state scripts by their existing identifiers.
+    script.getAttribute("data-gwd") !== "base-path" &&
     script.getAttribute("id") !== "data-client-options" &&
     // The parser returns undefined for a missing type; missing and empty types both mean classic JavaScript.
     [undefined, "", "module", "module-shim", "text/javascript", "application/javascript"].includes(

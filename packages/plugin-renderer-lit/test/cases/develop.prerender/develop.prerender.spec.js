@@ -86,7 +86,9 @@ describe("Develop Greenwood With: ", function () {
         const scripts = [...dom.window.document.querySelectorAll("head script")];
         const importMap = scripts.findIndex((script) => script.type === "importmap");
         const hydration = scripts.findIndex(
-          (script) => script.getAttribute("data-gwd") === "hydration",
+          (script) =>
+            script.getAttribute("src") ===
+            "/node_modules/@lit-labs/ssr-client/lit-element-hydrate-support.js",
         );
         const component = scripts.findIndex(
           (script) => script.getAttribute("src") === "/components/greeting.js",
@@ -95,7 +97,11 @@ describe("Develop Greenwood With: ", function () {
         expect(hydration).to.be.greaterThan(importMap);
         expect(component).to.be.greaterThan(hydration);
         expect(
-          scripts.filter((script) => script.getAttribute("data-gwd") === "hydration"),
+          scripts.filter(
+            (script) =>
+              script.getAttribute("src") ===
+              "/node_modules/@lit-labs/ssr-client/lit-element-hydrate-support.js",
+          ),
         ).to.have.length(1);
       });
     });

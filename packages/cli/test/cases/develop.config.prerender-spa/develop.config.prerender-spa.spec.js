@@ -78,7 +78,7 @@ describe("Develop Greenwood With: ", function () {
           null,
         );
         expect(
-          dom.window.document.querySelectorAll('script[data-gwd="livereload"]'),
+          dom.window.document.querySelectorAll('script[src*="/livereload.js"]'),
         ).to.have.length(1);
       });
     });
@@ -107,7 +107,7 @@ describe("Develop Greenwood With: ", function () {
           null,
         );
         expect(
-          dom.window.document.querySelectorAll('script[data-gwd="livereload"]'),
+          dom.window.document.querySelectorAll('script[src*="/livereload.js"]'),
         ).to.have.length(1);
       });
     });

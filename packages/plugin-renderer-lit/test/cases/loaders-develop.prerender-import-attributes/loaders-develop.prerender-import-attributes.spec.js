@@ -87,9 +87,11 @@ describe("Develop Greenwood With: ", function () {
           .textContent.replace(/\s/g, "")
           .replace(/;}/g, "}");
         expect(style).to.equal("header{color:red}");
-        expect(dom.window.document.querySelector('script[data-gwd="hydration"]')).not.to.equal(
-          null,
-        );
+        expect(
+          dom.window.document.querySelector(
+            'script[src="/node_modules/@lit-labs/ssr-client/lit-element-hydrate-support.js"]',
+          ),
+        ).not.to.equal(null);
       });
     });
   });
