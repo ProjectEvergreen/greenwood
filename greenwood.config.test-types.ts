@@ -1,4 +1,5 @@
 import { type Config, type ExternalSourcePage, run } from "@greenwood/cli";
+import { greenwoodPluginAdapterCloudflare } from "@greenwood/plugin-adapter-cloudflare";
 import { greenwoodPluginAdapterAws } from "@greenwood/plugin-adapter-aws";
 import { greenwoodPluginAdapterVercel } from "@greenwood/plugin-adapter-vercel";
 import { greenwoodPluginAdapterNetlify } from "@greenwood/plugin-adapter-netlify";
@@ -50,6 +51,7 @@ const config: Config = {
   pagesDirectory: "/my-pages",
   plugins: [
     greenwoodPluginAdapterAws(),
+    greenwoodPluginAdapterCloudflare(),
     greenwoodPluginAdapterNetlify(),
     greenwoodPluginAdapterVercel({ runtime: "nodejs24.x" }),
     greenwoodPluginBabel(),

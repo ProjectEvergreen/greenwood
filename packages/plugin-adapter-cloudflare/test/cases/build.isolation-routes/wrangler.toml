@@ -1,0 +1,22 @@
+name = "greenwood-cloudflare-isolation-routes"
+main = "./functions/worker.js"
+compatibility_date = "2026-10-01"
+compatibility_flags = ["new_module_registry", "nodejs_compat"]
+no_bundle = true
+
+[[rules]]
+type = "ESModule"
+globs = ["**/*.js"]
+fallthrough = true
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+# Required for Greenwood's isolation mode.
+[[worker_loaders]]
+binding = "GREENWOOD_ISOLATION"
+
+# Retain logs forwarded from isolated route Workers.
+[observability]
+enabled = true
