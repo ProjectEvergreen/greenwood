@@ -21,6 +21,7 @@
  *  src/
  *   pages/
  *     index.js
+ *     search.html
  */
 import { expect } from "chai";
 import { JSDOM } from "jsdom";
@@ -223,6 +224,29 @@ describe("Develop Greenwood With: ", function () {
         );
 
         expect(scripts.length).to.equal(0);
+      });
+    });
+
+    describe("Develop command with expected HTML for the static /search/ route", function () {
+      let resp;
+      let dom;
+
+      before(async function () {
+        resp = await fetch(`${hostname}/search/`);
+        dom = new JSDOM(await resp.text());
+      });
+
+      it("should include hydration support after the import map on a static HTML page", function () {
+        const scripts = Array.from(dom.window.document.querySelectorAll("head script"));
+        const hydrationScripts = scripts.filter((script) =>
+          script.src.includes("lit-element-hydrate-support"),
+        );
+        const importMapIndex = scripts.findIndex((script) => script.type === "importmap");
+
+        expect(resp.status).to.equal(200);
+        expect(hydrationScripts.length).to.equal(1);
+        expect(importMapIndex).to.be.at.least(0);
+        expect(scripts.indexOf(hydrationScripts[0])).to.be.greaterThan(importMapIndex);
       });
     });
   });

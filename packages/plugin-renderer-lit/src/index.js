@@ -15,9 +15,12 @@ class LitHydrationResource {
 
     const matchingRoute = getMatchingPageByRoute(this.compilation, pathname);
 
+    // Static HTML pages can fetch SSR fragments after loading
+    // https://github.com/ProjectEvergreen/greenwood/issues/1845
     return (
       matchingRoute &&
-      ((matchingRoute.isSSR && matchingRoute.hydration) ||
+      (!matchingRoute.isSSR ||
+        matchingRoute.hydration ||
         shouldPrerender(matchingRoute, this.compilation.config))
     );
   }
