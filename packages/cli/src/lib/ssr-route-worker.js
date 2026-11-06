@@ -14,10 +14,21 @@ async function executeModule({
   contentOptions = "{}",
   params,
 }) {
+  const parsedCompilation = JSON.parse(compilation);
+
+  if (prerender) {
+    // Set framework state before component imports load the Content-as-Data client.
+    globalThis.__GWD_BASE_PATH__ = parsedCompilation.config.basePath;
+    globalThis.__CONTENT_OPTIONS__ = {
+      PORT: parsedCompilation.config.devServer.port,
+      PRERENDER: "true",
+    };
+  }
+
   const { executeRouteModule } = await import(executeModuleUrl);
   const data = await executeRouteModule({
     moduleUrl,
-    compilation: JSON.parse(compilation),
+    compilation: parsedCompilation,
     page: JSON.parse(page),
     prerender,
     htmlContents,

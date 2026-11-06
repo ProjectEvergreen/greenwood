@@ -120,8 +120,25 @@ async function resolveForRelativeUrl(url, rootUrl) {
   return reducedUrl;
 }
 
-async function trackResourcesForRoute(html, compilation, route) {
-  const { context } = compilation;
+// Select local executable scripts for development prerendering and static optimization.
+// Greenwood's browser bootstrap scripts stay in the response and do not execute in the worker.
+function isPrerenderScript(script) {
+  const src = script.getAttribute("src");
+
+  return (
+    (!src || isLocalLink(src)) &&
+    src !== "/node_modules/es-module-shims/dist/es-module-shims.js" &&
+    // Exclude CLI-generated state scripts by their existing identifiers.
+    script.getAttribute("data-gwd") !== "base-path" &&
+    script.getAttribute("id") !== "data-client-options" &&
+    // The parser returns undefined for a missing type; missing and empty types both mean classic JavaScript.
+    [undefined, "", "module", "module-shim", "text/javascript", "application/javascript"].includes(
+      script.getAttribute("type"),
+    )
+  );
+}
+
+async function getScriptResources(html, context, development = false) {
   const root = parse(html, {
     blockTextElements: {
       noscript: false,
@@ -130,12 +147,13 @@ async function trackResourcesForRoute(html, compilation, route) {
   });
 
   // intentionally support <script> tags from the <head> or <body>
-  const scripts = await asyncMap(
+  return await asyncMap(
     Array.from(root.querySelectorAll("script")).filter(
       (script) =>
         (isLocalLink(script.getAttribute("src")) || script.rawText) &&
         script.rawAttrs.indexOf("importmap") < 0 &&
-        script.getAttribute("type") !== "application/json",
+        script.getAttribute("type") !== "application/json" &&
+        (!development || isPrerenderScript(script)),
     ),
     async (script) => {
       const src = script.getAttribute("src");
@@ -158,7 +176,17 @@ async function trackResourcesForRoute(html, compilation, route) {
       }
     },
   );
+}
 
+async function trackResourcesForRoute(html, compilation, route) {
+  const { context } = compilation;
+  const root = parse(html, {
+    blockTextElements: {
+      noscript: false,
+      pre: false,
+    },
+  });
+  const scripts = await getScriptResources(html, context);
   const styles = await asyncMap(
     Array.from(root.querySelectorAll("style")).filter(
       (style) => !/\$/.test(style.rawText) && !/<!-- Shady DOM styles for -->/.test(style.rawText),
@@ -334,6 +362,8 @@ export {
   requestAsObject,
   responseAsObject,
   resolveForRelativeUrl,
+  getScriptResources,
+  isPrerenderScript,
   trackResourcesForRoute,
   transformKoaRequestIntoStandardRequest,
   isLocalLink,

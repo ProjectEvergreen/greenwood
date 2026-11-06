@@ -1,4 +1,4 @@
-// determines whether browser JavaScript should run during the build
+// determines whether browser JavaScript should run during development or the build
 // page-level config takes precedence over project-level config
 function shouldPrerender(page, config) {
   return page.prerender ?? config.prerender;

@@ -1,8 +1,12 @@
 import fs from "node:fs/promises";
+import { Worker } from "node:worker_threads";
+import { parse } from "node-html-parser";
 import {
   checkResourceExists,
   trackResourcesForRoute,
   mergeResponse,
+  getScriptResources,
+  isPrerenderScript,
 } from "../lib/resource-utils.js";
 import { WorkerPool } from "../lib/threadpool.js";
 import { runWithConcurrency } from "../lib/async-utils.js";
@@ -12,6 +16,10 @@ import {
   getStaticRouteFromDynamicRoute,
   getOutputHrefForStaticPath,
 } from "../lib/url-utils.js";
+
+// Temporary boundaries used to protect already-rendered SSR content during prerendering.
+const SSR_START_MARKER = "<!-- greenwood-ssr-start -->";
+const SSR_END_MARKER = "<!-- greenwood-ssr-end -->";
 
 async function createOutputDirectory(outputDir) {
   // ignore creating directory for 404 pages since they live at the root of the output directory
@@ -75,46 +83,76 @@ function toScratchUrl(outputHref, context) {
 // Execute browser scripts against HTML that has already been rendered.
 // For SSR pages, preserve the route content and only transform the surrounding application shell.
 async function executePageScripts(compilation, workerPrerender, pool, page, html, params) {
-  const ssrContentsMatch = /<!-- greenwood-ssr-start -->(.*.)<!-- greenwood-ssr-end -->/s;
+  const development = process.env.__GWD_COMMAND__ === "develop";
+  const ssrContentsMatch = new RegExp(`${SSR_START_MARKER}(.*?)${SSR_END_MARKER}`, "s");
+  const ssrPlaceholder = `${SSR_START_MARKER}${SSR_END_MARKER}`;
   const ssrMatch = page.isSSR ? html.match(ssrContentsMatch) : null;
-  const ssrContents = ssrMatch
-    ? ssrMatch[0]
-        .replace("<!-- greenwood-ssr-start -->", "")
-        .replace("<!-- greenwood-ssr-end -->", "")
-    : null;
-  let body = ssrMatch
-    ? html.replace(ssrMatch[0], "<!-- greenwood-ssr-start --><!-- greenwood-ssr-end -->")
-    : html;
-  const resources = await trackResourcesForRoute(body, compilation, page.route);
+  const ssrContents = ssrMatch ? ssrMatch[1] : null;
+  let body = ssrMatch ? html.replace(ssrMatch[0], ssrPlaceholder) : html;
+  const resources = development
+    ? await getScriptResources(body, compilation.context, true)
+    : await trackResourcesForRoute(body, compilation, page.route);
   const scripts = resources
     .filter((resource) => resource.type === "script")
     .map((resource) => resource.sourcePathURL.href);
 
-  body = await new Promise((resolve, reject) => {
-    pool.runTask(
-      {
+  let worker;
+
+  try {
+    body = await new Promise((resolve, reject) => {
+      const task = {
         executeModuleUrl: workerPrerender.executeModuleUrl.href,
-        modulePath: null,
+        moduleUrl: null,
         compilation: JSON.stringify(compilation),
         page: JSON.stringify(page),
         prerender: true,
         htmlContents: body,
         scripts: JSON.stringify(scripts),
         params: params ? JSON.stringify(params) : params,
-      },
-      (err, result) => {
-        if (err) {
-          return reject(err);
-        }
+      };
 
-        return resolve(result.html);
-      },
-    );
-  });
+      if (pool) {
+        pool.runTask(task, (err, result) => {
+          if (err) {
+            return reject(err);
+          }
 
-  return ssrContents === null
-    ? body
-    : body.replace("<!-- greenwood-ssr-start --><!-- greenwood-ssr-end -->", ssrContents);
+          resolve(result.html);
+        });
+      } else {
+        // A fresh worker also refreshes transitive imports and custom element registrations.
+        worker = new Worker(new URL("../lib/ssr-route-worker.js", import.meta.url));
+        worker.once("message", (result) => resolve(result.html));
+        worker.once("error", reject);
+        worker.once("exit", (code) => reject(new Error(`Worker stopped with exit code ${code}`)));
+        worker.postMessage(task);
+      }
+    });
+  } finally {
+    if (worker) {
+      await worker.terminate();
+    }
+  }
+
+  if (development) {
+    const root = parse(body, { comment: true });
+    const { optimization } = compilation.config;
+
+    for (const script of root.querySelectorAll("script")) {
+      const attribute = script.getAttribute("data-gwd-opt");
+      const isStatic = attribute === "static" || optimization === "static";
+      const isInline = attribute === "inline" || optimization === "inline";
+
+      // Match production script optimization precedence while retaining browser tooling and data.
+      if (isStatic && (!script.getAttribute("src") || !isInline) && isPrerenderScript(script)) {
+        script.remove();
+      }
+    }
+
+    body = root.toString();
+  }
+
+  return ssrContents === null ? body : body.replace(ssrPlaceholder, () => ssrContents);
 }
 
 async function preRenderCompilationWorker(compilation, workerPrerender) {
@@ -232,6 +270,8 @@ async function staticRenderCompilation(compilation, pages = getStaticPages(compi
 }
 
 export {
+  SSR_START_MARKER,
+  SSR_END_MARKER,
   preRenderCompilationWorker,
   preRenderCompilationCustom,
   executePageScripts,
