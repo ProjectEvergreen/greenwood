@@ -1,0 +1,118 @@
+# @greenwood/plugin-import-text
+
+## Overview
+
+A Greenwood plugin to use ESM (`import`) syntax to load any file contents as a string exported as a JavaScript module.  Inspired by **webpack**'s [raw loader](https://v4.webpack.js.org/loaders/raw-loader/).  For more information and complete docs on Greenwood, please visit [our website](https://www.greenwoodjs.dev).
+
+> This package assumes you already have `@greenwood/cli` installed.
+
+## Installation
+
+You can use your favorite JavaScript package manager to install this package.
+
+```bash
+# npm
+$ npm i -D @greenwood/plugin-import-text
+
+# yarn
+$ yarn add @greenwood/plugin-import-text --dev
+
+# npm
+$ pnpm add -D @greenwood/plugin-import-text
+```
+
+## Usage
+
+Add this plugin to your _greenwood.config.js_:
+
+```javascript
+import { greenwoodPluginImportText } from '@greenwood/plugin-import-text';
+
+export default {
+  // ...
+
+  plugins: [
+    greenwoodPluginImportText()
+  ]
+}
+```
+
+This will then allow you to use ESM (`import`) to include any file as an arbitrary string exported as a JavaScript module.
+```js
+import css from '../path/to/styles.css?type=text'; // must be a relative path per ESM spec
+
+console.log(css); // h1 { color: red }
+```
+
+> For libraries like Material Web Components, this plugin will [resolve references to _some-file.css_ if the equivalent exists that ends in _.js_ (e.g. _styles.css.js_)](https://github.com/ProjectEvergreen/greenwood/issues/700).
+
+## Types
+
+Types should automatically be inferred through this package's exports map, but can be referenced explicitly in both JavaScript (JSDoc) and TypeScript files if needed.
+
+```js
+/** @type {import('@greenwood/plugin-import-text').ImportTextPlugin} */
+```
+
+```ts
+import type { ImportTextPlugin } from '@greenwood/plugin-import-text';
+```
+
+To support typing of `?type=text` imports, you can add this type definition to your project:
+
+```ts
+declare module "*?type=text" {
+  const content: string;
+  export default content;
+}
+```
+
+## Options
+
+### Matches
+
+Optionally, you can provide an array of "matcher" patterns for the plugin to transform custom paths, which can be useful for handling imports you can't change, like third party files in _node_modules_.
+
+```javascript
+import { greenwoodPluginImportText } from '@greenwood/plugin-import-text';
+
+export default {
+  plugins: [
+    greenwoodPluginImportText({
+      matches: [
+        '/node_modules/some-package/dist/styles.css'
+      ]
+    })
+  ]
+}
+```
+
+### Import Map Extensions
+
+As import maps treat all paths [as unique even for query strings](https://github.com/WICG/import-maps/issues/134#issuecomment-514741651), this import:
+
+<!-- eslint-disable -->
+```js
+import pauseSvg from 'heroicons/24/solid/pause.svg';
+```
+
+is **not** the same as this one:
+
+<!-- eslint-disable -->
+```js
+import pauseSvg from 'heroicons/24/solid/pause.svg?type=text';
+```
+
+To include entries in an import map for resources imported by this plugin, the `importMapExtensions` option can be used to add query string import map entries for all entries that end with the matching extension(s) provided.
+
+```javascript
+import { greenwoodPluginImportText } from '@greenwood/plugin-import-text';
+
+export default {
+  plugins: [
+    greenwoodPluginImportText({
+      importMapExtensions: ['svg']
+    })
+  ]
+}
+```

@@ -9,7 +9,7 @@ import { greenwoodPluginGoogleAnalytics } from "@greenwood/plugin-google-analyti
 import { greenwoodPluginGraphQL } from "@greenwood/plugin-graphql";
 import { greenwoodPluginImportCommonJs } from "@greenwood/plugin-import-commonjs";
 import { greenwoodPluginImportJsx } from "@greenwood/plugin-import-jsx";
-import { greenwoodPluginImportRaw } from "@greenwood/plugin-import-raw";
+import { greenwoodPluginImportText } from "@greenwood/plugin-import-text";
 import { greenwoodPluginIncludeHTML } from "@greenwood/plugin-include-html";
 import { greenwoodPluginMarkdown } from "@greenwood/plugin-markdown";
 import { greenwoodPluginPolyfills } from "@greenwood/plugin-polyfills";
@@ -60,7 +60,7 @@ const config: Config = {
     greenwoodPluginGraphQL(),
     greenwoodPluginImportCommonJs(),
     greenwoodPluginImportJsx(),
-    greenwoodPluginImportRaw(),
+    greenwoodPluginImportText(),
     greenwoodPluginIncludeHTML(),
     greenwoodPluginMarkdown({
       plugins: [

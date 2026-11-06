@@ -1,0 +1,7 @@
+{
+  "name": "test-plugin-import-text-css-develop-default",
+  "type": "module",
+  "dependencies": {
+    "@spectrum-web-components/styles": "^1.0.1"
+  }
+}

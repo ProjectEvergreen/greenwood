@@ -1,5 +1,5 @@
 import { css, html, LitElement, unsafeCSS } from "lit";
-import cardCss from "./card.css?type=raw";
+import cardCss from "./card.css?type=text";
 
 class Card extends LitElement {
   static get styles() {

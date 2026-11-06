@@ -36,7 +36,7 @@ import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
 
-describe("Build Greenwood With: ", function () {
+xdescribe("Build Greenwood With: ", function () {
   const LABEL = "Import Raw Plugin with matchers configuration";
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));

@@ -1,5 +1,5 @@
 import { css, html, LitElement, unsafeCSS } from "lit";
-import eveButtonCss from "./eve-button.css?type=raw";
+import eveButtonCss from "./eve-button.css?type=text";
 
 class Button extends LitElement {
   static get properties() {

@@ -36,7 +36,7 @@ import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
 
-describe("Serve Greenwood With: ", function () {
+xdescribe("Serve Greenwood With: ", function () {
   const LABEL = "A Server Rendered Application (SSR) with API Routes importing raw CSS";
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
