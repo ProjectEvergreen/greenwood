@@ -1,0 +1,1500 @@
+diff --git a/node_modules/wc-compiler/src/jsx-ast-utils.js b/node_modules/wc-compiler/src/jsx-ast-utils.js
+new file mode 100644
+index 0000000..9e65831
+--- /dev/null
++++ b/node_modules/wc-compiler/src/jsx-ast-utils.js
+@@ -0,0 +1,701 @@
++import * as walk from 'acorn-walk';
++import { generate, GENERATOR } from 'astring';
++import { defaultTreeAdapter, html, parse, parseFragment, serialize } from 'parse5';
++
++// HTML elements whose children are omitted by the serializer, including obsolete void tags.
++const voidElements = new Set([
++  'area',
++  'base',
++  'basefont',
++  'bgsound',
++  'br',
++  'col',
++  'embed',
++  'frame',
++  'hr',
++  'img',
++  'input',
++  'keygen',
++  'link',
++  'meta',
++  'param',
++  'source',
++  'track',
++  'wbr',
++]);
++
++// Reference a variable or property name, e.g. `count`.
++export const createIdentifier = (name) => ({ type: 'Identifier', name });
++
++// Reference the current instance: `this`.
++const createThisExpression = () => ({ type: 'ThisExpression' });
++
++// Embed a primitive value, e.g. `'template'`, `42`, or `true`.
++const createLiteral = (value) => ({
++  type: 'Literal',
++  value,
++  // Print string literals with single quotes.
++  raw:
++    typeof value === 'string'
++      ? `'${value.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\r/g, '\\r').replace(/\n/g, '\\n')}'`
++      : JSON.stringify(value),
++});
++
++// Access a property, e.g. `this.count` or `this[name]` when computed is true.
++export const createMemberExpression = (object, property, computed = false) => ({
++  type: 'MemberExpression',
++  object,
++  property: typeof property === 'string' ? createIdentifier(property) : property,
++  computed,
++  optional: false,
++});
++
++// Invoke a function or method, e.g. `count.get()`.
++export const createCallExpression = (callee, args = []) => ({
++  type: 'CallExpression',
++  callee,
++  arguments: args,
++  optional: false,
++});
++
++// Turn an expression into a statement, e.g. `this.render();`.
++const createExpressionStatement = (expression) => ({
++  type: 'ExpressionStatement',
++  expression,
++});
++
++// Assign or update a value, e.g. `this.count = 0` or `this.count += 1`.
++const createAssignmentExpression = (left, right, operator = '=') => ({
++  type: 'AssignmentExpression',
++  operator,
++  left,
++  right,
++});
++
++// Group statements in braces, e.g. `{ this.render(); }`.
++const createBlockStatement = (body) => ({ type: 'BlockStatement', body });
++
++// Create an arrow function with an expression or block body, e.g. `value => value`.
++const createArrowFunctionExpression = (params, body) => ({
++  type: 'ArrowFunctionExpression',
++  params: params.map((param) => createIdentifier(param)),
++  body,
++  expression: body.type !== 'BlockStatement',
++  async: false,
++});
++
++// Declare a class field, e.g. `$el0;` or `static count = 0;`.
++const createPropertyDefinition = (name, value = null, isStatic = false) => ({
++  type: 'PropertyDefinition',
++  key: createIdentifier(name),
++  value,
++  computed: false,
++  static: isStatic,
++});
++
++// Declare a class method or getter, e.g. `render() {}` or `static get observedAttributes() {}`.
++const createMethodDefinition = (name, params, body, kind = 'method', isStatic = false) => ({
++  type: 'MethodDefinition',
++  key: createIdentifier(name),
++  kind,
++  computed: false,
++  static: isStatic,
++  value: {
++    type: 'FunctionExpression',
++    id: null,
++    params: params.map((param) => createIdentifier(param)),
++    body: createBlockStatement(body),
++    generator: false,
++    async: false,
++    expression: false,
++  },
++});
++
++// Combine operands with a binary or logical operator, e.g. `count + 1` or `a && b`.
++const createBinaryExpression = (operator, left, right) => ({
++  type: operator === '||' || operator === '&&' ? 'LogicalExpression' : 'BinaryExpression',
++  operator,
++  left,
++  right,
++});
++
++// Apply a prefix operator, e.g. `!this.shadowRoot` or `+value`.
++const createUnaryExpression = (operator, argument) => ({
++  type: 'UnaryExpression',
++  operator,
++  argument,
++  prefix: true,
++});
++
++// Choose between expressions, e.g. `ready ? 'yes' : 'no'`.
++const createConditionalExpression = (test, consequent, alternate) => ({
++  type: 'ConditionalExpression',
++  test,
++  consequent,
++  alternate,
++});
++
++// Build a template literal from static strings and expression nodes, e.g. `Hello ${name}!`.
++function createTemplateLiteral(strings, expressions) {
++  return {
++    type: 'TemplateLiteral',
++    expressions,
++    quasis: strings.map((value, index) => ({
++      type: 'TemplateElement',
++      value: {
++        raw: value.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$\{/g, '\\${'),
++        cooked: value,
++      },
++      tail: index === strings.length - 1,
++    })),
++  };
++}
++
++// Collect template text and expressions incrementally, e.g. `Hello `, `${name}`, then `!`.
++export function createTemplateLiteralParts() {
++  const strings = [''];
++  const expressions = [];
++  return {
++    // Append static text to the current segment, e.g. `Hello `.
++    text(value) {
++      strings[strings.length - 1] += value;
++    },
++    // Add an interpolation and start the next text segment, e.g. `${name}`.
++    expression(node) {
++      expressions.push(node);
++      strings.push('');
++    },
++    // Finish the template, optionally trimming its outer static whitespace.
++    build(trim = false) {
++      const text = [...strings];
++      if (trim) {
++        text[0] = text[0].trimStart();
++        text[text.length - 1] = text[text.length - 1].trimEnd();
++      }
++      return createTemplateLiteral(text, expressions);
++    },
++  };
++}
++
++// Create a container for HTML nodes, e.g. the root of `<p>{count}</p>`.
++export function createHtmlFragment() {
++  return defaultTreeAdapter.createDocumentFragment();
++}
++
++// Create an HTML element with attributes, e.g. `<button disabled>`.
++export function createHtmlElement(tagName, attributes = []) {
++  const element = defaultTreeAdapter.createElement(tagName.toLowerCase(), html.NS.HTML, attributes);
++  if (element.tagName === 'template') {
++    defaultTreeAdapter.setTemplateContent(element, createHtmlFragment());
++  }
++  return element;
++}
++
++// Decode source text into a text node, e.g. `&dollar;` becomes `$` outside raw-text elements.
++export function createHtmlTextNode(value, parentTagName) {
++  if (!html.hasUnescapedText(parentTagName, true) && value.includes('&')) {
++    const fragment = parseFragment(value);
++    value = fragment.childNodes.map((node) => node.value).join('');
++  }
++  return defaultTreeAdapter.createTextNode(value);
++}
++
++// Create attribute data for a boolean attribute or placeholder, e.g. `disabled` or `title={name}`.
++export function createHtmlAttribute(name, value = '') {
++  return { name, value };
++}
++
++// Parse source attributes in their quoting context, e.g. `{0x10}` keeps `0x10` as its value.
++export function createHtmlLiteralAttributes(name, literal, isJsxAttribute = false) {
++  const value = isJsxAttribute ? `"${literal.value}"` : literal.raw;
++  // Required markup string: parse5's public parser needs HTML to interpret attribute quoting/entities.
++  // TODO: escape decoded JSX quotes; `title="&quot;Hello&quot;"` currently creates malformed attributes.
++  // Keep this parsing boundary until that output change is addressed separately.
++  const fragment = parseFragment(`<span ${name}=${value}></span>`);
++  return fragment.childNodes[0].attrs;
++}
++
++// Attach children to template content, or after void elements, e.g. `<img>hello</img>` becomes `<img>hello`.
++export function appendHtmlChild(parent, child) {
++  if (voidElements.has(parent.tagName)) parent = parent.parentNode;
++  defaultTreeAdapter.appendChild(parent.content || parent, child);
++}
++
++// Choose document or fragment parsing, e.g. `<html>...</html>` uses `parse`.
++function getHtmlParser(html) {
++  return html.indexOf('<html>') >= 0 || html.indexOf('<body>') >= 0 || html.indexOf('<head>') >= 0
++    ? parse
++    : parseFragment;
++}
++
++// Print assignments without spaces, e.g. `this.count-=1`, for onclick attributes.
++// Output tests expect this compact format in the generated SSR markup.
++const eventGenerator = {
++  ...GENERATOR,
++  AssignmentExpression(node, state) {
++    this[node.left.type](node.left, state);
++    state.write(node.operator);
++    this[node.right.type](node.right, state);
++  },
++};
++
++// Reference the component from an event target, e.g. `this.parentElement` or `this.getRootNode().host`.
++function createComponentReference(depth, hasShadowRoot) {
++  if (hasShadowRoot) {
++    return createMemberExpression(
++      createCallExpression(createThisMemberExpression('getRootNode')),
++      'host',
++    );
++  }
++  let reference = createThisExpression();
++  for (let i = 0; i < depth; i++) {
++    reference = createMemberExpression(reference, 'parentElement');
++  }
++  return reference;
++}
++
++// Generate a method or assignment handler string, e.g. `this.parentElement.increment(event)`.
++export function generateEventHandler(expression, depth, hasShadowRoot) {
++  const root = createComponentReference(depth, hasShadowRoot);
++  if (
++    expression.type === 'MemberExpression' &&
++    expression.object.type === 'ThisExpression' &&
++    expression.property.type === 'Identifier'
++  ) {
++    return generate(
++      createCallExpression(createMemberExpression(root, expression.property.name), [
++        createIdentifier('event'),
++      ]),
++    );
++  }
++  if (
++    expression.type === 'AssignmentExpression' &&
++    expression.left.object?.type === 'ThisExpression' &&
++    expression.left.property.type === 'Identifier'
++  ) {
++    const body = [
++      createExpressionStatement(
++        createAssignmentExpression(
++          createMemberExpression(root, expression.left.property.name),
++          // Only literal right-hand sides are supported; other expressions emit undefined.
++          expression.right.raw === undefined ? createIdentifier('undefined') : expression.right,
++          expression.operator,
++        ),
++      ),
++      createExpressionStatement(createCallExpression(createMemberExpression(root, 'render'))),
++    ];
++    return generate(
++      { type: 'Program', sourceType: 'module', body },
++      { generator: eventGenerator, indent: '', lineEnd: ' ' },
++    ).trim();
++  }
++  return undefined;
++}
++
++// Generate an arrow-handler wrapper that receives the component as `self`, e.g. `self.count.set(1)`.
++export function generateInlineEventHandler(expression, depth, hasShadowRoot) {
++  const body = structuredClone(expression.body);
++  walk.simple(body, {
++    MemberExpression(node) {
++      if (node.object.type === 'ThisExpression') {
++        node.object = createIdentifier('self');
++      }
++    },
++  });
++  const fn = {
++    type: 'FunctionExpression',
++    id: null,
++    params: [createIdentifier(expression.params[0]?.name || 'event'), createIdentifier('self')],
++    // Block handlers stay inside the wrapper: `function (event, self) { { ... } }`.
++    body: createBlockStatement([
++      body.type === 'BlockStatement' ? body : createExpressionStatement(body),
++    ]),
++    generator: false,
++    async: false,
++    expression: false,
++  };
++  return generate(
++    createCallExpression(fn, [
++      createIdentifier('event'),
++      createComponentReference(depth, hasShadowRoot),
++    ]),
++  );
++}
++
++// Use parse5 to normalize HTML while keeping JavaScript expressions as AST nodes.
++// Placeholders such as `wcc-expression-0-end` mark where `${count}` belongs in the template literal.
++export function createHtmlTemplateLiteralBuilder(moduleContents) {
++  let prefix = 'wcc-expression-';
++  while (moduleContents.includes(prefix)) prefix += '-';
++  const expressions = new Map();
++  const handlers = new Map();
++  // Give each expression or handler a distinct placeholder, e.g. `wcc-expression-0-end`.
++  const token = () => `${prefix}${expressions.size + handlers.size}-end`;
++  return {
++    // TODO: keep attribute-derived text such as `<template>` from becoming markup when interpolated.
++    // https://github.com/ProjectEvergreen/wcc/issues/249
++    // Save an interpolation node and return its placeholder, e.g. the `count` in `{count}`.
++    expression(node) {
++      const marker = token();
++      expressions.set(marker, node);
++      return marker;
++    },
++    // Defer handler generation until the parsed HTML determines its DOM depth.
++    handler(create) {
++      const marker = token();
++      handlers.set(marker, create);
++      return marker;
++    },
++    // Normalize HTML and restore its interpolations to produce a template literal node.
++    build(htmlTree) {
++      // String boundary: parse5 applies HTML tree rules (e.g. inserting tbody) when parsing text.
++      // Serialize the constructed nodes so parse5 can normalize them before final serialization.
++      const html = serialize(htmlTree);
++      const tree = getHtmlParser(html)(html);
++      // Fill event attributes with component references at the correct depth.
++      function applyEventHandlers(parent, depth = 1) {
++        for (const node of parent.childNodes || []) {
++          for (const attr of node.attrs || []) {
++            if (handlers.has(attr.value)) attr.value = handlers.get(attr.value)(depth);
++          }
++          applyEventHandlers(node, depth + 1);
++        }
++      }
++      applyEventHandlers(tree);
++      const template = createTemplateLiteralParts();
++      for (const part of serialize(tree).split(new RegExp(`(${prefix}\\d+-end)`, 'g'))) {
++        if (expressions.has(part)) template.expression(expressions.get(part));
++        else template.text(part);
++      }
++      return template.build();
++    },
++  };
++}
++
++// Create render statements, e.g. `this.innerHTML = ...`, with Shadow DOM setup when needed.
++export function createRenderStatements(template, hasShadowRoot) {
++  // TODO: could / should we do something else instead of .innerHTML
++  // https://github.com/ProjectEvergreen/wcc/issues/138
++  if (!hasShadowRoot) {
++    return [
++      createExpressionStatement(
++        createAssignmentExpression(createThisMemberExpression('innerHTML'), template),
++      ),
++    ];
++  }
++  const templateElement = createIdentifier('template');
++  return [
++    {
++      type: 'VariableDeclaration',
++      kind: 'const',
++      declarations: [
++        {
++          type: 'VariableDeclarator',
++          id: templateElement,
++          init: createCallExpression(
++            createMemberExpression(createIdentifier('document'), 'createElement'),
++            [createLiteral('template')],
++          ),
++        },
++      ],
++    },
++    createExpressionStatement(
++      createAssignmentExpression(createMemberExpression(templateElement, 'innerHTML'), template),
++    ),
++    {
++      type: 'IfStatement',
++      test: createUnaryExpression('!', createThisMemberExpression('shadowRoot')),
++      consequent: createBlockStatement([
++        createExpressionStatement(
++          createCallExpression(createThisMemberExpression('attachShadow'), [
++            {
++              type: 'ObjectExpression',
++              properties: [
++                {
++                  type: 'Property',
++                  key: createIdentifier('mode'),
++                  value: createLiteral('open'),
++                  kind: 'init',
++                  method: false,
++                  shorthand: false,
++                  computed: false,
++                },
++              ],
++            },
++          ]),
++        ),
++        createExpressionStatement(
++          createCallExpression(
++            createMemberExpression(createThisMemberExpression('shadowRoot'), 'appendChild'),
++            [
++              createCallExpression(
++                createMemberExpression(
++                  createMemberExpression(templateElement, 'content'),
++                  'cloneNode',
++                ),
++                [createLiteral(true)],
++              ),
++            ],
++          ),
++        ),
++      ]),
++      alternate: createBlockStatement([
++        createExpressionStatement(
++          createAssignmentExpression(
++            createMemberExpression(createThisMemberExpression('shadowRoot'), 'innerHTML'),
++            createMemberExpression(templateElement, 'innerHTML'),
++          ),
++        ),
++      ]),
++    },
++  ];
++}
++
++// Create an instance property access, e.g. `this.count`.
++function createThisMemberExpression(name) {
++  return createMemberExpression(createThisExpression(), name);
++}
++
++// Create a signal read, e.g. `this.count.get()`.
++function createSignalValueExpression(name) {
++  return createCallExpression(createMemberExpression(createThisMemberExpression(name), 'get'));
++}
++
++// Create a static text template and its call, e.g. `Counter.$$tmpl0(this.count.get())`.
++export function createReactiveTemplate(name, signals, template, componentName) {
++  return {
++    template: createPropertyDefinition(
++      name,
++      createArrowFunctionExpression(signals, template.build(true)),
++      true,
++    ),
++    expression: createCallExpression(
++      createMemberExpression(createIdentifier(componentName), name),
++      signals.map((signal) => createSignalValueExpression(signal)),
++    ),
++  };
++}
++
++// Create effect registrations, e.g. `this.$eff0 = effect(() => { ... });`.
++export function createEffectStatements(reactiveElements) {
++  const statements = [];
++  let effectsCount = 0;
++  // Append a registration that saves the effect's disposer in `this.$eff0`, `this.$eff1`, etc.
++  const addEffect = (body) => {
++    statements.push(
++      createExpressionStatement(
++        createAssignmentExpression(
++          createThisMemberExpression(`$eff${effectsCount++}`),
++          createCallExpression(createIdentifier('effect'), [
++            createArrowFunctionExpression([], createBlockStatement(body)),
++          ]),
++        ),
++      ),
++    );
++  };
++
++  reactiveElements.forEach(({ effect, attributes }, idx) => {
++    if (effect?.expression) {
++      addEffect([
++        createExpressionStatement(
++          createAssignmentExpression(
++            createMemberExpression(createThisMemberExpression(`$el${idx}`), 'textContent'),
++            effect.expression,
++          ),
++        ),
++      ]);
++    }
++    if (attributes.length > 0) {
++      addEffect(
++        attributes.map((attr) =>
++          createExpressionStatement(
++            createCallExpression(
++              createMemberExpression(createThisMemberExpression(`$el${idx}`), 'setAttribute'),
++              [createLiteral(attr.name), createSignalValueExpression(attr.value)],
++            ),
++          ),
++        ),
++      );
++    }
++  });
++  return statements;
++}
++
++// Create disposer calls for generated effects, e.g. `this.$eff0();`.
++export function createEffectCleanupStatements(reactiveElements) {
++  const statements = [];
++  for (const { effect, attributes } of reactiveElements) {
++    if (effect?.expression) {
++      statements.push(
++        createExpressionStatement(
++          createCallExpression(createThisMemberExpression(`$eff${statements.length}`)),
++        ),
++      );
++    }
++    if (attributes.length > 0) {
++      statements.push(
++        createExpressionStatement(
++          createCallExpression(createThisMemberExpression(`$eff${statements.length}`)),
++        ),
++      );
++    }
++  }
++  return statements;
++}
++
++// Create attribute conversion and change-handler methods, e.g. `this[name].set(Counter.parseAttribute(newValue))`.
++function createAttributeMethods(componentName) {
++  // TODO: better way to determine value type, e,g. array, number, object, etc for `parseAttribute`?
++  // Reference the attribute value parameter: `value`.
++  const createValueReference = () => createIdentifier('value');
++  // Compare the attribute value with a literal, e.g. `value === 'true'`.
++  const createValueComparison = (text) =>
++    createBinaryExpression('===', createValueReference(), createLiteral(text));
++  // Check the first character to recognize JSON, e.g. `value.charAt(0) === '{'`.
++  const createFirstCharacterComparison = (text) =>
++    createBinaryExpression(
++      '===',
++      createCallExpression(createMemberExpression(createValueReference(), 'charAt'), [
++        createLiteral(0),
++      ]),
++      createLiteral(text),
++    );
++
++  return [
++    createPropertyDefinition(
++      'parseAttribute',
++      createArrowFunctionExpression(
++        ['value'],
++        createConditionalExpression(
++          createBinaryExpression(
++            '||',
++            createFirstCharacterComparison('{'),
++            createFirstCharacterComparison('['),
++          ),
++          createCallExpression(createMemberExpression(createIdentifier('JSON'), 'parse'), [
++            createValueReference(),
++          ]),
++          createConditionalExpression(
++            createBinaryExpression(
++              '&&',
++              createBinaryExpression('!==', createValueReference(), createLiteral('')),
++              createUnaryExpression(
++                '!',
++                createCallExpression(createIdentifier('isNaN'), [
++                  createUnaryExpression('+', createValueReference()),
++                ]),
++              ),
++            ),
++            createCallExpression(createIdentifier('parseInt'), [
++              createValueReference(),
++              createLiteral(10),
++            ]),
++            createConditionalExpression(
++              createBinaryExpression(
++                '||',
++                createValueComparison('true'),
++                createValueComparison('false'),
++              ),
++              createConditionalExpression(
++                createValueComparison('true'),
++                createLiteral(true),
++                createLiteral(false),
++              ),
++              createValueReference(),
++            ),
++          ),
++        ),
++      ),
++      true,
++    ),
++    createMethodDefinition(
++      'attributeChangedCallback',
++      ['name', 'oldValue', 'newValue'],
++      [
++        createExpressionStatement(
++          createCallExpression(
++            createMemberExpression(
++              createMemberExpression(createThisExpression(), createIdentifier('name'), true),
++              'set',
++            ),
++            [
++              createCallExpression(
++                createMemberExpression(createIdentifier(componentName), 'parseAttribute'),
++                [createIdentifier('newValue')],
++              ),
++            ],
++          ),
++        ),
++      ],
++    ),
++  ];
++}
++
++// Create reactive fields and lifecycle methods, e.g. `$el0;` and `static get observedAttributes() { ... }`.
++export function createReactiveClassMembers(
++  componentName,
++  reactiveElements,
++  observedAttributes,
++  hasDisconnectedCallback,
++) {
++  const members = [
++    ...reactiveElements.map((el, idx) => createPropertyDefinition(`$el${idx}`)),
++    ...reactiveElements.filter((el) => el.effect?.template).map((el) => el.effect.template),
++    createMethodDefinition(
++      'observedAttributes',
++      [],
++      [
++        {
++          type: 'ReturnStatement',
++          argument: {
++            type: 'ArrayExpression',
++            elements: observedAttributes.map((attr) => createLiteral(attr)),
++          },
++        },
++      ],
++      'get',
++      true,
++    ),
++    ...createAttributeMethods(componentName),
++  ];
++  if (!hasDisconnectedCallback) {
++    members.push(
++      createMethodDefinition(
++        'disconnectedCallback',
++        [],
++        createEffectCleanupStatements(reactiveElements),
++      ),
++    );
++  }
++  return members;
++}
++
++// Cache reactive DOM nodes, e.g. `this.$el0 = this.shadowRoot.querySelector('span');`.
++export function createElementReferenceStatements(reactiveElements, hasShadowRoot) {
++  const root = hasShadowRoot ? createThisMemberExpression('shadowRoot') : createThisExpression();
++  return reactiveElements.map((el, idx) =>
++    createExpressionStatement(
++      createAssignmentExpression(
++        createThisMemberExpression(`$el${idx}`),
++        createCallExpression(createMemberExpression(root, 'querySelector'), [
++          createLiteral(el.selector),
++        ]),
++      ),
++    ),
++  );
++}
++
++// Import the effect helper: `import { effect } from 'wc-compiler/effect'`.
++export function createEffectImportDeclaration() {
++  return {
++    type: 'ImportDeclaration',
++    specifiers: [
++      {
++        type: 'ImportSpecifier',
++        imported: createIdentifier('effect'),
++        local: createIdentifier('effect'),
++      },
++    ],
++    source: createLiteral('wc-compiler/effect'),
++  };
++}
+diff --git a/node_modules/wc-compiler/src/jsx-loader.js b/node_modules/wc-compiler/src/jsx-loader.js
+index cbf5f8c..2eaba2f 100644
+--- a/node_modules/wc-compiler/src/jsx-loader.js
++++ b/node_modules/wc-compiler/src/jsx-loader.js
+@@ -8,8 +8,8 @@ import fs from 'fs';
+ // @ts-ignore
+ // but it does have a default export?
+ import jsx from '@projectevergreen/acorn-jsx-esm';
+-import { parse, parseFragment, serialize } from 'parse5';
+ import { transform } from 'sucrase';
++import * as ast from './jsx-ast-utils.js';
+ 
+ // expose global Signal polyfill to SSR environment
+ import { Signal } from 'signal-polyfill';
+@@ -22,18 +22,7 @@ const acornParseOptions = {
+   sourceType: 'module',
+ };
+ 
+-// TODO: same hack as definitions
+-// https://github.com/ProjectEvergreen/wcc/discussions/74
+-let string;
+-
+-// TODO: move to a util
+-// https://github.com/ProjectEvergreen/wcc/discussions/74
+-function getParse(html) {
+-  return html.indexOf('<html>') >= 0 || html.indexOf('<body>') >= 0 || html.indexOf('<head>') >= 0
+-    ? parse
+-    : parseFragment;
+-}
+-
++// Provide the parser and walker configuration for `.jsx` and `.tsx` modules.
+ export function getParser(moduleURL) {
+   const ext = moduleURL.pathname.split('.').pop();
+   const isJSX = ext === 'jsx' || ext === 'tsx';
+@@ -52,44 +41,9 @@ export function getParser(moduleURL) {
+   };
+ }
+ 
+-// replace all instances of __this__ marker with relative reference to the custom element parent node
+-function applyDomDepthSubstitutions(tree, currentDepth = 1, hasShadowRoot = false) {
+-  try {
+-    for (const node of tree.childNodes) {
+-      const attrs = node.attrs;
+-
+-      // check for attributes
+-      // and swap out __this__ with depthful parentElement chain
+-      if (attrs && attrs.length > 0) {
+-        for (const attr in attrs) {
+-          const { value } = attrs[attr];
+-
+-          if (value.indexOf('__this__.') >= 0) {
+-            const root = hasShadowRoot
+-              ? '.getRootNode().host'
+-              : `${'.parentElement'.repeat(currentDepth)}`;
+-
+-            node.attrs[attr].value = value.replace(/__this__/g, `this${root}`);
+-          }
+-        }
+-      }
+-
+-      // TODO: handle text nodes for __this__ references
+-      // https://github.com/ProjectEvergreen/wcc/issues/88
+-
+-      if (node.childNodes && node.childNodes.length > 0) {
+-        applyDomDepthSubstitutions(node, currentDepth + 1, hasShadowRoot);
+-      }
+-    }
+-  } catch (e) {
+-    console.error(e);
+-  }
+-
+-  return tree;
+-}
+-
+-// TODO handle if / else statements
++// TODO: handle if / else statements
+ // https://github.com/ProjectEvergreen/wcc/issues/88
++// Track component properties, e.g. `this.count = 0` or `const { count } = this`.
+ function findThisReferences(context, statement) {
+   const references = [];
+   const isRenderFunctionContext = context === 'render';
+@@ -128,246 +82,197 @@ function findThisReferences(context, statement) {
+   return references;
+ }
+ 
+-function parseJsxElement(
++// Create HTML nodes from JSX, e.g. `<p>{count}</p>` becomes an element with an interpolation marker.
++function createHtmlTreeFromJsx(
+   element,
+-  moduleContents = '',
++  template,
+   inferredObservability,
+   hasShadowRoot = false,
+   currentDepth = 1,
++  parent = ast.createHtmlFragment(),
+ ) {
+   try {
+     const { type } = element;
+-
+     if (type === 'JSXElement') {
+       const { openingElement } = element;
+-      const { attributes } = openingElement;
+-      const tagName = openingElement.name.name;
++      const node = ast.createHtmlElement(openingElement.name.name);
+ 
+-      string += `<${tagName}`;
++      ast.appendHtmlChild(parent, node);
+ 
+-      for (const attribute of attributes) {
++      for (const attribute of openingElement.attributes) {
+         const { name } = attribute.name;
+ 
+-        // handle events
+         if (name.startsWith('on')) {
+           const { value } = attribute;
+-          const { expression } = value;
+ 
+-          // onclick={this.increment}
+           if (value.type === 'JSXExpressionContainer') {
+-            if (expression.type === 'MemberExpression') {
+-              if (expression.object.type === 'ThisExpression') {
+-                if (expression.property.type === 'Identifier') {
+-                  // we leave markers for `this` so we can replace it later while also NOT accidentally replacing
+-                  // legitimate uses of this that might be actual content / markup of the custom element
+-                  string += ` ${name}="__this__.${expression.property.name}(event)"`;
+-                }
+-              }
+-            }
++            const { expression } = value;
+ 
+-            // <button onclick={(e: Event) => this.count.set(this.count.get() * 2)}>Double (++)</button>
+             if (expression.type === 'ArrowFunctionExpression' && expression.body) {
+-              // quick hack to get expression contents until we can properly build this all up from an AST
+-              const contents = generate(expression.body);
+-              const eventIdentifier = expression?.params[0]?.name || 'event';
+-              const root = hasShadowRoot
+-                ? '.getRootNode().host'
+-                : `${'.parentElement'.repeat(currentDepth)}`;
+-
+-              string += ` ${name}="(function (${eventIdentifier}, self) { ${contents.replace(/this./g, 'self.').replace('() => ', '')} })(event, this${root})"`;
+-            }
+-
+-            if (expression.type === 'AssignmentExpression') {
+-              const { left, right } = expression;
+-
+-              if (left.object.type === 'ThisExpression') {
+-                if (left.property.type === 'Identifier') {
+-                  // implicit reactivity using this.render
+-                  string += ` ${name}="__this__.${left.property.name}${expression.operator}${right.raw}; __this__.render();"`;
+-                }
+-              }
++              node.attrs.push(
++                ast.createHtmlAttribute(
++                  name,
++                  template.handler(() =>
++                    ast.generateInlineEventHandler(expression, currentDepth, hasShadowRoot),
++                  ),
++                ),
++              );
++            } else if (
++              ast.generateEventHandler(expression, currentDepth, hasShadowRoot) !== undefined
++            ) {
++              node.attrs.push(
++                ast.createHtmlAttribute(
++                  name,
++                  template.handler((depth) =>
++                    ast.generateEventHandler(expression, depth, hasShadowRoot),
++                  ),
++                ),
++              );
+             }
+           }
+         } else if (attribute.name.type === 'JSXIdentifier') {
+-          if (attribute.value) {
+-            const expression = attribute?.value?.expression;
+-            if (attribute.value.type === 'Literal') {
+-              // xxx="yyy" >
+-              string += ` ${name}="${attribute.value.value}"`;
+-            } else if (
+-              expression &&
+-              inferredObservability &&
+-              attribute.value.type === 'JSXExpressionContainer' &&
+-              expression?.type === 'CallExpression' &&
+-              expression?.callee.type === 'MemberExpression' &&
+-              expression?.arguments &&
+-              expression?.callee?.property?.name === 'get'
+-            ) {
+-              // xxx={products.get().length} >
+-              const { object, property } = expression.callee;
+-
+-              if (object.type === 'MemberExpression' && object?.object.type === 'ThisExpression') {
+-                // The count is counter={this.count.get()}
+-                string += ` ${name}=$\{${object.property.name}.${property.name}()}`;
+-              } else if (object.type === 'Identifier') {
+-                // xxx={products.get().length} >
+-                string += ` ${name}=$\{${object.name}.${property.name}()}`;
+-              }
+-            } else if (attribute.value.type === 'JSXExpressionContainer') {
+-              // xxx={allTodos.length} >
+-              const { value } = attribute;
+-              const { expression } = value;
+-              const expressionType = expression.type;
+-
+-              switch (expressionType) {
+-                case 'Literal':
+-                  string += ` ${name}=${expression.raw}`;
+-                  break;
+-                case 'Identifier':
+-                  string += ` ${name}=$\{${expression.name}}`;
+-                  break;
+-                case 'MemberExpression':
+-                  if (expression.object.type === 'Identifier') {
+-                    if (expression.property.type === 'Identifier') {
+-                      string += ` ${name}=$\{${expression.object.name}.${expression.property.name}}`;
+-                    }
+-                  }
+-                  break;
+-                default:
+-                  break;
+-              }
++          if (!attribute.value) {
++            node.attrs.push(ast.createHtmlAttribute(name));
++            continue;
++          }
++          const expression = attribute.value.expression;
++
++          if (attribute.value.type === 'Literal') {
++            node.attrs.push(...ast.createHtmlLiteralAttributes(name, attribute.value, true));
++          } else if (
++            expression &&
++            inferredObservability &&
++            attribute.value.type === 'JSXExpressionContainer' &&
++            expression.type === 'CallExpression' &&
++            expression.callee.type === 'MemberExpression' &&
++            expression.arguments &&
++            expression.callee.property?.name === 'get'
++          ) {
++            const { object, property } = expression.callee;
++            if (object.type === 'MemberExpression' && object.object?.type === 'ThisExpression') {
++              node.attrs.push(
++                ast.createHtmlAttribute(
++                  name,
++                  template.expression(
++                    ast.createCallExpression(
++                      ast.createMemberExpression(
++                        ast.createIdentifier(object.property.name),
++                        property.name,
++                      ),
++                    ),
++                  ),
++                ),
++              );
++            } else if (object.type === 'Identifier') {
++              node.attrs.push(
++                ast.createHtmlAttribute(
++                  name,
++                  template.expression(
++                    ast.createCallExpression(ast.createMemberExpression(object, property.name)),
++                  ),
++                ),
++              );
++            }
++          } else if (attribute.value.type === 'JSXExpressionContainer') {
++            switch (expression.type) {
++              case 'Literal':
++                node.attrs.push(...ast.createHtmlLiteralAttributes(name, expression));
++                break;
++              case 'Identifier':
++                node.attrs.push(ast.createHtmlAttribute(name, template.expression(expression)));
++                break;
++              case 'MemberExpression':
++                if (
++                  expression.object.type === 'Identifier' &&
++                  expression.property.type === 'Identifier'
++                ) {
++                  node.attrs.push(
++                    ast.createHtmlAttribute(
++                      name,
++                      template.expression(
++                        ast.createMemberExpression(expression.object, expression.property),
++                      ),
++                    ),
++                  );
++                }
++                break;
++              default:
++                break;
+             }
+-          } else {
+-            // xxx >
+-            string += ` ${name}`;
+           }
+         }
+       }
+ 
+-      string += openingElement.selfClosing ? ' />' : '>';
+-
+-      if (element.children.length > 0) {
+-        element.children.forEach((child) =>
+-          parseJsxElement(
+-            child,
+-            moduleContents,
+-            inferredObservability,
+-            hasShadowRoot,
+-            currentDepth + 1,
+-          ),
++      for (const child of element.children) {
++        createHtmlTreeFromJsx(
++          child,
++          template,
++          inferredObservability,
++          hasShadowRoot,
++          currentDepth + 1,
++          node,
+         );
+       }
+ 
+-      string += `</${tagName}>`;
++      // HTML treats </br> as another <br>; JSX br output includes both line-break nodes.
++      if (node.tagName === 'br') {
++        ast.appendHtmlChild(parent, ast.createHtmlElement('br'));
++      }
+     }
+ 
+     if (type === 'JSXText') {
+-      string += element.raw;
++      ast.appendHtmlChild(parent, ast.createHtmlTextNode(element.raw, parent.tagName));
+     }
+ 
+     if (type === 'JSXExpressionContainer') {
+-      const { type } = element.expression;
++      const expression = element.expression;
++      let value;
+ 
+       if (
+         inferredObservability &&
+-        type === 'CallExpression' &&
+-        element.expression.arguments &&
+-        element.expression?.callee?.type === 'MemberExpression' &&
+-        element.expression?.callee?.property?.name === 'get'
++        expression.type === 'CallExpression' &&
++        expression.arguments &&
++        expression.callee?.type === 'MemberExpression' &&
++        expression.callee.property?.name === 'get'
+       ) {
+         // TODO: handle this references
+         // https://github.com/ProjectEvergreen/wcc/issues/88
+-        const { object, property } = element.expression.callee;
+-        string += `$\{${object.name}.${property.name}()}`;
+-      } else if (type === 'Identifier') {
++        const { object, property } = expression.callee;
++        // Direct component this references are unsupported.
++        value = ast.createCallExpression(
++          ast.createMemberExpression(
++            ast.createIdentifier(object.name ?? 'undefined'),
++            property.name,
++          ),
++        );
++      } else if (expression.type === 'Identifier') {
+         // You have {count} TODOs left to complete
+-        string += `$\{${element.expression.name}}`;
+-      } else if (type === 'MemberExpression') {
+-        const { object } = element.expression.object;
+-
++        value = expression;
++      } else if (expression.type === 'MemberExpression') {
+         // You have {this.todos.length} Todos left to complete
+         // https://github.com/ProjectEvergreen/wcc/issues/88
+-        if (object && object.type === 'ThisExpression') {
+-          // TODO ReferenceError: __this__ is not defined
+-          // string += `\$\{__this__.${element.expression.object.property.name}.${element.expression.property.name}\}`;
+-        } else {
+-          // const { todos } = this;
+-          // ....
+-          // You have {todos.length} Todos left to complete
+-          string += `$\{${element.expression.object.name}.${element.expression.property.name}}`;
++        // TODO: support component this references in JSX text member expressions
++        if (expression.object.object?.type !== 'ThisExpression') {
++          value = ast.createMemberExpression(
++            ast.createIdentifier(expression.object.name ?? 'undefined'),
++            ast.createIdentifier(expression.property.name ?? 'undefined'),
++          );
+         }
+       }
++      if (value) {
++        ast.appendHtmlChild(
++          parent,
++          ast.createHtmlTextNode(template.expression(value), parent.tagName),
++        );
++      }
+     }
+   } catch (e) {
+     console.error(e);
+   }
+-
+-  return string;
+-}
+-
+-function generateEffectsForReactiveElements(reactiveElements) {
+-  let effectsCount = 0;
+-  let contents = '';
+-
+-  reactiveElements.forEach((element, idx) => {
+-    const { effect, attributes } = element;
+-
+-    if (effect?.expression) {
+-      contents += `
+-        this.$eff${effectsCount} = effect(() => {
+-          this.$el${idx}.textContent = ${effect.expression}
+-        });\n
+-      `;
+-
+-      effectsCount++;
+-    }
+-
+-    if (attributes.length > 0) {
+-      const attributeUpdates = attributes
+-        .map((attr) => {
+-          return `this.$el${idx}.setAttribute('${attr.name}', this.${attr.value}.get())`;
+-        })
+-        .join('\n');
+-
+-      contents += `
+-        this.$eff${effectsCount} = effect(() => {
+-          ${attributeUpdates}
+-        });\n
+-      `;
+-
+-      effectsCount++;
+-    }
+-  });
+-
+-  return contents;
+-}
+-
+-function generateEffectsCleanupForReactiveElements(reactiveElements) {
+-  let contents = '';
+-  let effectCount = 0;
+-
+-  reactiveElements.forEach((element) => {
+-    const { effect, attributes } = element;
+-
+-    if (effect?.expression) {
+-      contents += `
+-        this.$eff${effectCount}()\n;
+-      `;
+-
+-      effectCount++;
+-    }
+-
+-    if (attributes.length > 0) {
+-      contents += `
+-        this.$eff${effectCount}();
+-      `;
+-      effectCount += 1;
+-    }
+-  });
+-
+-  return contents;
++  return parent;
+ }
+ 
++// Compile a JSX/TSX module into a JavaScript AST with render statements and inferred effects.
+ export function parseJsx(moduleURL) {
+   const moduleContents = fs.readFileSync(moduleURL, 'utf-8');
+   const result = transform(moduleContents, {
+@@ -387,7 +292,6 @@ export function parseJsx(moduleURL) {
+   let hasShadowRoot;
+   let hasDisconnectedCallback;
+   let tree = acorn.Parser.extend(jsx()).parse(result.code, acornParseOptions);
+-  string = '';
+ 
+   // initial pass to get certain information before running JSX transformations (could we do this in one pass?)
+   // 1. if `inferredObservability` is set
+@@ -429,10 +333,24 @@ export function parseJsx(moduleURL) {
+       ClassDeclaration(node) {
+         // @ts-ignore
+         if (node.superClass.name === 'HTMLElement') {
+-          // TODO: (good first issue) find a more AST (visitor) based way to check for this
+-          // https://github.com/ProjectEvergreen/wcc/issues/258
+-          hasShadowRoot =
+-            result.code.slice(node.body.start, node.body.end).indexOf('this.attachShadow(') > 0;
++          hasShadowRoot = false;
++
++          walk.simple(
++            node.body,
++            {
++              CallExpression(call) {
++                if (
++                  call.callee.type === 'MemberExpression' &&
++                  !call.callee.computed &&
++                  call.callee.object.type === 'ThisExpression' &&
++                  call.callee.property.name === 'attachShadow'
++                ) {
++                  hasShadowRoot = true;
++                }
++              },
++            },
++            { ...walk.base, JSXElement: () => {} },
++          );
+ 
+           for (const n1 of node.body.body) {
+             if (n1.type === 'MethodDefinition') {
+@@ -504,7 +422,6 @@ export function parseJsx(moduleURL) {
+   // we do this first to track reactivity usage before we transform the template and re-write its contents
+   if (inferredObservability && observedAttributes.length > 0 && !hasOwnObservedAttributes) {
+     // this scans for signals usage within the template and builds up a reactive list of templates + effects
+-    // (could this be done during the transformation pass instead of having to generate and re-parse the module again?)
+     // TODO: recursive scanning for nested components
+     // https://github.com/ProjectEvergreen/wcc/issues/256
+     walk.simple(
+@@ -514,11 +431,12 @@ export function parseJsx(moduleURL) {
+           if (node.key.name === 'render') {
+             for (const n2 in node.value.body.body) {
+               const n = node.value.body.body[n2];
++
+               if (n.type === 'ReturnStatement' && n.argument.type === 'JSXElement') {
+                 const rootNode = n.argument;
+                 const parentTag = rootNode.openingElement.name.name;
+                 const children = [];
+-                let parentTemplate = '';
++                const parentTemplate = ast.createTemplateLiteralParts();
+                 let parentHasReactiveTemplate;
+                 let parentHasReactiveAttributes;
+                 let parentSignals = [];
+@@ -527,7 +445,7 @@ export function parseJsx(moduleURL) {
+                   if (child.type === 'JSXText') {
+                     // TODO: track top level reactivity for text nodes?
+                     // https://github.com/ProjectEvergreen/wcc/issues/256
+-                    parentTemplate += child.raw;
++                    parentTemplate.text(child.raw);
+                   } else if (child.type === 'JSXExpressionContainer') {
+                     if (
+                       child.expression?.type === 'CallExpression' &&
+@@ -535,7 +453,7 @@ export function parseJsx(moduleURL) {
+                       child.expression?.callee?.property?.name === 'get'
+                     ) {
+                       const { object } = child.expression.callee || {};
+-                      parentTemplate += `$\{${object.name}}`;
++                      parentTemplate.expression(ast.createIdentifier(object.name));
+                       parentSignals.push(object.name);
+                       parentHasReactiveTemplate = true;
+                     }
+@@ -584,31 +502,30 @@ export function parseJsx(moduleURL) {
+ 
+                     if (hasReactiveTemplate) {
+                       const signals = [];
+-                      let template = '';
++                      const template = ast.createTemplateLiteralParts();
+ 
+                       for (const c of child.children) {
+                         if (c.type === 'JSXText') {
+-                          template += c.value;
++                          template.text(c.value);
+                         } else if (c.type === 'JSXExpressionContainer') {
+                           // TODO: handle this references?
+                           // https://github.com/ProjectEvergreen/wcc/issues/88
+                           const { object } = c.expression.callee || {};
+-                          template += `$\{${object.name}}`;
++                          template.expression(ast.createIdentifier(object.name));
+                           signals.push(object.name);
+                         }
+                       }
+ 
+-                      if (template !== '' && signals.length > 0) {
+-                        const $$templ = `$$tmpl${reactiveElements.length - 1}`;
+-                        const staticTemplate = `static ${$$templ} = (${signals.join(',')}) => \`${template.trim()}\`;`;
++                      if (signals.length > 0) {
+                         // TODO: handle this references?
+                         // https://www.github.com/ProjectEvergreen/wcc/issues/88
+-                        const expression = `${componentName}.${$$templ}(${signals.map((s) => `this.${s}.get()`).join(', ')});`;
+-
+-                        reactiveElements[reactiveElements.length - 1].effect = {
+-                          template: staticTemplate,
+-                          expression,
+-                        };
++                        reactiveElements[reactiveElements.length - 1].effect =
++                          ast.createReactiveTemplate(
++                            `$$tmpl${reactiveElements.length - 1}`,
++                            signals,
++                            template,
++                            componentName,
++                          );
+                       }
+                     }
+ 
+@@ -638,18 +555,16 @@ export function parseJsx(moduleURL) {
+                 }
+ 
+                 if (parentHasReactiveTemplate) {
+-                  const $$templ = `$$tmpl${reactiveElements.length}`;
+-                  const staticTemplate = `static ${$$templ} = (${parentSignals.join(',')}) => \`${parentTemplate.trim()}\`;`;
+                   // TODO: handle this references?
+                   // https://www.github.com/ProjectEvergreen/wcc/issues/88
+-                  const expression = `${componentName}.${$$templ}(${parentSignals.map((s) => `this.${s}.get()`).join(', ')});`;
+-
+                   reactiveElements.push({
+                     selector: `${parentTag}:nth-of-type(1)`,
+-                    effect: {
+-                      template: staticTemplate,
+-                      expression,
+-                    },
++                    effect: ast.createReactiveTemplate(
++                      `$$tmpl${reactiveElements.length}`,
++                      parentSignals,
++                      parentTemplate,
++                      componentName,
++                    ),
+                     attributes: [],
+                   });
+ 
+@@ -701,47 +616,22 @@ export function parseJsx(moduleURL) {
+               // @ts-ignore
+               const nodeName = n1.key.name;
+               if (nodeName === 'render') {
+-                for (const n2 in n1.value.body.body) {
+-                  const n = n1.value.body.body[n2];
+-
+-                  if (n.type === 'ReturnStatement' && n.argument.type === 'JSXElement') {
+-                    const html = parseJsxElement(
+-                      n.argument,
+-                      moduleContents,
+-                      inferredObservability,
+-                      hasShadowRoot,
+-                      1,
+-                    );
+-                    const elementTree = getParse(html)(html);
+-                    const elementRoot = hasShadowRoot ? 'this.shadowRoot' : 'this';
+-
+-                    applyDomDepthSubstitutions(elementTree, undefined, hasShadowRoot);
+-
+-                    const serializedHtml = serialize(elementTree);
+-                    // we have to Shadow DOM use cases here
+-                    // 1. No shadowRoot, so we attachShadow and append the template
+-                    // 2. If there is root from the attachShadow signal, so we just need to inject innerHTML, say in an htmx
+-                    // could / should we do something else instead of .innerHTML
+-                    // https://github.com/ProjectEvergreen/wcc/issues/138
+-                    const renderHandler = hasShadowRoot
+-                      ? `
+-                        const template = document.createElement('template');
+-                        template.innerHTML = \`${serializedHtml}\`;
+-
+-                        if(!${elementRoot}) {
+-                          this.attachShadow({ mode: 'open' });
+-                          this.shadowRoot.appendChild(template.content.cloneNode(true));
+-                        } else {
+-                          this.shadowRoot.innerHTML = template.innerHTML;
+-                        }
+-                      `
+-                      : `${elementRoot}.innerHTML = \`${serializedHtml}\`;`;
+-                    const transformed = acorn.parse(renderHandler, acornParseOptions);
+-
+-                    // @ts-ignore
+-                    n1.value.body.body[n2] = transformed;
++                n1.value.body.body = n1.value.body.body.flatMap((statement) => {
++                  if (
++                    statement.type !== 'ReturnStatement' ||
++                    statement.argument.type !== 'JSXElement'
++                  ) {
++                    return [statement];
+                   }
+-                }
++                  const template = ast.createHtmlTemplateLiteralBuilder(moduleContents);
++                  const htmlTree = createHtmlTreeFromJsx(
++                    statement.argument,
++                    template,
++                    inferredObservability,
++                    hasShadowRoot,
++                  );
++                  return ast.createRenderStatements(template.build(htmlTree), hasShadowRoot);
++                });
+               }
+             }
+           }
+@@ -773,74 +663,31 @@ export function parseJsx(moduleURL) {
+           ) {
+             // TODO: do we even need this filter?
+             const trackingAttrs = observedAttributes.filter((attr) => typeof attr === 'string');
+-            // create a disconnectedCallback function if not present to append effect cleanup functions
+-            const disconnectedCallbackContents = hasDisconnectedCallback
+-              ? ''
+-              : `
+-                disconnectedCallback() {
+-                  ${generateEffectsCleanupForReactiveElements(reactiveElements)}
+-                }
+-              `;
+-
+-            // TODO: better way to determine value type, e,g. array, number, object, etc for `parseAttribute`?
+-            // have to wrap these `static` calls in a class here, otherwise we can't parse them standalone w/ acorn
+-            const staticContents = `
+-              class Stub {
+-                ${reactiveElements.map((el, idx) => `$el${idx};`).join('')}
+-                ${reactiveElements
+-                  .filter((el) => el.effect?.template)
+-                  .map((el) => el.effect.template)
+-                  .join('\n')}
+-                static get observedAttributes() {
+-                  return [${[...trackingAttrs]
+-                    .filter((attr) => constructorMembersSignals.get(attr)?.isState)
+-                    .map((attr) => `'${attr}'`)
+-                    .join()}]
+-                }
+-                static parseAttribute = (value) => value.charAt(0) === '{' || value.charAt(0) === '['
+-                  ? JSON.parse(value)
+-                  : value !== '' && !isNaN(+value)
+-                    ? parseInt(value, 10)
+-                    : value === 'true' || value === 'false'
+-                      ? value === 'true' ? true : false
+-                      : value;
+-                attributeChangedCallback(name, oldValue, newValue) {
+-                  this[name].set(${componentName}.parseAttribute(newValue));
+-                }
+-                ${disconnectedCallbackContents}
+-              }
+-            `;
+-
+-            const staticContentsTree = acorn.parse(staticContents, acornParseOptions);
+-
+-            node.body.body.unshift(...staticContentsTree.body[0].body.body);
++            const stateAttrs = trackingAttrs.filter(
++              (attr) => constructorMembersSignals.get(attr)?.isState,
++            );
++            node.body.body.unshift(
++              ...ast.createReactiveClassMembers(
++                componentName,
++                reactiveElements,
++                stateAttrs,
++                hasDisconnectedCallback,
++              ),
++            );
+           }
+         },
+         MethodDefinition(node) {
+           // append DOM references and effect functions for signals
+           if (node.key.name === 'connectedCallback') {
+-            const root = hasShadowRoot ? 'this.shadowRoot' : 'this';
+-            const effectElements = reactiveElements
+-              .map((el, idx) => `this.$el${idx} = ${root}.querySelector('${el.selector}');`)
+-              .join('\n');
+-            const effectContents = generateEffectsForReactiveElements(reactiveElements);
+-            const effectElementsTree = acorn.parse(effectElements, acornParseOptions);
+-            const effectContentsTree = acorn.parse(effectContents, acornParseOptions);
+-
+-            node.value.body.body = [
+-              ...node.value.body.body,
+-              ...effectElementsTree.body,
+-              ...effectContentsTree.body,
+-            ];
++            node.value.body.body.push(
++              ...ast.createElementReferenceStatements(reactiveElements, hasShadowRoot),
++              ...ast.createEffectStatements(reactiveElements),
++            );
+           }
+ 
+           // append cleanup functions.if component already has a disconnectedCallback
+           if (node.key.name === 'disconnectedCallback' && hasDisconnectedCallback) {
+-            const effectCleanupContents =
+-              generateEffectsCleanupForReactiveElements(reactiveElements);
+-            const effectCleanupElementsTree = acorn.parse(effectCleanupContents, acornParseOptions);
+-
+-            node.value.body.body = [...node.value.body.body, ...effectCleanupElementsTree.body];
++            node.value.body.body.push(...ast.createEffectCleanupStatements(reactiveElements));
+           }
+         },
+       },
+@@ -853,10 +700,7 @@ export function parseJsx(moduleURL) {
+     );
+ 
+     // inject WCC's effect function
+-    const effectImportContents = `import { effect } from 'wc-compiler/effect'`;
+-    const effectImportTree = acorn.parse(effectImportContents, acornParseOptions);
+-
+-    tree.body = [...effectImportTree.body, ...tree.body];
++    tree.body.unshift(ast.createEffectImportDeclaration());
+   }
+ 
+   return tree;
+@@ -864,6 +708,7 @@ export function parseJsx(moduleURL) {
+ 
+ // --------------
+ 
++// Resolve JSX/TSX imports to module URLs, e.g. `./counter.jsx` relative to its importer.
+ export function resolve(specifier, context, defaultResolve) {
+   const { parentURL } = context;
+ 
+@@ -877,6 +722,7 @@ export function resolve(specifier, context, defaultResolve) {
+   return defaultResolve(specifier, context, defaultResolve);
+ }
+ 
++// Return compiled JavaScript source for JSX/TSX imports through Node's module loader.
+ export async function load(url, context, defaultLoad) {
+   if (jsxRegex.test(url) || tsxRegex.test(url)) {
+     const jsFromJsx = parseJsx(new URL(url));
