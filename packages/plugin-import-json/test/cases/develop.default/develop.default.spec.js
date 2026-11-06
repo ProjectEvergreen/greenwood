@@ -82,8 +82,8 @@ xdescribe("Develop Greenwood With: ", function () {
     });
   });
 
-  after(function () {
-    runner.stopCommand();
-    runner.teardown([path.join(outputPath, ".greenwood")]);
+  after(async function () {
+    await runner.stopCommand();
+    await runner.teardown([path.join(outputPath, ".greenwood")]);
   });
 });
