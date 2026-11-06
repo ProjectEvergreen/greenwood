@@ -33,12 +33,13 @@ import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
+import { startServer, stopServer } from "../../../../../test/server.js";
 
 describe("Build Greenwood With Custom Lit Renderer for SSR: ", function () {
   const LABEL = "For SSR with Import Attributes";
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
-  const hostname = "http://localhost:8080";
+  let hostname;
   let runner;
 
   before(function () {
@@ -53,17 +54,8 @@ describe("Build Greenwood With Custom Lit Renderer for SSR: ", function () {
       await runner.setup(outputPath);
       await runner.runCommand(cliPath, "build");
 
-      await new Promise((resolve, reject) => {
-        runner
-          .runCommand(cliPath, "serve", {
-            onStdOut: (message) => {
-              if (message.includes("Started server at http://localhost:8080")) {
-                resolve();
-              }
-            },
-          })
-          .catch(reject);
-      });
+      hostname = await startServer(runner, cliPath, "serve");
+      this.context.hostname = hostname;
     });
 
     describe("Serve command with API route server rendering LitElement <app-card> components as an HTML response with import attributes", function () {
@@ -112,7 +104,7 @@ describe("Build Greenwood With Custom Lit Renderer for SSR: ", function () {
   });
 
   after(async function () {
+    await stopServer(runner);
     await runner.teardown(getOutputTeardownFiles(outputPath));
-    await runner.stopCommand();
   });
 });

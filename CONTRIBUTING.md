@@ -110,8 +110,11 @@ $ deno task test:deno
 $ deno task test:loaders:deno
 ```
 
+> _Mocha runs test files in parallel with two workers by default. Override the worker count with `yarn test --jobs 4`, or run serially with `yarn test --no-parallel` when debugging or using `describe.only` / `it.only`. Watch mode runs serially._
+
 Below are some tips to help with running / debugging tests:
-- `describe.only` / `it.only`: only runs this block
+- To accommodate Greenwood's fallback port detection, server based tests should use `startServer` and `stopServer` from _test/server.js_
+- `describe.only` / `it.only`: only runs this block (requires `--no-parallel`)
 - `xdescribe` / `xit`: don't run this block
 - Uncomment `await runner.teardown()` in a case to see the build output without it getting cleaned up post test run
 - Use `new Runner(true)` to get debug output from Greenwood when running tests

@@ -32,12 +32,13 @@ import path from "node:path";
 import { Runner } from "gallinago";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { fileURLToPath } from "node:url";
+import { startServer, stopServer } from "../../../../../test/server.js";
 
 describe("Serve Greenwood With: ", function () {
   const LABEL = "Import Attributes used in API Routes and SSR Pages";
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
-  const hostname = "http://localhost:8080";
+  let hostname;
   let runner;
 
   before(function () {
@@ -52,17 +53,8 @@ describe("Serve Greenwood With: ", function () {
       await runner.setup(outputPath);
       await runner.runCommand(cliPath, "build");
 
-      await new Promise((resolve, reject) => {
-        runner
-          .runCommand(cliPath, "serve", {
-            onStdOut: (message) => {
-              if (message.includes("Started server at http://localhost:8080")) {
-                resolve();
-              }
-            },
-          })
-          .catch(reject);
-      });
+      hostname = await startServer(runner, cliPath, "serve");
+      this.context.hostname = hostname;
     });
 
     describe('API Route specific behaviors for an HTML ("fragment") API', function () {
@@ -170,7 +162,7 @@ describe("Serve Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.stopCommand();
+    await stopServer(runner);
     await runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });
