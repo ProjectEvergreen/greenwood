@@ -52,7 +52,7 @@ describe("Build Greenwood With: Cloudflare adapter and dynamic routing", functio
   let source;
 
   before(async function () {
-    runner = new Runner(true);
+    runner = new Runner();
     await runner.setup(outputPath);
     await runner.runCommand(path.join(process.cwd(), "packages/cli/src/bin.js"), "build");
     source = await fs.readFile(new URL("./worker.js", functionsDir), "utf8");
