@@ -97,7 +97,7 @@ describe("Build Greenwood With: ", function () {
         it("should have a <script> tag that captures content as data related options", function () {
           expect(optionsScript.length).to.equal(1);
 
-          expect(optionsScript[0].textContent).to.contain("PORT:1984");
+          expect(optionsScript[0].textContent).to.match(/PORT:\d+/);
           expect(optionsScript[0].textContent).to.contain('PRERENDER:"true"');
         });
       });

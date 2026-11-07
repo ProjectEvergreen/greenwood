@@ -24,6 +24,7 @@ import path from "node:path";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
+import { startServer, stopServer } from "../../../../../test/server.js";
 
 function removeWhiteSpace(string = "") {
   return string.replace(/\n/g, "").replace(/ /g, "");
@@ -33,7 +34,7 @@ describe("Serve Greenwood With: ", function () {
   const LABEL = "A Single Page Application (SPA)";
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
-  const hostname = "http://localhost";
+  let hostname;
   const BODY_REGEX = /<body>(.*)<\/body>/s;
   const expected = removeWhiteSpace(
     fs
@@ -41,12 +42,11 @@ describe("Serve Greenwood With: ", function () {
       .match(BODY_REGEX)[0],
   );
 
-  const port = 8080;
   let runner;
 
   before(function () {
     this.context = {
-      hostname: `${hostname}:${port}`,
+      hostname,
       publicDir: path.join(outputPath, "public"),
     };
     runner = new Runner();
@@ -57,17 +57,8 @@ describe("Serve Greenwood With: ", function () {
       await runner.setup(outputPath);
       await runner.runCommand(cliPath, "build");
 
-      await new Promise((resolve, reject) => {
-        runner
-          .runCommand(cliPath, "serve", {
-            onStdOut: (message) => {
-              if (message.includes("Started server at http://localhost:8080")) {
-                resolve();
-              }
-            },
-          })
-          .catch(reject);
-      });
+      hostname = await startServer(runner, cliPath, "serve");
+      this.context.hostname = hostname;
     });
 
     runSmokeTest(["public"], LABEL);
@@ -77,7 +68,7 @@ describe("Serve Greenwood With: ", function () {
       let body;
 
       before(async function () {
-        response = await fetch(`${hostname}:${port}/`);
+        response = await fetch(`${hostname}/`);
         body = await response.clone().text();
       });
 
@@ -103,7 +94,7 @@ describe("Serve Greenwood With: ", function () {
       let body;
 
       before(async function () {
-        response = await fetch(`${hostname}:${port}/artists/`);
+        response = await fetch(`${hostname}/artists/`);
         body = await response.clone().text();
       });
 
@@ -129,7 +120,7 @@ describe("Serve Greenwood With: ", function () {
       let body;
 
       before(async function () {
-        response = await fetch(`${hostname}:${port}/artists/1`);
+        response = await fetch(`${hostname}/artists/1`);
         body = await response.clone().text();
       });
 
@@ -152,7 +143,7 @@ describe("Serve Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.stopCommand();
+    await stopServer(runner);
     await runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });

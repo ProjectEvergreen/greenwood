@@ -4,7 +4,7 @@
  */
 import { expect } from "chai";
 import fs from "node:fs/promises";
-import net from "node:net";
+import { occupyPort } from "../../../../../test/server.js";
 import path from "node:path";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
@@ -14,15 +14,13 @@ describe("Build Greenwood With: Active Content Port Already In Use", function ()
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
   const runner = new Runner();
-  const preferredPort = 1990;
+  let preferredPort;
   let blocker;
 
   before(async function () {
-    blocker = net.createServer();
-    await new Promise((resolve, reject) => {
-      blocker.once("error", reject);
-      blocker.listen(preferredPort, resolve);
-    });
+    blocker = await occupyPort();
+    preferredPort = blocker.address().port;
+    process.env.__GWD_TEST_PORT__ = String(preferredPort);
 
     await runner.setup(outputPath);
     await runner.runCommand(cliPath, "build");
@@ -42,6 +40,7 @@ describe("Build Greenwood With: Active Content Port Already In Use", function ()
     if (blocker?.listening) {
       await new Promise((resolve) => blocker.close(resolve));
     }
+    delete process.env.__GWD_TEST_PORT__;
     await runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });
