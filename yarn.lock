@@ -18961,10 +18961,10 @@ walk-up-path@^4.0.0:
   resolved "https://registry.yarnpkg.com/walk-up-path/-/walk-up-path-4.0.0.tgz#590666dcf8146e2d72318164f1f2ac6ef51d4198"
   integrity sha512-3hu+tD8YzSLGuFYtPRb48vdhKMi0KQV5sn+uWr8+7dMEq/2G/dtLrdDinkLjqq5TIbIBjYJ4Ax/n3YiaW7QM8A==
 
-wc-compiler@~0.23.0-rc.0:
-  version "0.23.0-rc.0"
-  resolved "https://registry.yarnpkg.com/wc-compiler/-/wc-compiler-0.23.0-rc.0.tgz#d8e446ca4b86289fab9b902d6edfdc563e0c1390"
-  integrity sha512-v2y28R8GO0ihdpOgc1018NtDXudX+mTGpbgmQ6yMgy7k7ZfmQxQhiTB3MPYG0v1XR9tyJ7LsmlJvzI/75iyeDA==
+wc-compiler@~0.23.0:
+  version "0.23.0"
+  resolved "https://registry.yarnpkg.com/wc-compiler/-/wc-compiler-0.23.0.tgz#9b8a9eb270aa2f4e12c9821225fb918632fe1f6f"
+  integrity sha512-paqenNTcn/Xv3H5/rH/ZH8EmQ1/2yG4VggiST8kNTo/vhFhHQf4fVFIe5HCb0v9BHgr4RnEMb430f/yWFrkQsg==
   dependencies:
     "@projectevergreen/acorn-jsx-esm" "~0.1.0"
     acorn "^8.14.0"
