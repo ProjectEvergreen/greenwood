@@ -69,27 +69,36 @@ describe("Develop Greenwood With: ", function () {
 
     describe("Develop command with plugins setup for Signals and effects in the output HTML", function () {
       let dom;
+      let importMap;
 
       before(async function () {
         const response = await fetch(`http://127.0.0.1:${port}/`);
         const html = await response.text();
 
         dom = new JSDOM(html);
+        const importMapTag = dom.window.document.querySelector('head > script[type="importmap"]');
+        importMap = JSON.parse(importMapTag.textContent).imports;
       });
 
       it("should contain an import map for Signals polyfill and WCC effect.js", function (done) {
-        const importMapTags = dom.window.document.querySelectorAll(
-          'head > script[type="importmap"]',
-        );
-        const importMapTag = importMapTags[0];
-        const importMap = JSON.parse(importMapTag.textContent).imports;
-
         expect(importMap["signal-polyfill"]).to.equal(
           "/node_modules/signal-polyfill/dist/index.js",
         );
-        expect(importMap["wc-compiler/effect"]).to.equal("/node_modules/wc-compiler/src/effect.js");
+        expect(importMap["wc-compiler/effect"]).to.equal(
+          "/node_modules/wc-compiler/dist/effect.js",
+        );
 
         done();
+      });
+
+      it("should serve the effect module referenced by the import map", async function () {
+        const response = await fetch(
+          new URL(importMap["wc-compiler/effect"], `http://127.0.0.1:${port}`),
+        );
+
+        expect(response.status).to.equal(200);
+        expect(response.headers.get("content-type")).to.contain("text/javascript");
+        expect(await response.text()).to.match(/export\s*\{[^}]*\beffect\b/);
       });
 
       it("should contain a script tag for exposing Signal globally", function (done) {
