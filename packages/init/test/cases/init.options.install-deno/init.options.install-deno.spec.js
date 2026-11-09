@@ -31,20 +31,15 @@ describe("Initialize a new Greenwood project: ", function () {
     this.context = {
       publicDir: path.join(initOutputPath, "public"),
     };
-    initRunner = new Runner(true);
+    initRunner = new Runner({ enableStdOut: true });
   });
 
   describe(LABEL, function () {
     before(async function () {
-      await initRunner.setup(outputPath, [], { create: false });
-      await initRunner.runCommand(initPath, [
-        "--name",
-        APP_NAME,
-        "--install",
-        "deno",
-        "--ts",
-        "no",
-      ]);
+      await initRunner.setup(outputPath, { create: false });
+      await initRunner.runCommand(initPath, {
+        args: ["--name", APP_NAME, "--install", "deno", "--ts", "no"],
+      });
     });
 
     it("should generate a deno.lock file", function () {

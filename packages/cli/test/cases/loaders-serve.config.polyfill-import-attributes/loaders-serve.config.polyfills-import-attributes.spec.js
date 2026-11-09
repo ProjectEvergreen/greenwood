@@ -48,17 +48,18 @@ describe("Serve Greenwood With: ", function () {
     this.context = {
       hostname,
     };
-    runner = new Runner(false, true);
+    runner = new Runner({ forwardParentArgs: true });
   });
 
   describe(LABEL, function () {
     before(async function () {
       await runner.setup(outputPath);
-      await runner.runCommand(cliPath, "build");
+      await runner.runCommand(cliPath, { args: "build" });
 
       await new Promise((resolve, reject) => {
         runner
-          .runCommand(cliPath, "serve", {
+          .runCommand(cliPath, {
+            args: "serve",
             onStdOut: (message) => {
               if (message.includes("Started server at http://localhost:8080")) {
                 resolve();
