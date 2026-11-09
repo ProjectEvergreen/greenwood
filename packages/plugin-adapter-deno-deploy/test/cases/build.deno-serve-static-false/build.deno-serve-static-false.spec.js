@@ -55,7 +55,7 @@ describe("Build Greenwood With: Deno Deploy adapter and serveStatic disabled", f
     this.context = { publicDir: path.join(outputPath, "public") };
     runner = new Runner();
     await runner.setup(outputPath);
-    await runner.runCommand(cliPath, "build");
+    await runner.runCommand(cliPath, { args: "build" });
 
     const deno = globalThis.Deno;
     const originalServe = deno.serve;

@@ -62,7 +62,7 @@ xdescribe("Build Greenwood With: ", function () {
 
     before(function () {
       runner.setup(outputPath);
-      runner.runCommand(cliPath, "build");
+      runner.runCommand(cliPath, { args: "build" });
 
       jsFiles = glob.sync(path.join(this.context.publicDir, "*.js"));
     });

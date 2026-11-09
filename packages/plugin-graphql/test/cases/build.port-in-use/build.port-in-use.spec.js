@@ -26,7 +26,8 @@ describe("Build Greenwood With: GraphQL Port Already In Use", function () {
     });
 
     await runner.setup(outputPath);
-    await runner.runCommand(cliPath, "build", {
+    await runner.runCommand(cliPath, {
+      args: "build",
       onStdOut: (message) => {
         output += message;
       },

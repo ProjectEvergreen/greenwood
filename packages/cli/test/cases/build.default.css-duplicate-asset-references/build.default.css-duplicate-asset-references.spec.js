@@ -57,7 +57,7 @@ describe("Build Greenwood With: ", function () {
 
       try {
         await runner.setup(outputPath);
-        await runner.runCommand(cliPath, "build");
+        await runner.runCommand(cliPath, { args: "build" });
       } finally {
         if (previousNodeOptions === undefined) {
           delete process.env.NODE_OPTIONS;

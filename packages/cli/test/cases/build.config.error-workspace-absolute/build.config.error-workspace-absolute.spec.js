@@ -41,7 +41,7 @@ describe("Build Greenwood With: ", function () {
     it("should throw an error that workspace path must exist", async function () {
       await runner.setup(outputPath);
 
-      await expect(runner.runCommand(cliPath, "build")).to.be.rejectedWith(
+      await expect(runner.runCommand(cliPath, { args: "build" })).to.be.rejectedWith(
         "Configuration error: Workspace doesn't exist! Please double check your configuration.",
       );
     });

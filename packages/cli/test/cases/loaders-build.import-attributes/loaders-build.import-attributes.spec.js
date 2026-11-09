@@ -42,13 +42,13 @@ describe("Build Greenwood With: ", function () {
     this.context = {
       hostname,
     };
-    runner = new Runner(false, true);
+    runner = new Runner({ forwardParentArgs: true });
   });
 
   describe(LABEL, function () {
     before(async function () {
       await runner.setup(outputPath);
-      await runner.runCommand(cliPath, "build");
+      await runner.runCommand(cliPath, { args: "build" });
     });
 
     describe("Custom Element Importing CSS w/ Constructable Stylesheet", function () {

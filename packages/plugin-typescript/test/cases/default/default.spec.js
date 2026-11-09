@@ -60,7 +60,7 @@ xdescribe("Build Greenwood With: ", function () {
   describe(LABEL, function () {
     before(async function () {
       runner.setup(outputPath);
-      runner.runCommand(cliPath, "build");
+      runner.runCommand(cliPath, { args: "build" });
     });
 
     runSmokeTest(["public", "index"], LABEL);

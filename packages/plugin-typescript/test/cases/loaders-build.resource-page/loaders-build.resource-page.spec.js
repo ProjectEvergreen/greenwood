@@ -42,13 +42,13 @@ xdescribe("Build Greenwood With: ", function () {
     this.context = {
       publicDir: path.join(outputPath, "public"),
     };
-    runner = new Runner(false, true);
+    runner = new Runner({ forwardParentArgs: true });
   });
 
   describe(LABEL, function () {
     before(function () {
       runner.setup(outputPath);
-      runner.runCommand(cliPath, "build");
+      runner.runCommand(cliPath, { args: "build" });
     });
 
     describe("Home Page", function () {

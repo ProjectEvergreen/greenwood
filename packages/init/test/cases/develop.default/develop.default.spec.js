@@ -39,8 +39,10 @@ describe("Initialize a new Greenwood project: ", function () {
 
   describe(LABEL, function () {
     before(async function () {
-      await initRunner.setup(outputPath, [], { create: false });
-      await initRunner.runCommand(initPath, ["--name", APP_NAME, "--ts", "no", "--install", "no"]);
+      await initRunner.setup(outputPath, { create: false });
+      await initRunner.runCommand(initPath, {
+        args: ["--name", APP_NAME, "--ts", "no", "--install", "no"],
+      });
     });
 
     describe("should run the Greenwood dev server", function () {
@@ -51,7 +53,8 @@ describe("Initialize a new Greenwood project: ", function () {
 
         await new Promise((resolve, reject) => {
           greenwoodRunner
-            .runCommand(cliPath, "develop", {
+            .runCommand(cliPath, {
+              args: "develop",
               onStdOut: (message) => {
                 if (message.includes(`Started local development server at http://localhost:1984`)) {
                   resolve();

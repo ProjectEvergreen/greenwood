@@ -69,8 +69,8 @@ describe("Build Greenwood With: ", function () {
         `${outputPath}/node_modules/geist/dist/fonts/geist-sans/`,
       );
 
-      await runner.setup(outputPath, [...geistPackageJson, ...geistFonts]);
-      await runner.runCommand(cliPath, "build");
+      await runner.setup(outputPath, { setupFiles: [...geistPackageJson, ...geistFonts] });
+      await runner.runCommand(cliPath, { args: "build" });
     });
 
     describe("Output for JavaScript / CSS tags and files", function () {
