@@ -114,7 +114,7 @@ Below are some tips to help with running / debugging tests:
 - `describe.only` / `it.only`: only runs this block
 - `xdescribe` / `xit`: don't run this block
 - Uncomment `await runner.teardown()` in a case to see the build output without it getting cleaned up post test run
-- Use `new Runner(true)` to get debug output from Greenwood when running tests
+- Use `new Runner({ enableStdOut: true })` to get debug output from Greenwood when running tests
 
 > 🛑 _**PLEASE DO NOT COMMIT ANY OF THE ABOVE CHANGES THOUGH**_
 
@@ -159,7 +159,7 @@ describe('Build Greenwood With: ', function() {
 
     before(async function() {
       await runner.setup(outputPath);
-      await runner.runCommand(cliPath, 'build');
+      await runner.runCommand(cliPath, { args: 'build' });
     });
 
     runSmokeTest(['public', 'index'], LABEL);
@@ -189,19 +189,20 @@ describe('Build Greenwood With: ', function() {
 });
 ```
 
+> _For `develop` and `serve` tests, call `stopCommand()` before `teardown()` so the server releases its files before cleanup._
+
 ### Custom Loaders
 
 Test cases that exercise custom loaders for SSR and pre-rendering use cases will need to do a couple of things:
 
 1. Prefix the test case directory and spec file with _loaders-_
-1. Make sure to pass `true` as the second param to `Runner`
+1. Set `forwardParentArgs: true` in the `Runner` options so child processes inherit the runtime's loader arguments
     ```js
     import { Runner } from 'gallinago';
     let runner;
 
     before(function() {
-      // pass true as the second param here
-      runner = new Runner(false, true);
+      runner = new Runner({ forwardParentArgs: true });
     });
 
     await runner.runCommand(/* ... */);

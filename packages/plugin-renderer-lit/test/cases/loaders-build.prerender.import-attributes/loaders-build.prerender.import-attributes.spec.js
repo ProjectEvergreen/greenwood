@@ -46,13 +46,13 @@ describe("Build Greenwood With Custom Lit Renderer for SSG prerendering: ", func
     this.context = {
       publicDir: path.join(outputPath, "public"),
     };
-    runner = new Runner(false, true);
+    runner = new Runner({ forwardParentArgs: true });
   });
 
   describe(LABEL, function () {
     before(async function () {
       await runner.setup(outputPath);
-      await runner.runCommand(cliPath, "build");
+      await runner.runCommand(cliPath, { args: "build" });
     });
 
     runSmokeTest(["public", "index"], LABEL);

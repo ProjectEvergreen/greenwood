@@ -69,12 +69,10 @@ describe("Build Greenwood With: ", function () {
         `${outputPath}/node_modules/font-awesome/fonts/`,
       );
 
-      await runner.setup(outputPath, [
-        ...fontAwesomePackageJson,
-        ...fontAwesomeCssFiles,
-        ...fontAwesomeFontFiles,
-      ]);
-      await runner.runCommand(cliPath, "build");
+      await runner.setup(outputPath, {
+        setupFiles: [...fontAwesomePackageJson, ...fontAwesomeCssFiles, ...fontAwesomeFontFiles],
+      });
+      await runner.runCommand(cliPath, { args: "build" });
 
       dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "index.html"));
     });

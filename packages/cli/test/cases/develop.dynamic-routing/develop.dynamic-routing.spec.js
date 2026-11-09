@@ -50,7 +50,8 @@ describe("Develop Greenwood With: ", function () {
 
       await new Promise((resolve, reject) => {
         runner
-          .runCommand(cliPath, "develop", {
+          .runCommand(cliPath, {
+            args: "develop",
             onStdOut: (message) => {
               if (message.includes(`Started local development server at ${hostname}`)) {
                 resolve();
@@ -117,7 +118,7 @@ describe("Develop Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
     await runner.stopCommand();
+    await runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });

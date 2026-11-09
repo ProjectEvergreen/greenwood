@@ -43,7 +43,7 @@ describe("Build Greenwood With: ", function () {
     it("should throw an error that polyfills.importAttributes must be an array of types; ['css', 'json']", async function () {
       await runner.setup(outputPath);
 
-      await expect(runner.runCommand(cliPath, "build")).to.be.rejectedWith(
+      await expect(runner.runCommand(cliPath, { args: "build" })).to.be.rejectedWith(
         "Configuration error: polyfills.importAttributes must be an array of types; ['css', 'json'].  Passed value was typeof: object",
       );
     });

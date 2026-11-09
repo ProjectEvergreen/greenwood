@@ -41,7 +41,7 @@ describe("Build Greenwood With: ", function () {
     it("should throw an error that pagesDirectory must be a string", async function () {
       await runner.setup(outputPath);
 
-      await expect(runner.runCommand(cliPath, "build")).to.be.rejectedWith(
+      await expect(runner.runCommand(cliPath, { args: "build" })).to.be.rejectedWith(
         "Configuration error: provided pagesDirectory \"[object Object]\" is not supported.  Please make sure to pass something like 'docs/'",
       );
     });

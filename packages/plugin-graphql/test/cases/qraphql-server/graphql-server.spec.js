@@ -37,7 +37,8 @@ describe("Develop Greenwood With: ", function () {
 
       await new Promise((resolve, reject) => {
         runner
-          .runCommand(cliPath, "develop", {
+          .runCommand(cliPath, {
+            args: "develop",
             onStdOut: (message) => {
               // here we are waiting for the _GraphQL_ server to be started
               // ignore hostname and port as they can be different in CI vs local dev, e.g. `localhost` vs `0.0.0.0`

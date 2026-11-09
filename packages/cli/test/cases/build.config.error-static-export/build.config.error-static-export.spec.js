@@ -27,7 +27,7 @@ describe("Build Greenwood With: ", function () {
     it("should throw an error that staticExport must be a boolean", async function () {
       await runner.setup(outputPath);
 
-      await expect(runner.runCommand(cliPath, "build")).to.be.rejectedWith(
+      await expect(runner.runCommand(cliPath, { args: "build" })).to.be.rejectedWith(
         "Configuration error: staticExport must be a boolean; true or false.  Passed value was typeof: object",
       );
     });

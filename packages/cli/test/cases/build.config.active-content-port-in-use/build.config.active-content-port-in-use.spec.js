@@ -25,7 +25,7 @@ describe("Build Greenwood With: Active Content Port Already In Use", function ()
     });
 
     await runner.setup(outputPath);
-    await runner.runCommand(cliPath, "build");
+    await runner.runCommand(cliPath, { args: "build" });
   });
 
   it("should render using active content from the next available port", async function () {

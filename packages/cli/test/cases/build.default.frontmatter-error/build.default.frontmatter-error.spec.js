@@ -47,13 +47,13 @@ describe("Build Greenwood With: ", function () {
     });
 
     it("should throw an error that the frontmatter for the page could not be parsed", async function () {
-      await expect(runner.runCommand(cliPath, "build")).to.be.rejectedWith(
+      await expect(runner.runCommand(cliPath, { args: "build" })).to.be.rejectedWith(
         'Error parsing frontmatter for page "./broken.html"',
       );
     });
 
     it("should report the reason from the YAML parser instead of a raw js-yaml stack trace", async function () {
-      const error = await runner.runCommand(cliPath, "build").then(
+      const error = await runner.runCommand(cliPath, { args: "build" }).then(
         () => "",
         (err) => `${err}`,
       );

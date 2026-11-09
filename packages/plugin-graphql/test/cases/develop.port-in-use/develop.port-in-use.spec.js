@@ -42,7 +42,8 @@ describe("Develop Greenwood With: ", function () {
         let output = "";
 
         runner
-          .runCommand(cliPath, "develop", {
+          .runCommand(cliPath, {
+            args: "develop",
             onStdOut: (message) => {
               // stdout chunks can split startup messages, so wait for a complete CLI-ready line.
               output += message;
