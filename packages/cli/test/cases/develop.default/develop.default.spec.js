@@ -80,16 +80,19 @@ describe("Develop Greenwood With: ", function () {
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath, [
-        {
-          source: path.join(outputPath, "fixtures/deleted.html"),
-          destination: deletedPagePath,
-        },
-      ]);
+      await runner.setup(outputPath, {
+        setupFiles: [
+          {
+            source: path.join(outputPath, "fixtures/deleted.html"),
+            destination: deletedPagePath,
+          },
+        ],
+      });
 
       await new Promise((resolve, reject) => {
         runner
-          .runCommand(cliPath, "develop", {
+          .runCommand(cliPath, {
+            args: "develop",
             onStdOut: (message) => {
               if (message.includes(`Started local development server at http://localhost:1984`)) {
                 resolve();

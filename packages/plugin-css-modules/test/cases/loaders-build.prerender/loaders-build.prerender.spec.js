@@ -58,7 +58,7 @@ describe("Build Greenwood With: ", function () {
     this.context = {
       publicDir: path.join(outputPath, "public"),
     };
-    runner = new Runner(false, true);
+    runner = new Runner({ forwardParentArgs: true });
   });
 
   describe(LABEL, function () {
@@ -69,7 +69,7 @@ describe("Build Greenwood With: ", function () {
       implementation.prototype._updateAStyleBlock = () => {};
 
       await runner.setup(outputPath);
-      await runner.runCommand(cliPath, "build");
+      await runner.runCommand(cliPath, { args: "build" });
     });
 
     runSmokeTest(["public"], LABEL);

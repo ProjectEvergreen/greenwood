@@ -50,7 +50,7 @@ describe("Build Greenwood With: Cloudflare adapter and global route isolation", 
   before(async function () {
     runner = new Runner();
     await runner.setup(outputPath);
-    await runner.runCommand(path.join(process.cwd(), "packages/cli/src/bin.js"), "build");
+    await runner.runCommand(path.join(process.cwd(), "packages/cli/src/bin.js"), { args: "build" });
 
     const modules = {};
     for (const file of await fs.readdir(functionsDir, { recursive: true })) {

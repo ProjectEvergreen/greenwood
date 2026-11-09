@@ -38,8 +38,10 @@ describe("Initialize a new Greenwood project: ", function () {
 
   describe(LABEL, function () {
     before(async function () {
-      await initRunner.setup(outputPath, [], { create: false });
-      await initRunner.runCommand(initPath, ["--name", APP_NAME, "--ts", "no", "--install", "no"]);
+      await initRunner.setup(outputPath, { create: false });
+      await initRunner.runCommand(initPath, {
+        args: ["--name", APP_NAME, "--ts", "no", "--install", "no"],
+      });
     });
 
     describe(`should build with the Greenwood CLI and have all standard build output files`, function () {
@@ -47,7 +49,7 @@ describe("Initialize a new Greenwood project: ", function () {
 
       before(async function () {
         await greenwoodRunner.setup(initOutputPath);
-        await greenwoodRunner.runCommand(cliPath, ["build"]);
+        await greenwoodRunner.runCommand(cliPath, { args: ["build"] });
       });
 
       runSmokeTest(["public", "index"], LABEL);

@@ -57,14 +57,14 @@ describe("Build Greenwood With: ", function () {
 
       await runner.setup(outputPath);
 
-      await expect(runner.runCommand(cliPath, "build")).to.be.rejectedWith(
+      await expect(runner.runCommand(cliPath, { args: "build" })).to.be.rejectedWith(
         `Configuration error: plugins must be one of type "${pluginTypes.join(", ")}". got "indexxx" instead.`,
       );
     });
 
     // https://github.com/ProjectEvergreen/greenwood/issues/1745
     it("should surface the configuration error directly instead of an unhandled promise rejection", async function () {
-      const error = await runner.runCommand(cliPath, "build").then(
+      const error = await runner.runCommand(cliPath, { args: "build" }).then(
         () => null,
         (err) => err,
       );

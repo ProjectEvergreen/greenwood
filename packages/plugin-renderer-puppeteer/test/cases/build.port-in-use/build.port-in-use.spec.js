@@ -31,7 +31,8 @@ describe("Build Greenwood With: Puppeteer and Active Content Ports Already In Us
     });
 
     await runner.setup(outputPath);
-    await runner.runCommand(cliPath, "build", {
+    await runner.runCommand(cliPath, {
+      args: "build",
       onStdOut: (message) => {
         output += message;
       },

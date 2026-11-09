@@ -48,7 +48,7 @@ describe("Build Greenwood With: ", function () {
   describe(LABEL, function () {
     before(async function () {
       await runner.setup(outputPath);
-      await runner.runCommand(cliPath, "build");
+      await runner.runCommand(cliPath, { args: "build" });
     });
 
     it("should have the correct filename in the output HTML for a script tag", async function () {
