@@ -11,7 +11,7 @@ import { parse } from "node-html-parser";
 
 const importMap = {
   "signal-polyfill": "/node_modules/signal-polyfill/dist/index.js",
-  "wc-compiler/effect": "/node_modules/wc-compiler/src/effect.js",
+  "wc-compiler/effect": "/node_modules/wc-compiler/dist/effect.js",
 };
 
 class ImportJsxResource {
