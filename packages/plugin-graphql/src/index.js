@@ -1,8 +1,12 @@
 import fs from "node:fs/promises";
+import http from "node:http";
+import express from "express";
+import cors from "cors";
+import { expressMiddleware } from "@as-integrations/express5";
+import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
 import { graphqlServer } from "./core/server.js";
-import { getAvailablePort } from "@greenwood/cli/src/lib/server-utils.js";
+import { listenOnAvailablePort } from "@greenwood/cli/src/lib/server-utils.js";
 import { mergeImportMap } from "@greenwood/cli/src/lib/node-modules-utils.js";
-import { startStandaloneServer } from "@apollo/server/standalone";
 import { createCache } from "./core/cache.js";
 
 const DEFAULT_PORT = 4000;
@@ -97,7 +101,49 @@ class GraphQLServer {
   }
 
   async start() {
-    const port = await getAvailablePort(DEFAULT_PORT);
+    const app = express();
+    const httpServer = http.createServer(app);
+    const apolloServer = await graphqlServer(this.compilation);
+    let port;
+
+    apolloServer.addPlugin(ApolloServerPluginDrainHttpServer({ httpServer }));
+    await apolloServer.start();
+
+    // Own the HTTP listener so concurrent servers select and bind a port in one
+    // operation, rather than releasing a probe before Apollo attempts to bind it.
+    // https://www.apollographql.com/docs/apollo-server/api/express-middleware
+    app.disable("x-powered-by");
+    app.use(
+      cors(),
+      express.json({ limit: "50mb" }),
+      expressMiddleware(apolloServer, {
+        context: async ({ req }) => {
+          const { config, graph, context } = this.compilation;
+
+          // make sure to ignore introspection requests from being generated as an output cache file
+          // https://stackoverflow.com/a/58040379/417806
+          if (
+            process.env.__GWD_COMMAND__ === "build" &&
+            !req?.url.endsWith("?q=internal") &&
+            req?.body?.operationName !== "IntrospectionQuery"
+          ) {
+            await createCache(req, context, port);
+          }
+
+          return {
+            config,
+            graph,
+          };
+        },
+      }),
+    );
+
+    try {
+      port = await listenOnAvailablePort(httpServer, DEFAULT_PORT);
+    } catch (error) {
+      await apolloServer.stop();
+      throw error;
+    }
 
     if (port !== DEFAULT_PORT) {
       console.warn(
@@ -105,36 +151,12 @@ class GraphQLServer {
       );
     }
 
-    // https://www.apollographql.com/docs/apollo-server/api/standalone
-    const { url } = await startStandaloneServer(await graphqlServer(this.compilation), {
-      listen: { port },
-      context: async (integrationContext) => {
-        const { req } = integrationContext;
-        const { config, graph, context } = this.compilation;
-
-        // make sure to ignore introspection requests from being generated as an output cache file
-        // https://stackoverflow.com/a/58040379/417806
-        if (
-          process.env.__GWD_COMMAND__ === "build" &&
-          !req?.url.endsWith("?q=internal") &&
-          req?.body?.operationName !== "IntrospectionQuery"
-        ) {
-          await createCache(req, context, port);
-        }
-
-        return {
-          config,
-          graph,
-        };
-      },
-    });
-
     serverState.port = port;
     globalThis.__GWD_GRAPHQL_PORT__ = port;
     // worker threads inherit the environment when they are created.
     process.env.__GWD_GRAPHQL_PORT__ = String(port);
 
-    console.log(`GraphQLServer started at ${url}`);
+    console.log(`GraphQLServer started at http://localhost:${port}/`);
   }
 }
 

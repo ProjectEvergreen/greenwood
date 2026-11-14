@@ -60,20 +60,20 @@ import path from "node:path";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
+import { startServer, stopServer } from "../../../../../test/server.js";
 import { HASH_REGEX } from "../../../../../test/utils.js";
 
 describe("Develop Greenwood With: ", function () {
   const LABEL = "Default Greenwood Configuration and Workspace";
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
-  const hostname = "http://localhost";
-  const port = 1984;
+  let hostname;
   const deletedPagePath = path.join(outputPath, "src/pages/deleted.html");
   let runner;
 
   before(function () {
     this.context = {
-      hostname: `${hostname}:${port}`,
+      hostname,
     };
     runner = new Runner();
   });
@@ -87,17 +87,8 @@ describe("Develop Greenwood With: ", function () {
         },
       ]);
 
-      await new Promise((resolve, reject) => {
-        runner
-          .runCommand(cliPath, "develop", {
-            onStdOut: (message) => {
-              if (message.includes(`Started local development server at http://localhost:1984`)) {
-                resolve();
-              }
-            },
-          })
-          .catch(reject);
-      });
+      hostname = await startServer(runner, cliPath, "develop");
+      this.context.hostname = hostname;
     });
 
     runSmokeTest(["serve"], LABEL);
@@ -108,7 +99,7 @@ describe("Develop Greenwood With: ", function () {
       let expectedImportMap;
 
       before(async function () {
-        response = await fetch(`http://127.0.0.1:${port}`);
+        response = await fetch(`${hostname}`);
         const data = await response.text();
         dom = new JSDOM(data);
         expectedImportMap = JSON.parse(
@@ -183,7 +174,7 @@ describe("Develop Greenwood With: ", function () {
       let dom;
 
       before(async function () {
-        response = await fetch(`http://127.0.0.1:${port}/404/`);
+        response = await fetch(`${hostname}/404/`);
         const data = await response.text();
         dom = new JSDOM(data);
       });
@@ -221,7 +212,7 @@ describe("Develop Greenwood With: ", function () {
       let body;
 
       before(async function () {
-        response = await fetch(`${hostname}:${port}/components/header.js`);
+        response = await fetch(`${hostname}/components/header.js`);
         body = await response.clone().text();
       });
 
@@ -246,7 +237,7 @@ describe("Develop Greenwood With: ", function () {
       let body;
 
       before(async function () {
-        response = await fetch(`${hostname}:${port}/styles/main.css`);
+        response = await fetch(`${hostname}/styles/main.css`);
         body = await response.clone().text();
       });
 
@@ -272,7 +263,7 @@ describe("Develop Greenwood With: ", function () {
       let body;
 
       before(async function () {
-        response = await fetch(`${hostname}:${port}/assets/logo.${ext}`);
+        response = await fetch(`${hostname}/assets/logo.${ext}`);
         body = await response.clone().text();
       });
 
@@ -297,7 +288,7 @@ describe("Develop Greenwood With: ", function () {
       let body;
 
       before(async function () {
-        response = await fetch(`${hostname}:${port}/assets/favicon.ico`);
+        response = await fetch(`${hostname}/assets/favicon.ico`);
         body = await response.clone().text();
       });
 
@@ -322,7 +313,7 @@ describe("Develop Greenwood With: ", function () {
       let body;
 
       before(async function () {
-        response = await fetch(`${hostname}:${port}/assets/river-valley.webp`);
+        response = await fetch(`${hostname}/assets/river-valley.webp`);
         body = await response.clone().text();
       });
 
@@ -347,7 +338,7 @@ describe("Develop Greenwood With: ", function () {
       let body;
 
       before(async function () {
-        response = await fetch(`${hostname}:${port}/assets/fox.avif`);
+        response = await fetch(`${hostname}/assets/fox.avif`);
         body = await response.clone().text();
       });
 
@@ -373,7 +364,7 @@ describe("Develop Greenwood With: ", function () {
       let body;
 
       before(async function () {
-        response = await fetch(`${hostname}:${port}/assets/webcomponents.${ext}`);
+        response = await fetch(`${hostname}/assets/webcomponents.${ext}`);
         body = await response.clone().text();
       });
 
@@ -399,7 +390,7 @@ describe("Develop Greenwood With: ", function () {
       let body;
 
       before(async function () {
-        response = await fetch(`${hostname}:${port}/assets/source-sans-pro.${ext}?v=1`);
+        response = await fetch(`${hostname}/assets/source-sans-pro.${ext}?v=1`);
         body = await response.clone().text();
       });
 
@@ -425,7 +416,7 @@ describe("Develop Greenwood With: ", function () {
       let body;
 
       before(async function () {
-        response = await fetch(`${hostname}:${port}/assets/splash-clip.mp4`);
+        response = await fetch(`${hostname}/assets/splash-clip.mp4`);
         body = await response.clone().text();
       });
 
@@ -460,7 +451,7 @@ describe("Develop Greenwood With: ", function () {
       let body;
 
       before(async function () {
-        response = await fetch(`${hostname}:${port}/assets/splash-clip.mp4`, {
+        response = await fetch(`${hostname}/assets/splash-clip.mp4`, {
           headers: new Headers({ "if-none-match": "QgHxJEgC" }),
         });
         body = await response.clone().text();
@@ -487,7 +478,7 @@ describe("Develop Greenwood With: ", function () {
       let body;
 
       before(async function () {
-        response = await fetch(`${hostname}:${port}/assets/song-sample.mp3`);
+        response = await fetch(`${hostname}/assets/song-sample.mp3`);
         body = await response.clone().text();
       });
 
@@ -517,7 +508,7 @@ describe("Develop Greenwood With: ", function () {
       let body;
 
       before(async function () {
-        response = await fetch(`${hostname}:${port}/wasm/wasm_hello_world_bg.wasm`);
+        response = await fetch(`${hostname}/wasm/wasm_hello_world_bg.wasm`);
         body = await response.clone().text();
       });
 
@@ -542,7 +533,7 @@ describe("Develop Greenwood With: ", function () {
       let data;
 
       before(async function () {
-        response = await fetch(`${hostname}:${port}/assets/data.json`);
+        response = await fetch(`${hostname}/assets/data.json`);
         data = await response.clone().json();
       });
 
@@ -567,7 +558,7 @@ describe("Develop Greenwood With: ", function () {
       let body;
 
       before(async function () {
-        response = await fetch(`${hostname}:${port}/node_modules/lit-html/lit-html.js.map`);
+        response = await fetch(`${hostname}/node_modules/lit-html/lit-html.js.map`);
         body = await response.clone().text();
       });
 
@@ -592,7 +583,7 @@ describe("Develop Greenwood With: ", function () {
       let body;
 
       before(async function () {
-        response = await fetch(`${hostname}:${port}/node_modules/lit-html/lit-html.js?type=xyz`);
+        response = await fetch(`${hostname}/node_modules/lit-html/lit-html.js?type=xyz`);
         body = await response.clone().text();
       });
 
@@ -617,9 +608,7 @@ describe("Develop Greenwood With: ", function () {
       let body;
 
       before(async function () {
-        response = await fetch(
-          `http://127.0.0.1:${port}/node_modules/simpledotcss/simple.css?xyz=123`,
-        );
+        response = await fetch(`${hostname}/node_modules/simpledotcss/simple.css?xyz=123`);
         body = await response.clone().text();
       });
 
@@ -646,7 +635,7 @@ describe("Develop Greenwood With: ", function () {
       let body;
 
       before(async function () {
-        response = await fetch(`${hostname}:${port}/lit-html.js`);
+        response = await fetch(`${hostname}/lit-html.js`);
         body = await response.clone().text();
       });
 
@@ -672,7 +661,7 @@ describe("Develop Greenwood With: ", function () {
       let body;
 
       before(async function () {
-        response = await fetch(`${hostname}:${port}/abc.js`);
+        response = await fetch(`${hostname}/abc.js`);
         body = await response.clone().text();
       });
 
@@ -704,12 +693,12 @@ describe("Develop Greenwood With: ", function () {
       let body;
 
       before(async function () {
-        responseBeforeDelete = await fetch(`${hostname}:${port}/deleted/`);
+        responseBeforeDelete = await fetch(`${hostname}/deleted/`);
         await responseBeforeDelete.clone().text();
 
         fs.rmSync(deletedPagePath);
 
-        response = await fetch(`${hostname}:${port}/deleted/`);
+        response = await fetch(`${hostname}/deleted/`);
         body = await response.clone().text();
       });
 
@@ -745,7 +734,7 @@ describe("Develop Greenwood With: ", function () {
       let data;
 
       before(async function () {
-        response = await fetch(`${hostname}:${port}/posts?id=7`);
+        response = await fetch(`${hostname}/posts?id=7`);
         data = await response.clone().json();
       });
 
@@ -777,7 +766,7 @@ describe("Develop Greenwood With: ", function () {
       let data = {};
 
       before(async function () {
-        response = await fetch(`${hostname}:${port}/api/greeting?name=${name}`);
+        response = await fetch(`${hostname}/api/greeting?name=${name}`);
         data = await response.json();
       });
 
@@ -810,7 +799,7 @@ describe("Develop Greenwood With: ", function () {
       let body;
 
       before(async function () {
-        response = await fetch(`${hostname}:${port}/api/fragment?name=${name}`);
+        response = await fetch(`${hostname}/api/fragment?name=${name}`);
         body = await response.clone().text();
       });
 
@@ -843,7 +832,7 @@ describe("Develop Greenwood With: ", function () {
       let body;
 
       before(async function () {
-        response = await fetch(`${hostname}:${port}/api/missing`);
+        response = await fetch(`${hostname}/api/missing`);
         body = await response.clone().text();
       });
 
@@ -862,7 +851,7 @@ describe("Develop Greenwood With: ", function () {
       let response = {};
 
       before(async function () {
-        response = await fetch(`${hostname}:${port}/api/nothing`);
+        response = await fetch(`${hostname}/api/nothing`);
       });
 
       it("should return a custom status code", function (done) {
@@ -877,7 +866,7 @@ describe("Develop Greenwood With: ", function () {
       let data;
 
       before(async function () {
-        response = await fetch(`${hostname}:${port}/api/submit-json`, {
+        response = await fetch(`${hostname}/api/submit-json`, {
           method: "POST",
           body: JSON.stringify({ name: param }),
         });
@@ -907,7 +896,7 @@ describe("Develop Greenwood With: ", function () {
       let body;
 
       before(async function () {
-        response = await fetch(`${hostname}:${port}/api/submit-form-data`, {
+        response = await fetch(`${hostname}/api/submit-form-data`, {
           method: "POST",
           body: new URLSearchParams({ name: param }).toString(),
           headers: new Headers({
@@ -938,7 +927,7 @@ describe("Develop Greenwood With: ", function () {
       let body;
 
       before(async function () {
-        response = await fetch(`${hostname}:${port}/api/nested/endpoint`);
+        response = await fetch(`${hostname}/api/nested/endpoint`);
         body = await response.clone().text();
       });
 
@@ -963,7 +952,7 @@ describe("Develop Greenwood With: ", function () {
     // remove the copied in page first, since an aborted run can hang in stopCommand before teardown
     fs.rmSync(deletedPagePath, { force: true });
 
-    await runner.stopCommand();
+    await stopServer(runner);
     await runner.teardown([
       path.join(outputPath, ".greenwood"),
       path.join(outputPath, "node_modules"),

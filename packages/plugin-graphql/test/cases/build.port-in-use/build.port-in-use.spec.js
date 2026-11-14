@@ -4,7 +4,7 @@
  */
 import { expect } from "chai";
 import fs from "node:fs/promises";
-import net from "node:net";
+import { occupyPort } from "../../../../../test/server.js";
 import path from "node:path";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
@@ -19,11 +19,7 @@ describe("Build Greenwood With: GraphQL Port Already In Use", function () {
   let blocker;
 
   before(async function () {
-    blocker = net.createServer();
-    await new Promise((resolve, reject) => {
-      blocker.once("error", reject);
-      blocker.listen(preferredPort, resolve);
-    });
+    blocker = await occupyPort(preferredPort);
 
     await runner.setup(outputPath);
     await runner.runCommand(cliPath, "build", {

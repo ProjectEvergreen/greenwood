@@ -5,7 +5,7 @@
  */
 import { expect } from "chai";
 import fs from "node:fs/promises";
-import net from "node:net";
+import { occupyPort } from "../../../../../test/server.js";
 import path from "node:path";
 import { JSDOM } from "jsdom";
 import { Runner } from "gallinago";
@@ -16,7 +16,7 @@ describe("Build Greenwood With: Puppeteer and Active Content Ports Already In Us
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
   const runner = new Runner();
-  const preferredContentPort = 1990;
+  let preferredContentPort;
   let blocker;
   let preferredPrerenderPort;
   let selectedPrerenderPort;
@@ -24,11 +24,9 @@ describe("Build Greenwood With: Puppeteer and Active Content Ports Already In Us
 
   before(async function () {
     // The fixture occupies Puppeteer's preferred port after active content selects its port.
-    blocker = net.createServer();
-    await new Promise((resolve, reject) => {
-      blocker.once("error", reject);
-      blocker.listen(preferredContentPort, resolve);
-    });
+    blocker = await occupyPort();
+    preferredContentPort = blocker.address().port;
+    process.env.__GWD_TEST_PORT__ = String(preferredContentPort);
 
     await runner.setup(outputPath);
     await runner.runCommand(cliPath, "build", {
@@ -73,6 +71,7 @@ describe("Build Greenwood With: Puppeteer and Active Content Ports Already In Us
     if (blocker?.listening) {
       await new Promise((resolve) => blocker.close(resolve));
     }
+    delete process.env.__GWD_TEST_PORT__;
     await runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });

@@ -27,12 +27,13 @@ import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
+import { startServer, stopServer } from "../../../../../test/server.js";
 
 describe("Develop Greenwood With: ", function () {
   const LABEL = "A Server Rendered Application (SSR) with API Routes in TypeScript";
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
-  const hostname = "http://127.0.0.1:1984";
+  let hostname;
   let runner;
 
   before(function () {
@@ -47,17 +48,8 @@ describe("Develop Greenwood With: ", function () {
     before(async function () {
       await runner.setup(outputPath);
 
-      await new Promise((resolve, reject) => {
-        runner
-          .runCommand(cliPath, "develop", {
-            onStdOut: (message) => {
-              if (message.includes("Started local development server at http://localhost:1984")) {
-                resolve();
-              }
-            },
-          })
-          .catch(reject);
-      });
+      hostname = await startServer(runner, cliPath, "develop");
+      this.context.hostname = hostname;
     });
 
     describe("Develop command for an SSR page written in TypeScript", function () {
@@ -129,7 +121,7 @@ describe("Develop Greenwood With: ", function () {
   });
 
   after(async function () {
+    await stopServer(runner);
     await runner.teardown(getOutputTeardownFiles(outputPath));
-    await runner.stopCommand();
   });
 });

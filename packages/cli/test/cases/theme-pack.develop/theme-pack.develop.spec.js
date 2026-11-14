@@ -32,6 +32,7 @@ import path from "node:path";
 import { Runner } from "gallinago";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { fileURLToPath } from "node:url";
+import { startServer, stopServer } from "../../../../../test/server.js";
 
 const packageJson = JSON.parse(
   await fs.promises.readFile(new URL("./package.json", import.meta.url), "utf-8"),
@@ -41,13 +42,12 @@ describe("Develop Greenwood With: ", function () {
   const LABEL = "Development environment for a Theme Pack";
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
-  const hostname = "http://localhost";
-  const port = 1984;
+  let hostname;
   let runner;
 
   before(function () {
     this.context = {
-      hostname: `${hostname}:${port}`,
+      hostname,
     };
     runner = new Runner();
   });
@@ -56,17 +56,8 @@ describe("Develop Greenwood With: ", function () {
     before(async function () {
       await runner.setup(outputPath);
 
-      await new Promise((resolve, reject) => {
-        runner
-          .runCommand(cliPath, "develop", {
-            onStdOut: (message) => {
-              if (message.includes(`Started local development server at http://localhost:1984`)) {
-                resolve();
-              }
-            },
-          })
-          .catch(reject);
-      });
+      hostname = await startServer(runner, cliPath, "develop");
+      this.context.hostname = hostname;
     });
 
     runSmokeTest(["serve"], LABEL);
@@ -76,7 +67,7 @@ describe("Develop Greenwood With: ", function () {
       let dom;
 
       before(async function () {
-        response = await fetch(`${hostname}:${port}`);
+        response = await fetch(`${hostname}`);
         const body = await response.clone().text();
         dom = new JSDOM(body);
       });
@@ -111,7 +102,7 @@ describe("Develop Greenwood With: ", function () {
 
       before(async function () {
         response = await fetch(
-          `${hostname}:${port}/node_modules/${packageJson.name}/dist/styles/theme.css`,
+          `${hostname}/node_modules/${packageJson.name}/dist/styles/theme.css`,
         );
         body = await response.clone().text();
       });
@@ -142,7 +133,7 @@ describe("Develop Greenwood With: ", function () {
 
       before(async function () {
         response = await fetch(
-          `${hostname}:${port}/node_modules/${packageJson.name}/dist/components/header.js`,
+          `${hostname}/node_modules/${packageJson.name}/dist/components/header.js`,
         );
         body = await response.clone().text();
       });
@@ -167,7 +158,7 @@ describe("Develop Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.stopCommand();
+    await stopServer(runner);
     await runner.teardown([path.join(outputPath, ".greenwood")]);
   });
 });

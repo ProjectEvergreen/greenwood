@@ -17,6 +17,7 @@ import path from "node:path";
 import { Runner } from "gallinago";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { fileURLToPath } from "node:url";
+import { startServer, stopServer } from "../../../../../test/server.js";
 
 describe("Initialize a new Greenwood project: ", function () {
   const LABEL = "Scaffold Greenwood with default options and run the development server";
@@ -24,14 +25,13 @@ describe("Initialize a new Greenwood project: ", function () {
   const initPath = path.join(process.cwd(), "packages/init/src/index.js");
   const outputPath = path.dirname(fileURLToPath(new URL(import.meta.url)));
   const initOutputPath = path.join(outputPath, `/${APP_NAME}`);
-  const hostname = "http://localhost";
-  const port = 1984;
+  let hostname;
   let initRunner;
   let greenwoodRunner;
 
   before(function () {
     this.context = {
-      hostname: `${hostname}:${port}`,
+      hostname,
     };
     initRunner = new Runner();
     greenwoodRunner = new Runner();
@@ -49,17 +49,8 @@ describe("Initialize a new Greenwood project: ", function () {
       before(async function () {
         await greenwoodRunner.setup(initOutputPath);
 
-        await new Promise((resolve, reject) => {
-          greenwoodRunner
-            .runCommand(cliPath, "develop", {
-              onStdOut: (message) => {
-                if (message.includes(`Started local development server at http://localhost:1984`)) {
-                  resolve();
-                }
-              },
-            })
-            .catch(reject);
-        });
+        hostname = await startServer(greenwoodRunner, cliPath, "develop");
+        this.context.hostname = hostname;
       });
 
       runSmokeTest(["serve"], LABEL);
@@ -69,7 +60,7 @@ describe("Initialize a new Greenwood project: ", function () {
         let dom;
 
         before(async function () {
-          response = await fetch(`${hostname}:${port}/`);
+          response = await fetch(`${hostname}/`);
           const data = await response.text();
 
           dom = new JSDOM(data);
@@ -98,7 +89,7 @@ describe("Initialize a new Greenwood project: ", function () {
   });
 
   after(async function () {
-    await greenwoodRunner.stopCommand();
+    await stopServer(greenwoodRunner);
     await initRunner.teardown([initOutputPath]);
   });
 });
