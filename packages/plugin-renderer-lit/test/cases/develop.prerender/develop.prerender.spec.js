@@ -85,24 +85,19 @@ describe("Develop Greenwood With: ", function () {
       it("should preserve hydration support after import maps and before component scripts", function () {
         const scripts = [...dom.window.document.querySelectorAll("head script")];
         const importMap = scripts.findIndex((script) => script.type === "importmap");
-        const hydration = scripts.findIndex(
-          (script) =>
-            script.getAttribute("src") ===
-            "/node_modules/@lit-labs/ssr-client/lit-element-hydrate-support.js",
+        const hydrationScripts = scripts.filter((script) =>
+          /^\/~.*\/@lit-labs\/ssr-client\/lit-element-hydrate-support\.js$/.test(
+            script.getAttribute("src") ?? "",
+          ),
         );
+        const hydration = scripts.indexOf(hydrationScripts[0]);
         const component = scripts.findIndex(
           (script) => script.getAttribute("src") === "/components/greeting.js",
         );
         expect(importMap).to.be.greaterThan(-1);
         expect(hydration).to.be.greaterThan(importMap);
         expect(component).to.be.greaterThan(hydration);
-        expect(
-          scripts.filter(
-            (script) =>
-              script.getAttribute("src") ===
-              "/node_modules/@lit-labs/ssr-client/lit-element-hydrate-support.js",
-          ),
-        ).to.have.length(1);
+        expect(hydrationScripts).to.have.length(1);
       });
     });
   });

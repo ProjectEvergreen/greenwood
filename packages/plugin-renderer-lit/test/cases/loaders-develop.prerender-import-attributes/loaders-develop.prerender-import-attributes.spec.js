@@ -89,7 +89,7 @@ describe("Develop Greenwood With: ", function () {
         expect(style).to.equal("header{color:red}");
         expect(
           dom.window.document.querySelector(
-            'script[src="/node_modules/@lit-labs/ssr-client/lit-element-hydrate-support.js"]',
+            'script[src^="/~"][src$="/@lit-labs/ssr-client/lit-element-hydrate-support.js"]',
           ),
         ).not.to.equal(null);
       });

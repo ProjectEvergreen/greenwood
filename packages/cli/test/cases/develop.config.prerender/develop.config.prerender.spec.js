@@ -156,7 +156,7 @@ describe("Develop Greenwood With: ", function () {
         ).to.have.length(1);
         expect(
           dom.window.document.querySelectorAll(
-            'script[src="/node_modules/es-module-shims/dist/es-module-shims.js"]',
+            'script[src^="/~"][src$="/es-module-shims/dist/es-module-shims.js"]',
           ),
         ).to.have.length(1);
         expect(
