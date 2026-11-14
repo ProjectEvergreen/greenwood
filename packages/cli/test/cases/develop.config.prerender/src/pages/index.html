@@ -1,0 +1,18 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Prerender development</title>
+    <script type="module" data-gwd-opt="static" data-gwd="custom">
+      export default class Badge extends HTMLElement {
+        connectedCallback() {
+          this.innerHTML = "<span>Inline badge</span>";
+        }
+      }
+      customElements.define("app-badge", Badge);
+    </script>
+  </head>
+  <body>
+    <h1>Home</h1>
+    <app-badge></app-badge>
+  </body>
+</html>
