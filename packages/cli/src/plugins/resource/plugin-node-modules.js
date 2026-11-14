@@ -86,9 +86,13 @@ class NodeModulesResource {
 
     const { packageJson, packageJsonUrl } = await getPackageJsonForProject(context);
 
-    // Walk the project's dependencies once and cache the completed import map.
-    if (!generatedImportMap && Object.keys(packageJson.dependencies || {}).length > 0) {
-      console.log("Generating import map from project dependencies...");
+    // Walk the project's dependencies and import aliases once and cache the completed import map.
+    if (
+      !generatedImportMap &&
+      (Object.keys(packageJson.dependencies || {}).length > 0 ||
+        Object.keys(packageJson.imports || {}).length > 0)
+    ) {
+      console.log("Generating import map from project dependencies and aliases...");
       const { importMap, diagnostics, scopes } = await walkPackageJson(
         packageJson,
         new Set(),

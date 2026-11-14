@@ -13,6 +13,7 @@ import terser from "@rollup/plugin-terser";
 import * as acorn from "acorn";
 import * as walk from "acorn-walk";
 import { ACORN_OPTIONS } from "@greenwood/cli/src/lib/parsing-utils.js";
+import { resolve } from "../lib/vendor/import-meta-resolve.js";
 
 // ConstructableStylesheets, JSON Modules
 const externalizedResources = ["css", "json"];
@@ -76,6 +77,15 @@ function greenwoodResourceLoader(compilation, browser = false) {
       const importerUrl = new URL(`file://${importer ?? ""}`);
       const isUserWorkspaceImporter = importerUrl?.pathname?.startsWith(userWorkspace.pathname);
       const isScratchDirImporter = importerUrl?.pathname?.startsWith(scratchDir.pathname);
+
+      // Rollup's Node resolver still rejects #/ aliases.
+      // Resolve this syntax with our Node-compatible resolver, then let Rollup load and bundle the resulting file.
+      if (id.startsWith("#/") && importer) {
+        return this.resolve(fileUrlToModulePath(resolve(id, importerUrl)), importer, {
+          ...options,
+          skipSelf: true,
+        });
+      }
 
       // check for relative paths and resolve them to the user's workspace or Greenwood's scratch dir
       // like when bundling inline <script> tags with relative paths

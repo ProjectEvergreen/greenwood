@@ -5,7 +5,7 @@
  *
  * User Result
  * Should start the development server and serve HTML in which each shared resource tag
- * is only emitted once.
+ * is only emitted once, with a native import map for local aliases even without dependencies.
  * https://github.com/ProjectEvergreen/greenwood/issues/1760
  *
  * User Command
@@ -94,6 +94,17 @@ describe("Develop Greenwood With: ", function () {
 
         expect(headings.length).to.equal(1);
         expect(headings[0].textContent).to.equal("Default home page");
+      });
+
+      it("should generate a native import map for a project with only local aliases", async function () {
+        const maps = dom.window.document.querySelectorAll('head > script[type="importmap"]');
+        const { imports } = JSON.parse(maps[0].textContent);
+        const response = await fetch(`${hostname}:${port}${imports["#shared"]}`);
+
+        expect(maps.length).to.equal(1);
+        expect(imports["#shared"]).to.equal(`${imports["#/"]}scripts/shared.js`);
+        expect(response.status).to.equal(200);
+        expect(await response.text()).to.contain('export default "shared"');
       });
 
       it("should merge page layout <script> tags after app layout <script> tags", function () {

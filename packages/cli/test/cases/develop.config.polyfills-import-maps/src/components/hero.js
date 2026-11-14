@@ -1,3 +1,6 @@
+import data from "#/data/title.json" with { type: "json" };
+import aliasedData from "#title" with { type: "json" };
+
 const template = document.createElement("template");
 
 template.innerHTML = `
@@ -22,10 +25,10 @@ template.innerHTML = `
   }
   </style>
   <div class="hero">
-    <h2>Welcome to my website</h2>
+    <h2>${data.title}</h2>
     
     <a href="#">
-      <button>Get Started</button>
+      <button>${aliasedData.subtitle}</button>
     </a>
     <a href="#">
       <button>Learn More &#8594</button>

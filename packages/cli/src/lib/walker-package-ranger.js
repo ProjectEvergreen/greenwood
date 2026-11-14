@@ -2,6 +2,7 @@ import fs from "node:fs";
 import { isBuiltin } from "node:module";
 import { getPackageRoot } from "./node-modules-utils.js";
 import { fileUrlToResolvedPrefixPath, IMPORT_MAP_RESOLVED_PREFIX } from "./resource-utils.js";
+import { resolve } from "./vendor/import-meta-resolve.js";
 
 // priority is from L -> R
 const SUPPORTED_EXPORT_CONDITIONS = ["import", "module-sync", "default"];
@@ -350,6 +351,48 @@ async function walkPackageJson(packageJson = {}, walkedPackages = new Set(), par
   const { importMap, directImports, scopes, diagnostics } = state;
   const resolvedImports = new Map([...importMap, ...directImports]);
   const scopedOverrides = {};
+
+  // Browsers do not read package.json imports. Translate project-local aliases into
+  // exact entries or directory prefixes; import maps cannot express wildcard substitutions.
+  for (const [specifier, target] of Object.entries(packageJson.imports || {})) {
+    const isPrefix = specifier.endsWith("/*");
+    const key = isPrefix ? specifier.slice(0, -1) : specifier;
+    const supportedKey =
+      specifier.startsWith("#") &&
+      specifier !== "#" &&
+      !specifier.endsWith("/") &&
+      !key.includes("*");
+    const supportedTarget =
+      typeof target === "string" &&
+      target.startsWith("./") &&
+      (isPrefix
+        ? target.endsWith("/*") && !target.slice(0, -1).includes("*")
+        : !target.includes("*"));
+
+    if (!supportedKey || (target !== null && !supportedTarget)) {
+      diagnostics.set(
+        specifier,
+        `WARNING: No automatic browser mapping for import alias => \`${specifier}\`. Use a local file target or matching directory /* patterns, or supply an import map in HTML.`,
+      );
+      continue;
+    }
+
+    try {
+      resolvedImports.set(
+        key,
+        target === null
+          ? null
+          : fileUrlToResolvedPrefixPath(
+              isPrefix ? new URL(target.slice(0, -1), parent) : new URL(resolve(specifier, parent)),
+            ),
+      );
+    } catch (error) {
+      diagnostics.set(
+        specifier,
+        `ERROR (${error.code}): unable to resolve import alias => \`${specifier}\`\n${error.message}`,
+      );
+    }
+  }
 
   for (const [scope, entries] of scopes) {
     const overrides = Object.fromEntries(
