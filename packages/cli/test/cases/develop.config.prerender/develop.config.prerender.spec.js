@@ -77,7 +77,8 @@ describe("Develop Greenwood With: ", function () {
       await new Promise((resolve, reject) => {
         let output = "";
         runner
-          .runCommand(cliPath, "develop", {
+          .runCommand(cliPath, {
+            args: "develop",
             onStdOut: (message) => {
               output += message;
               const ready = output.match(
