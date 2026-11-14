@@ -4,6 +4,10 @@
  *
  */
 import fs from "node:fs";
+import {
+  resolveResourceUrl,
+  isPackageResourcePath,
+} from "@greenwood/cli/src/lib/node-modules-utils.js";
 import { parse as hparse } from "node-html-parser";
 import { generate, parse, walk } from "css-tree";
 import * as acornWalk from "acorn-walk";
@@ -106,12 +110,19 @@ async function walkAllImportsForCssModules(
       const { value = "" } = source;
 
       if (value.endsWith(".module.css") && specifiers.length === 1) {
-        const cssModuleUrl = new URL(value, scriptUrl);
+        const cssModuleUrl = resolveResourceUrl(value, scriptUrl);
         cssModules.set(cssModuleUrl.href, transformCssModule(cssModuleUrl));
       } else {
-        const recursiveScriptUrl = new URL(value, scriptUrl);
+        if (!value) return;
+        let recursiveScriptUrl;
 
-        if (value && fs.existsSync(recursiveScriptUrl)) {
+        try {
+          recursiveScriptUrl = resolveResourceUrl(value, scriptUrl);
+        } catch {
+          return; // Unresolvable or external imports do not contribute local CSS Modules.
+        }
+
+        if (recursiveScriptUrl.protocol === "file:" && fs.existsSync(recursiveScriptUrl)) {
           additionalScripts.push(recursiveScriptUrl);
         }
       }
@@ -159,11 +170,13 @@ class ScanForCssModulesResource {
         const src = script.getAttribute("src");
 
         // allow module and module-shims attributes
-        if (src && type.startsWith("module")) {
-          const scriptUrl = new URL(
-            `./${src.replace(/\.\.\//g, "").replace(/\.\//g, "")}`,
-            this.compilation.context.userWorkspace,
-          );
+        if (src && type.startsWith("module") && !src.startsWith("http") && !src.startsWith("//")) {
+          const scriptUrl = isPackageResourcePath(src)
+            ? resolveResourceUrl(src, this.compilation.context.projectDirectory)
+            : new URL(
+                `./${src.replace(/\.\.\//g, "").replace(/\.\//g, "")}`,
+                this.compilation.context.userWorkspace,
+              );
 
           await walkAllImportsForCssModules(scriptUrl, this.compilation, cssModules);
         }
@@ -225,7 +238,7 @@ class StripCssModulesResource {
             start,
             end,
             identifier: specifiers[0].local.name,
-            cssModuleUrl: new URL(value, url),
+            cssModuleUrl: resolveResourceUrl(value, url),
           });
         }
       },

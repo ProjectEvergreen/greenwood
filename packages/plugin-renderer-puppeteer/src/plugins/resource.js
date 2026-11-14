@@ -1,3 +1,13 @@
+import { getPackageRoot } from "@greenwood/cli/src/lib/node-modules-utils.js";
+import { fileUrlToResolvedPrefixPath } from "@greenwood/cli/src/lib/resource-utils.js";
+
+const webComponentsBundleUrl = fileUrlToResolvedPrefixPath(
+  new URL(
+    "./webcomponents-bundle.js",
+    getPackageRoot("@webcomponents/webcomponentsjs", import.meta.url),
+  ),
+);
+
 class PuppeteerResource {
   constructor(compilation, options) {
     this.compilation = compilation;
@@ -23,7 +33,7 @@ class PuppeteerResource {
       "<head>",
       `
       <head>
-        <script src="/node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
+        <script src="${webComponentsBundleUrl}"></script>
     `,
     );
 

@@ -3,7 +3,7 @@
 
   "include": ["packages/*/src/**/**/*.js"],
 
-  "exclude": ["packages/cli/src/lib/*-interface.js"],
+  "exclude": ["packages/cli/src/lib/vendor/**"],
 
   "reporter": ["cobertura", "html", "text", "text-summary"],
 

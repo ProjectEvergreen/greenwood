@@ -3,26 +3,33 @@
  * Enables using JavaScript to import any type of file as a string using ESM syntax.
  *
  */
-import { IMPORT_MAP_RESOLVED_PREFIX } from "@greenwood/cli/src/lib/walker-package-ranger.js";
-import { mergeImportMap } from "@greenwood/cli/src/lib/node-modules-utils.js";
+import {
+  isPackageResourcePath,
+  resolveResourceUrl,
+  mergeImportMap,
+  getImportMap,
+} from "@greenwood/cli/src/lib/node-modules-utils.js";
 import { getMatchingPageByRoute } from "@greenwood/cli/src/lib/graph-utils.js";
-import { parse } from "node-html-parser";
 
-function generateImportMapExtensionsMap(body = "", extensions = []) {
-  const dom = parse(body);
-  const importMap = JSON.parse(
-    dom.querySelector("head > script[type='importmap']").textContent,
-  ).imports;
+function withRawType(value) {
+  const url = new URL(value, "http://localhost/");
+  url.searchParams.set("type", "raw");
 
-  for (const entry in importMap) {
-    const ext = entry.split(".").pop().split("?")[0];
+  return `${value.split(/[?#]/)[0]}${url.search}${url.hash}`;
+}
+
+function generateImportMapExtensionsMap(imports = {}, extensions = []) {
+  const aliases = {};
+
+  for (const [specifier, target] of Object.entries(imports)) {
+    const ext = specifier.split(/[?#]/)[0].split(".").pop();
 
     if (extensions.includes(ext)) {
-      importMap[`${entry}?type=raw`] = `${importMap[entry]}?type=raw`;
+      aliases[withRawType(specifier)] = withRawType(target);
     }
   }
 
-  return importMap;
+  return aliases;
 }
 
 class ImportMapExtensionsResourcePlugin {
@@ -49,9 +56,18 @@ class ImportMapExtensionsResourcePlugin {
 
   async intercept(url, request, response) {
     const body = await response.text();
+    const { imports, scopes = {} } = getImportMap(body);
+    const extensions = this.options.importMapExtensions;
+    const scopedAliases = Object.fromEntries(
+      Object.entries(scopes).map(([scope, entries]) => [
+        scope,
+        generateImportMapExtensionsMap(entries, extensions),
+      ]),
+    );
     const newBody = mergeImportMap(
       body,
-      generateImportMapExtensionsMap(body, this.options.importMapExtensions),
+      { imports: generateImportMapExtensionsMap(imports, extensions), scopes: scopedAliases },
+      this.compilation.config.polyfills.importMaps,
     );
 
     return new Response(newBody);
@@ -74,14 +90,11 @@ class ImportRawResource {
     }
   }
 
-  async resolve(url) {
-    const { searchParams, href, pathname } = url;
-    const params = url.searchParams.size > 0 ? `${searchParams.toString()}&type=raw` : "type=raw";
-    const fromImportMap = pathname.startsWith(IMPORT_MAP_RESOLVED_PREFIX);
-    const resolvedHref = fromImportMap
-      ? pathname.replace(IMPORT_MAP_RESOLVED_PREFIX, "file://")
-      : href;
-    const matchedUrl = new URL(`${resolvedHref}?${params}`);
+  async resolve(url, request) {
+    const matchedUrl = isPackageResourcePath(url.pathname)
+      ? resolveResourceUrl(url.href, this.compilation.context.projectDirectory)
+      : new URL(request?.url ?? url.href);
+    matchedUrl.searchParams.set("type", "raw");
 
     return new Request(matchedUrl);
   }

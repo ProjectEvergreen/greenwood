@@ -5,7 +5,7 @@
  * This is a Greenwood default plugin.
  *
  */
-import { checkResourceExists } from "../../lib/resource-utils.js";
+import { fileUrlToResolvedPrefixPath, checkResourceExists } from "../../lib/resource-utils.js";
 import { getStaticPages, getMatchingPageByRoute } from "../../lib/graph-utils.js";
 import { getStaticRouteFromDynamicRoute } from "../../lib/url-utils.js";
 import fs from "node:fs/promises";
@@ -25,7 +25,7 @@ class StaticRouterResource {
   async resolve() {
     const routerUrl = new URL("../../lib/router.js", import.meta.url);
 
-    return new Request(`file://${routerUrl.pathname}`);
+    return new Request(routerUrl);
   }
 
   async shouldIntercept(url, request, response) {
@@ -47,7 +47,7 @@ class StaticRouterResource {
     body = body.replace(
       "</head>",
       `
-      <script type="module" src="/node_modules/@greenwood/cli/src/lib/router.js"></script>\n
+      <script type="module" src="${fileUrlToResolvedPrefixPath(new URL("../../lib/router.js", import.meta.url))}"></script>\n
       </head>
     `,
     );

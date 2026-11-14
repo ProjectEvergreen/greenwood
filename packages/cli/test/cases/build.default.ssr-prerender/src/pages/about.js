@@ -1,4 +1,4 @@
-import "../components/logo.js";
+import "my-project/logo";
 
 const html = `
 <body>

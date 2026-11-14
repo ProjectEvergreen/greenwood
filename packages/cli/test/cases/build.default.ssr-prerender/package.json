@@ -1,0 +1,8 @@
+{
+  "name": "my-project",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./logo": "./src/components/logo.js"
+  }
+}

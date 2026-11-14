@@ -1,4 +1,8 @@
 {
   "name": "test-develop-command-default-workspace-layouts-page-and-app",
-  "type": "module"
+  "type": "module",
+  "imports": {
+    "#/*": "./src/*",
+    "#shared": "./src/scripts/shared.js"
+  }
 }

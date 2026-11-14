@@ -2,5 +2,5 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('../system/variables.css');
+@import url('./tokens.css');
 @import url('https://fonts.googleapis.com/css?family=Raleway&display=swap');

@@ -1,3 +1,5 @@
+import { heading } from "#/system/heading.js";
+
 class HeaderComponent extends HTMLElement {
   constructor() {
     super();
@@ -11,7 +13,7 @@ class HeaderComponent extends HTMLElement {
 
   getTemplate() {
     return `
-      <header>This is the header component.</header>
+      <header>${heading}</header>
     `;
   }
 }

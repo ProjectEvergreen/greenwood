@@ -1,9 +1,11 @@
 /*
  * Use Case
- * Run Greenwood build command with default setting for optimization
+ * Run Greenwood build command with default setting for optimization, package exports, and #/ imports.
  *
  * User Result
  * Should generate a Greenwood build that preloads all <script> and <link> tags
+ * Should inline CSS reached through relative paths, export maps, and #/ import aliases.
+ * Should bundle JavaScript modules referenced through #/ import aliases.
  *
  * User Command
  * greenwood build
@@ -11,6 +13,8 @@
  * Default Config
  *
  * Custom Workspace
+ * package.json (exports my-project/theme to ./src/styles/theme.css)
+ *              (maps #/* to ./src/* through imports)
  * src/
  *   components/
  *     header.js
@@ -23,7 +27,9 @@
  *   styles/
  *     main.css
  *     theme.css
- *   system
+ *     tokens.css
+ *   system/
+ *     heading.js
  *     variables.css
  */
 import { expect } from "chai";
@@ -81,8 +87,13 @@ describe("Build Greenwood With: ", function () {
       });
 
       describe("<script> tag and preloading", function () {
-        it("should contain one javascript file in the output directory", async function () {
-          expect(await glob.promise(path.join(this.context.publicDir, "*.js"))).to.have.lengthOf(1);
+        it("should bundle the JavaScript import alias into one output file", async function () {
+          const files = await glob.promise(path.join(this.context.publicDir, "*.js"));
+          const contents = await fs.promises.readFile(files[0], "utf-8");
+
+          expect(files).to.have.lengthOf(1);
+          expect(contents).to.contain("This is the header component.");
+          expect(contents).not.to.contain("#/system/heading.js");
         });
 
         it("should have the expected <script> tag in the <head>", function () {
