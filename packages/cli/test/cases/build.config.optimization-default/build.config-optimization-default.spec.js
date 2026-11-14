@@ -1,9 +1,10 @@
 /*
  * Use Case
- * Run Greenwood build command with default setting for optimization
+ * Run Greenwood build command with default setting for optimization, package exports, and #/ imports.
  *
  * User Result
  * Should generate a Greenwood build that preloads all <script> and <link> tags
+ * Should inline CSS reached through relative paths, export maps, and #/ import aliases.
  *
  * User Command
  * greenwood build
@@ -12,6 +13,7 @@
  *
  * Custom Workspace
  * package.json (exports my-project/theme to ./src/styles/theme.css)
+ *              (maps #/* to ./src/* through imports)
  * src/
  *   components/
  *     header.js
@@ -24,6 +26,7 @@
  *   styles/
  *     main.css
  *     theme.css
+ *     tokens.css
  *   system/
  *     variables.css
  */

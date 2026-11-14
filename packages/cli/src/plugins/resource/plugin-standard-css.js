@@ -54,8 +54,9 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
           } else if (isBareSpecifier) {
             const parent = workingUrl ?? sourceUrl;
             const relativeUrl = new URL(`./${value}`, parent);
+            // Resolve # import aliases through package.json imports instead of treating them as relative files.
             const resolvedUrl =
-              workingUrl && fs.existsSync(relativeUrl)
+              workingUrl && !value.startsWith("#") && fs.existsSync(relativeUrl)
                 ? relativeUrl
                 : new URL(resolve(value, parent));
             const importContents = fs.readFileSync(resolvedUrl, "utf-8");

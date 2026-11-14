@@ -2,6 +2,9 @@
   "name": "my-project",
   "private": true,
   "type": "module",
+  "imports": {
+    "#/*": "./src/*"
+  },
   "exports": {
     "./theme": "./src/styles/theme.css"
   }

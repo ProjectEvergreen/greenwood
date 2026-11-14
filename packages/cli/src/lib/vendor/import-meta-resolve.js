@@ -1135,7 +1135,10 @@ function patternKeyCompare(a, b) {
 }
 
 function packageImportsResolve(name, base, conditions) {
-  if (name === "#" || name.startsWith("#/") || name.endsWith("/")) {
+  // Allow #/ imports, backported from https://github.com/wooorm/import-meta-resolve/pull/38.
+  // TODO: Remove this local patch when refreshing to an upstream release containing Node's change:
+  // https://github.com/nodejs/node/pull/60864
+  if (name === "#" || name.endsWith("/")) {
     const reason = "is not a valid internal imports specifier name";
     throw new ERR_INVALID_MODULE_SPECIFIER(name, reason, fileURLToPath(base));
   }
