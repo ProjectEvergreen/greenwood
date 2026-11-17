@@ -86,6 +86,22 @@ describe("Build Greenwood With: ", function () {
         dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "./index.html"));
       });
 
+      it("should leave resource URLs in metadata and page text unchanged", function () {
+        expect(dom.window.document.querySelector('meta[name="resource-example"]').content).to.equal(
+          "/components/header.js",
+        );
+        expect(dom.window.document.querySelector("#resource-example").textContent).to.equal(
+          "  /components/header.js\n /styles/main.css ",
+        );
+      });
+
+      it("should preserve comments and optimization attributes in literal page content", function () {
+        expect(dom.window.document.body.innerHTML).to.contain("<!-- optimizer-comment -->");
+        expect(
+          dom.window.document.querySelector("#literal-optimization-attribute").textContent,
+        ).to.equal('data-gwd-opt="static"');
+      });
+
       describe("<script> tag and preloading", function () {
         it("should bundle the JavaScript import alias into one output file", async function () {
           const files = await glob.promise(path.join(this.context.publicDir, "*.js"));

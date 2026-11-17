@@ -1,3 +1,4 @@
+import { createHtmlElement, insertHtml } from "@greenwood/cli/src/lib/html-utils.js";
 import { getMatchingPageByRoute, shouldPrerender } from "@greenwood/cli/src/lib/graph-utils.js";
 import { getPackageRoot, insertAfterImportMap } from "@greenwood/cli/src/lib/node-modules-utils.js";
 import { fileUrlToResolvedPrefixPath } from "@greenwood/cli/src/lib/resource-utils.js";
@@ -43,21 +44,21 @@ class LitHydrationResource {
     if (isDevelopment) {
       body = insertAfterImportMap(
         body,
-        `<script type="${importType}" src="${fileUrlToResolvedPrefixPath(hydrationSupportUrl)}"></script>`,
+        createHtmlElement("script", {
+          type: importType,
+          src: fileUrlToResolvedPrefixPath(hydrationSupportUrl),
+        }),
       );
     } else {
       // Note: in production builds we have to inline the hydration support script
       // due to how Rollup bundles dependencies. If we try to load it as an external
       // module, it leads to this issue in our monorepo tests
       // https://github.com/ProjectEvergreen/greenwood/issues/1463
-      body = body.replace(
-        "<head>",
-        `
-        <head>
-          <script type="module">
-            import '${hydrationSupportUrl.href}';
-          </script>
-      `,
+      body = insertHtml(
+        body,
+        createHtmlElement("script", { type: "module" }, `import '${hydrationSupportUrl.href}';`),
+        "head",
+        true,
       );
     }
 

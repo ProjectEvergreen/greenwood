@@ -1,3 +1,4 @@
+import { createHtmlElement, insertHtml } from "../../lib/html-utils.js";
 import { fileUrlToResolvedPrefixPath, checkResourceExists } from "../../lib/resource-utils.js";
 import { mergeImportMap } from "../../lib/node-modules-utils.js";
 import {
@@ -99,19 +100,19 @@ class ContentAsDataResource {
       newBody = mergeImportMap(body, { imports: importMap }, polyfills.importMaps);
     }
 
-    newBody = newBody.replace(
-      "<head>",
-      `
-      <head>
-        <script id="data-client-options">
-          globalThis.__CONTENT_OPTIONS__ = globalThis.__CONTENT_OPTIONS__
-            ? globalThis.__CONTENT_OPTIONS__
-            : {
-                PORT: ${devServer.port},
-                PRERENDER: "${this.compilation.config.prerender}",
-              }
-        </script>
+    newBody = insertHtml(
+      newBody,
+      createHtmlElement(
+        "script",
+        { id: "data-client-options" },
+        `
+      globalThis.__CONTENT_OPTIONS__ = globalThis.__CONTENT_OPTIONS__
+        ? globalThis.__CONTENT_OPTIONS__
+        : { PORT: ${devServer.port}, PRERENDER: "${this.compilation.config.prerender}" }
     `,
+      ),
+      "head",
+      true,
     );
 
     // Greenwood active frontmatter keys
@@ -161,14 +162,15 @@ class ContentAsDataResource {
   async optimize(url, response) {
     let body = await response.text();
 
-    body = body.replace(
-      "<head>",
-      `
-      <head>
-        <script id="content-as-data-state">
-          globalThis.__CONTENT_AS_DATA_STATE__ = true;
-        </script>
-    `,
+    body = insertHtml(
+      body,
+      createHtmlElement(
+        "script",
+        { id: "content-as-data-state" },
+        "globalThis.__CONTENT_AS_DATA_STATE__ = true;",
+      ),
+      "head",
+      true,
     );
 
     return new Response(body);

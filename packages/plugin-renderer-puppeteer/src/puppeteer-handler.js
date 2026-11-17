@@ -1,3 +1,4 @@
+import { parseHtml } from "@greenwood/cli/src/lib/html-utils.js";
 import { runWithConcurrency } from "../../cli/src/lib/async-utils.js";
 import { serverState } from "./plugins/server.js";
 
@@ -15,7 +16,17 @@ export default async function (compilation, callback) {
       console.info(`prerendering complete for page ${route}.`);
 
       // clean this up here to avoid sending webcomponents-bundle to rollup
-      const body = html.replace(/<script src="(.*webcomponents-bundle.js)"><\/script>/, "");
+      const root = parseHtml(html);
+      for (const script of root.querySelectorAll("script[src]")) {
+        if (
+          new URL(script.getAttribute("src"), serverUrl).pathname.endsWith(
+            "/webcomponents-bundle.js",
+          )
+        ) {
+          script.remove();
+        }
+      }
+      const body = root.toString();
 
       await callback(page, body);
     });

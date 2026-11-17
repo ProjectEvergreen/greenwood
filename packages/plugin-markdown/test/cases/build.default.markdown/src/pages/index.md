@@ -13,3 +13,5 @@ console.log('hello world');
 ```
 
 <img src="#my-image.png" alt="just passing by"/>
+
+<outer-card><inner-card>Nested custom element content</inner-card></outer-card>

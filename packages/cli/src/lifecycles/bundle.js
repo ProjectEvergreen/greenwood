@@ -1,5 +1,6 @@
 // @ts-nocheck
 import fs from "node:fs/promises";
+import { removeOptimizationAttributes } from "../lib/html-utils.js";
 import {
   getRollupConfigForApiRoutes,
   getRollupConfigForBrowserScripts,
@@ -160,7 +161,7 @@ async function optimizeStaticPages(compilation, plugins) {
         }
 
         // clean up optimization markers
-        const body = (await response.text()).replace(/data-gwd-opt=".*?[a-z]"/g, "");
+        const body = removeOptimizationAttributes(await response.text());
 
         await fs.writeFile(
           new URL(getOutputHrefForStaticPath(staticPath, segment, outputHref)),
@@ -193,7 +194,7 @@ async function optimizeStaticPages(compilation, plugins) {
       }
 
       // clean up optimization markers
-      const body = (await response.text()).replace(/data-gwd-opt=".*?[a-z]"/g, "");
+      const body = removeOptimizationAttributes(await response.text());
 
       await fs.writeFile(new URL(outputHref), body);
     }
@@ -409,7 +410,6 @@ async function bundleSsrPages(compilation, optimizePlugins) {
       staticHtml = await (
         await optimizePage(new URL(`http://localhost:8080${route}`), plugins, staticHtml)
       ).text();
-      staticHtml = staticHtml.replace(/[`\\$]/g, "\\$&"); // https://stackoverflow.com/a/75688937/417806
 
       if (!(await checkResourceExists(outputPathRootUrl))) {
         await fs.mkdir(outputPathRootUrl, {
@@ -420,13 +420,13 @@ async function bundleSsrPages(compilation, optimizePlugins) {
       // would be nice to find out a better way to write out / generate this inline code "facade"
       // and how to calculate the relative path to the src/ page's entry point in the user's workspace
       // https://github.com/ProjectEvergreen/greenwood/pull/1482#issuecomment-2905643391
-      /* eslint-disable no-useless-escape */
       await fs.writeFile(
         entryFileOutputUrl,
         `
         import { executeRouteModule } from '${normalizePathnameForWindows(executeModuleUrl)}';
 
         const moduleUrl = new URL('${relativeDepth}${pagesPathDiff}${pagePath.replace("./", "")}', import.meta.url);
+        const staticHtml = ${JSON.stringify(staticHtml)};
 
         export async function handler(request, params) {
           const compilation = JSON.parse(\`${JSON.stringify({
@@ -439,13 +439,12 @@ async function bundleSsrPages(compilation, optimizePlugins) {
             .replace(/\\"/g, "&quote")
             .replace(/\\n/g, "")}\`);
           const data = await executeRouteModule({ moduleUrl, compilation, page, request, contentOptions: { body: true }, params });
-          let staticHtml = \`${staticHtml}\`;
+          // Replace Greenwood's generated placeholder without interpreting dollar tokens in the body.
+          const body = data.body
+            ? staticHtml.replace('<output for="content"></output>', () => data.body)
+            : staticHtml;
 
-          if (data.body) {
-            staticHtml = staticHtml.replace(\/\<output for="content">(.*)<\\/output>\/s, data.body);
-          }
-
-          return new Response(staticHtml, {
+          return new Response(body, {
             headers: {
               'Content-Type': 'text/html'
             }
@@ -453,7 +452,6 @@ async function bundleSsrPages(compilation, optimizePlugins) {
         }
       `,
       );
-      /* eslint-enable no-useless-escape */
 
       input.push({
         id,

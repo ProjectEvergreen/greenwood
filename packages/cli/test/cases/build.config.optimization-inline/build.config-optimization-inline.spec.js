@@ -67,12 +67,12 @@ describe("Build Greenwood With: ", function () {
       });
 
       describe("<script> tags and files", function () {
-        it("should contain three <script> tags in the <head>", function () {
+        it("should contain the expected number of <script> tags in the <head>", function () {
           const allScriptTags = Array.from(
             dom.window.document.querySelectorAll('head script[type="module"]'),
           ).filter((tag) => !tag.getAttribute("data-gwd"));
 
-          expect(allScriptTags.length).to.be.equal(3);
+          expect(allScriptTags.length).to.be.equal(4);
         });
 
         it("should contain no <script> tags in the <head> with a src", function () {
@@ -129,6 +129,14 @@ describe("Build Greenwood With: ", function () {
             "class t extends HTMLElement{constructor(){super(),this.list=[]}find(t){this.list.findIndex(e=>new RegExp(`^${t}$`).test(e.route))}}export{t as Baz};",
           );
         });
+      });
+
+      it("should preserve markup-looking strings and replacement tokens in optimized inline JavaScript", function () {
+        const script = dom.window.document.querySelector("#raw-html-payload").textContent;
+        expect(script).to.contain(
+          "<head>costs $& $$ $1 $` and <output for='content'></output></head>",
+        );
+        expect(script).to.match(/^globalThis\.__HTML_PAYLOAD__=/);
       });
 
       describe("<link> tags as <style> tags and file output", function () {

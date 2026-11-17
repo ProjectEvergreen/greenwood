@@ -14,6 +14,7 @@ import * as acornWalk from "acorn-walk";
 import * as acorn from "acorn";
 import { hashString } from "@greenwood/cli/src/lib/hashing-utils.js";
 import { ACORN_OPTIONS } from "@greenwood/cli/src/lib/parsing-utils.js";
+import { createHtmlElement, insertHtml } from "@greenwood/cli/src/lib/html-utils.js";
 
 async function getTransformedScriptContents(scriptUrl, compilation) {
   const resourcePlugins = compilation.config.plugins
@@ -184,15 +185,7 @@ class ScanForCssModulesResource {
 
       const sheets = [...cssModules.values()].map((cssModule) => cssModule.contents);
 
-      const newBody = body.replace(
-        "</head>",
-        `
-          <style>
-            ${sheets.join("\n")}
-          </style>
-        </head>
-      `,
-      );
+      const newBody = insertHtml(body, createHtmlElement("style", {}, sheets.join("\n")));
 
       return new Response(newBody);
     } else if (protocol === "file:" && pathname.endsWith(this.extensions[0])) {

@@ -95,6 +95,12 @@ describe("Serve Greenwood With: ", function () {
         expect(headings[0].textContent).to.equal("Hello from the server rendered home page!");
       });
 
+      it("should preserve replacement tokens in generated SSR handler output", function () {
+        expect(dom.window.document.querySelector("#replacement-tokens").textContent).to.equal(
+          "costs $& $$ $1 $` $' and \\ backslashes",
+        );
+      });
+
       it("should have the expected bundled SSR output for the page entry point and chunk file", async function () {
         const scriptFiles = await glob.promise(path.join(this.context.publicDir, "index*.js"));
 

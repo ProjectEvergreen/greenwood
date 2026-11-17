@@ -9,6 +9,7 @@ import { fileUrlToResolvedPrefixPath, checkResourceExists } from "../../lib/reso
 import { getStaticPages, getMatchingPageByRoute } from "../../lib/graph-utils.js";
 import { getStaticRouteFromDynamicRoute } from "../../lib/url-utils.js";
 import fs from "node:fs/promises";
+import { parseHtml, createHtmlElement, insertHtml } from "../../lib/html-utils.js";
 
 class StaticRouterResource {
   constructor(compilation) {
@@ -42,14 +43,12 @@ class StaticRouterResource {
   }
 
   async intercept(url, request, response) {
-    let body = await response.text();
-
-    body = body.replace(
-      "</head>",
-      `
-      <script type="module" src="${fileUrlToResolvedPrefixPath(new URL("../../lib/router.js", import.meta.url))}"></script>\n
-      </head>
-    `,
+    const body = insertHtml(
+      await response.text(),
+      createHtmlElement("script", {
+        type: "module",
+        src: fileUrlToResolvedPrefixPath(new URL("../../lib/router.js", import.meta.url)),
+      }),
     );
 
     return new Response(body);
@@ -64,7 +63,7 @@ class StaticRouterResource {
   }
 
   async optimize(url, response) {
-    let body = await response.text();
+    const root = parseHtml(await response.text());
     const { basePath } = this.compilation.config;
     const { pathname } = url;
     const staticPages = getStaticPages(this.compilation);
@@ -73,10 +72,8 @@ class StaticRouterResource {
       pathname,
     );
     const { outputDir } = this.compilation.context;
-    const partial = body
-      .match(/<body>(.*)<\/body>/s)[0]
-      .replace("<body>", "")
-      .replace("</body>", "");
+    const bodyNode = root.querySelector("body");
+    const partial = bodyNode.innerHTML;
     const outputPartialDirUrl = new URL(
       `./_routes${url.pathname.replace(basePath, "")}`,
       outputDir,
@@ -101,9 +98,13 @@ class StaticRouterResource {
               currentLayout = layout;
             }
 
-            routeTags.push(`
-              <greenwood-route data-route="${staticRoute}" data-layout="${layout}" data-key="${basePath}/_routes${key}/index.html"></greenwood-route>
-            `);
+            routeTags.push(
+              createHtmlElement("greenwood-route", {
+                "data-route": staticRoute,
+                "data-layout": String(layout),
+                "data-key": `${basePath}/_routes${key}/index.html`,
+              }),
+            );
           });
         } else {
           const key =
@@ -113,9 +114,13 @@ class StaticRouterResource {
             currentLayout = layout;
           }
 
-          routeTags.push(`
-            <greenwood-route data-route="${route}" data-layout="${layout}" data-key="${basePath}/_routes${key}/index.html"></greenwood-route>
-          `);
+          routeTags.push(
+            createHtmlElement("greenwood-route", {
+              "data-route": route,
+              "data-layout": String(layout),
+              "data-key": `${basePath}/_routes${key}/index.html`,
+            }),
+          );
         }
       });
 
@@ -129,32 +134,21 @@ class StaticRouterResource {
       await fs.writeFile(new URL("./index.html", outputPartialDirUrl), partial);
     }
 
-    body = body
-      .replace(
-        "</head>",
-        `
-          <script data-gwd="static-router">
-            globalThis.__greenwood = globalThis.__greenwood || {};
-            globalThis.__greenwood.currentLayout = "${currentLayout}";
-          </script>
-        </head>
-      `,
-      )
-      .replace(
-        /<body>(.*)<\/body>/s,
-        `
-        <body>\n
+    root.querySelector("head")?.appendChild(
+      createHtmlElement(
+        "script",
+        { "data-gwd": "static-router" },
+        `globalThis.__greenwood = globalThis.__greenwood || {};
+       globalThis.__greenwood.currentLayout = ${JSON.stringify(String(currentLayout))};`,
+      ),
+    );
+    const outlet = createHtmlElement("router-outlet");
+    const children = [...bodyNode.childNodes];
 
-          <router-outlet>
-            ${partial.replace(/\$/g, "$$$")}\n
-          </router-outlet>
+    bodyNode.set_content([outlet, ...routeTags]);
+    outlet.append(...children);
 
-          ${routeTags.join("\n")}
-        </body>
-      `,
-      );
-
-    return new Response(body);
+    return new Response(root.toString());
   }
 }
 

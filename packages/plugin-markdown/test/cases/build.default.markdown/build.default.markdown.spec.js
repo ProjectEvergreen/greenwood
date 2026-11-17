@@ -87,6 +87,14 @@ describe("Build Greenwood With: ", function () {
         expect(code[0].textContent).to.contain("console.log('hello world');");
       });
 
+      it("should unwrap custom elements while preserving their nested content", function () {
+        const document = dom.window.document;
+        expect(document.querySelector("outer-card").parentElement).to.equal(document.body);
+        expect(document.querySelector("outer-card inner-card").textContent).to.equal(
+          "Nested custom element content",
+        );
+      });
+
       it("should correctly render markdown with an HTML <img> tag in it", function () {
         const images = dom.window.document.querySelectorAll("body img");
         const myImage = images[0];

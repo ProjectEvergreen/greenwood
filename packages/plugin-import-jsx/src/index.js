@@ -12,6 +12,7 @@ import {
 } from "@greenwood/cli/src/lib/node-modules-utils.js";
 import { getMatchingPageByRoute } from "@greenwood/cli/src/lib/graph-utils.js";
 import { fileUrlToResolvedPrefixPath } from "@greenwood/cli/src/lib/resource-utils.js";
+import { createHtmlElement } from "@greenwood/cli/src/lib/html-utils.js";
 
 const compilerRoot = getPackageRoot("wc-compiler", import.meta.url);
 const pluginImports = {
@@ -109,10 +110,14 @@ class ImportJsxResource {
 
     const scriptType =
       process.env.__GWD_COMMAND__ === "develop" && polyfills.importMaps ? "module-shim" : "module";
-    const signalScript = `<script type="${scriptType}">
+    const signalScript = createHtmlElement(
+      "script",
+      { type: scriptType },
+      `
       import { Signal } from '${signalPolyfillSpecifier}';
       globalThis.Signal = Signal;
-    </script>`;
+    `,
+    );
 
     newBody = insertAfterImportMap(newBody, signalScript);
     return new Response(newBody);

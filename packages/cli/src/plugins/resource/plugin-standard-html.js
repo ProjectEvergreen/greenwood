@@ -11,7 +11,7 @@ import { requestAsObject } from "../../lib/resource-utils.js";
 import { getMatchingDynamicSsrRoute, getParamsFromSegment } from "../../lib/url-utils.js";
 import { getMatchingPageByRoute } from "../../lib/graph-utils.js";
 import { Worker } from "node:worker_threads";
-import { parse } from "node-html-parser";
+import { parseHtml, createHtmlElement, setHtmlText } from "../../lib/html-utils.js";
 
 class StandardHtmlResource {
   constructor(compilation) {
@@ -172,120 +172,87 @@ class StandardHtmlResource {
     const { optimization, basePath } = this.compilation.config;
     const { pathname } = url;
     const pageResources = getMatchingPageByRoute(this.compilation, pathname).resources;
-    let body = await response.text();
-
-    const root = parse(body, {
-      blockTextElements: {
-        noscript: false,
-        pre: false,
-      },
-    });
+    const root = parseHtml(await response.text());
+    // Capture original identities before mutating nodes, including repeated resources.
+    const tags = root.querySelectorAll("script, link, style").map((tag) => ({
+      tag,
+      type: tag.localName,
+      src: tag.getAttribute(tag.localName === "link" ? "href" : "src"),
+      contents: tag.innerHTML,
+    }));
 
     for (const pageResource of pageResources) {
-      const keyedResource = this.compilation.resources.get(pageResource);
       const { contents, src, type, optimizationAttr, optimizedFileContents, optimizedFileName } =
-        keyedResource;
+        this.compilation.resources.get(pageResource);
+      const matches = tags.filter(
+        (entry) =>
+          entry.type === type &&
+          (type !== "link" || entry.tag.getAttribute("rel") === "stylesheet") &&
+          (src ? entry.src === src : !entry.src && entry.contents === contents),
+      );
 
-      if (src) {
-        if (type === "script") {
-          const tag = root
-            .querySelectorAll("script")
-            .find((script) => script.getAttribute("src") === src);
-
+      for (const { tag } of matches) {
+        if (src && type === "script") {
           if (!optimizationAttr && (optimization === "default" || optimization === "none")) {
             const optimizedFilePath = `${basePath}/${optimizedFileName}`;
 
-            body = body.replace(src, optimizedFilePath);
-            body = body.replace(
-              "<head>",
-              `
-              <head>
-              <link rel="modulepreload" href="${optimizedFilePath}" as="script">
-            `,
+            tag.setAttribute("src", optimizedFilePath);
+            root.querySelector("head")?.prepend(
+              createHtmlElement("link", {
+                rel: "modulepreload",
+                href: optimizedFilePath,
+                as: "script",
+              }),
             );
           } else if (optimizationAttr === "inline" || optimization === "inline") {
-            const isModule = tag.rawAttrs.indexOf('type="module') >= 0 ? ' type="module"' : "";
+            const attributes = tag.getAttribute("type")?.startsWith("module")
+              ? { type: "module" }
+              : {};
 
-            body = body.replace(
-              `<script ${tag.rawAttrs}></script>`,
-              `
-              <script ${isModule}>
-                ${optimizedFileContents.replace(/\.\//g, `${basePath}/`).replace(/\$/g, "$$$")}
-              </script>
-            `,
+            tag.replaceWith(
+              createHtmlElement(
+                "script",
+                attributes,
+                optimizedFileContents.replace(/\.\//g, () => `${basePath}/`),
+              ),
             );
           } else if (optimizationAttr === "static" || optimization === "static") {
-            body = body.replace(`<script ${tag.rawAttrs}></script>`, "");
+            tag.remove();
           }
-        } else if (type === "link") {
-          const tag = root
-            .querySelectorAll("link")
-            .find((link) => link.getAttribute("href") === src);
-
+        } else if (src && type === "link") {
           if (optimizationAttr !== "inline" && optimization !== "inline") {
             const optimizedFilePath = `${basePath}/${optimizedFileName}`;
 
-            body = body.replace(src, optimizedFilePath);
-            body = body.replace(
-              "<head>",
-              `
-              <head>
-              <link rel="preload" href="${optimizedFilePath}" as="style" crossorigin="anonymous"></link>
-            `,
-            );
-          } else if (optimizationAttr === "inline" || optimization === "inline") {
-            // https://github.com/ProjectEvergreen/greenwood/issues/810
-            // when pre-rendering, puppeteer normalizes everything to <link .../>
-            // but if not using pre-rendering, then it could come out as <link ...></link>
-            // not great, but best we can do for now until #742
-            body = body
-              .replace(
-                `<link ${tag.rawAttrs}>`,
-                `
-              <style>
-                ${optimizedFileContents}
-              </style>
-            `,
-              )
-              .replace(
-                `<link ${tag.rawAttrs}/>`,
-                `
-              <style>
-                ${optimizedFileContents}
-              </style>
-            `,
-              );
-          }
-        }
-      } else {
-        if (type === "script") {
-          const tag = root
-            .querySelectorAll("script")
-            .find((script) => script.innerHTML === contents);
-
-          if (optimizationAttr === "static" || optimization === "static") {
-            body = body.replace(
-              `<script ${tag.rawAttrs}>${contents.replace(/\.\//g, "/").replace(/\$/g, "$$$")}</script>`,
-              "",
-            );
-          } else if (optimizationAttr === "none") {
-            body = body.replace(
-              contents,
-              contents.replace(/\.\//g, `${basePath}/`).replace(/\$/g, "$$$"),
+            tag.setAttribute("href", optimizedFilePath);
+            root.querySelector("head")?.prepend(
+              createHtmlElement("link", {
+                rel: "preload",
+                href: optimizedFilePath,
+                as: "style",
+                crossorigin: "anonymous",
+              }),
             );
           } else {
-            body = body.replace(
-              contents,
-              optimizedFileContents.replace(/\.\//g, `${basePath}/`).replace(/\$/g, "$$$"),
+            tag.replaceWith(createHtmlElement("style", {}, optimizedFileContents));
+          }
+        } else if (type === "script") {
+          if (optimizationAttr === "static" || optimization === "static") {
+            tag.remove();
+          } else {
+            const script = optimizationAttr === "none" ? contents : optimizedFileContents;
+
+            setHtmlText(
+              tag,
+              script.replace(/\.\//g, () => `${basePath}/`),
             );
           }
         } else if (type === "style") {
-          body = body.replace(contents, optimizedFileContents);
+          setHtmlText(tag, optimizedFileContents);
         }
       }
     }
 
-    return new Response(body);
+    return new Response(root.toString());
   }
 }
 

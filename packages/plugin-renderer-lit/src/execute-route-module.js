@@ -4,6 +4,7 @@ const { render, LitElementRenderer } = await import("@lit-labs/ssr");
 import { collectResult } from "@lit-labs/ssr/lib/render-result.js";
 import { html, literal, unsafeStatic } from "lit/static-html.js";
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
+import { parseHtml } from "@greenwood/cli/src/lib/html-utils.js";
 
 async function executeRouteModule({
   moduleUrl,
@@ -128,10 +129,10 @@ async function executeRouteModule({
 
         const ssrResult = render(pageTemplate);
         const ssrContent = await collectResult(ssrResult);
-        const ssrContentsMatch =
-          /<template shadowroot="open" shadowrootmode="open">(.*.)<\/template>/s;
 
-        data.body = ssrContent.match(ssrContentsMatch)[1];
+        data.body = parseHtml(ssrContent).querySelector(
+          'template[shadowrootmode="open"]',
+        ).innerHTML;
       } else if (getBody) {
         const templateResult = await getBody(compilation, page, request, params);
 
@@ -176,10 +177,10 @@ async function executeRouteModule({
 
         const ssrResult = render(layoutTemplate);
         const ssrContent = await collectResult(ssrResult);
-        const ssrContentsMatch =
-          /<template shadowroot="open" shadowrootmode="open">(.*.)<\/template>/s;
 
-        data.layout = ssrContent.match(ssrContentsMatch)[1];
+        data.layout = parseHtml(ssrContent).querySelector(
+          'template[shadowrootmode="open"]',
+        ).innerHTML;
       } else if (getLayout) {
         const templateResult = await getLayout(compilation, page, request, params);
 

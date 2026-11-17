@@ -22,6 +22,7 @@
  *     index.html
  */
 import { expect } from "chai";
+import { JSDOM } from "jsdom";
 import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
@@ -83,7 +84,8 @@ describe("Serve Greenwood With: ", function () {
 
       it("should return the correct response body", function (done) {
         expect(body).to.contain("<h2>Analog</h2>");
-        expect(body).to.contain('<img src="/assets/analog.png" alt="Analog"/>');
+        const image = new JSDOM(body).window.document.querySelector('img[alt="Analog"]');
+        expect(image.getAttribute("src")).to.equal("/assets/analog.png");
         done();
       });
     });

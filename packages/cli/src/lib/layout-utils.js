@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
-import { parse, valid } from "node-html-parser";
+import { valid, HTMLElement } from "node-html-parser";
+import { parseHtml, createHtmlElement, insertHtml } from "./html-utils.js";
 import { checkResourceExists } from "./resource-utils.js";
 import { Worker } from "node:worker_threads";
 import { asyncFilter } from "./async-utils.js";
@@ -67,8 +68,8 @@ async function mergeContentIntoLayout(
 ) {
   const activeFrontmatterTitleKey = "${globalThis.page.title}";
   // keep comments, especially for SSR placeholder markers
-  const parentRoot = parentContents && parse(parentContents, { comment: true });
-  const childRoot = parse(childContents, { comment: true });
+  const parentRoot = parentContents ? parseHtml(parentContents) : null;
+  const childRoot = parseHtml(childContents);
   let mergedContents = "";
 
   if ((parentContents && !valid(parentContents)) || (childContents && !valid(childContents))) {
@@ -82,20 +83,17 @@ async function mergeContentIntoLayout(
         ? childContents
         : (parentContents ?? `<html><body></body></html>`);
 
-      mergedContents = validContents.replace(
-        "<body>",
-        `
-        <body>
-          <div style="position: absolute; width: auto; border: dotted 3px red; background-color: white; opacity: 0.75; padding: 1% 1% 0">
-            <p>Malformed HTML detected, please check your closing tags or an <a href="https://www.google.com/search?q=html+formatter" target="_blank" rel="noreferrer">HTML formatter</a>.</p>
-            <details>
-              <pre>
-                ${invalidContents.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;")}
-              </pre>
-            </details>
-          </div>
-        `,
+      const root = parseHtml(validContents);
+      const hud = parseHtml(
+        '<div style="position: absolute; width: auto; border: dotted 3px red; background-color: white; opacity: 0.75; padding: 1% 1% 0"><p>Malformed HTML detected, please check your closing tags or an <a href="https://www.google.com/search?q=html+formatter" target="_blank" rel="noreferrer">HTML formatter</a>.</p><details><pre></pre></details></div>',
       );
+      hud.querySelector("pre").textContent = invalidContents
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+      root.querySelector("body")?.prepend(...hud.childNodes);
+      mergedContents = root.toString();
     }
   } else {
     // only merge custom page imports if we are handling a page into a layout to not duplication entries in the final HTML
@@ -148,26 +146,20 @@ async function mergeContentIntoLayout(
               : "";
     }
 
-    const mergedHtml =
-      childRoot &&
-      childRoot.querySelector("html") &&
-      childRoot.querySelector("html")?.rawAttrs !== ""
-        ? `<html ${childRoot.querySelector("html").rawAttrs}>`
-        : parentRoot &&
-            parentRoot.querySelector("html") &&
-            parentRoot.querySelector("html")?.rawAttrs !== ""
-          ? `<html ${parentRoot.querySelector("html").rawAttrs}>`
-          : "<html>";
+    const htmlAttributes =
+      childRoot.querySelector("html")?.rawAttrs ||
+      parentRoot?.querySelector("html")?.rawAttrs ||
+      "";
 
     const mergedMeta = [
       ...((parentRoot && parentRoot?.querySelectorAll("head meta")) ?? []),
       ...[...((childRoot && childRoot.querySelectorAll("head meta")) || [])],
-    ].join("\n");
+    ];
 
     const mergedLinks = dedupeMergedResourceTags([
       ...((parentRoot && parentRoot?.querySelectorAll("head link")) ?? []),
       ...[...((childRoot && childRoot.querySelectorAll("head link")) || [])],
-    ]).join("\n");
+    ]);
 
     const mergedStyles = [
       ...((parentRoot && parentRoot?.querySelectorAll("head style")) ?? []),
@@ -202,10 +194,14 @@ async function mergeContentIntoLayout(
       ).map((resource) => {
         const [href, ...attributes] = resource.split(" ");
         const attrs = attributes?.length > 0 ? attributes.join(" ") : "";
+        const element = new HTMLElement("link", {}, attrs);
 
-        return `<link rel="stylesheet" href="${href}" ${attrs}></link>`;
+        element.setAttribute("rel", "stylesheet");
+        element.setAttribute("href", href);
+
+        return element;
       }),
-    ].join("\n");
+    ];
 
     const mergedScripts = dedupeMergedResourceTags([
       ...((parentRoot && parentRoot?.querySelectorAll("head script")) || []),
@@ -240,35 +236,29 @@ async function mergeContentIntoLayout(
       ).map((resource) => {
         const [src, ...attributes] = resource.split(" ");
         const attrs = attributes?.length > 0 ? attributes.join(" ") : "";
+        const element = new HTMLElement("script", {}, attrs);
 
-        return `<script src="${src}" ${attrs}></script>`;
+        element.setAttribute("src", src);
+
+        return element;
       }),
-    ]).join("\n");
+    ]);
 
-    // // https://stackoverflow.com/a/51432792/417806
-    const outletRegex =
-      outletType === "content"
-        ? /<output for=(["'])((?:\\\1|(?:(?!\1)).)*)content(\1)><\/output>/
-        : /<output for=(["'])((?:\\\1|(?:(?!\1)).)*)page(\1)><\/output>/;
+    const parentBodyNode = parentRoot?.querySelector("body");
+    const outlet =
+      parentBodyNode?.querySelector(`output[for="${outletType}"]`) ??
+      (outletType === "content" ? parentRoot?.querySelector('output[for="content"]') : null);
 
-    // we need to make sure that if parent layouts don't have an "output" tag
-    // then we _do not_ favor the child contents in that case
-    // this can happen in the case of context plugins in which pages may _only_ be used for loading a layout
-    // https://github.com/ProjectEvergreen/greenwood/pull/1527
-    let finalBody =
-      parentBody && parentBody.match(outletRegex)
-        ? parentBody.replace(outletRegex, () => childBody ?? childContents)
-        : parentContents && parentContents.match(outletRegex) && outletType === "content"
-          ? parentContents.replace(outletRegex, () => childBody ?? childContents)
-          : parentBody
-            ? parentBody
-            : childRoot.querySelector("html") && childBody
-              ? childBody
-              : !childRoot.querySelector("html")
-                ? childRoot.querySelector("body")
-                  ? childBody
-                  : childContents
-                : "";
+    // A layout without an outlet keeps its own body (context-only pages depend on this).
+    let finalBody;
+    if (outlet) {
+      outlet.replaceWith(...parseHtml(childBody ?? childContents).childNodes);
+      finalBody = parentBodyNode ? parentBodyNode.innerHTML : parentRoot.toString();
+    } else {
+      finalBody =
+        parentBody ||
+        (childRoot.querySelector("html") ? childBody || "" : (childBody ?? childContents));
+    }
 
     // Only pages that prerender need these temporary markers to protect already-rendered SSR content.
     // https://github.com/ProjectEvergreen/greenwood/issues/1044
@@ -282,20 +272,23 @@ async function mergeContentIntoLayout(
       finalBody = `${SSR_START_MARKER}${finalBody}${SSR_END_MARKER}`;
     }
 
-    mergedContents = `<!DOCTYPE html>
-      ${mergedHtml}
-        <head>
-          <title>${title}</title>
-          ${mergedMeta}
-          ${mergedLinks}
-          ${mergedStyles}
-          ${mergedScripts}
-        </head>
-        <body>
-          ${finalBody}
-        </body>
-      </html>
-    `;
+    const root = parseHtml("<!DOCTYPE html>");
+    const html = new HTMLElement("html", {}, htmlAttributes);
+    const head = createHtmlElement("head");
+
+    head.appendChild(createHtmlElement("title", {}, title));
+
+    for (const node of [...mergedMeta, ...mergedLinks, ...mergedStyles, ...mergedScripts]) {
+      head.appendChild(node);
+    }
+
+    const body = createHtmlElement("body");
+
+    body.append(...parseHtml(finalBody).childNodes);
+    html.append(head, body);
+    root.appendChild(html);
+
+    mergedContents = root.toString();
   }
 
   return mergedContents;
@@ -454,17 +447,16 @@ async function getAppLayout(pageLayoutContents, compilation, matchingRoute) {
 async function getGreenwoodScripts(contents, compilation) {
   const { config } = compilation;
 
-  contents = contents.replace(
-    "<head>",
-    `
-    <head>
-      <script data-gwd="base-path">
-        globalThis.__GWD_BASE_PATH__ = '${config.basePath}';
-      </script>
-  `,
+  return insertHtml(
+    contents,
+    createHtmlElement(
+      "script",
+      { "data-gwd": "base-path" },
+      `globalThis.__GWD_BASE_PATH__ = '${config.basePath}';`,
+    ),
+    "head",
+    true,
   );
-
-  return contents;
 }
 
 export { getAppLayout, getPageLayout, getGreenwoodScripts };

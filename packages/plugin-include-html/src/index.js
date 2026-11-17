@@ -1,4 +1,5 @@
 import fs from "node:fs/promises";
+import { parseHtml } from "@greenwood/cli/src/lib/html-utils.js";
 
 class IncludeHtmlResource {
   constructor(compilation) {
@@ -12,47 +13,33 @@ class IncludeHtmlResource {
   }
 
   async intercept(url, request, response) {
-    let body = await response.text();
-    const includeLinksRegexMatches = body.match(/<link (.*)>/g);
-    const includeCustomElementsRegexMatches = body.match(
-      /<[a-zA-Z]*-[a-zA-Z](.*)>(.*)<\/[a-zA-Z]*-[a-zA-Z](.*)>/g,
-    );
+    const root = parseHtml(await response.text());
+    const links = root.querySelectorAll('link[rel="html"]');
+    const customElements = root
+      .querySelectorAll("[src]")
+      .filter((node) => node.localName.includes("-"));
 
-    if (includeLinksRegexMatches) {
-      const htmlIncludeLinks = includeLinksRegexMatches.filter(
-        (link) => link.indexOf('rel="html"') > 0,
+    for (const link of links) {
+      const href = link.getAttribute("href");
+      const prefix = href.startsWith("/") ? "." : "";
+      const contents = await fs.readFile(
+        new URL(`${prefix}${href}`, this.compilation.context.userWorkspace),
+        "utf-8",
       );
-
-      for (const link of htmlIncludeLinks) {
-        const href = link.match(/href="(.*)"/)[1];
-        const prefix = href.startsWith("/") ? "." : "";
-        const includeContents = await fs.readFile(
-          new URL(`${prefix}${href}`, this.compilation.context.userWorkspace),
-          "utf-8",
-        );
-
-        body = body.replace(link, includeContents);
-      }
+      link.replaceWith(...parseHtml(contents).childNodes);
     }
 
-    if (includeCustomElementsRegexMatches) {
-      const customElementTags = includeCustomElementsRegexMatches.filter(
-        (customElementTag) => customElementTag.indexOf("src=") > 0,
+    for (const tag of customElements) {
+      const src = tag.getAttribute("src");
+      const srcUrl = new URL(
+        `./${src.replace(/\.\.\//g, "")}`,
+        this.compilation.context.userWorkspace,
       );
-
-      for (const tag of customElementTags) {
-        const src = tag.match(/src="(.*)"/)[1];
-        const srcUrl = new URL(
-          `./${src.replace(/\.\.\//g, "")}`,
-          this.compilation.context.userWorkspace,
-        );
-        // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
-        const { getData, getTemplate } = await import(srcUrl);
-        const includeContents = await getTemplate(await getData());
-
-        body = body.replace(tag, includeContents);
-      }
+      // @ts-expect-error see https://github.com/microsoft/TypeScript/issues/42866
+      const { getData, getTemplate } = await import(srcUrl);
+      tag.replaceWith(...parseHtml(await getTemplate(await getData())).childNodes);
     }
+    const body = root.toString();
 
     return new Response(body, {
       headers: response.headers,
