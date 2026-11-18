@@ -1,4 +1,4 @@
-import theme from "../../styles/theme.css" with { type: "css" };
+import theme from "../../styles/theme-$&.css" with { type: "css" };
 import sheet from "./card.css" with { type: "css" };
 import data from "./card.json" with { type: "json" };
 import SpectrumCard from "@spectrum-css/card" with { type: "css" };

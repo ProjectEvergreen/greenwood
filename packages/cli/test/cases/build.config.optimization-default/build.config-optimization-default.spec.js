@@ -25,7 +25,7 @@
  *   pages/
  *     index.html
  *   styles/
- *     main.css
+ *     main-$&.css
  *     theme.css
  *     tokens.css
  *   system/
@@ -91,7 +91,7 @@ describe("Build Greenwood With: ", function () {
           "/components/header.js",
         );
         expect(dom.window.document.querySelector("#resource-example").textContent).to.equal(
-          "  /components/header.js\n /styles/main.css ",
+          "  /components/header.js\n /styles/main-$&.css ",
         );
       });
 
@@ -131,10 +131,13 @@ describe("Build Greenwood With: ", function () {
       });
 
       describe("<link> tag and preloading", function () {
-        it("should contain one style.css in the output directory", async function () {
-          expect(
-            await glob.promise(`${path.join(this.context.publicDir, "styles")}/main.*.css`),
-          ).to.have.lengthOf(1);
+        it("should preserve replacement tokens in the emitted stylesheet filename", async function () {
+          const styles = await glob.promise(
+            `${path.join(this.context.publicDir, "styles")}/main-*.css`,
+          );
+
+          expect(styles).to.have.lengthOf(1);
+          expect(path.basename(styles[0])).to.match(/^main-\$&\.[a-zA-Z0-9_-]+\.css$/);
         });
 
         it("should have the expected <link> tag in the <head>", function () {
@@ -234,7 +237,7 @@ describe("Build Greenwood With: ", function () {
 
           it("should have the expected @font-face file bundle path in the referenced <style> tag in index.html", async function () {
             const mainCss = await glob.promise(
-              `${path.join(this.context.publicDir, "styles")}/main.*.css`,
+              `${path.join(this.context.publicDir, "styles")}/main-*.css`,
             );
             const contents = await fs.promises.readFile(mainCss[0], "utf-8");
 

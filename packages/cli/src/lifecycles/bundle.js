@@ -223,7 +223,7 @@ async function bundleStyleResources(compilation, resourcePlugins) {
             ? `${basenamePieces[0]}.${hashString(contents)}.css`
             : fileNamePieces
                 .join("/")
-                .replace(basename, `${basenamePieces[0]}.${hashString(contents)}.css`);
+                .replace(basename, () => `${basenamePieces[0]}.${hashString(contents)}.css`);
       } else {
         optimizedFileName = `${hashString(contents)}.css`;
       }

@@ -76,7 +76,7 @@ function getParamsFromSegment(compilation, segment, route) {
 
 // get the full route for a static path
 function getStaticRouteFromDynamicRoute(dynamicStaticPath, segment, route) {
-  return `${route.replace(`[${segment.key}]`, dynamicStaticPath.params[segment.key])}`;
+  return `${route.replace(`[${segment.key}]`, () => dynamicStaticPath.params[segment.key])}`;
 }
 
 // decodeURIComponent throws URIError on a "%" that does not start a valid escape

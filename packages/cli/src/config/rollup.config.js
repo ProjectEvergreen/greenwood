@@ -576,7 +576,7 @@ function greenwoodSyncImportAttributes(compilation) {
                 ) {
                   bundles[bundle].code = bundles[bundle].code.replace(
                     value,
-                    `/${resource.optimizedFileName}`,
+                    () => `/${resource.optimizedFileName}`,
                   );
                   preBundled = true;
                 }

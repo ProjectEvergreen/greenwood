@@ -164,6 +164,7 @@ describe("Build Greenwood With: ", function () {
           const styleTags = dom.window.document.querySelectorAll("head style");
 
           expect(styleTags[1].textContent).to.contain("body{color:red}");
+          expect(styleTags[1].textContent).to.contain("[data-price='costs $& $$ $1']");
         });
       });
     });
