@@ -7,7 +7,7 @@ import fs from "node:fs/promises";
 import { realpathSync } from "node:fs";
 import { findPackageJSON } from "node:module";
 import { pathToFileURL } from "node:url";
-import { parse } from "node-html-parser";
+import { parseHtml, createHtmlElement, setHtmlText } from "./html-utils.js";
 import { resolve } from "./vendor/import-meta-resolve.js";
 
 // Find a package's real directory from its manifest, including packages with no module entry point.
@@ -81,7 +81,7 @@ async function getPackageJsonForProject({ userWorkspace, projectDirectory }) {
 const IMPORT_MAP_SELECTOR = 'head > script[type="importmap"], head > script[type="importmap-shim"]';
 
 function getImportMap(html = "") {
-  const script = parse(html).querySelector(IMPORT_MAP_SELECTOR);
+  const script = parseHtml(html).querySelector(IMPORT_MAP_SELECTOR);
 
   return script ? JSON.parse(script.textContent) : { imports: {} };
 }
@@ -91,9 +91,7 @@ function mergeImportMap(html = "", { imports = {}, scopes = {} } = {}, shouldShi
     return html;
   }
 
-  // Keep comment: true: SSR markers prevent already rendered content from being prerendered again.
-  // https://github.com/ProjectEvergreen/greenwood/issues/1831
-  const root = parse(html, { comment: true });
+  const root = parseHtml(html);
   const script = root.querySelector(IMPORT_MAP_SELECTOR);
   const existing = script ? JSON.parse(script.textContent) : {};
   const mergedScopes = { ...scopes, ...existing.scopes };
@@ -111,14 +109,18 @@ function mergeImportMap(html = "", { imports = {}, scopes = {} } = {}, shouldShi
   const contents = JSON.stringify(merged, null, 2);
 
   if (script) {
-    script.set_content(contents);
+    setHtmlText(script, contents);
     script.setAttribute("type", shouldShim ? "importmap-shim" : "importmap");
   } else {
-    root
-      .querySelector("head")
-      ?.prepend(
-        `<script type="${shouldShim ? "importmap-shim" : "importmap"}">${contents}</script>`,
-      );
+    root.querySelector("head")?.prepend(
+      createHtmlElement(
+        "script",
+        {
+          type: shouldShim ? "importmap-shim" : "importmap",
+        },
+        contents,
+      ),
+    );
   }
 
   return root.toString();
@@ -127,7 +129,7 @@ function mergeImportMap(html = "", { imports = {}, scopes = {} } = {}, shouldShi
 // Both Lit hydration and JSX Signals must follow the map and precede user module scripts.
 function insertAfterImportMap(html, scriptContents) {
   // Keep comment: true here too, so script insertion preserves the SSR markers per `mergeImportMap`.
-  const root = parse(html, { comment: true });
+  const root = parseHtml(html);
   const script = root.querySelector(IMPORT_MAP_SELECTOR);
 
   if (script) {

@@ -21,6 +21,11 @@
       export { Baz };
     </script>
 
+    <script type="module" id="raw-html-payload">
+      globalThis.__HTML_PAYLOAD__ =
+        "<head>costs $& $$ $1 $` and <output for='content'></output></head>";
+    </script>
+
     <script data-gwd-opt="static" type="module">
       console.log("I should not be here");
     </script>

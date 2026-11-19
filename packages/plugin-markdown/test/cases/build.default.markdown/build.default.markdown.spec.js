@@ -87,6 +87,25 @@ describe("Build Greenwood With: ", function () {
         expect(code[0].textContent).to.contain("console.log('hello world');");
       });
 
+      it("should unwrap custom elements while preserving their nested content", function () {
+        const document = dom.window.document;
+
+        expect(document.querySelector("outer-card").parentElement).to.equal(document.body);
+        expect(document.querySelector("outer-card inner-card").textContent).to.equal(
+          "Nested custom element content",
+        );
+      });
+
+      // https://github.com/ProjectEvergreen/greenwood/discussions/1267
+      it("should unwrap a custom element with multiline attributes and a closing tag on a separate line", function () {
+        const document = dom.window.document;
+        const latestPost = document.querySelector("app-latest-post");
+
+        expect(latestPost.parentElement).to.equal(document.body);
+        expect(latestPost.getAttribute("link")).to.equal("/blog/release/v0.30.0/");
+        expect(latestPost.getAttribute("title")).to.equal("We just launched v0.30.0");
+      });
+
       it("should correctly render markdown with an HTML <img> tag in it", function () {
         const images = dom.window.document.querySelectorAll("body img");
         const myImage = images[0];

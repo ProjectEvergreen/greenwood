@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import { Worker } from "node:worker_threads";
-import { parse } from "node-html-parser";
+import { parseHtml } from "../lib/html-utils.js";
 import {
   checkResourceExists,
   trackResourcesForRoute,
@@ -135,7 +135,7 @@ async function executePageScripts(compilation, workerPrerender, pool, page, html
   }
 
   if (development) {
-    const root = parse(body, { comment: true });
+    const root = parseHtml(body);
     const { optimization } = compilation.config;
 
     for (const script of root.querySelectorAll("script")) {
@@ -218,13 +218,24 @@ async function preRenderCompilationCustom(compilation, customPrerender) {
     const scratchUrl = toScratchUrl(outputHref, context);
 
     // clean up special Greenwood dev only assets that would come through if prerendering with a headless browser
-    if (importMaps) {
-      body = body.replace(/<script type="importmap-shim">.*?<\/script>/s, "");
-      body = body.replace(/<script defer="" src="(.*es-module-shims.js)"><\/script>/, "");
-      body = body.replace(/type="module-shim"/g, 'type="module"');
-    } else {
-      body = body.replace(/<script type="importmap">.*?<\/script>/s, "");
+    const root = parseHtml(body);
+    for (const script of root.querySelectorAll("script")) {
+      const type = script.getAttribute("type");
+      const src = script.getAttribute("src");
+
+      if (
+        type === (importMaps ? "importmap-shim" : "importmap") ||
+        (importMaps &&
+          src &&
+          new URL(src, "http://localhost").pathname.endsWith("/es-module-shims.js"))
+      ) {
+        script.remove();
+      } else if (importMaps && type === "module-shim") {
+        script.setAttribute("type", "module");
+      }
     }
+
+    body = root.toString();
 
     await trackResourcesForRoute(body, compilation, route);
     await createOutputDirectory(new URL(scratchUrl.href.replace("index.html", "")));

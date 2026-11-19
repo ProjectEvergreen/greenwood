@@ -4,6 +4,7 @@ import { graphqlServer } from "./core/server.js";
 import { getAvailablePort } from "@greenwood/cli/src/lib/server-utils.js";
 import { mergeImportMap } from "@greenwood/cli/src/lib/node-modules-utils.js";
 import { startStandaloneServer } from "@apollo/server/standalone";
+import { parseHtml, createHtmlElement, insertHtml } from "@greenwood/cli/src/lib/html-utils.js";
 import { createCache } from "./core/cache.js";
 
 const DEFAULT_PORT = 4000;
@@ -11,9 +12,11 @@ const serverState = {
   port: DEFAULT_PORT,
 };
 const getPortScript = (port) => {
-  return `<script data-gwd-opt="none" data-graphql-port>
-          globalThis.__GWD_GRAPHQL_PORT__ = ${port};
-        </script>`;
+  return createHtmlElement(
+    "script",
+    { "data-gwd-opt": "none", "data-graphql-port": "" },
+    `globalThis.__GWD_GRAPHQL_PORT__ = ${port};`,
+  );
 };
 
 const importMap = Object.fromEntries(
@@ -65,11 +68,7 @@ class GraphQLResource {
       this.compilation?.config?.polyfills?.importMaps,
     );
 
-    newBody = newBody.replace(
-      "<head>",
-      `<head>
-        ${getPortScript(serverState.port)}`,
-    );
+    newBody = insertHtml(newBody, getPortScript(serverState.port), "head", true);
 
     return new Response(newBody);
   }
@@ -81,15 +80,19 @@ class GraphQLResource {
   async optimize(url, response) {
     let body = await response.text();
 
-    body = body.replace(getPortScript(serverState.port), "");
-    body = body.replace(
-      "<head>",
-      `
-      <head>
-        <script data-state="apollo" data-gwd-opt="none">
-          globalThis.__APOLLO_STATE__ = true;
-        </script>
-    `,
+    const root = parseHtml(body);
+
+    root.querySelector("script[data-graphql-port]")?.remove();
+
+    body = insertHtml(
+      root.toString(),
+      createHtmlElement(
+        "script",
+        { "data-state": "apollo", "data-gwd-opt": "none" },
+        "globalThis.__APOLLO_STATE__ = true;",
+      ),
+      "head",
+      true,
     );
 
     return new Response(body);

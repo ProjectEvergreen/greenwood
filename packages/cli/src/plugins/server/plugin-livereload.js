@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import livereload from "livereload";
 import { startServerOnAvailablePort } from "../../lib/server-utils.js";
+import { createHtmlElement, insertHtml } from "../../lib/html-utils.js";
 
 const DEFAULT_PORT = 35729;
 const serverState = {
@@ -105,14 +106,13 @@ class LiveReloadResource {
   }
 
   async intercept(url, request, response) {
-    let body = await response.text();
+    const source = await response.text();
 
-    body = body.replace(
-      "</head>",
-      `
-        <script src="http://localhost:${serverState.port}/livereload.js?snipver=1"></script>
-      </head>
-    `,
+    const body = insertHtml(
+      source,
+      createHtmlElement("script", {
+        src: `http://localhost:${serverState.port}/livereload.js?snipver=1`,
+      }),
     );
 
     return new Response(body);

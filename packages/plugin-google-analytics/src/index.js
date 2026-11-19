@@ -1,3 +1,5 @@
+import { createHtmlElement, insertHtml } from "@greenwood/cli/src/lib/html-utils.js";
+
 class GoogleAnalyticsResource {
   constructor(compilation, options = {}) {
     this.compilation = compilation;
@@ -23,12 +25,16 @@ class GoogleAnalyticsResource {
     const trackAnon = typeof anonymous === "boolean" ? anonymous : true;
     let body = await response.text();
 
-    body = body.replace(
-      "</head>",
-      `
-      <link rel="preconnect" href="https://www.google-analytics.com/">
-      <script async src="https://www.googletagmanager.com/gtag/js?id=${analyticsId}"></script>
-      <script data-gwd-opt="none">
+    body = insertHtml(body, [
+      createHtmlElement("link", { rel: "preconnect", href: "https://www.google-analytics.com/" }),
+      createHtmlElement("script", {
+        async: "",
+        src: `https://www.googletagmanager.com/gtag/js?id=${analyticsId}`,
+      }),
+      createHtmlElement(
+        "script",
+        { "data-gwd-opt": "none" },
+        `
         var getOutboundLink = function(url) {
           gtag('event', 'click', {
             'event_category': 'outbound',
@@ -39,11 +45,9 @@ class GoogleAnalyticsResource {
         globalThis.dataLayer = globalThis.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-        gtag('config', '${analyticsId}', { 'anonymize_ip': ${trackAnon} });
-      </script>
-    </head>
-    `,
-    );
+        gtag('config', '${analyticsId}', { 'anonymize_ip': ${trackAnon} });`,
+      ),
+    ]);
 
     return new Response(body, {
       headers: response.headers,

@@ -183,6 +183,8 @@ function isPrerenderScript(script) {
 async function getScriptResources(html, context, development = false) {
   const root = parse(html, {
     blockTextElements: {
+      script: true,
+      style: true,
       noscript: false,
       pre: false,
     },
@@ -224,6 +226,8 @@ async function trackResourcesForRoute(html, compilation, route) {
   const { context } = compilation;
   const root = parse(html, {
     blockTextElements: {
+      script: true,
+      style: true,
       noscript: false,
       pre: false,
     },

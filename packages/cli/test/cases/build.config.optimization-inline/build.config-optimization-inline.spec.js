@@ -67,12 +67,12 @@ describe("Build Greenwood With: ", function () {
       });
 
       describe("<script> tags and files", function () {
-        it("should contain three <script> tags in the <head>", function () {
+        it("should contain the expected number of <script> tags in the <head>", function () {
           const allScriptTags = Array.from(
             dom.window.document.querySelectorAll('head script[type="module"]'),
           ).filter((tag) => !tag.getAttribute("data-gwd"));
 
-          expect(allScriptTags.length).to.be.equal(3);
+          expect(allScriptTags.length).to.be.equal(4);
         });
 
         it("should contain no <script> tags in the <head> with a src", function () {
@@ -131,6 +131,14 @@ describe("Build Greenwood With: ", function () {
         });
       });
 
+      it("should preserve markup-looking strings and replacement tokens in optimized inline JavaScript", function () {
+        const script = dom.window.document.querySelector("#raw-html-payload").textContent;
+        expect(script).to.contain(
+          "<head>costs $& $$ $1 $` and <output for='content'></output></head>",
+        );
+        expect(script).to.match(/^globalThis\.__HTML_PAYLOAD__=/);
+      });
+
       describe("<link> tags as <style> tags and file output", function () {
         it("should contain no CSS files in the output directory", async function () {
           const cssFiles = await glob.promise(`${this.context.publicDir}**/**/*.css`);
@@ -156,6 +164,7 @@ describe("Build Greenwood With: ", function () {
           const styleTags = dom.window.document.querySelectorAll("head style");
 
           expect(styleTags[1].textContent).to.contain("body{color:red}");
+          expect(styleTags[1].textContent).to.contain("[data-price='costs $& $$ $1']");
         });
       });
     });

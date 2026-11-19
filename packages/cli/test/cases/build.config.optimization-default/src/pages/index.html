@@ -1,8 +1,9 @@
 <!doctype html>
 <html lang="en" prefix="og:http://ogp.me/ns#">
   <head>
+    <meta name="resource-example" content="/components/header.js" />
     <script type="module" src="/components/header.js"></script>
-    <link rel="stylesheet" href="/styles/main.css" />
+    <link rel="stylesheet" href="/styles/main-$&.css" />
     <!-- https://github.com/ProjectEvergreen/greenwood/issues/1608 -->
     <link
       rel="stylesheet"
@@ -23,6 +24,11 @@
   </head>
 
   <body>
+    <!-- optimizer-comment -->
+    <span id="literal-optimization-attribute">data-gwd-opt="static"</span>
+    <!-- prettier-ignore -->
+    <pre id="resource-example">  /components/header.js
+ /styles/main-$&.css </pre>
     <div class="gwd-content-outlet">
       <div>
         <app-header></app-header>

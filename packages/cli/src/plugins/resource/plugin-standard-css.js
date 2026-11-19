@@ -359,7 +359,7 @@ function bundleCss(body, sourceUrl, compilation, workingUrl) {
 
             optimizedCss = optimizedCss.replace(
               `${name}${value}`,
-              `${name}${node.matcher}${value}`,
+              () => `${name}${node.matcher}${value}`,
             );
           }
           optimizedCss += "]";

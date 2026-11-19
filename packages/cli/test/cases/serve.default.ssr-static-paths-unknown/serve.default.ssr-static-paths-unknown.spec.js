@@ -80,6 +80,16 @@ describe("Serve Greenwood With: ", function () {
       });
     });
 
+    for (const slug of ["costs-$&", "costs-$$", "costs-$`"]) {
+      it(`should serve the static path ${slug} without expanding replacement tokens`, async function () {
+        const response = await fetch(`${hostname}/${encodeURI(slug)}/`);
+        const dom = new JSDOM(await response.text());
+
+        expect(response.status).to.equal(200);
+        expect(dom.window.document.querySelector("body h2").textContent).to.equal(slug);
+      });
+    }
+
     // https://github.com/ProjectEvergreen/greenwood/issues/1737
     describe("An SSR page with a dynamic route value NOT returned from getStaticPaths", function () {
       let response;

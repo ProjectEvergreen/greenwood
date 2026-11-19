@@ -1,3 +1,4 @@
+import { createHtmlElement, insertHtml } from "@greenwood/cli/src/lib/html-utils.js";
 import { getPackageRoot } from "@greenwood/cli/src/lib/node-modules-utils.js";
 import { fileUrlToResolvedPrefixPath } from "@greenwood/cli/src/lib/resource-utils.js";
 
@@ -44,32 +45,32 @@ class PolyfillsResource {
 
     // standard WC polyfill
     if (wc) {
-      body = body.replace(
-        "<head>",
-        `
-        <head>
-          <script src="${fileUrlToResolvedPrefixPath(locations.wcLoader)}"></script>
-      `,
+      body = insertHtml(
+        body,
+        createHtmlElement("script", { src: fileUrlToResolvedPrefixPath(locations.wcLoader) }),
+        "head",
+        true,
       );
     }
 
     // append Lit polyfill next to make sure it comes before WC polyfill
     if (lit) {
-      body = body.replace(
-        "<head>",
-        `
-        <head>
-          <script src="${fileUrlToResolvedPrefixPath(locations.litSupport)}"></script>
-      `,
+      body = insertHtml(
+        body,
+        createHtmlElement("script", { src: fileUrlToResolvedPrefixPath(locations.litSupport) }),
+        "head",
+        true,
       );
     }
 
     // lastly, Declarative Shadow DOM polyfill
     if (dsd) {
-      body = body.replace(
-        "</body>",
-        `
-          <script>
+      body = insertHtml(
+        body,
+        createHtmlElement(
+          "script",
+          {},
+          `
             if (!HTMLTemplateElement.prototype.hasOwnProperty('shadowRoot')) {
               (function attachShadowRoots(root) {
                 root.querySelectorAll("template[shadowroot]").forEach(template => {
@@ -80,10 +81,9 @@ class PolyfillsResource {
                   attachShadowRoots(shadowRoot);
                 });
               })(document);
-            }
-          </script>
-        </body>
-      `,
+            }`,
+        ),
+        "body",
       );
     }
 

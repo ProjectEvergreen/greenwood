@@ -14,6 +14,7 @@ import {
   isPackageResourcePath,
 } from "../../lib/node-modules-utils.js";
 import { walkPackageJson } from "../../lib/walker-package-ranger.js";
+import { parseHtml, createHtmlElement } from "../../lib/html-utils.js";
 
 let generatedImportMap;
 const importMapShimUrl = fileUrlToResolvedPrefixPath(
@@ -72,17 +73,16 @@ class NodeModulesResource {
   async intercept(url, request, response) {
     const { context, config } = this.compilation;
     const { importMaps } = config.polyfills;
-    const importMapShimScript = importMaps
-      ? `<script defer src="${importMapShimUrl}"></script>`
-      : "";
     let body = await response.text();
-    const hasHead = body.match(/<head>(.*)<\/head>/s);
+    const root = parseHtml(body);
 
-    if (importMaps && hasHead && hasHead.length > 0) {
-      const contents = hasHead[0].replace(/type="module"/g, 'type="module-shim"');
-
-      body = body.replace(/<head>(.*)<\/head>/s, contents.replace(/\$/g, "$$$")); // https://github.com/ProjectEvergreen/greenwood/issues/656);
+    if (importMaps) {
+      for (const script of root.querySelectorAll('head script[type="module"]')) {
+        script.setAttribute("type", "module-shim");
+      }
     }
+
+    body = root.toString();
 
     const { packageJson, packageJsonUrl } = await getPackageJsonForProject(context);
 
@@ -114,13 +114,15 @@ class NodeModulesResource {
     }
 
     body = mergeImportMap(body, generatedImportMap, importMaps);
-    body = body.replace(
-      "<head>",
-      `
-      <head>
-        ${importMapShimScript}
-    `,
-    );
+
+    const merged = parseHtml(body);
+
+    if (importMaps) {
+      merged
+        .querySelector("head")
+        ?.prepend(createHtmlElement("script", { defer: "", src: importMapShimUrl }));
+    }
+    body = merged.toString();
 
     return new Response(body);
   }

@@ -47,6 +47,33 @@ async function trackAllTocHeadings(compilation) {
   allHeadingsTracked = true;
 }
 
+// Unwrap paragraphs containing only a custom element before serializing the HAST.
+// <p><my-component></my-component></p> → <my-component></my-component>
+function unwrapCustomElements() {
+  return function transform(node) {
+    if (!node.children) return;
+
+    for (let index = 0; index < node.children.length; index++) {
+      const child = node.children[index];
+      transform(child);
+
+      if (child.type === "element" && child.tagName === "p") {
+        const meaningful = child.children.filter(
+          (entry) => entry.type !== "text" || entry.value.trim(),
+        );
+        if (
+          meaningful.length === 1 &&
+          meaningful[0].type === "element" &&
+          meaningful[0].tagName.includes("-")
+        ) {
+          node.children.splice(index, 1, ...child.children);
+          index += child.children.length - 1;
+        }
+      }
+    }
+  };
+}
+
 // extracted for standalone usage
 // https://github.com/ProjectEvergreen/greenwood/issues/1247#issuecomment-2721881358
 async function processMarkdown(contents, plugins = [], parent = new URL(import.meta.url)) {
@@ -57,7 +84,6 @@ async function processMarkdown(contents, plugins = [], parent = new URL(import.m
   const rehypePlugins = [];
   const remarkPlugins = [];
   let processedMarkdown;
-  let html = "";
 
   for (const plugin of plugins || []) {
     const name = typeof plugin === "string" ? plugin : plugin.name;
@@ -79,28 +105,11 @@ async function processMarkdown(contents, plugins = [], parent = new URL(import.m
     .use(remarkRehype, { allowDangerousHtml: true }) // convert from markdown to HTML AST
     .use(rehypeRaw) // support mixed HTML in markdown
     .use(rehypePlugins) // apply userland rehype plugins
+    .use(unwrapCustomElements)
     .use(rehypeStringify) // convert AST to HTML string
     .process(contents);
 
-  html = String(processedMarkdown);
-
-  // remove markdown wrapping custom elements in <p></p> tags
-  // https://github.com/ProjectEvergreen/greenwood/discussions/1267
-  const wrappedCustomElementRegex =
-    /<p><[a-zA-Z]*-[a-zA-Z](.*)>(.*)<\/[a-zA-Z]*-[a-zA-Z](.*)><\/p>/g;
-  const ceTest = wrappedCustomElementRegex.test(html);
-
-  if (ceTest) {
-    const ceMatches = html.match(wrappedCustomElementRegex);
-
-    ceMatches.forEach((match) => {
-      const stripWrappingTags = match.replace("<p>", "").replace("</p>", "");
-
-      html = html.replace(match, stripWrappingTags);
-    });
-  }
-
-  return html;
+  return String(processedMarkdown);
 }
 
 class MarkdownResource {

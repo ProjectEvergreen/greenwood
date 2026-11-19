@@ -1,3 +1,4 @@
+import { createHtmlElement, insertHtml } from "@greenwood/cli/src/lib/html-utils.js";
 import { getPackageRoot } from "@greenwood/cli/src/lib/node-modules-utils.js";
 import { fileUrlToResolvedPrefixPath } from "@greenwood/cli/src/lib/resource-utils.js";
 
@@ -27,14 +28,13 @@ class PuppeteerResource {
   }
 
   async intercept(url, request, response) {
-    let body = await response.text();
+    const source = await response.text();
 
-    body = body.replace(
-      "<head>",
-      `
-      <head>
-        <script src="${webComponentsBundleUrl}"></script>
-    `,
+    const body = insertHtml(
+      source,
+      createHtmlElement("script", { src: webComponentsBundleUrl }),
+      "head",
+      true,
     );
 
     return new Response(body);

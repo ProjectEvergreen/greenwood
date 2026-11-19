@@ -72,6 +72,13 @@ describe("Build Greenwood With HTML Include Plugin: ", function () {
         expect(text.trim()).to.be.equal("Greenwood v1.0.0");
       });
 
+      it("should replace multiline nested includes without consuming sibling elements", function () {
+        expect(dom.window.document.querySelector("inner-card")).to.equal(null);
+        expect(dom.window.document.querySelector("other-card").textContent).to.equal(
+          "keep this sibling",
+        );
+      });
+
       it("should have existing <h1> content in the <body>", function () {
         const text = headingTags[0].textContent;
 

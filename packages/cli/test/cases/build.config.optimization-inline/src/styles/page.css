@@ -1,3 +1,7 @@
 body {
   color: red;
 }
+
+[data-price="costs $& $$ $1"] {
+  color: teal;
+}
