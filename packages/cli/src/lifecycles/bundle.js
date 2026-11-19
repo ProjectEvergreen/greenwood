@@ -321,6 +321,7 @@ async function bundleApiRoutes(compilation) {
     await runWithConcurrency(apiConfigs, compilation.config.concurrency, async (rollupConfig) => {
       const bundle = await rollup(rollupConfig);
       await bundle.write(rollupConfig.output);
+      await bundle.close();
     });
   }
 }
@@ -467,6 +468,7 @@ async function bundleSsrPages(compilation, optimizePlugins) {
       await runWithConcurrency(ssrConfigs, config.concurrency, async (rollupConfig) => {
         const bundle = await rollup(rollupConfig);
         await bundle.write(rollupConfig.output);
+        await bundle.close();
       });
     }
   }
@@ -479,6 +481,7 @@ async function bundleScriptResources(compilation) {
   if (rollupConfig.input.length !== 0) {
     const bundle = await rollup(rollupConfig);
     await bundle.write(rollupConfig.output);
+    await bundle.close();
   }
 }
 
