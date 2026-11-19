@@ -43,7 +43,7 @@ describe("Build Greenwood With: ", function () {
     it("should throw an error that provided extensions is not valid", async function () {
       await runner.setup(outputPath);
 
-      await expect(runner.runCommand(cliPath, "build")).to.be.rejectedWith(
+      await expect(runner.runCommand(cliPath, { args: "build" })).to.be.rejectedWith(
         "Configuration error: provided extensions is not an array.  Please provide an array like ['txt', 'foo']",
       );
     });

@@ -33,8 +33,10 @@ describe("Initialize a new Greenwood project: ", function () {
 
   describe("Scaffolding a new project in the current directory", function () {
     before(async function () {
-      await runner.setup(outputPath, [], { create: false });
-      await runner.runCommand(initPath, ["--name", APP_NAME, "--ts", "no", "--install", "no"]);
+      await runner.setup(outputPath, { create: false });
+      await runner.runCommand(initPath, {
+        args: ["--name", APP_NAME, "--ts", "no", "--install", "no"],
+      });
     });
 
     describe("project files and folders", () => {

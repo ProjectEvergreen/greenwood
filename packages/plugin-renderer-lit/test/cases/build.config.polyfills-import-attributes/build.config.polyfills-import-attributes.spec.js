@@ -48,7 +48,7 @@ describe("Build Greenwood With Lit and the CSS import attributes polyfill", func
   before(async function () {
     runner = new Runner();
     await runner.setup(outputPath);
-    await runner.runCommand(cliPath, "build");
+    await runner.runCommand(cliPath, { args: "build" });
     apiContents = await fs.readFile(new URL("./public/api/fragment.js", outputUrl), "utf-8");
   });
 

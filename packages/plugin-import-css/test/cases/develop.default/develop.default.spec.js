@@ -52,7 +52,7 @@ xdescribe("Develop Greenwood With: ", function () {
           resolve();
         }, 5000);
 
-        runner.runCommand(cliPath, "develop", { async: true });
+        runner.runCommand(cliPath, { args: "develop" });
       });
     });
 
@@ -112,8 +112,8 @@ xdescribe("Develop Greenwood With: ", function () {
     });
   });
 
-  after(function () {
-    runner.stopCommand();
-    runner.teardown([path.join(outputPath, ".greenwood")]);
+  after(async function () {
+    await runner.stopCommand();
+    await runner.teardown([path.join(outputPath, ".greenwood")]);
   });
 });

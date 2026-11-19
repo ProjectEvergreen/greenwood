@@ -56,7 +56,8 @@ describe("Develop Greenwood With: ", function () {
         let output = "";
 
         runner
-          .runCommand(cliPath, "develop", {
+          .runCommand(cliPath, {
+            args: "develop",
             onStdOut: (message) => {
               output += message;
               const ready = output.match(

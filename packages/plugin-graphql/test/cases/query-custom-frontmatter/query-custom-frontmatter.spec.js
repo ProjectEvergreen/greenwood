@@ -54,7 +54,7 @@ describe("Build Greenwood With: ", function () {
     before(async function () {
       await runner.setup(outputPath);
 
-      await runner.runCommand(cliPath, "build");
+      await runner.runCommand(cliPath, { args: "build" });
     });
 
     runSmokeTest(["public"], LABEL);

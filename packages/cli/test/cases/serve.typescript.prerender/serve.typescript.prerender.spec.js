@@ -40,17 +40,18 @@ describe("Serve Greenwood With: ", function () {
       publicDir: path.join(outputPath, "public"),
       hostname,
     };
-    runner = new Runner(false, true);
+    runner = new Runner({ forwardParentArgs: true });
   });
 
   describe(LABEL, function () {
     before(async function () {
       await runner.setup(outputPath);
-      await runner.runCommand(cliPath, "build");
+      await runner.runCommand(cliPath, { args: "build" });
 
       await new Promise((resolve, reject) => {
         runner
-          .runCommand(cliPath, "serve", {
+          .runCommand(cliPath, {
+            args: "serve",
             onStdOut: (message) => {
               if (message.includes("Started server at http://localhost:8080")) {
                 resolve();
@@ -94,7 +95,7 @@ describe("Serve Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
     await runner.stopCommand();
+    await runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });

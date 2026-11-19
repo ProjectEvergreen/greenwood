@@ -138,34 +138,37 @@ describe("Develop Greenwood With: ", function () {
       );
 
       // would be nice to figure out why this test case still requires manually copying in dependencies
-      await runner.setup(outputPath, [
-        ...lit,
-        ...litPackageJson,
-        ...litDirectives,
-        ...litDecorators,
-        ...litElementPackageJson,
-        ...litElement,
-        ...litElementDecorators,
-        ...litHtmlPackageJson,
-        ...litHtml,
-        ...litHtmlNode,
-        ...litHtmlDirectives,
-        ...litHtmlNodeDirectives,
-        ...trustedTypes,
-        ...litReactiveElement,
-        ...litReactiveElementNode,
-        ...litReactiveElementDecorators,
-        ...litReactiveElementPackageJson,
-        ...litSsrElementHydrationSupport,
-        ...litSsrHtmlHydrationSupport,
-        ...litSsrDomShim,
-        ...litSsrDomShimPackageJson,
-        ...litSsrDomShimLibs,
-      ]);
+      await runner.setup(outputPath, {
+        setupFiles: [
+          ...lit,
+          ...litPackageJson,
+          ...litDirectives,
+          ...litDecorators,
+          ...litElementPackageJson,
+          ...litElement,
+          ...litElementDecorators,
+          ...litHtmlPackageJson,
+          ...litHtml,
+          ...litHtmlNode,
+          ...litHtmlDirectives,
+          ...litHtmlNodeDirectives,
+          ...trustedTypes,
+          ...litReactiveElement,
+          ...litReactiveElementNode,
+          ...litReactiveElementDecorators,
+          ...litReactiveElementPackageJson,
+          ...litSsrElementHydrationSupport,
+          ...litSsrHtmlHydrationSupport,
+          ...litSsrDomShim,
+          ...litSsrDomShimPackageJson,
+          ...litSsrDomShimLibs,
+        ],
+      });
 
       await new Promise((resolve, reject) => {
         runner
-          .runCommand(cliPath, "develop", {
+          .runCommand(cliPath, {
+            args: "develop",
             onStdOut: (message) => {
               if (message.includes("Started local development server at http://localhost:1984")) {
                 resolve();
@@ -252,7 +255,7 @@ describe("Develop Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
     await runner.stopCommand();
+    await runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });

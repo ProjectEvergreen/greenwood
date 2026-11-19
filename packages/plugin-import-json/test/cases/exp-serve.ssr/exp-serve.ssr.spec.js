@@ -45,20 +45,20 @@ xdescribe("Serve Greenwood With: ", function () {
       publicDir: path.join(outputPath, "public"),
       hostname,
     };
-    runner = new Runner(false, true);
+    runner = new Runner({ forwardParentArgs: true });
   });
 
   describe(LABEL, function () {
     before(async function () {
       runner.setup(outputPath);
-      runner.runCommand(cliPath, "build");
+      runner.runCommand(cliPath, { args: "build" });
 
       return new Promise((resolve) => {
         setTimeout(() => {
           resolve();
         }, 10000);
 
-        runner.runCommand(cliPath, "serve", { async: true });
+        runner.runCommand(cliPath, { args: "serve" });
       });
     });
 
@@ -119,8 +119,8 @@ xdescribe("Serve Greenwood With: ", function () {
     });
   });
 
-  after(function () {
-    runner.teardown(getOutputTeardownFiles(outputPath));
-    runner.stopCommand();
+  after(async function () {
+    await runner.stopCommand();
+    await runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });

@@ -45,7 +45,7 @@ xdescribe("Develop Greenwood With: ", function () {
       publicDir: path.join(outputPath, "public"),
       hostname,
     };
-    runner = new Runner(false, true);
+    runner = new Runner({ forwardParentArgs: true });
   });
 
   describe(LABEL, function () {
@@ -57,7 +57,7 @@ xdescribe("Develop Greenwood With: ", function () {
           resolve();
         }, 10000);
 
-        runner.runCommand(cliPath, "develop", { async: true });
+        runner.runCommand(cliPath, { args: "develop" });
       });
     });
 
@@ -129,8 +129,8 @@ xdescribe("Develop Greenwood With: ", function () {
     });
   });
 
-  after(function () {
-    runner.teardown(getOutputTeardownFiles(outputPath));
-    runner.stopCommand();
+  after(async function () {
+    await runner.stopCommand();
+    await runner.teardown(getOutputTeardownFiles(outputPath));
   });
 });
