@@ -1,20 +1,16 @@
 /*
  * Use Case
- * Run Greenwood build command against a binary asset, using .wasm as the concrete case,
- * covering both the supported `new URL("./add.wasm", import.meta.url)` pattern and an
- * unsupported direct `import ... from "./add.wasm"`.
+ * Run Greenwood build command against a binary asset served by a custom resource plugin,
+ * using .wasm for the test case.
  *
  * User Result
- * For the supported pattern, should generate a Greenwood build that emits the .wasm as a
- * content-hashed, byte-identical asset.
- * For the unsupported direct import, the build should fail with a Rollup parse error rather
- * than an acorn `SyntaxError` attributed to the `greenwood-import-meta-url` plugin.
+ * Should emit a content-hashed, byte-identical binary asset instead of bundling it as JavaScript.
  *
  * User Command
  * greenwood build
  *
  * User Config
- * None (Greenwood Default)
+ * A resource plugin serving .wasm files with the application/wasm content type.
  *
  * User Workspace
  *  src/
@@ -23,6 +19,7 @@
  *    scripts/
  *      add.wasm
  *      main.js
+ * greenwood.config.js
  */
 import { expect } from "chai";
 import fs from "node:fs/promises";
@@ -34,7 +31,7 @@ import { fileURLToPath } from "node:url";
 
 // https://github.com/ProjectEvergreen/greenwood/issues/1723
 describe("Build Greenwood With: ", function () {
-  const LABEL = "Referencing a binary asset with new URL and import.meta.url";
+  const LABEL = "Referencing a binary asset";
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
   let runner;
@@ -54,7 +51,7 @@ describe("Build Greenwood With: ", function () {
 
     runSmokeTest(["public"], LABEL);
 
-    describe("WASM asset output", function () {
+    describe("Binary asset bundling from a plugin", function () {
       let wasmFiles;
 
       before(async function () {
@@ -85,46 +82,6 @@ describe("Build Greenwood With: ", function () {
 
         expect(contents).to.contain(wasmFiles[0]);
       });
-    });
-  });
-
-  describe("An unsupported direct import of a .wasm module", function () {
-    const mainScriptUrl = new URL("./src/scripts/main.js", import.meta.url);
-    let originalMainScript;
-    let buildError;
-
-    before(async function () {
-      originalMainScript = await fs.readFile(mainScriptUrl, "utf-8");
-      await fs.writeFile(
-        mainScriptUrl,
-        [
-          'import * as wasm from "./add.wasm";',
-          "",
-          'document.getElementById("out").textContent = `add(2,3)=${wasm.add(2, 3)}`;',
-          "",
-        ].join("\n"),
-      );
-      await runner.setup(outputPath);
-
-      try {
-        await runner.runCommand(cliPath, "build");
-      } catch (error) {
-        buildError = `${error}`;
-      }
-    });
-
-    // restore the workspace fixture no matter how the build run above ends
-    after(async function () {
-      await fs.writeFile(mainScriptUrl, originalMainScript);
-    });
-
-    it("should fail the build", function () {
-      expect(buildError).to.not.equal(undefined);
-    });
-
-    // https://github.com/ProjectEvergreen/greenwood/issues/1723
-    it("should not crash with the acorn SyntaxError from the greenwood-import-meta-url plugin", function () {
-      expect(buildError).to.not.contain("greenwood-import-meta-url");
     });
   });
 

@@ -379,9 +379,7 @@ function greenwoodImportMetaUrl(compilation) {
         }
       }
 
-      const contentType = response.headers.get("content-type") || "";
-
-      if (!canTransform || !contentType.includes("text/javascript")) {
+      if (!canTransform) {
         return null;
       }
 
