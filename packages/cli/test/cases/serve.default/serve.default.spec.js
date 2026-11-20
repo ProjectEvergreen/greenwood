@@ -22,9 +22,13 @@
  * User Workspace
  * src/
  *   index.html
+ *   robots.txt
+ *   sitemap.xml
  *   wasm.html
  *   assets/
+ *     data.bak
  *     data.json
+ *     data.xml
  *     favicon.ico
  *     logo.png
  *     router.js.map
@@ -386,6 +390,133 @@ describe("Serve Greenwood With: ", function () {
 
       it("should return the correct response body", function (done) {
         expect(body).to.contain('"sources":["../packages/cli/src/lib/router.js"]');
+        done();
+      });
+    });
+
+    // https://github.com/ProjectEvergreen/greenwood/issues/1767
+    describe("Serve command with sitemap (.xml) specific behavior", function () {
+      let response = {};
+      let body;
+
+      before(async function () {
+        response = await fetch(`${hostname}/sitemap.xml`);
+        body = await response.clone().text();
+      });
+
+      it("should return a 200 status", function (done) {
+        expect(response.status).to.equal(200);
+        done();
+      });
+
+      it("should return the correct content type", function (done) {
+        expect(response.headers.get("content-type")).to.equal("application/xml");
+        done();
+      });
+
+      it("should return the correct response body", function (done) {
+        expect(body).to.contain("<urlset");
+        done();
+      });
+    });
+
+    // https://github.com/ProjectEvergreen/greenwood/issues/1767
+    describe("Serve command with robots (.txt) specific behavior", function () {
+      let response = {};
+      let body;
+
+      before(async function () {
+        response = await fetch(`${hostname}/robots.txt`);
+        body = await response.clone().text();
+      });
+
+      it("should return a 200 status", function (done) {
+        expect(response.status).to.equal(200);
+        done();
+      });
+
+      it("should return the correct content type", function (done) {
+        expect(response.headers.get("content-type")).to.equal("text/plain");
+        done();
+      });
+
+      it("should return the correct response body", function (done) {
+        expect(body).to.contain("User-agent: *");
+        done();
+      });
+    });
+
+    // https://github.com/ProjectEvergreen/greenwood/issues/1767
+    describe("Serve command with an arbitrary XML asset", function () {
+      let response = {};
+      let body;
+
+      before(async function () {
+        response = await fetch(`${hostname}/assets/data.xml`);
+        body = await response.clone().text();
+      });
+
+      it("should return a 200 status", function (done) {
+        expect(response.status).to.equal(200);
+        done();
+      });
+
+      it("should return the correct content type", function (done) {
+        expect(response.headers.get("content-type")).to.equal("application/xml");
+        done();
+      });
+
+      it("should return the correct response body", function (done) {
+        expect(body).to.contain("<name>Marvin</name>");
+        done();
+      });
+    });
+
+    // https://github.com/ProjectEvergreen/greenwood/issues/1767
+    describe("Serve command with 404 not found behavior for a missing XML file", function () {
+      let response = {};
+      let body = "";
+
+      before(async function () {
+        response = await fetch(`${hostname}/assets/definitely-missing.xml`);
+        body = await response.text();
+      });
+
+      it("should return a Not Found body", function (done) {
+        expect(body).to.equal("Not Found");
+        done();
+      });
+
+      it("should return a 404 status", function (done) {
+        expect(response.status).to.equal(404);
+        done();
+      });
+
+      it("should return a Content-Type of text/plain", function (done) {
+        expect(response.headers.get("Content-Type")).to.equal("text/plain");
+        done();
+      });
+    });
+
+    // https://github.com/ProjectEvergreen/greenwood/issues/1767
+    // assets/data.bak is copied into the output directory, so this only passes while the
+    // fallback stays an allow list of extensions instead of serving anything that exists
+    describe("Serve command with 404 not found behavior for an existing file with an unsupported extension", function () {
+      let response = {};
+      let body = "";
+
+      before(async function () {
+        response = await fetch(`${hostname}/assets/data.bak`);
+        body = await response.text();
+      });
+
+      it("should return a 404 status", function (done) {
+        expect(response.status).to.equal(404);
+        done();
+      });
+
+      it("should not return the contents of the file", function (done) {
+        expect(body).to.not.contain("THIS_EXTENSION_IS_NOT_IN_THE_FALLBACK_ALLOWLIST");
         done();
       });
     });
