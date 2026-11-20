@@ -1,9 +1,13 @@
 /*
  * Use Case
- * Run Greenwood build command with custom copy plugin with deeply nested directories
+ * Run Greenwood build command with custom copy plugins with deeply nested directories, including
+ * two plugins that resolve to the same destination, and a single plugin that returns two locations
+ * resolving to the same destination
  *
  * User Result
- * Should generate a Greenwood build with a public asset folder containing contents of assets directory
+ * Should generate a Greenwood build with a public asset folder containing contents of assets
+ * directory, and with the last copy operation registered for a shared destination winning
+ * https://github.com/ProjectEvergreen/greenwood/issues/1764
  *
  * User Command
  * greenwood build
@@ -54,6 +58,42 @@ describe("Build Greenwood With: ", function () {
             path.join(this.context.publicDir, "node_modules/prismjs/themes/*.css"),
           ),
         ).to.have.lengthOf(16);
+      });
+    });
+
+    describe("Copy Duplicate Destinations", function () {
+      const expected = fs.readFileSync(
+        new URL("./duplicate-destination.css", import.meta.url),
+        "utf-8",
+      );
+
+      it("should copy the whole themes directory into each shared destination", async function () {
+        for (const sharedDir of [
+          "duplicate-destination-plugins",
+          "duplicate-destination-locations",
+        ]) {
+          expect(
+            await glob.promise(path.join(this.context.publicDir, sharedDir, "*.css")),
+          ).to.have.lengthOf(16);
+        }
+      });
+
+      it("should let the last of two plugins sharing a destination win", function () {
+        const contents = fs.readFileSync(
+          path.join(this.context.publicDir, "duplicate-destination-plugins/prism.min.css"),
+          "utf-8",
+        );
+
+        expect(contents).to.equal(expected);
+      });
+
+      it("should let the last of two locations from one plugin sharing a destination win", function () {
+        const contents = fs.readFileSync(
+          path.join(this.context.publicDir, "duplicate-destination-locations/prism.min.css"),
+          "utf-8",
+        );
+
+        expect(contents).to.equal(expected);
       });
     });
   });
