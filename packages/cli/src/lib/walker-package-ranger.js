@@ -192,9 +192,7 @@ async function walkPackageForExports(dependency, packageJson, resolvedRoot, stat
               if (item[condition]) {
                 matched = true;
                 if (sub.indexOf("*") >= 0) {
-                  // walk the pattern target from the matched array item; indexing the array
-                  // itself by condition name would pass undefined as the resolved root
-                  // https://github.com/ProjectEvergreen/greenwood/issues/1758
+                  // basic support, not fully tested
                   await walkExportPatterns(
                     dependency,
                     item[condition].default ?? item[condition],
@@ -303,7 +301,6 @@ async function walkPackageDependencies(packageJson, walkedPackages, parent, stat
     // isolate failures per dependency, so one package with an unexpected exports shape
     // degrades to an error for that package instead of silently dropping every remaining
     // dependency from the import map
-    // https://github.com/ProjectEvergreen/greenwood/issues/1758
     try {
       const resolved = resolveBareSpecifier(dependency, parent, diagnostics);
 
