@@ -4,8 +4,8 @@
  * resolves to the same route as an existing static page.
  *
  * User Result
- * Should warn about the colliding route, generate the existing page's output only once, and
- * still generate the dynamic route's other static paths.
+ * Should preserve the existing page's output for colliding routes and still generate
+ * the dynamic route's other static paths.
  *
  * User Command
  * greenwood build
@@ -19,6 +19,10 @@
  *     [slug].js
  *     about.html
  *     index.html
+ *     exported.js
+ *     runtime.js
+ *     café.html
+ *     hello world.html
  */
 import { expect } from "chai";
 import fs from "node:fs/promises";
@@ -33,43 +37,52 @@ describe("Build Greenwood With: ", function () {
   const LABEL = "A getStaticPaths value that collides with an existing static page";
   const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
   const outputPath = fileURLToPath(new URL(".", import.meta.url));
-  let runner;
-  let stdout = "";
-  let stderr = "";
-
-  before(function () {
-    this.context = {
-      publicDir: path.join(outputPath, "public"),
-    };
-    runner = new Runner();
-  });
+  const encodedSlugs = ["café", "hello world"];
+  const runner = new Runner();
 
   describe(LABEL, function () {
     before(async function () {
       await runner.setup(outputPath);
-
-      // gallinago only surfaces stderr when a command exits non-zero, so observe it directly
-      const command = runner.runCommand(cliPath, "build", {
-        onStdOut: (message) => {
-          stdout += message;
-        },
-      });
-
-      runner.childProcess.stderr.on("data", (data) => {
-        stderr += data.toString("utf-8");
-      });
-
-      await command;
+      await runner.runCommand(cliPath, "build");
     });
 
-    it("should warn about the colliding route, naming both pages", function () {
-      expect(stderr).to.contain("Duplicate route detected: the static path /about/");
-      expect(stderr).to.contain("pages/[slug].js");
-      expect(stderr).to.contain("pages/about.html");
+    for (const slug of encodedSlugs) {
+      it(`should preserve the static page output for the encoded route ${slug}`, async function () {
+        const html = await fs.readFile(
+          new URL(`./public/${encodeURIComponent(slug)}/index.html`, import.meta.url),
+          "utf-8",
+        );
+        const dom = new JSDOM(html);
+
+        expect(dom.window.document.querySelector("body > h1").textContent).to.equal(
+          `Static Page: ${slug}`,
+        );
+      });
+    }
+
+    it("should preserve a statically exported SSR page over a static path", async function () {
+      const html = await fs.readFile(
+        new URL("./public/exported/index.html", import.meta.url),
+        "utf-8",
+      );
+      const dom = new JSDOM(html);
+
+      expect(dom.window.document.querySelector("body > h1").textContent).to.equal(
+        "Exported SSR Page",
+      );
     });
 
-    it("should not generate the colliding static path", function () {
-      expect(stdout).to.not.contain("generated static path... /about/");
+    it("should still emit a static path overlapping a request-time SSR route", async function () {
+      const html = await fs.readFile(
+        new URL("./public/runtime/index.html", import.meta.url),
+        "utf-8",
+      );
+      const dom = new JSDOM(html);
+
+      expect(dom.window.document.querySelector("body > h1").textContent).to.equal(
+        "Runtime SSR Page",
+      );
+      await fs.access(new URL("./public/runtime.route.js", import.meta.url));
     });
 
     it("should generate the colliding route from the static page", async function () {

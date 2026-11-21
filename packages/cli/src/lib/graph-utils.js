@@ -77,7 +77,10 @@ function getMatchingPageByRoute(compilation, route) {
 
 // an existing page already emitting this route, which takes precedence over a getStaticPaths value
 function getPageClaimingStaticRoute(staticPages, page, staticRoute) {
-  return staticPages.find((node) => node !== page && node.route === staticRoute);
+  // Match the URL pathname used when rendering, including encoded spaces and Unicode.
+  const pathname = new URL(staticRoute, "http://localhost").pathname;
+
+  return staticPages.find((node) => node !== page && node.route === pathname);
 }
 
 export {

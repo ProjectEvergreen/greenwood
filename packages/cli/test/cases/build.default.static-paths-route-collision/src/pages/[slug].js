@@ -1,5 +1,7 @@
 export async function getStaticPaths() {
-  return [{ params: { slug: "about" } }, { params: { slug: "contact" } }];
+  return ["about", "contact", "café", "hello world", "exported", "runtime"].map((slug) => ({
+    params: { slug },
+  }));
 }
 
 export async function getBody(compilation, page, request, params) {
