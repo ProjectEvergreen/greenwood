@@ -10,7 +10,11 @@ import {
 } from "../lib/resource-utils.js";
 import { WorkerPool } from "../lib/threadpool.js";
 import { runWithConcurrency } from "../lib/async-utils.js";
-import { getPrerenderPages, getStaticPages } from "../lib/graph-utils.js";
+import {
+  getPageClaimingStaticRoute,
+  getPrerenderPages,
+  getStaticPages,
+} from "../lib/graph-utils.js";
 import {
   getParamsFromSegment,
   getStaticRouteFromDynamicRoute,
@@ -156,8 +160,8 @@ async function executePageScripts(compilation, workerPrerender, pool, page, html
 }
 
 async function preRenderCompilationWorker(compilation, workerPrerender) {
-  const staticPages = new Set(getStaticPages(compilation));
-  const pages = getPrerenderPages(compilation).filter((page) => staticPages.has(page));
+  const staticPages = getStaticPages(compilation);
+  const pages = getPrerenderPages(compilation).filter((page) => staticPages.includes(page));
   const { context, config } = compilation;
   const pool = new WorkerPool(
     config.concurrency,
@@ -171,6 +175,11 @@ async function preRenderCompilationWorker(compilation, workerPrerender) {
       for (const staticPath of page.staticPaths) {
         const { route, outputHref, segment } = page;
         const staticRoute = getStaticRouteFromDynamicRoute(staticPath, segment, route);
+
+        if (getPageClaimingStaticRoute(staticPages, page, staticRoute)) {
+          continue;
+        }
+
         const scratchUrl = toScratchUrl(
           getOutputHrefForStaticPath(staticPath, segment, outputHref),
           context,
@@ -246,6 +255,7 @@ async function preRenderCompilationCustom(compilation, customPrerender) {
 }
 
 async function staticRenderCompilation(compilation, pages = getStaticPages(compilation)) {
+  const staticPages = getStaticPages(compilation);
   const { config, context } = compilation;
   const plugins = getPluginInstances(compilation);
   const renderPage = async (route, outputHref, message) => {
@@ -268,6 +278,11 @@ async function staticRenderCompilation(compilation, pages = getStaticPages(compi
     if (page.staticPaths) {
       for (const staticPath of page.staticPaths) {
         const staticRoute = getStaticRouteFromDynamicRoute(staticPath, page.segment, page.route);
+
+        if (getPageClaimingStaticRoute(staticPages, page, staticRoute)) {
+          continue;
+        }
+
         const outputHref = getOutputHrefForStaticPath(staticPath, page.segment, page.outputHref);
 
         await renderPage(staticRoute, outputHref, "generated static path...");
