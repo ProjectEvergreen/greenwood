@@ -44,9 +44,9 @@ describe("Build Greenwood With: ", function () {
     before(async function () {
       await runner.setup(outputPath);
 
-      const build = runner.runCommand(cliPath, "build");
+      const build = runner.runCommand(cliPath, { args: "build" });
 
-      // the runner only surfaces stderr for a non zero exit code, and this build is expected to pass
+      // Successful commands do not return captured stderr, so observe the child stream directly.
       runner.childProcess.stderr.on("data", function (data) {
         stderr += data.toString();
       });
