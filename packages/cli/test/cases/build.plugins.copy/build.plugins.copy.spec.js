@@ -1,20 +1,27 @@
 /*
  * Use Case
- * Run Greenwood build command with custom copy plugins with deeply nested directories, including
- * two plugins that resolve to the same destination, and a single plugin that returns two locations
- * resolving to the same destination
+ * Run Greenwood build command with custom copy plugins that copy nested directories and files.
+ * Cover overlapping directory and file copies across plugins and within one plugin, as well as
+ * two file copies from one plugin targeting the same destination.
  *
  * User Result
- * Should generate a Greenwood build with a public asset folder containing contents of assets
- * directory, and with the last copy operation registered for a shared destination winning
+ * Should copy the Prism theme directory into the output and preserve its files when merging.
+ * The last registered copy should win for shared destinations, with the complete contents of
+ * duplicate-destination.css replacing prism.min.css.
  * https://github.com/ProjectEvergreen/greenwood/issues/1764
  *
  * User Command
  * greenwood build
  *
- * Default Config
+ * User Config
+ * {
+ *   plugins: [
+ *     // custom copy plugins; see greenwood.config.js for the complete implementation
+ *   ]
+ * }
  *
- * Default Workspace
+ * User Workspace
+ * duplicate-destination.css
  */
 import { expect } from "chai";
 import fs from "node:fs";
@@ -90,6 +97,15 @@ describe("Build Greenwood With: ", function () {
       it("should let the last of two locations from one plugin sharing a destination win", function () {
         const contents = fs.readFileSync(
           path.join(this.context.publicDir, "duplicate-destination-locations/prism.min.css"),
+          "utf-8",
+        );
+
+        expect(contents).to.equal(expected);
+      });
+
+      it("should let the last file copy to the same destination win", function () {
+        const contents = fs.readFileSync(
+          path.join(this.context.publicDir, "duplicate-destination-files.css"),
           "utf-8",
         );
 

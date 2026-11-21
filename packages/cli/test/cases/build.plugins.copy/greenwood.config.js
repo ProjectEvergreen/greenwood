@@ -6,7 +6,10 @@ import {
 // the directory copy is registered first and is what creates the destination, so when copies
 // overlap the override runs before that directory exists and is dropped; only in series does
 // the last copy registered for the shared destination win
-const themesUrl = new URL("./themes/", derivePackageRoot(resolveBareSpecifier("prismjs")));
+const themesUrl = new URL(
+  "./themes/",
+  derivePackageRoot(resolveBareSpecifier("prismjs", import.meta.url)),
+);
 const overrideUrl = new URL("./duplicate-destination.css", import.meta.url);
 
 export default {
@@ -51,6 +54,18 @@ export default {
             from: overrideUrl,
             to: new URL("./duplicate-destination-plugins/prism.min.css", outputDir),
           },
+        ];
+      },
+    },
+    {
+      type: "copy",
+      name: "plugin-copy-duplicate-destination-files",
+      provider: (compilation) => {
+        const to = new URL("./duplicate-destination-files.css", compilation.context.outputDir);
+
+        return [
+          { from: new URL("./prism.min.css", themesUrl), to },
+          { from: overrideUrl, to },
         ];
       },
     },
