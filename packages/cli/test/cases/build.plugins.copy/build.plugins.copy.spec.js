@@ -1,16 +1,27 @@
 /*
  * Use Case
- * Run Greenwood build command with custom copy plugin with deeply nested directories
+ * Run Greenwood build command with custom copy plugins that copy nested directories and files.
+ * Cover overlapping directory and file copies across plugins and within one plugin, as well as
+ * two file copies from one plugin targeting the same destination.
  *
  * User Result
- * Should generate a Greenwood build with a public asset folder containing contents of assets directory
+ * Should copy the Prism theme directory into the output and preserve its files when merging.
+ * The last registered copy should win for shared destinations, with the complete contents of
+ * duplicate-destination.css replacing prism.min.css.
+ * https://github.com/ProjectEvergreen/greenwood/issues/1764
  *
  * User Command
  * greenwood build
  *
- * Default Config
+ * User Config
+ * {
+ *   plugins: [
+ *     // custom copy plugins; see greenwood.config.js for the complete implementation
+ *   ]
+ * }
  *
- * Default Workspace
+ * User Workspace
+ * duplicate-destination.css
  */
 import { expect } from "chai";
 import fs from "node:fs";
@@ -54,6 +65,51 @@ describe("Build Greenwood With: ", function () {
             path.join(this.context.publicDir, "node_modules/prismjs/themes/*.css"),
           ),
         ).to.have.lengthOf(16);
+      });
+    });
+
+    describe("Copy Duplicate Destinations", function () {
+      const expected = fs.readFileSync(
+        new URL("./duplicate-destination.css", import.meta.url),
+        "utf-8",
+      );
+
+      it("should copy the whole themes directory into each shared destination", async function () {
+        for (const sharedDir of [
+          "duplicate-destination-plugins",
+          "duplicate-destination-locations",
+        ]) {
+          expect(
+            await glob.promise(path.join(this.context.publicDir, sharedDir, "*.css")),
+          ).to.have.lengthOf(16);
+        }
+      });
+
+      it("should let the last of two plugins sharing a destination win", function () {
+        const contents = fs.readFileSync(
+          path.join(this.context.publicDir, "duplicate-destination-plugins/prism.min.css"),
+          "utf-8",
+        );
+
+        expect(contents).to.equal(expected);
+      });
+
+      it("should let the last of two locations from one plugin sharing a destination win", function () {
+        const contents = fs.readFileSync(
+          path.join(this.context.publicDir, "duplicate-destination-locations/prism.min.css"),
+          "utf-8",
+        );
+
+        expect(contents).to.equal(expected);
+      });
+
+      it("should let the last file copy to the same destination win", function () {
+        const contents = fs.readFileSync(
+          path.join(this.context.publicDir, "duplicate-destination-files.css"),
+          "utf-8",
+        );
+
+        expect(contents).to.equal(expected);
       });
     });
   });
