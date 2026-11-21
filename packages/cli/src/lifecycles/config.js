@@ -79,12 +79,12 @@ const defaultConfig = {
   port: 8080,
   prerender: false,
   staticExport: false,
+  staticRouter: false,
   concurrency: os.availableParallelism(),
   useTsc: false,
   workspace: new URL("./src/", cwd),
 };
-// staticRouter has no default value of its own, so it is not part of defaultConfig
-const supportedConfigOptions = [...Object.keys(defaultConfig), "staticRouter"];
+const supportedConfigOptions = Object.keys(defaultConfig);
 
 const readAndMergeConfig = async () => {
   // check for greenwood.config.ts or greenwood.config.js

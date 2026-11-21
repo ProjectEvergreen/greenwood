@@ -11,8 +11,7 @@
  * User Config
  * {
  *   basepath: "/my-app",
- *   notARealOption: 42,
- *   staticRouter: false
+ *   notARealOption: 42
  * }
  *
  * User Workspace
@@ -67,10 +66,6 @@ describe("Build Greenwood With: ", function () {
       expect(stderr).to.contain(
         'Configuration warning: "notARealOption" is not a supported configuration option and will be ignored.',
       );
-    });
-
-    it("should not warn about a supported option that has no default value", function () {
-      expect(stderr).to.not.contain('Configuration warning: "staticRouter"');
     });
   });
 
