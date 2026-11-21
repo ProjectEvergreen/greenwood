@@ -422,7 +422,7 @@ function greenwoodImportMetaUrl(compilation) {
           if (plugin.shouldServe && (await plugin.shouldServe(url, request))) {
             const response = await plugin.serve(url, request);
 
-            if (response?.headers?.get("content-type") || "".indexOf("text/javascript") >= 0) {
+            if ((response?.headers?.get("content-type") || "").indexOf("text/javascript") >= 0) {
               bundleExtensions = [...bundleExtensions, ...plugin.extensions];
             }
           }
