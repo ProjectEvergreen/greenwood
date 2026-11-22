@@ -19,11 +19,15 @@
  * fixtures/
  *   deleted.html (copied in as src/pages/deleted.html, then deleted mid test run)
  * src/
+ *   robots.txt
+ *   sitemap.xml
  *   assets/
  *     data.json
+ *     data.xml
  *     favicon.ico
  *     fox.avif
  *     logo.png
+ *     notes.txt
  *     river-valley.webp
  *     song-sample.mp3
  *     source-sans-pro.woff
@@ -583,6 +587,106 @@ describe("Develop Greenwood With: ", function () {
 
       it("should return the correct response body", function (done) {
         expect(body).to.contain('"sources":["src/lit-html.ts"]');
+        done();
+      });
+    });
+
+    describe("Develop command with sitemap (.xml) specific behavior", function () {
+      let response = {};
+      let body;
+
+      before(async function () {
+        response = await fetch(`${hostname}:${port}/sitemap.xml`);
+        body = await response.clone().text();
+      });
+
+      it("should return a 200 status", function (done) {
+        expect(response.status).to.equal(200);
+        done();
+      });
+
+      it("should return the correct content type", function (done) {
+        expect(response.headers.get("content-type")).to.equal("application/xml");
+        done();
+      });
+
+      it("should return the correct response body", function (done) {
+        expect(body).to.contain("<urlset");
+        done();
+      });
+    });
+
+    describe("Develop command with robots (.txt) specific behavior", function () {
+      let response = {};
+      let body;
+
+      before(async function () {
+        response = await fetch(`${hostname}:${port}/robots.txt`);
+        body = await response.clone().text();
+      });
+
+      it("should return a 200 status", function (done) {
+        expect(response.status).to.equal(200);
+        done();
+      });
+
+      it("should return the correct content type", function (done) {
+        expect(response.headers.get("content-type")).to.equal("text/plain");
+        done();
+      });
+
+      it("should return the correct response body", function (done) {
+        expect(body).to.contain("User-agent: *");
+        done();
+      });
+    });
+
+    describe("Develop command with an arbitrary XML asset specific behavior", function () {
+      let response = {};
+      let body;
+
+      before(async function () {
+        response = await fetch(`${hostname}:${port}/assets/data.xml`);
+        body = await response.clone().text();
+      });
+
+      it("should return a 200 status", function (done) {
+        expect(response.status).to.equal(200);
+        done();
+      });
+
+      it("should return the correct content type", function (done) {
+        expect(response.headers.get("content-type")).to.equal("application/xml");
+        done();
+      });
+
+      it("should return the correct response body", function (done) {
+        expect(body).to.contain("<name>Marvin</name>");
+        done();
+      });
+    });
+
+    describe("Develop command with an arbitrary text asset specific behavior", function () {
+      let response = {};
+      let body;
+
+      before(async function () {
+        response = await fetch(`${hostname}:${port}/assets/notes.txt`);
+        body = await response.clone().text();
+      });
+
+      it("should return a 200 status", function (done) {
+        expect(response.status).to.equal(200);
+        done();
+      });
+
+      it("should return the correct content type", function (done) {
+        expect(response.headers.get("content-type")).to.equal("text/plain");
+        done();
+      });
+
+      it("should return the correct response body", function (done) {
+        expect(body).to.contain("Plain text asset — café.");
         done();
       });
     });
