@@ -43,15 +43,12 @@ describe("Build Greenwood With: ", function () {
   describe(LABEL, function () {
     before(async function () {
       await runner.setup(outputPath);
-
-      const build = runner.runCommand(cliPath, { args: "build" });
-
-      // Successful commands do not return captured stderr, so observe the child stream directly.
-      runner.childProcess.stderr.on("data", function (data) {
-        stderr += data.toString();
+      await runner.runCommand(cliPath, {
+        args: "build",
+        onStdErr: (chunk) => {
+          stderr += chunk;
+        },
       });
-
-      await build;
     });
 
     runSmokeTest(["public", "index"], LABEL);
