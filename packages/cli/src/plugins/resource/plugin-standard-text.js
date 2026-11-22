@@ -26,9 +26,9 @@ class StandardTextResource {
     const body = await fs.readFile(url);
 
     return new Response(body, {
-      headers: {
+      headers: new Headers({
         "Content-Type": this.contentType,
-      },
+      }),
     });
   }
 }
