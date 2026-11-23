@@ -16,6 +16,9 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node }}
+      # Temporary diagnostics as part of debugging https://github.com/ProjectEvergreen/greenwood/issues/1585
+      # TODO: Remove this step and the dump upload below after a period of stable Windows CI following the PR merge
+      # https://github.com/ProjectEvergreen/greenwood/pull/1813
       - name: Enable Node crash dumps
         shell: pwsh
         run: |
