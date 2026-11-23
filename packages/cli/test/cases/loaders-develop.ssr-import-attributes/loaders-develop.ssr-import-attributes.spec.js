@@ -41,7 +41,7 @@ describe("Develop Greenwood With: ", function () {
     this.context = {
       publicDir: path.join(outputPath, "public"),
     };
-    runner = new Runner(false, true);
+    runner = new Runner({ forwardParentArgs: true });
   });
 
   describe(LABEL, function () {
@@ -50,7 +50,8 @@ describe("Develop Greenwood With: ", function () {
 
       await new Promise((resolve, reject) => {
         runner
-          .runCommand(cliPath, "develop", {
+          .runCommand(cliPath, {
+            args: "develop",
             onStdOut: (message) => {
               if (message.includes("Started local development server at http://localhost:1984")) {
                 resolve();

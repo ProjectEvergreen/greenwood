@@ -41,7 +41,7 @@ describe("Build Greenwood With: Prerendered Active Content on a Custom Port", fu
 
   before(async function () {
     await runner.setup(outputPath);
-    await runner.runCommand(cliPath, "build");
+    await runner.runCommand(cliPath, { args: "build" });
   });
 
   it("should prerender navigation from the data client using the custom dev server port", async function () {

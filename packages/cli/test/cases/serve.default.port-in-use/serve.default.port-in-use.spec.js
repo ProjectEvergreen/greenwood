@@ -15,7 +15,7 @@ describe("Serve Greenwood With: Production Server Port Already In Use", function
 
   before(async function () {
     await runner.setup(outputPath);
-    await runner.runCommand(cliPath, "build");
+    await runner.runCommand(cliPath, { args: "build" });
 
     blocker = net.createServer();
     await new Promise((resolve, reject) => {
@@ -27,7 +27,8 @@ describe("Serve Greenwood With: Production Server Port Already In Use", function
       let output = "";
 
       runner
-        .runCommand(cliPath, "serve", {
+        .runCommand(cliPath, {
+          args: "serve",
           onStdOut: (message) => {
             output += message;
             const ready = output.match(/Started server at (http:\/\/localhost:\d+)\/?\r?\n/);

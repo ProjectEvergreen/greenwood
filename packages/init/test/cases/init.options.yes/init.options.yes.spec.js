@@ -33,8 +33,8 @@ describe("Initialize a new Greenwood project: ", function () {
 
   describe("Scaffolding a new project accepting all default options", function () {
     before(async function () {
-      await runner.setup(outputPath, [], { create: false });
-      await runner.runCommand(initPath, ["-y"]);
+      await runner.setup(outputPath, { create: false });
+      await runner.runCommand(initPath, { args: ["-y"] });
     });
 
     describe("project files and folders", () => {

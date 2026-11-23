@@ -46,7 +46,7 @@ describe("Build Greenwood With: ", function () {
     it("should throw an error that analyticsId must be a string", async function () {
       await runner.setup(outputPath);
 
-      await expect(runner.runCommand(cliPath, "build")).to.be.rejectedWith(
+      await expect(runner.runCommand(cliPath, { args: "build" })).to.be.rejectedWith(
         `Error: analyticsId should be of type string.  got "undefined" instead.`,
       );
     });

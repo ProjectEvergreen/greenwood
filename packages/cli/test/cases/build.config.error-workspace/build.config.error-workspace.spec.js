@@ -41,7 +41,7 @@ describe("Build Greenwood With: ", function () {
     it("should throw an error that workspace path must be a URL", async function () {
       await runner.setup(outputPath);
 
-      await expect(runner.runCommand(cliPath, "build")).to.be.rejectedWith(
+      await expect(runner.runCommand(cliPath, { args: "build" })).to.be.rejectedWith(
         "Configuration error: workspace must be an instance of URL",
       );
     });

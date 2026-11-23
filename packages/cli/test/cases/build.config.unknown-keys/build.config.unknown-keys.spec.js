@@ -43,15 +43,12 @@ describe("Build Greenwood With: ", function () {
   describe(LABEL, function () {
     before(async function () {
       await runner.setup(outputPath);
-
-      const build = runner.runCommand(cliPath, "build");
-
-      // the runner only surfaces stderr for a non zero exit code, and this build is expected to pass
-      runner.childProcess.stderr.on("data", function (data) {
-        stderr += data.toString();
+      await runner.runCommand(cliPath, {
+        args: "build",
+        onStdErr: (chunk) => {
+          stderr += chunk;
+        },
       });
-
-      await build;
     });
 
     runSmokeTest(["public", "index"], LABEL);

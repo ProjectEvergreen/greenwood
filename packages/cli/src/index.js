@@ -1,4 +1,6 @@
 import { generateCompilation } from "./lifecycles/compile.js";
+import { writeSync } from "node:fs";
+import { format } from "node:util";
 
 async function run(command) {
   process.env.__GWD_COMMAND__ = command;
@@ -30,7 +32,9 @@ async function run(command) {
     }
     process.exit(0);
   } catch (err) {
-    console.error(err);
+    // write synchronously so process.exit() cannot discard an asynchronous stderr write.
+    // https://nodejs.org/api/process.html#processexitcode
+    writeSync(process.stderr.fd, `${format(err)}\n`);
     process.exit(1);
   }
 }
