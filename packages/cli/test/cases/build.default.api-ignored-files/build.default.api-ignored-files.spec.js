@@ -20,11 +20,11 @@
  *       notes.txt
  *     index.html
  */
-import { fileURLToPath } from "node:url";
 import { expect } from "chai";
 import glob from "glob-promise";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
+import { fileURLToPath } from "node:url";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 
 // https://github.com/ProjectEvergreen/greenwood/issues/1707

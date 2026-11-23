@@ -22,13 +22,13 @@
  *     index.html
  */
 // https://github.com/ProjectEvergreen/greenwood/issues/1743
-import { fileURLToPath } from "node:url";
 import { JSDOM } from "jsdom";
 import fs from "node:fs/promises";
 import { expect } from "chai";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { Runner } from "gallinago";
+import { fileURLToPath } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Active Frontmatter with Dollar Sign Replacement Patterns";

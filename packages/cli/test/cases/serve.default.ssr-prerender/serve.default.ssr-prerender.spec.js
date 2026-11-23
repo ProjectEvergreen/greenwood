@@ -23,13 +23,13 @@
  *   layouts/
  *     app.html
  */
-import { fileURLToPath } from "node:url";
 import { expect } from "chai";
 import glob from "glob-promise";
 import { JSDOM } from "jsdom";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { Runner } from "gallinago";
+import { fileURLToPath } from "node:url";
 
 describe("Serve Greenwood With: ", function () {
   const LABEL = "A Server Rendered Application (SSR) with prerender configuration";

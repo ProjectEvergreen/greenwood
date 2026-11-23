@@ -28,7 +28,6 @@
  *       logo.module.css
  *   index.html
  */
-import { fileURLToPath } from "node:url";
 import { expect } from "chai";
 import { JSDOM } from "jsdom";
 import fs from "node:fs";
@@ -37,6 +36,7 @@ import { generate, parse, walk } from "css-tree";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { getOutputTeardownFiles, HASH_REGEX } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
+import { fileURLToPath } from "node:url";
 import { implementation } from "jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js";
 
 describe("Build Greenwood With: ", function () {

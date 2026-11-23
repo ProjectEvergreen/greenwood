@@ -22,13 +22,13 @@
  *     index.html   (frontmatter: title "100% Complete", label "Save 20%")
  */
 // https://github.com/ProjectEvergreen/greenwood/issues/1709
-import { fileURLToPath } from "node:url";
 import fs from "node:fs";
 import { JSDOM } from "jsdom";
 import { expect } from "chai";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
+import { fileURLToPath } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Frontmatter title and label containing a literal percent sign";

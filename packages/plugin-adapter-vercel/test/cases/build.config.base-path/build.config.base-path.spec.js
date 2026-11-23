@@ -26,7 +26,6 @@
  *       greeting.js
  *     users.js
  */
-import { fileURLToPath, pathToFileURL } from "node:url";
 import { expect } from "chai";
 import fs from "node:fs/promises";
 import glob from "glob-promise";
@@ -34,6 +33,7 @@ import { JSDOM } from "jsdom";
 import { checkResourceExists } from "../../../../cli/src/lib/resource-utils.js";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Vercel Adapter plugin output and custom base path";

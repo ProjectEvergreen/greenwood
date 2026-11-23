@@ -21,7 +21,6 @@
  *     index.html
  *     regex-test.html
  */
-import { fileURLToPath } from "node:url";
 import { expect } from "chai";
 import fs from "node:fs";
 import glob from "glob-promise";
@@ -29,6 +28,7 @@ import { JSDOM } from "jsdom";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
+import { fileURLToPath } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Static Router Configuration and Hybrid Workspace";

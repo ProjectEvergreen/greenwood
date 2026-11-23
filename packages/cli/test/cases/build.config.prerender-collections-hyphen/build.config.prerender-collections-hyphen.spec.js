@@ -31,13 +31,13 @@
  */
 
 // https://github.com/ProjectEvergreen/greenwood/issues/1715
-import { fileURLToPath } from "node:url";
 import fs from "node:fs/promises";
 import { expect } from "chai";
 import { JSDOM } from "jsdom";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
+import { fileURLToPath } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL =

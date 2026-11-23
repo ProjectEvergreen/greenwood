@@ -42,7 +42,6 @@
  *     artists.js
  *     greeting.js
  */
-import { fileURLToPath } from "node:url";
 import { expect } from "chai";
 import fs from "node:fs/promises";
 import glob from "glob-promise";
@@ -50,6 +49,7 @@ import { JSDOM } from "jsdom";
 import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
+import { fileURLToPath } from "node:url";
 import extract from "extract-zip";
 
 describe("Build Greenwood With: ", function () {

@@ -24,12 +24,12 @@
  *     event/
  *       title.js # has staticExport = true
  */
-import { pathToFileURL } from "node:url";
 import { expect } from "chai";
 import fs from "node:fs/promises";
 import { JSDOM } from "jsdom";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
+import { pathToFileURL } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Vercel Adapter with Dynamic Routing";

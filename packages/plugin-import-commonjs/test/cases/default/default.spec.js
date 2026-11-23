@@ -25,7 +25,6 @@
  *   scripts/
  *     main.js
  */
-import { fileURLToPath } from "node:url";
 import { expect } from "chai";
 import fs from "node:fs";
 import glob from "glob-promise";
@@ -33,6 +32,7 @@ import { JSDOM } from "jsdom";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
+import { fileURLToPath } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Import CommonJs Plugin with default options";

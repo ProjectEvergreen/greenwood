@@ -23,7 +23,6 @@
  *       hero.json
  *    index.html
  */
-import { fileURLToPath } from "node:url";
 import { expect } from "chai";
 import fs from "node:fs";
 import glob from "glob-promise";
@@ -31,6 +30,7 @@ import { JSDOM } from "jsdom";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { getOutputTeardownFiles, HASH_REGEX } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
+import { fileURLToPath } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "ESM Import Attribute for CSS and JSON with prerendering";

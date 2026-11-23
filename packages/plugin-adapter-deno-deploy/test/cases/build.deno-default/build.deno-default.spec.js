@@ -46,9 +46,9 @@
  *   services/
  *     artists.ts
  */
-import { fileURLToPath } from "node:url";
 import { expect } from "chai";
 import fs from "node:fs/promises";
+import { fileURLToPath } from "node:url";
 import { Runner } from "gallinago";
 import { JSDOM } from "jsdom";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";

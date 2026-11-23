@@ -24,13 +24,13 @@
  *     greeting.js
  *
  */
-import { fileURLToPath } from "node:url";
 import { expect } from "chai";
 import fs from "node:fs";
 import glob from "glob-promise";
 import { JSDOM } from "jsdom";
 import { Runner } from "gallinago";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
+import { fileURLToPath } from "node:url";
 
 describe("Serve Greenwood With: ", function () {
   const LABEL = "Import Attributes used in API Routes and SSR Pages";

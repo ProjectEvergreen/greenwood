@@ -17,12 +17,12 @@
  *     index.html
  *
  */
-import { fileURLToPath } from "node:url";
 import { expect } from "chai";
 import glob from "glob-promise";
 import { JSDOM } from "jsdom";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
+import { fileURLToPath } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Loading remote JavaScript and CSS using <script> and <link> tags";
