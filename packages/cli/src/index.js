@@ -32,7 +32,8 @@ async function run(command) {
     }
     process.exit(0);
   } catch (err) {
-    // TODO: remove this once we have a better error handling strategy in place for the CLI
+    // write synchronously so process.exit() cannot discard an asynchronous stderr write.
+    // https://nodejs.org/api/process.html#processexitcode
     writeSync(process.stderr.fd, `${format(err)}\n`);
     process.exit(1);
   }
