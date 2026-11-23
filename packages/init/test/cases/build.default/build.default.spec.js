@@ -14,23 +14,21 @@
 import { expect } from "chai";
 import fs from "node:fs/promises";
 import { JSDOM } from "jsdom";
-import path from "node:path";
 import { Runner } from "gallinago";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
-import { fileURLToPath } from "node:url";
 
 describe("Initialize a new Greenwood project: ", function () {
   const LABEL = "Scaffold Greenwood with default options and run a build";
   const APP_NAME = "my-app";
-  const initPath = path.join(process.cwd(), "packages/init/src/index.js");
-  const outputPath = path.dirname(fileURLToPath(new URL(import.meta.url)));
-  const initOutputPath = path.join(outputPath, `/${APP_NAME}`);
+  const initUrl = new URL("../../../src/index.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
+  const initOutputUrl = new URL(`${APP_NAME}/`, outputUrl);
   let initRunner;
   let greenwoodRunner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(initOutputPath, "public"),
+      publicDir: new URL("public/", initOutputUrl),
     };
     initRunner = new Runner();
     greenwoodRunner = new Runner();
@@ -38,18 +36,18 @@ describe("Initialize a new Greenwood project: ", function () {
 
   describe(LABEL, function () {
     before(async function () {
-      await initRunner.setup(outputPath, { create: false });
-      await initRunner.runCommand(initPath, {
+      await initRunner.setup(outputUrl, { create: false });
+      await initRunner.runCommand(initUrl, {
         args: ["--name", APP_NAME, "--ts", "no", "--install", "no"],
       });
     });
 
     describe(`should build with the Greenwood CLI and have all standard build output files`, function () {
-      const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
+      const cliUrl = new URL("../../../../cli/src/bin.js", import.meta.url);
 
       before(async function () {
-        await greenwoodRunner.setup(initOutputPath);
-        await greenwoodRunner.runCommand(cliPath, { args: ["build"] });
+        await greenwoodRunner.setup(initOutputUrl);
+        await greenwoodRunner.runCommand(cliUrl, { args: ["build"] });
       });
 
       runSmokeTest(["public", "index"], LABEL);
@@ -58,7 +56,7 @@ describe("Initialize a new Greenwood project: ", function () {
         let dom;
 
         before(async function () {
-          const html = await fs.readFile(path.join(initOutputPath, "public/index.html"), "utf-8");
+          const html = await fs.readFile(new URL("public/index.html", initOutputUrl), "utf-8");
 
           dom = new JSDOM(html);
         });
@@ -93,6 +91,6 @@ describe("Initialize a new Greenwood project: ", function () {
   });
 
   after(async function () {
-    await initRunner.teardown([initOutputPath]);
+    await initRunner.teardown([initOutputUrl]);
   });
 });

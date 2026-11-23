@@ -30,35 +30,34 @@
  *     event/
  *       title.js # has staticExport = true
  */
+import { fileURLToPath } from "node:url";
 import { expect } from "chai";
 import fs from "node:fs/promises";
 import { JSDOM } from "jsdom";
 import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
-import { normalizePathnameForWindows } from "../../../../cli/src/lib/resource-utils.js";
 import extract from "extract-zip";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Netlify Adapter plugin output";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../../cli/src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   const netlifyFunctionsOutputUrl = new URL("./netlify/functions/", import.meta.url);
   const hostname = "http://www.example.com";
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
     });
 
     describe("Default Output", function () {
@@ -67,7 +66,7 @@ describe("Build Greenwood With: ", function () {
 
       before(async function () {
         zipFiles = await Array.fromAsync(fs.glob("*.zip", { cwd: netlifyFunctionsOutputUrl }));
-        redirectsFile = await Array.fromAsync(fs.glob("public/_redirects", { cwd: outputPath }));
+        redirectsFile = await Array.fromAsync(fs.glob("public/_redirects", { cwd: outputUrl }));
       });
 
       it("should have the expected number of generated zip files for each function", function () {
@@ -109,7 +108,7 @@ describe("Build Greenwood With: ", function () {
         const name = path.basename(apiFunctions[0]).replace(".zip", "");
 
         await extract(new URL(`./${apiFunctions[0]}`, netlifyFunctionsOutputUrl), {
-          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name),
+          dir: fileURLToPath(new URL(`${name}/`, netlifyFunctionsOutputUrl)),
         });
         const { handler } = await import(
           new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl)
@@ -146,7 +145,7 @@ describe("Build Greenwood With: ", function () {
         const name = path.basename(pageFunctions[0]).replace(".zip", "");
 
         await extract(new URL(`./${pageFunctions[0]}`, netlifyFunctionsOutputUrl), {
-          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name),
+          dir: fileURLToPath(new URL(`${name}/`, netlifyFunctionsOutputUrl)),
         });
         const { handler } = await import(
           new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl)
@@ -178,10 +177,7 @@ describe("Build Greenwood With: ", function () {
         staticPathsFunctions = await Array.fromAsync(
           fs.glob("artists*.zip", { cwd: netlifyFunctionsOutputUrl }),
         );
-        redirectsFileContents = await fs.readFile(
-          path.join(outputPath, "public/_redirects"),
-          "utf-8",
-        );
+        redirectsFileContents = await fs.readFile(new URL("public/_redirects", outputUrl), "utf-8");
       });
 
       it("should not output a serverless function zip file for the route", function () {
@@ -196,7 +192,7 @@ describe("Build Greenwood With: ", function () {
       it("should output static HTML for each path enumerated from getStaticPaths", async function () {
         for (const name of ["foo", "bar", "baz"]) {
           const html = await fs.readFile(
-            path.join(outputPath, `public/artists/${name}/index.html`),
+            new URL(`public/artists/${encodeURIComponent(name)}/index.html`, outputUrl),
             "utf-8",
           );
 
@@ -209,10 +205,7 @@ describe("Build Greenwood With: ", function () {
       let redirectsFileContents;
 
       before(async function () {
-        redirectsFileContents = await fs.readFile(
-          path.join(outputPath, "public/_redirects"),
-          "utf-8",
-        );
+        redirectsFileContents = await fs.readFile(new URL("public/_redirects", outputUrl), "utf-8");
       });
 
       it("should return the expected response when the serverless adapter entry point handler is invoked", async function () {
@@ -226,9 +219,6 @@ describe("Build Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.teardown([
-      path.join(outputPath, "netlify"),
-      ...getOutputTeardownFiles(outputPath),
-    ]);
+    await runner.teardown([new URL("netlify", outputUrl), ...getOutputTeardownFiles(outputUrl)]);
   });
 });

@@ -22,6 +22,7 @@
  *   index.js
  *   index.html
  */
+import { fileURLToPath } from "node:url";
 import { expect } from "chai";
 import glob from "glob-promise";
 import { JSDOM } from "jsdom";
@@ -29,25 +30,24 @@ import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "A Single Page Application (SPA)";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
     });
 
     runSmokeTest(["public"], LABEL);
@@ -58,9 +58,9 @@ describe("Build Greenwood With: ", function () {
       let jsFiles;
 
       before(async function () {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "index.html"));
-        htmlFiles = await glob(`${this.context.publicDir}/**/*.html`);
-        jsFiles = await glob(`${this.context.publicDir}/**/*.js`);
+        dom = await JSDOM.fromFile(fileURLToPath(new URL("index.html", this.context.publicDir)));
+        htmlFiles = await glob(fileURLToPath(new URL("**/*.html", this.context.publicDir)));
+        jsFiles = await glob(fileURLToPath(new URL("**/*.js", this.context.publicDir)));
       });
 
       it("should only have one HTML file in the output directory", function () {
@@ -130,6 +130,6 @@ describe("Build Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

@@ -32,26 +32,25 @@
  *   layouts/
  *     app.html
  */
+import { fileURLToPath } from "node:url";
 import { expect } from "chai";
 import glob from "glob-promise";
 import fs from "node:fs";
 import { JSDOM } from "jsdom";
-import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
 
 describe("Serve Greenwood With: ", function () {
   const LABEL = "A Server Rendered Application (SSR)";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   const hostname = "http://127.0.0.1:8181";
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
       hostname,
     };
     runner = new Runner();
@@ -59,12 +58,12 @@ describe("Serve Greenwood With: ", function () {
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
 
       await new Promise((resolve, reject) => {
         runner
-          .runCommand(cliPath, {
+          .runCommand(cliUrl, {
             args: "serve",
             onStdOut: (message) => {
               if (message.includes("Started server at http://localhost:8181")) {
@@ -103,7 +102,9 @@ describe("Serve Greenwood With: ", function () {
       });
 
       it("should have the expected bundled SSR output for the page entry point and chunk file", async function () {
-        const scriptFiles = await glob.promise(path.join(this.context.publicDir, "index*.js"));
+        const scriptFiles = await glob.promise(
+          fileURLToPath(new URL("index*.js", this.context.publicDir)),
+        );
 
         expect(scriptFiles.length).to.equal(2);
       });
@@ -142,7 +143,7 @@ describe("Serve Greenwood With: ", function () {
         response = await fetch(`${hostname}/artists/`);
         body = await response.clone().text();
         const graph = JSON.parse(
-          await fs.promises.readFile(path.join(outputPath, "public/graph.json"), "utf-8"),
+          await fs.promises.readFile(new URL("public/graph.json", outputUrl), "utf-8"),
         );
 
         artistsPageGraphData = graph.find((page) => page.route === "/artists/");
@@ -166,7 +167,7 @@ describe("Serve Greenwood With: ", function () {
 
       // this is limited by the fact SSR routes have to write to the fs in order to bundle a page on the fly
       it("should not emit a static file", function (done) {
-        const ssrPageOutput = fs.existsSync(path.join(outputPath, "public/artists/index.html"));
+        const ssrPageOutput = fs.existsSync(new URL("public/artists/index.html", outputUrl));
 
         expect(ssrPageOutput).to.be.false;
         done();
@@ -270,7 +271,9 @@ describe("Serve Greenwood With: ", function () {
       });
 
       it("should have the expected bundled SSR output for the page entry point and chunk file", async function () {
-        const scriptFiles = await glob.promise(path.join(this.context.publicDir, "artists*.js"));
+        const scriptFiles = await glob.promise(
+          fileURLToPath(new URL("artists*.js", this.context.publicDir)),
+        );
 
         expect(scriptFiles.length).to.equal(2);
       });
@@ -309,7 +312,9 @@ describe("Serve Greenwood With: ", function () {
       });
 
       it("should have the expected bundled SSR output for the page entry point and chunk file", async function () {
-        const scriptFiles = await glob.promise(path.join(this.context.publicDir, "users*.js"));
+        const scriptFiles = await glob.promise(
+          fileURLToPath(new URL("users*.js", this.context.publicDir)),
+        );
 
         expect(scriptFiles.length).to.equal(2);
       });
@@ -512,6 +517,6 @@ describe("Serve Greenwood With: ", function () {
 
   after(async function () {
     await runner.stopCommand();
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

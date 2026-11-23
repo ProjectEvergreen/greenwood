@@ -24,38 +24,37 @@
  *     index.html
  *     about.ts
  */
+import { fileURLToPath } from "node:url";
 import { expect } from "chai";
 import fs from "node:fs";
 import glob from "glob-promise";
-import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
 
 xdescribe("Build Greenwood With: ", function () {
   const LABEL = "Custom TypeScript Plugin and Default Workspace serving a page";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../../cli/src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner({ forwardParentArgs: true });
   });
 
   describe(LABEL, function () {
     before(function () {
-      runner.setup(outputPath);
-      runner.runCommand(cliPath, { args: "build" });
+      runner.setup(outputUrl);
+      runner.runCommand(cliUrl, { args: "build" });
     });
 
     describe("Home Page", function () {
       let homePage;
 
       before(async function () {
-        homePage = await glob.promise(path.join(this.context.publicDir, "index.html"));
+        homePage = await glob.promise(fileURLToPath(new URL("index.html", this.context.publicDir)));
       });
 
       it("should have expected text from from index.html in the script output file", function () {
@@ -69,7 +68,9 @@ xdescribe("Build Greenwood With: ", function () {
       let aboutPage;
 
       before(async function () {
-        aboutPage = await glob.promise(path.join(this.context.publicDir, "*about/index.html"));
+        aboutPage = await glob.promise(
+          fileURLToPath(new URL("*about/index.html", this.context.publicDir)),
+        );
       });
 
       it("should have the expected page HTML file in the output directory", function () {
@@ -91,6 +92,6 @@ xdescribe("Build Greenwood With: ", function () {
   });
 
   after(function () {
-    runner.teardown(getOutputTeardownFiles(outputPath));
+    runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

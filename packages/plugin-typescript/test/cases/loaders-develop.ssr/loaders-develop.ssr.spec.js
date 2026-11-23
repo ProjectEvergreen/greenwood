@@ -28,21 +28,19 @@
  */
 import { expect } from "chai";
 import { JSDOM } from "jsdom";
-import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
 
 xdescribe("Develop Greenwood With: ", function () {
   const LABEL = "A Server Rendered Application (SSR) with API Routes in TypeScript";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../../cli/src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   const hostname = "http://127.0.0.1:1984";
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
       hostname,
     };
     runner = new Runner({ forwardParentArgs: true });
@@ -50,14 +48,14 @@ xdescribe("Develop Greenwood With: ", function () {
 
   describe(LABEL, function () {
     before(async function () {
-      runner.setup(outputPath);
+      runner.setup(outputUrl);
 
       return new Promise((resolve) => {
         setTimeout(() => {
           resolve();
         }, 10000);
 
-        runner.runCommand(cliPath, { args: "develop" });
+        runner.runCommand(cliUrl, { args: "develop" });
       });
     });
 
@@ -131,6 +129,6 @@ xdescribe("Develop Greenwood With: ", function () {
 
   after(async function () {
     await runner.stopCommand();
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

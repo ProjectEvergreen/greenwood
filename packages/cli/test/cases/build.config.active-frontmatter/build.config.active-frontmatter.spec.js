@@ -23,31 +23,30 @@
  *   layouts/
  *     blog.html
  */
+import { fileURLToPath } from "node:url";
 import { JSDOM } from "jsdom";
-import path from "node:path";
 import { expect } from "chai";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Active Frontmatter";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
     });
 
     runSmokeTest(["public", "index"], LABEL);
@@ -56,7 +55,7 @@ describe("Build Greenwood With: ", function () {
       let dom;
 
       before(async function () {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "./index.html"));
+        dom = await JSDOM.fromFile(fileURLToPath(new URL("index.html", this.context.publicDir)));
       });
 
       it("should have the correct value for the <title> tag in the <head> for the home page", function () {
@@ -89,7 +88,7 @@ describe("Build Greenwood With: ", function () {
 
       before(async function () {
         dom = await JSDOM.fromFile(
-          path.resolve(this.context.publicDir, "./blog/first-post/index.html"),
+          fileURLToPath(new URL("blog/first-post/index.html", this.context.publicDir)),
         );
       });
 
@@ -125,7 +124,7 @@ describe("Build Greenwood With: ", function () {
 
       before(async function () {
         dom = await JSDOM.fromFile(
-          path.resolve(this.context.publicDir, "./blog/second-post/index.html"),
+          fileURLToPath(new URL("blog/second-post/index.html", this.context.publicDir)),
         );
       });
 
@@ -154,7 +153,9 @@ describe("Build Greenwood With: ", function () {
       let dom;
 
       before(async function () {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "./about/index.html"));
+        dom = await JSDOM.fromFile(
+          fileURLToPath(new URL("about/index.html", this.context.publicDir)),
+        );
       });
 
       it("should have the correct value for the <title> tag in the <head>", function () {
@@ -172,6 +173,6 @@ describe("Build Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

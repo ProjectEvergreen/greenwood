@@ -24,19 +24,18 @@
  *     greeting.js
  *
  */
+import { fileURLToPath } from "node:url";
 import { expect } from "chai";
 import fs from "node:fs";
 import glob from "glob-promise";
 import { JSDOM } from "jsdom";
-import path from "node:path";
 import { Runner } from "gallinago";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
-import { fileURLToPath } from "node:url";
 
 describe("Serve Greenwood With: ", function () {
   const LABEL = "Import Attributes used in API Routes and SSR Pages";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   const hostname = "http://localhost:8080";
   let runner;
 
@@ -49,12 +48,12 @@ describe("Serve Greenwood With: ", function () {
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
 
       await new Promise((resolve, reject) => {
         runner
-          .runCommand(cliPath, {
+          .runCommand(cliUrl, {
             args: "serve",
             onStdOut: (message) => {
               if (message.includes("Started server at http://localhost:8080")) {
@@ -75,7 +74,7 @@ describe("Serve Greenwood With: ", function () {
       before(async function () {
         response = await fetch(`${hostname}/api/fragment?name=${name}`);
         body = await response.clone().text();
-        scripts = await glob.promise(path.join(outputPath, "public/api/fragment.*.js"));
+        scripts = await glob.promise(fileURLToPath(new URL("public/api/fragment.*.js", outputUrl)));
       });
 
       it("should return a 200 status", function (done) {
@@ -126,7 +125,9 @@ describe("Serve Greenwood With: ", function () {
       before(async function () {
         response = await fetch(`${hostname}/greeting/`);
         body = await response.clone().text();
-        scripts = await glob.promise(path.join(outputPath, "public/greeting.route.chunk.*.js"));
+        scripts = await glob.promise(
+          fileURLToPath(new URL("public/greeting.route.chunk.*.js", outputUrl)),
+        );
       });
 
       it("should return a 200 status", function (done) {
@@ -172,6 +173,6 @@ describe("Serve Greenwood With: ", function () {
 
   after(async function () {
     await runner.stopCommand();
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

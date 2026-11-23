@@ -27,25 +27,23 @@
  */
 import { expect } from "chai";
 import fs from "node:fs/promises";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { JSDOM } from "jsdom";
 import { Runner } from "gallinago";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 
 describe("Build Greenwood With: Prerendered Active Content on a Custom Port", function () {
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
 
   const runner = new Runner();
 
   before(async function () {
-    await runner.setup(outputPath);
-    await runner.runCommand(cliPath, { args: "build" });
+    await runner.setup(outputUrl);
+    await runner.runCommand(cliUrl, { args: "build" });
   });
 
   it("should prerender navigation from the data client using the custom dev server port", async function () {
-    const html = await fs.readFile(path.join(outputPath, "public/index.html"), "utf-8");
+    const html = await fs.readFile(new URL("public/index.html", outputUrl), "utf-8");
     const dom = new JSDOM(html);
     const links = dom.window.document.querySelectorAll("app-header nav a");
 
@@ -55,6 +53,6 @@ describe("Build Greenwood With: Prerendered Active Content on a Custom Port", fu
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

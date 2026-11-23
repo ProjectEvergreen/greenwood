@@ -24,32 +24,31 @@
  *   layout/
  *     page.html
  */
+import { fileURLToPath } from "node:url";
 import fs from "node:fs";
 import { JSDOM } from "jsdom";
-import path from "node:path";
 import { expect } from "chai";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Custom (Frontmatter) Meta Tags and Nested Workspace";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../../cli/src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
     });
 
     runSmokeTest(["public", "index"], LABEL);
@@ -59,9 +58,9 @@ describe("Build Greenwood With: ", function () {
       let graph;
 
       before(async function () {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "./index.html"));
+        dom = await JSDOM.fromFile(fileURLToPath(new URL("index.html", this.context.publicDir)));
         graph = JSON.parse(
-          await fs.promises.readFile(path.join(this.context.publicDir, "graph.json"), "utf-8"),
+          await fs.promises.readFile(new URL("graph.json", this.context.publicDir), "utf-8"),
         );
       });
 
@@ -116,12 +115,13 @@ describe("Build Greenwood With: ", function () {
       let dom;
 
       before(async function () {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "about", "./index.html"));
+        dom = await JSDOM.fromFile(
+          fileURLToPath(new URL("about/index.html", this.context.publicDir)),
+        );
       });
 
       it("should output an index.html file within the about page directory", function () {
-        expect(fs.existsSync(path.join(this.context.publicDir, "about", "./index.html"))).to.be
-          .true;
+        expect(fs.existsSync(new URL("about/index.html", this.context.publicDir))).to.be.true;
       });
 
       it("should have a <meta> tag with custom og:site content in the <head>", function () {
@@ -147,7 +147,7 @@ describe("Build Greenwood With: ", function () {
       let dom;
 
       before(async function () {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "./index.html"));
+        dom = await JSDOM.fromFile(fileURLToPath(new URL("index.html", this.context.publicDir)));
       });
 
       it("should have our custom config <link> tag with shortcut icon in the <head> for the index page", function () {
@@ -165,6 +165,6 @@ describe("Build Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

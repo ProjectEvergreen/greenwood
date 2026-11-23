@@ -10,14 +10,12 @@
  */
 import { expect } from "chai";
 import net from "node:net";
-import path from "node:path";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
 
 describe("Develop Greenwood With: ", function () {
   const LABEL = "GraphQL Server Port Already In Use";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../../cli/src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   const preferredPort = 4000;
   let devServerUrl;
   let selectedPort;
@@ -36,13 +34,13 @@ describe("Develop Greenwood With: ", function () {
         blocker.listen(preferredPort, resolve);
       });
 
-      await runner.setup(outputPath);
+      await runner.setup(outputUrl);
 
       await new Promise((resolve, reject) => {
         let output = "";
 
         runner
-          .runCommand(cliPath, {
+          .runCommand(cliUrl, {
             args: "develop",
             onStdOut: (message) => {
               // stdout chunks can split startup messages, so wait for a complete CLI-ready line.
@@ -115,6 +113,6 @@ describe("Develop Greenwood With: ", function () {
     if (blocker?.listening) {
       await new Promise((resolve) => blocker.close(resolve));
     }
-    await runner.teardown([path.join(outputPath, ".greenwood")]);
+    await runner.teardown([new URL(".greenwood", outputUrl)]);
   });
 });

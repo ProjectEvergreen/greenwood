@@ -28,31 +28,30 @@
  *     about.jsx
  *     index.html
  */
+import { fileURLToPath } from "node:url";
 import { expect } from "chai";
 import fs from "node:fs/promises";
 import { JSDOM } from "jsdom";
-import path from "node:path";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "JSX based Signals Reactivity and prerendering";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../../cli/src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner({ forwardParentArgs: true });
   });
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
     });
 
     runSmokeTest(["public"], LABEL);
@@ -61,7 +60,7 @@ describe("Build Greenwood With: ", function () {
       let dom;
 
       before(async function () {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "./index.html"));
+        dom = await JSDOM.fromFile(fileURLToPath(new URL("index.html", this.context.publicDir)));
       });
 
       it("should not contain an import map for Signals polyfill and WCC effect.js", function (done) {
@@ -92,7 +91,7 @@ describe("Build Greenwood With: ", function () {
       let dom;
 
       before(async function () {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "./index.html"));
+        dom = await JSDOM.fromFile(fileURLToPath(new URL("index.html", this.context.publicDir)));
         scripts = await Array.fromAsync(
           fs.glob("counter.*.js", { cwd: new URL("./public/", import.meta.url) }),
         );
@@ -130,7 +129,9 @@ describe("Build Greenwood With: ", function () {
       let dom;
 
       before(async function () {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "./welcome/index.html"));
+        dom = await JSDOM.fromFile(
+          fileURLToPath(new URL("welcome/index.html", this.context.publicDir)),
+        );
       });
 
       it("should render the component shadow root only once during prerendering", function () {
@@ -175,9 +176,9 @@ describe("Build Greenwood With: ", function () {
 
   after(async function () {
     await runner.teardown([
-      path.join(outputPath, "public"),
-      path.join(outputPath, ".greenwood"),
-      path.join(outputPath, "node_modules"),
+      new URL("public", outputUrl),
+      new URL(".greenwood", outputUrl),
+      new URL("node_modules", outputUrl),
     ]);
   });
 });

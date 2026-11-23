@@ -15,14 +15,12 @@
  * Greenwood default (src/)
  */
 import { expect } from "chai";
-import path from "node:path";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
 
 describe("Develop Greenwood With: ", function () {
   const LABEL = "GraphQL Server";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../../cli/src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   const hostname = "localhost";
   const port = 4000;
   let runner;
@@ -33,11 +31,11 @@ describe("Develop Greenwood With: ", function () {
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
+      await runner.setup(outputUrl);
 
       await new Promise((resolve, reject) => {
         runner
-          .runCommand(cliPath, {
+          .runCommand(cliUrl, {
             args: "develop",
             onStdOut: (message) => {
               // here we are waiting for the _GraphQL_ server to be started
@@ -119,6 +117,6 @@ describe("Develop Greenwood With: ", function () {
 
   after(async function () {
     await runner.stopCommand();
-    await runner.teardown([path.join(outputPath, ".greenwood"), path.join(outputPath, "public")]);
+    await runner.teardown([new URL(".greenwood", outputUrl), new URL("public", outputUrl)]);
   });
 });

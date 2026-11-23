@@ -19,24 +19,23 @@
  *     about.js
  *     index.html
  */
+import { fileURLToPath } from "node:url";
 import { expect } from "chai";
 import fs from "node:fs";
 import { JSDOM } from "jsdom";
-import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Default Greenwood Configuration and Workspace w/Custom App Layout";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
@@ -45,19 +44,19 @@ describe("Build Greenwood With: ", function () {
     let dom;
 
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
     });
 
     runSmokeTest(["public", "index"], LABEL);
 
     describe("Custom App Layout for index.html", function () {
       before(async function () {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "index.html"));
+        dom = await JSDOM.fromFile(fileURLToPath(new URL("index.html", this.context.publicDir)));
       });
 
       it("should output a single index.html file using our custom app layout", function () {
-        expect(fs.existsSync(path.join(this.context.publicDir, "./index.html"))).to.be.true;
+        expect(fs.existsSync(new URL("index.html", this.context.publicDir))).to.be.true;
       });
 
       it("should have the <title> tag element we added as part of our custom app layout", function () {
@@ -81,11 +80,13 @@ describe("Build Greenwood With: ", function () {
 
     describe("Custom App Layout for prerendered about.js page", function () {
       before(async function () {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "about/index.html"));
+        dom = await JSDOM.fromFile(
+          fileURLToPath(new URL("about/index.html", this.context.publicDir)),
+        );
       });
 
       it("should output a single index.html file using our page", function () {
-        expect(fs.existsSync(path.join(this.context.publicDir, "./about/index.html"))).to.be.true;
+        expect(fs.existsSync(new URL("about/index.html", this.context.publicDir))).to.be.true;
       });
 
       it("should have the <title> tag element we added as part of our page", function () {
@@ -115,6 +116,6 @@ describe("Build Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

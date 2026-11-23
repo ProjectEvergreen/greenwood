@@ -13,65 +13,63 @@
  */
 import { expect } from "chai";
 import fs from "node:fs";
-import path from "node:path";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
 
 describe("Initialize a new Greenwood project: ", function () {
   const APP_NAME = "my-app";
-  const initPath = path.join(process.cwd(), "packages/init/src/index.js");
-  const outputPath = path.dirname(fileURLToPath(new URL(import.meta.url)));
-  const initOutputPath = path.join(outputPath, `/${APP_NAME}`);
+  const initUrl = new URL("../../../src/index.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
+  const initOutputUrl = new URL(`${APP_NAME}/`, outputUrl);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: outputPath,
+      publicDir: outputUrl,
     };
     runner = new Runner();
   });
 
   describe("Scaffolding a new project with default options", function () {
     before(async function () {
-      await runner.setup(outputPath, { create: false });
-      await runner.runCommand(initPath, {
+      await runner.setup(outputUrl, { create: false });
+      await runner.runCommand(initUrl, {
         args: ["--name", APP_NAME, "--ts", "no", "--install", "no"],
       });
     });
 
     describe("project files and folders", () => {
       it("should create a src/pages directory", function () {
-        expect(fs.existsSync(path.join(initOutputPath, "src", "pages"))).to.be.true;
+        expect(fs.existsSync(new URL("src/pages", initOutputUrl))).to.be.true;
       });
 
       it("should generate a .gitignore file", function () {
-        expect(fs.existsSync(path.join(initOutputPath, ".gitignore"))).to.be.true;
+        expect(fs.existsSync(new URL(".gitignore", initOutputUrl))).to.be.true;
       });
 
       it("should generate a package.json file", function () {
-        expect(fs.existsSync(path.join(initOutputPath, "package.json"))).to.be.true;
+        expect(fs.existsSync(new URL("package.json", initOutputUrl))).to.be.true;
       });
 
       it("should not generate a .npmrc file", function () {
-        const npmrcPath = path.join(initOutputPath, ".npmrc");
+        const npmrcUrl = new URL(".npmrc", initOutputUrl);
 
-        expect(fs.existsSync(npmrcPath)).to.be.false;
+        expect(fs.existsSync(npmrcUrl)).to.be.false;
       });
 
       it("should not generate a package-lock.json file", function () {
-        expect(fs.existsSync(path.join(initOutputPath, "package-lock.json"))).to.be.false;
+        expect(fs.existsSync(new URL("package-lock.json", initOutputUrl))).to.be.false;
       });
 
       it("should not generate a yarn.lock file", function () {
-        expect(fs.existsSync(path.join(initOutputPath, "yarn.lock"))).to.be.false;
+        expect(fs.existsSync(new URL("yarn.lock", initOutputUrl))).to.be.false;
       });
 
       it("should not generate a pnpm-lock.yaml file", function () {
-        expect(fs.existsSync(path.join(initOutputPath, "pnpm-lock.yaml"))).to.be.false;
+        expect(fs.existsSync(new URL("pnpm-lock.yaml", initOutputUrl))).to.be.false;
       });
 
       it("should not generate a public directory", function () {
-        expect(fs.existsSync(path.join(initOutputPath, "public"))).to.be.false;
+        expect(fs.existsSync(new URL("public", initOutputUrl))).to.be.false;
       });
     });
 
@@ -79,7 +77,7 @@ describe("Initialize a new Greenwood project: ", function () {
       let pkgJson;
 
       before(function () {
-        pkgJson = JSON.parse(fs.readFileSync(path.join(initOutputPath, "package.json"), "utf-8"));
+        pkgJson = JSON.parse(fs.readFileSync(new URL("package.json", initOutputUrl), "utf-8"));
       });
 
       it("the should have the correct type", function () {
@@ -121,7 +119,7 @@ describe("Initialize a new Greenwood project: ", function () {
       let pageContents;
 
       before(async function () {
-        pageContents = fs.readFileSync(path.join(initOutputPath, "src/pages/index.html"), "utf-8");
+        pageContents = fs.readFileSync(new URL("src/pages/index.html", initOutputUrl), "utf-8");
       });
 
       it("should have the expected getting started prompt", function () {
@@ -147,6 +145,6 @@ describe("Initialize a new Greenwood project: ", function () {
   });
 
   after(async function () {
-    await runner.teardown([initOutputPath]);
+    await runner.teardown([initOutputUrl]);
   });
 });

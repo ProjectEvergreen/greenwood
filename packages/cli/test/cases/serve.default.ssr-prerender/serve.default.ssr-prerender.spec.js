@@ -23,25 +23,24 @@
  *   layouts/
  *     app.html
  */
+import { fileURLToPath } from "node:url";
 import { expect } from "chai";
 import glob from "glob-promise";
 import { JSDOM } from "jsdom";
-import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
 
 describe("Serve Greenwood With: ", function () {
   const LABEL = "A Server Rendered Application (SSR) with prerender configuration";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
   const hostname = "http://127.0.0.1:8080";
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const outputUrl = new URL("./", import.meta.url);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
       hostname,
     };
     runner = new Runner();
@@ -49,12 +48,12 @@ describe("Serve Greenwood With: ", function () {
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
 
       await new Promise((resolve, reject) => {
         runner
-          .runCommand(cliPath, {
+          .runCommand(cliUrl, {
             args: "serve",
             onStdOut: (message) => {
               if (message.includes("Started server at http://localhost:8080")) {
@@ -125,20 +124,24 @@ describe("Serve Greenwood With: ", function () {
 
         it("should have the expected bundled SSR output for the page", async function () {
           const scriptFiles = await glob.promise(
-            path.join(this.context.publicDir, "index.route*.js"),
+            fileURLToPath(new URL("index.route*.js", this.context.publicDir)),
           );
 
           expect(scriptFiles.length).to.equal(2);
         });
 
         it("should not emit static HTML for the SSR page", async function () {
-          const htmlFiles = await glob.promise(path.join(this.context.publicDir, "index.html"));
+          const htmlFiles = await glob.promise(
+            fileURLToPath(new URL("index.html", this.context.publicDir)),
+          );
 
           expect(htmlFiles.length).to.equal(0);
         });
 
         it("should have no _layouts/ output directory for the app", async function () {
-          const layoutFiles = await glob.promise(path.join(this.context.publicDir, "_layouts/*"));
+          const layoutFiles = await glob.promise(
+            fileURLToPath(new URL("_layouts/*", this.context.publicDir)),
+          );
 
           expect(layoutFiles.length).to.equal(0);
         });
@@ -148,6 +151,6 @@ describe("Serve Greenwood With: ", function () {
 
   after(async function () {
     await runner.stopCommand();
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

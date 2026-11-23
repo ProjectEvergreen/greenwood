@@ -20,10 +20,8 @@
 import { expect } from "chai";
 import fs from "node:fs";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
-import path from "node:path";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
 
 function removeWhiteSpace(string = "") {
   return string.replace(/\n/g, "").replace(/ /g, "");
@@ -31,14 +29,12 @@ function removeWhiteSpace(string = "") {
 
 describe("Serve Greenwood With: ", function () {
   const LABEL = "A Single Page Application (SPA)";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   const hostname = "http://localhost";
   const BODY_REGEX = /<body>(.*)<\/body>/s;
   const expected = removeWhiteSpace(
-    fs
-      .readFileSync(path.join(outputPath, `src${path.sep}index.html`), "utf-8")
-      .match(BODY_REGEX)[0],
+    fs.readFileSync(new URL("src/index.html", outputUrl), "utf-8").match(BODY_REGEX)[0],
   );
 
   const port = 8080;
@@ -47,19 +43,19 @@ describe("Serve Greenwood With: ", function () {
   before(function () {
     this.context = {
       hostname: `${hostname}:${port}`,
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
 
       await new Promise((resolve, reject) => {
         runner
-          .runCommand(cliPath, {
+          .runCommand(cliUrl, {
             args: "serve",
             onStdOut: (message) => {
               if (message.includes("Started server at http://localhost:8080")) {
@@ -154,6 +150,6 @@ describe("Serve Greenwood With: ", function () {
 
   after(async function () {
     await runner.stopCommand();
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

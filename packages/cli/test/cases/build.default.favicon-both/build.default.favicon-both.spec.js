@@ -21,45 +21,43 @@
  */
 import { expect } from "chai";
 import fs from "node:fs/promises";
-import path from "node:path";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL =
     "Default Greenwood Configuration and Workspace with both favicon.ico and favicon.svg";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
     });
 
     runSmokeTest(["public"], LABEL);
 
     describe("Default output for project level favicon.ico and favicon.svg", function () {
       it("should have a favicon.ico file in the output directory matching the source file", async function () {
-        const source = await fs.readFile(path.join(outputPath, "src/favicon.ico"));
-        const output = await fs.readFile(path.join(this.context.publicDir, "favicon.ico"));
+        const source = await fs.readFile(new URL("src/favicon.ico", outputUrl));
+        const output = await fs.readFile(new URL("favicon.ico", this.context.publicDir));
 
         expect(output.equals(source)).to.equal(true);
       });
 
       it("should have a favicon.svg file in the output directory matching the source file", async function () {
-        const source = await fs.readFile(path.join(outputPath, "src/favicon.svg"));
-        const output = await fs.readFile(path.join(this.context.publicDir, "favicon.svg"));
+        const source = await fs.readFile(new URL("src/favicon.svg", outputUrl));
+        const output = await fs.readFile(new URL("favicon.svg", this.context.publicDir));
 
         expect(output.equals(source)).to.equal(true);
       });
@@ -67,6 +65,6 @@ describe("Build Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

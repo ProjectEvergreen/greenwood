@@ -20,32 +20,31 @@
  *       notes.txt
  *     index.html
  */
+import { fileURLToPath } from "node:url";
 import { expect } from "chai";
 import glob from "glob-promise";
-import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 
 // https://github.com/ProjectEvergreen/greenwood/issues/1707
 describe("Build Greenwood With: ", function () {
   const LABEL = "Default Config and Unsupported File Extension in the API Directory";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
     });
 
     runSmokeTest(["public"]);
@@ -53,25 +52,25 @@ describe("Build Greenwood With: ", function () {
     describe("Default output", function () {
       it("should emit the index page in the output directory", async function () {
         expect(
-          await glob.promise(path.join(this.context.publicDir, "index.html")),
+          await glob.promise(fileURLToPath(new URL("index.html", this.context.publicDir))),
         ).to.have.lengthOf(1);
       });
 
       it("should emit the one valid API route in the output directory", async function () {
         expect(
-          await glob.promise(path.join(this.context.publicDir, "api/**/*.js")),
+          await glob.promise(fileURLToPath(new URL("api/**/*.js", this.context.publicDir))),
         ).to.have.lengthOf(1);
       });
 
       it("should not emit the unsupported api file in the output directory", async function () {
         expect(
-          await glob.promise(path.join(this.context.publicDir, "api/**/*.txt")),
+          await glob.promise(fileURLToPath(new URL("api/**/*.txt", this.context.publicDir))),
         ).to.have.lengthOf(0);
       });
     });
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

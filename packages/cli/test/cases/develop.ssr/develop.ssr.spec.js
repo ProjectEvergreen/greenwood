@@ -28,32 +28,30 @@
 import { expect } from "chai";
 import fs from "node:fs";
 import { JSDOM } from "jsdom";
-import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
 
 describe("Develop Greenwood With: ", function () {
   const LABEL = "A Server Rendered Project (SSR)";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   const hostname = "http://127.0.0.1:1984";
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
+      await runner.setup(outputUrl);
 
       await new Promise((resolve, reject) => {
         runner
-          .runCommand(cliPath, {
+          .runCommand(cliUrl, {
             args: "develop",
             onStdOut: (message) => {
               if (message.includes("Started local development server at http://localhost:1984")) {
@@ -73,7 +71,7 @@ describe("Develop Greenwood With: ", function () {
 
       before(async function () {
         const graph = JSON.parse(
-          await fs.promises.readFile(path.join(outputPath, ".greenwood/graph.json"), "utf-8"),
+          await fs.promises.readFile(new URL(".greenwood/graph.json", outputUrl), "utf-8"),
         );
 
         response = await fetch(`${hostname}/artists/`);
@@ -170,7 +168,7 @@ describe("Develop Greenwood With: ", function () {
 
       before(async function () {
         const graph = JSON.parse(
-          await fs.promises.readFile(path.join(outputPath, ".greenwood/graph.json"), "utf-8"),
+          await fs.promises.readFile(new URL(".greenwood/graph.json", outputUrl), "utf-8"),
         );
         const response = await fetch(`${hostname}/page-object/`);
 
@@ -342,6 +340,6 @@ describe("Develop Greenwood With: ", function () {
 
   after(async function () {
     await runner.stopCommand();
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

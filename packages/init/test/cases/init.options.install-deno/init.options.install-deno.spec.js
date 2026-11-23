@@ -13,44 +13,42 @@
  */
 import { expect } from "chai";
 import fs from "node:fs";
-import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { Runner } from "gallinago";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
-import { fileURLToPath } from "node:url";
 
 describe("Initialize a new Greenwood project: ", function () {
   const LABEL = "Scaffolding a new project with dependencies installed through Deno";
   const APP_NAME = "my-app";
-  const initPath = path.join(process.cwd(), "packages/init/src/index.js");
-  const outputPath = path.dirname(fileURLToPath(new URL(import.meta.url)));
-  const initOutputPath = path.join(outputPath, `/${APP_NAME}`);
+  const initUrl = new URL("../../../src/index.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
+  const initOutputUrl = new URL(`${APP_NAME}/`, outputUrl);
   let initRunner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(initOutputPath, "public"),
+      publicDir: new URL("public/", initOutputUrl),
     };
     initRunner = new Runner({ enableStdOut: true });
   });
 
   describe(LABEL, function () {
     before(async function () {
-      await initRunner.setup(outputPath, { create: false });
-      await initRunner.runCommand(initPath, {
+      await initRunner.setup(outputUrl, { create: false });
+      await initRunner.runCommand(initUrl, {
         args: ["--name", APP_NAME, "--install", "deno", "--ts", "no"],
       });
     });
 
     it("should generate a deno.lock file", function () {
-      expect(fs.existsSync(path.join(initOutputPath, "deno.lock"))).to.be.true;
+      expect(fs.existsSync(new URL("deno.lock", initOutputUrl))).to.be.true;
     });
 
     it("should generate a deno.jsonc file", function () {
-      const denoConfigPath = path.join(initOutputPath, "deno.jsonc");
-      const denoConfigContents = JSON.parse(fs.readFileSync(denoConfigPath, "utf-8"));
+      const denoConfigUrl = new URL("deno.jsonc", initOutputUrl);
+      const denoConfigContents = JSON.parse(fs.readFileSync(denoConfigUrl, "utf-8"));
 
-      expect(fs.existsSync(denoConfigPath)).to.be.true;
+      expect(fs.existsSync(denoConfigUrl)).to.be.true;
       expect(denoConfigContents.preferPackageJson).to.equal(true);
       expect(denoConfigContents.minimumDependencyAge).to.deep.equal({
         age: "P1D",
@@ -61,7 +59,7 @@ describe("Initialize a new Greenwood project: ", function () {
 
     it("should scaffold Greenwood NPM scripts with Deno permissions", function () {
       const { scripts } = JSON.parse(
-        fs.readFileSync(path.join(initOutputPath, "package.json"), "utf-8"),
+        fs.readFileSync(new URL("package.json", initOutputUrl), "utf-8"),
       );
       const baseCommand = "deno run --allow-read --allow-sys --allow-env --allow-write --allow-ffi";
 
@@ -75,21 +73,21 @@ describe("Initialize a new Greenwood project: ", function () {
 
     // https://github.com/ProjectEvergreen/greenwood/discussions/1810
     it("should install @rollup/wasm-node", function () {
-      const packageJsonPath = path.join(initOutputPath, "package.json");
-      const packageJsonContents = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
+      const packageJsonUrl = new URL("package.json", initOutputUrl);
+      const packageJsonContents = JSON.parse(fs.readFileSync(packageJsonUrl, "utf-8"));
 
       expect(packageJsonContents.devDependencies["@rollup/wasm-node"]).to.equal("^4.59.0");
     });
 
     it("should not generate a .npmrc file", function () {
-      const npmrcPath = path.join(initOutputPath, ".npmrc");
+      const npmrcUrl = new URL(".npmrc", initOutputUrl);
 
-      expect(fs.existsSync(npmrcPath)).to.be.false;
+      expect(fs.existsSync(npmrcUrl)).to.be.false;
     });
 
     it("should build with Deno", function () {
       const result = spawnSync("deno", ["task", "build"], {
-        cwd: initOutputPath,
+        cwd: initOutputUrl,
         encoding: "utf-8",
       });
 
@@ -101,6 +99,6 @@ describe("Initialize a new Greenwood project: ", function () {
   });
 
   after(async function () {
-    await initRunner.teardown([initOutputPath]);
+    await initRunner.teardown([initOutputUrl]);
   });
 });

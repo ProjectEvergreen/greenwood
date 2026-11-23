@@ -6,12 +6,12 @@
  * There are a number of examples in the CLI package you can use as a reference.
  *
  */
+import { fileURLToPath } from "node:url";
 import { expect } from "chai";
 import fs from "node:fs";
 import glob from "glob-promise";
 import http from "node:http";
 import { JSDOM } from "jsdom";
-import path from "node:path";
 import { tagsMatch } from "./utils.js";
 
 function commonIndexSpecs(dom, html, label) {
@@ -151,13 +151,13 @@ function publicDirectory(label) {
 
       it("should output one graph.json file", async function () {
         expect(
-          await glob.promise(path.join(this.context.publicDir, "graph.json")),
+          await glob.promise(fileURLToPath(new URL("graph.json", this.context.publicDir))),
         ).to.have.lengthOf(1);
       });
 
       it("should not output any map files for HTML pages", async function () {
         expect(
-          await glob.promise(path.join(this.context.publicDir, "**/**/*.html.map")),
+          await glob.promise(fileURLToPath(new URL("**/**/*.html.map", this.context.publicDir))),
         ).to.have.lengthOf(0);
       });
     });
@@ -171,10 +171,10 @@ function defaultIndex(label) {
       let html;
 
       before(async function () {
-        const htmlPath = path.resolve(this.context.publicDir, "index.html");
+        const htmlUrl = new URL("index.html", this.context.publicDir);
 
-        dom = await JSDOM.fromFile(htmlPath);
-        html = await fs.promises.readFile(htmlPath, "utf-8");
+        dom = await JSDOM.fromFile(fileURLToPath(htmlUrl));
+        html = await fs.promises.readFile(htmlUrl, "utf-8");
       });
 
       it("should do all the common checks for an HTML page", function (done) {

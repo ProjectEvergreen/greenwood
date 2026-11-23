@@ -25,24 +25,23 @@
  *   styles/
  *     theme.css
  */
+import { fileURLToPath } from "node:url";
 import { expect } from "chai";
 import glob from "glob-promise";
 import { JSDOM } from "jsdom";
-import path from "node:path";
 import { getDependencyFiles, getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Development environment for a Theme Pack";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
@@ -50,22 +49,22 @@ describe("Build Greenwood With: ", function () {
   describe(LABEL, function () {
     before(async function () {
       const themePackLayouts = await getDependencyFiles(
-        `${outputPath}/src/layouts/*.html`,
-        `${outputPath}/node_modules/my-theme-pack/dist/layouts`,
+        new URL("src/layouts/*.html", outputUrl),
+        new URL("node_modules/my-theme-pack/dist/layouts/", outputUrl),
       );
       const themePackStyles = await getDependencyFiles(
-        `${outputPath}/src/styles/*.css`,
-        `${outputPath}/node_modules/my-theme-pack/dist/styles`,
+        new URL("src/styles/*.css", outputUrl),
+        new URL("node_modules/my-theme-pack/dist/styles/", outputUrl),
       );
       const themePackComponents = await getDependencyFiles(
-        `${outputPath}/src/components/*.js`,
-        `${outputPath}/node_modules/my-theme-pack/dist/components`,
+        new URL("src/components/*.js", outputUrl),
+        new URL("node_modules/my-theme-pack/dist/components/", outputUrl),
       );
 
-      await runner.setup(outputPath, {
+      await runner.setup(outputUrl, {
         setupFiles: [...themePackLayouts, ...themePackStyles, ...themePackComponents],
       });
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.runCommand(cliUrl, { args: "build" });
     });
 
     runSmokeTest(["public", "index"], LABEL);
@@ -74,7 +73,7 @@ describe("Build Greenwood With: ", function () {
       let dom;
 
       before(async function () {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "index.html"));
+        dom = await JSDOM.fromFile(fileURLToPath(new URL("index.html", this.context.publicDir)));
       });
 
       it("should have expected text from layout/blog-post.html", function () {
@@ -98,12 +97,12 @@ describe("Build Greenwood With: ", function () {
       let dom;
 
       before(async function () {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "index.html"));
+        dom = await JSDOM.fromFile(fileURLToPath(new URL("index.html", this.context.publicDir)));
       });
 
       it("should output a single CSS file for custom theme pack styles/theme.css", async function () {
         expect(
-          await glob.promise(path.join(this.context.publicDir, "**/theme.*.css")),
+          await glob.promise(fileURLToPath(new URL("**/theme.*.css", this.context.publicDir))),
         ).to.have.lengthOf(1);
       });
 
@@ -125,12 +124,12 @@ describe("Build Greenwood With: ", function () {
       let dom;
 
       before(async function () {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "index.html"));
+        dom = await JSDOM.fromFile(fileURLToPath(new URL("index.html", this.context.publicDir)));
       });
 
       it("should output a single JS file for custom theme pack components/heading.js", async function () {
         expect(
-          await glob.promise(path.join(this.context.publicDir, "**/header.*.js")),
+          await glob.promise(fileURLToPath(new URL("**/header.*.js", this.context.publicDir))),
         ).to.have.lengthOf(1);
       });
 
@@ -151,6 +150,6 @@ describe("Build Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

@@ -19,33 +19,32 @@
  *     about.md
  *     index.md
  */
+import { fileURLToPath } from "node:url";
 import { expect } from "chai";
 import fs from "node:fs";
 import glob from "glob-promise";
 import { JSDOM } from "jsdom";
-import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
-import { fileURLToPath } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Static Router Configuration and Markdown pages";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../../cli/src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
     });
 
     runSmokeTest(["public", "index"], LABEL);
@@ -58,11 +57,13 @@ describe("Build Greenwood With: ", function () {
       let routerFiles;
 
       before(async function () {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "index.html"));
-        aboutDom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "about/index.html"));
-        pages = await glob(`${this.context.publicDir}/*.html`);
-        partials = await glob(`${this.context.publicDir}/_routes/**/*.html`);
-        routerFiles = await glob(`${this.context.publicDir}/router.*.js`);
+        dom = await JSDOM.fromFile(fileURLToPath(new URL("index.html", this.context.publicDir)));
+        aboutDom = await JSDOM.fromFile(
+          fileURLToPath(new URL("about/index.html", this.context.publicDir)),
+        );
+        pages = await glob(fileURLToPath(new URL("*.html", this.context.publicDir)));
+        partials = await glob(fileURLToPath(new URL("_routes/**/*.html", this.context.publicDir)));
+        routerFiles = await glob(fileURLToPath(new URL("router.*.js", this.context.publicDir)));
       });
 
       it("should have one <script> tag in the <head> for the router", function () {
@@ -136,7 +137,7 @@ describe("Build Greenwood With: ", function () {
 
       it("should have the expected partial output to match the contents of the home page in the <router-outlet> tag in the <body>", function () {
         const aboutPartial = fs.readFileSync(
-          path.join(this.context.publicDir, "_routes/about/index.html"),
+          new URL("_routes/about/index.html", this.context.publicDir),
           "utf-8",
         );
         const aboutRouterOutlet =
@@ -149,7 +150,7 @@ describe("Build Greenwood With: ", function () {
 
       it("should have the expected partial output to match the contents of the about page in the <router-outlet> tag in the <body>", function () {
         const homePartial = fs.readFileSync(
-          path.join(this.context.publicDir, "_routes/index.html"),
+          new URL("_routes/index.html", this.context.publicDir),
           "utf-8",
         );
         const homeRouterOutlet = dom.window.document.querySelectorAll("body > router-outlet")[0];
@@ -162,6 +163,6 @@ describe("Build Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

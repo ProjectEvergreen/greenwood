@@ -22,32 +22,31 @@
  *     index.html
  */
 // https://github.com/ProjectEvergreen/greenwood/issues/1743
+import { fileURLToPath } from "node:url";
 import { JSDOM } from "jsdom";
-import path from "node:path";
 import fs from "node:fs/promises";
 import { expect } from "chai";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Active Frontmatter with Dollar Sign Replacement Patterns";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
     });
 
     runSmokeTest(["public", "index"], LABEL);
@@ -57,10 +56,10 @@ describe("Build Greenwood With: ", function () {
       let html;
 
       before(async function () {
-        const htmlPath = path.resolve(this.context.publicDir, "./index.html");
+        const htmlUrl = new URL("index.html", this.context.publicDir);
 
-        dom = await JSDOM.fromFile(htmlPath);
-        html = await fs.readFile(htmlPath, "utf-8");
+        dom = await JSDOM.fromFile(fileURLToPath(htmlUrl));
+        html = await fs.readFile(htmlUrl, "utf-8");
       });
 
       it("should interpolate a custom data frontmatter value with $&, $` and $1 verbatim", function () {
@@ -91,6 +90,6 @@ describe("Build Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

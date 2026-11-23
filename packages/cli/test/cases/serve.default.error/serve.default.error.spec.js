@@ -15,33 +15,31 @@
  * Greenwood default
  */
 import { expect } from "chai";
-import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
 
 describe("Serve Greenwood With: ", function () {
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
 
   describe("Running the serve command without running the build command first", function () {
     it("should throw an error that no build output was detected", async function () {
-      await runner.setup(outputPath);
-      await expect(runner.runCommand(cliPath, { args: "serve" })).to.be.rejectedWith(
+      await runner.setup(outputUrl);
+      await expect(runner.runCommand(cliUrl, { args: "serve" })).to.be.rejectedWith(
         "Error: No build output detected. Make sure you have run greenwood build",
       );
     });
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

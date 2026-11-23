@@ -23,18 +23,18 @@
  *     index.html
  * package.json
  */
+import { fileURLToPath } from "node:url";
 import { expect } from "chai";
 import fs from "node:fs";
 import glob from "glob-promise";
 import path from "node:path";
 import { Runner } from "gallinago";
 import { getOutputTeardownFiles, HASH_REGEX } from "../../../../../test/utils.js";
-import { fileURLToPath } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Import Attributes used in static pages";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   const hostname = "http://localhost:8080";
   let runner;
 
@@ -47,8 +47,8 @@ describe("Build Greenwood With: ", function () {
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
     });
 
     describe("Custom Element Importing CSS w/ Constructable Stylesheet", function () {
@@ -57,14 +57,18 @@ describe("Build Greenwood With: ", function () {
       let dollarSignStyles;
 
       before(async function () {
-        scripts = await glob.promise(path.join(outputPath, "public/card.*.js"));
-        styles = await glob.promise(path.join(outputPath, `public/card.*.css`));
-        dollarSignStyles = await glob.promise(path.join(outputPath, "public/asset-927.*.css"));
+        scripts = await glob.promise(fileURLToPath(new URL("public/card.*.js", outputUrl)));
+        styles = await glob.promise(fileURLToPath(new URL("public/card.*.css", outputUrl)));
+        dollarSignStyles = await glob.promise(
+          fileURLToPath(new URL("public/asset-927.*.css", outputUrl)),
+        );
       });
 
       it("should reference the emitted global stylesheet without expanding filename replacement tokens", async function () {
         const scriptContents = fs.readFileSync(scripts[0], "utf-8");
-        const themes = await glob.promise(path.join(outputPath, "public/styles/theme-*.css"));
+        const themes = await glob.promise(
+          fileURLToPath(new URL("public/styles/theme-*.css", outputUrl)),
+        );
 
         expect(scripts.length).to.equal(1);
         expect(themes.length).to.equal(1);
@@ -113,6 +117,6 @@ describe("Build Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

@@ -26,14 +26,12 @@
  *
  */
 import { expect } from "chai";
-import path from "node:path";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
 
 describe("Develop Greenwood With: ", function () {
   const LABEL = "Import Attributes Polyfill Configuration";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   const hostname = "http://localhost";
   const port = 1984;
   let runner;
@@ -47,11 +45,11 @@ describe("Develop Greenwood With: ", function () {
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
+      await runner.setup(outputUrl);
 
       await new Promise((resolve, reject) => {
         runner
-          .runCommand(cliPath, {
+          .runCommand(cliUrl, {
             args: "develop",
             onStdOut: (message) => {
               if (message.includes(`Started local development server at http://localhost:1984`)) {
@@ -179,9 +177,6 @@ describe("Develop Greenwood With: ", function () {
 
   after(async function () {
     await runner.stopCommand();
-    await runner.teardown([
-      path.join(outputPath, ".greenwood"),
-      path.join(outputPath, "node_modules"),
-    ]);
+    await runner.teardown([new URL(".greenwood", outputUrl), new URL("node_modules", outputUrl)]);
   });
 });

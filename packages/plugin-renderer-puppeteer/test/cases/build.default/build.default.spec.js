@@ -26,34 +26,33 @@
  *   scripts/
  *     main.js
  */
+import { fileURLToPath } from "node:url";
 import { expect } from "chai";
 import fs from "node:fs/promises";
 import glob from "glob-promise";
 import { JSDOM } from "jsdom";
-import path from "node:path";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { getOutputTeardownFiles, HASH_REGEX } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Puppeteer prerendering enabled";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../../cli/src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
+      await runner.setup(outputUrl);
 
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.runCommand(cliUrl, { args: "build" });
     });
 
     runSmokeTest(["public", "index"], LABEL);
@@ -63,10 +62,10 @@ describe("Build Greenwood With: ", function () {
       let raw;
 
       before(async function () {
-        const outputFile = path.join(this.context.publicDir, "./index.html");
+        const outputFile = new URL("index.html", this.context.publicDir);
 
         raw = await fs.readFile(outputFile, "utf-8");
-        dom = await JSDOM.fromFile(outputFile);
+        dom = await JSDOM.fromFile(fileURLToPath(outputFile));
       });
 
       describe("head section tags", function () {
@@ -86,7 +85,9 @@ describe("Build Greenwood With: ", function () {
       });
 
       it("should contain the expected number of javascript files in the output directory", async function () {
-        expect(await glob.promise(path.join(this.context.publicDir, "*.js"))).to.have.lengthOf(3);
+        expect(
+          await glob.promise(fileURLToPath(new URL("*.js", this.context.publicDir))),
+        ).to.have.lengthOf(3);
       });
 
       it("should have the expected output from main.js for lit (ESM) in the page output", async function () {
@@ -159,9 +160,9 @@ describe("Build Greenwood With: ", function () {
       let dom;
 
       before(async function () {
-        const outputFile = path.join(this.context.publicDir, "./404.html");
+        const outputFile = new URL("404.html", this.context.publicDir);
 
-        dom = await JSDOM.fromFile(outputFile);
+        dom = await JSDOM.fromFile(fileURLToPath(outputFile));
       });
 
       it("should ignore client-side redirects during prerendering", function () {
@@ -183,6 +184,6 @@ describe("Build Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

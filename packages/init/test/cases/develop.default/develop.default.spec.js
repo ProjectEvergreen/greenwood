@@ -13,17 +13,15 @@
  */
 import { expect } from "chai";
 import { JSDOM } from "jsdom";
-import path from "node:path";
 import { Runner } from "gallinago";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
-import { fileURLToPath } from "node:url";
 
 describe("Initialize a new Greenwood project: ", function () {
   const LABEL = "Scaffold Greenwood with default options and run the development server";
   const APP_NAME = "my-app";
-  const initPath = path.join(process.cwd(), "packages/init/src/index.js");
-  const outputPath = path.dirname(fileURLToPath(new URL(import.meta.url)));
-  const initOutputPath = path.join(outputPath, `/${APP_NAME}`);
+  const initUrl = new URL("../../../src/index.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
+  const initOutputUrl = new URL(`${APP_NAME}/`, outputUrl);
   const hostname = "http://localhost";
   const port = 1984;
   let initRunner;
@@ -39,21 +37,21 @@ describe("Initialize a new Greenwood project: ", function () {
 
   describe(LABEL, function () {
     before(async function () {
-      await initRunner.setup(outputPath, { create: false });
-      await initRunner.runCommand(initPath, {
+      await initRunner.setup(outputUrl, { create: false });
+      await initRunner.runCommand(initUrl, {
         args: ["--name", APP_NAME, "--ts", "no", "--install", "no"],
       });
     });
 
     describe("should run the Greenwood dev server", function () {
-      const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
+      const cliUrl = new URL("../../../../cli/src/bin.js", import.meta.url);
 
       before(async function () {
-        await greenwoodRunner.setup(initOutputPath);
+        await greenwoodRunner.setup(initOutputUrl);
 
         await new Promise((resolve, reject) => {
           greenwoodRunner
-            .runCommand(cliPath, {
+            .runCommand(cliUrl, {
               args: "develop",
               onStdOut: (message) => {
                 if (message.includes(`Started local development server at http://localhost:1984`)) {
@@ -102,6 +100,6 @@ describe("Initialize a new Greenwood project: ", function () {
 
   after(async function () {
     await greenwoodRunner.stopCommand();
-    await initRunner.teardown([initOutputPath]);
+    await initRunner.teardown([initOutputUrl]);
   });
 });

@@ -60,19 +60,17 @@
 import { expect } from "chai";
 import fs from "node:fs";
 import { JSDOM } from "jsdom";
-import path from "node:path";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
 import { HASH_REGEX } from "../../../../../test/utils.js";
 
 describe("Develop Greenwood With: ", function () {
   const LABEL = "Default Greenwood Configuration and Workspace";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   const hostname = "http://localhost";
   const port = 1984;
-  const deletedPagePath = path.join(outputPath, "src/pages/deleted.html");
+  const deletedPageUrl = new URL("src/pages/deleted.html", outputUrl);
   let runner;
 
   before(function () {
@@ -84,18 +82,18 @@ describe("Develop Greenwood With: ", function () {
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath, {
+      await runner.setup(outputUrl, {
         setupFiles: [
           {
-            source: path.join(outputPath, "fixtures/deleted.html"),
-            destination: deletedPagePath,
+            source: new URL("fixtures/deleted.html", outputUrl),
+            destination: deletedPageUrl,
           },
         ],
       });
 
       await new Promise((resolve, reject) => {
         runner
-          .runCommand(cliPath, {
+          .runCommand(cliUrl, {
             args: "develop",
             onStdOut: (message) => {
               if (message.includes(`Started local development server at http://localhost:1984`)) {
@@ -814,7 +812,7 @@ describe("Develop Greenwood With: ", function () {
         responseBeforeDelete = await fetch(`${hostname}:${port}/deleted/`);
         await responseBeforeDelete.clone().text();
 
-        fs.rmSync(deletedPagePath);
+        fs.rmSync(deletedPageUrl);
 
         response = await fetch(`${hostname}:${port}/deleted/`);
         body = await response.clone().text();
@@ -1068,12 +1066,9 @@ describe("Develop Greenwood With: ", function () {
 
   after(async function () {
     // remove the copied in page first, since an aborted run can hang in stopCommand before teardown
-    fs.rmSync(deletedPagePath, { force: true });
+    fs.rmSync(deletedPageUrl, { force: true });
 
     await runner.stopCommand();
-    await runner.teardown([
-      path.join(outputPath, ".greenwood"),
-      path.join(outputPath, "node_modules"),
-    ]);
+    await runner.teardown([new URL(".greenwood", outputUrl), new URL("node_modules", outputUrl)]);
   });
 });
