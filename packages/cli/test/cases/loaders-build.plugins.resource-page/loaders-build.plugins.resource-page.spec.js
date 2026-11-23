@@ -41,35 +41,34 @@
 import { expect } from "chai";
 import fs from "node:fs";
 import glob from "glob-promise";
-import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Custom Static and Dynamic Page Loaders";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner({ forwardParentArgs: true });
   });
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
     });
 
     describe("Home Page", function () {
       let homePage;
 
       before(async function () {
-        homePage = await glob.promise(path.join(this.context.publicDir, "index.html"));
+        homePage = await glob.promise(fileURLToPath(new URL("index.html", this.context.publicDir)));
       });
 
       it("should have expected text from from my-other-custom-file.foo in the script output file", function () {
@@ -83,7 +82,9 @@ describe("Build Greenwood With: ", function () {
       let aboutPage;
 
       before(async function () {
-        aboutPage = await glob.promise(path.join(this.context.publicDir, "*about/index.html"));
+        aboutPage = await glob.promise(
+          fileURLToPath(new URL("*about/index.html", this.context.publicDir)),
+        );
       });
 
       it("should have the expected JavaScript equivalent file in the output directory", function () {
@@ -101,7 +102,9 @@ describe("Build Greenwood With: ", function () {
       let contactPage;
 
       before(async function () {
-        contactPage = await glob.promise(path.join(this.context.publicDir, "contact/index.html"));
+        contactPage = await glob.promise(
+          fileURLToPath(new URL("contact/index.html", this.context.publicDir)),
+        );
       });
 
       it("should have the expected pre-rendered HTML file in the output directory", function () {
@@ -132,6 +135,6 @@ describe("Build Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

@@ -30,11 +30,9 @@
 import { expect } from "chai";
 import { JSDOM } from "jsdom";
 import fs from "node:fs/promises";
-import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
 
 // contains test cases for these bugs
 // https://github.com/ProjectEvergreen/greenwood/issues/1044
@@ -42,21 +40,21 @@ import { fileURLToPath } from "node:url";
 // https://github.com/ProjectEvergreen/greenwood/pull/1559
 describe("Build Greenwood With: ", function () {
   const LABEL = "A Server Rendered Application (SSR) with prerender configuration";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
     });
 
     runSmokeTest(["public"], LABEL);
@@ -188,6 +186,6 @@ describe("Build Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

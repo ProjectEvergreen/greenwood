@@ -27,7 +27,6 @@ import { expect } from "chai";
 import fs from "node:fs";
 import glob from "glob-promise";
 import { JSDOM } from "jsdom";
-import path from "node:path";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
@@ -35,29 +34,29 @@ import { fileURLToPath } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Base Path Configuration with Active Content";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   const basePath = "/my-path";
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
     });
 
     runSmokeTest(["public", "index"], LABEL);
 
     describe("Graph data emitted to the output directory", function () {
       it("should emit graph.json at the root of the output directory", function () {
-        expect(fs.existsSync(path.join(this.context.publicDir, "graph.json"))).to.equal(true);
+        expect(fs.existsSync(new URL("graph.json", this.context.publicDir))).to.equal(true);
       });
     });
 
@@ -65,7 +64,7 @@ describe("Build Greenwood With: ", function () {
       let dom;
 
       before(async function () {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "index.html"));
+        dom = await JSDOM.fromFile(fileURLToPath(new URL("index.html", this.context.publicDir)));
       });
 
       it("should have a <script> tag for tracking base path configuration", function () {
@@ -93,7 +92,7 @@ describe("Build Greenwood With: ", function () {
       let bundledClientContents;
 
       before(async function () {
-        const bundledJs = await glob(path.join(this.context.publicDir, "header.*.js"));
+        const bundledJs = await glob(fileURLToPath(new URL("header.*.js", this.context.publicDir)));
 
         bundledClientContents = fs.readFileSync(bundledJs[0], "utf-8");
       });
@@ -114,6 +113,6 @@ describe("Build Greenwood With: ", function () {
   });
 
   after(function () {
-    runner.teardown(getOutputTeardownFiles(outputPath));
+    runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

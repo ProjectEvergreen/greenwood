@@ -32,13 +32,11 @@
  */
 import { expect } from "chai";
 import fs from "node:fs/promises";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { Runner } from "gallinago";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 
 describe("Build Greenwood With: Cloudflare Adapter and Base Path", function () {
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const outputUrl = new URL("./", import.meta.url);
   const functionsDir = new URL("./functions/", import.meta.url);
   const publicDir = new URL("./public/", import.meta.url);
   const hostname = "https://example.com";
@@ -47,8 +45,10 @@ describe("Build Greenwood With: Cloudflare Adapter and Base Path", function () {
 
   before(async function () {
     runner = new Runner();
-    await runner.setup(outputPath);
-    await runner.runCommand(path.join(process.cwd(), "packages/cli/src/bin.js"), { args: "build" });
+    await runner.setup(outputUrl);
+    await runner.runCommand(new URL("../../../../cli/src/bin.js", import.meta.url), {
+      args: "build",
+    });
     worker = (await import(new URL("./worker.js", functionsDir))).default;
   });
 
@@ -119,9 +119,6 @@ describe("Build Greenwood With: Cloudflare Adapter and Base Path", function () {
   });
 
   after(async function () {
-    await runner.teardown([
-      path.join(outputPath, "functions"),
-      ...getOutputTeardownFiles(outputPath),
-    ]);
+    await runner.teardown([new URL("functions", outputUrl), ...getOutputTeardownFiles(outputUrl)]);
   });
 });

@@ -13,23 +13,21 @@
  */
 import { expect } from "chai";
 import fs from "node:fs";
-import path from "node:path";
 import { Runner } from "gallinago";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
-import { fileURLToPath } from "node:url";
 
 describe("Initialize a new Greenwood project: ", function () {
   const LABEL = "Scaffolding a new project with dependencies installed through PNPM";
   const APP_NAME = "my-app";
-  const initPath = path.join(process.cwd(), "packages/init/src/index.js");
-  const outputPath = path.dirname(fileURLToPath(new URL(import.meta.url)));
-  const initOutputPath = path.join(outputPath, `/${APP_NAME}`);
+  const initUrl = new URL("../../../src/index.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
+  const initOutputUrl = new URL(`${APP_NAME}/`, outputUrl);
   let initRunner;
   let greenwoodRunner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(initOutputPath, "public"),
+      publicDir: new URL("public/", initOutputUrl),
     };
     initRunner = new Runner();
     greenwoodRunner = new Runner();
@@ -37,37 +35,37 @@ describe("Initialize a new Greenwood project: ", function () {
 
   describe(LABEL, function () {
     before(async function () {
-      await initRunner.setup(outputPath, { create: false });
-      await initRunner.runCommand(initPath, {
+      await initRunner.setup(outputUrl, { create: false });
+      await initRunner.runCommand(initUrl, {
         args: ["--name", APP_NAME, "--install", "pnpm", "--ts", "no"],
       });
     });
 
     describe("should install with pnpm", function () {
-      const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
+      const cliUrl = new URL("../../../../cli/src/bin.js", import.meta.url);
 
       before(async function () {
-        await greenwoodRunner.setup(initOutputPath);
-        await greenwoodRunner.runCommand(cliPath, { args: "build" });
+        await greenwoodRunner.setup(initOutputUrl);
+        await greenwoodRunner.runCommand(cliUrl, { args: "build" });
       });
 
       runSmokeTest(["public", "index"], LABEL);
 
       it("should generate a pnpm-lock.yaml file", function () {
-        expect(fs.existsSync(path.join(initOutputPath, "pnpm-lock.yaml"))).to.be.true;
+        expect(fs.existsSync(new URL("pnpm-lock.yaml", initOutputUrl))).to.be.true;
       });
 
       it("should generate a .npmrc file with the expected contents", function () {
-        const npmrcPath = path.join(initOutputPath, ".npmrc");
-        const contents = fs.readFileSync(npmrcPath, "utf-8");
+        const npmrcUrl = new URL(".npmrc", initOutputUrl);
+        const contents = fs.readFileSync(npmrcUrl, "utf-8");
 
-        expect(fs.existsSync(npmrcPath)).to.be.true;
+        expect(fs.existsSync(npmrcUrl)).to.be.true;
         expect(contents).contains("shamefully-hoist=true");
       });
     });
   });
 
   after(async function () {
-    await initRunner.teardown([initOutputPath]);
+    await initRunner.teardown([initOutputUrl]);
   });
 });

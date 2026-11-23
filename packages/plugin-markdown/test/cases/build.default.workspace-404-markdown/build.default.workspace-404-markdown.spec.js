@@ -30,7 +30,6 @@ import { expect } from "chai";
 import fs from "node:fs";
 import glob from "glob-promise";
 import { JSDOM } from "jsdom";
-import path from "node:path";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
@@ -39,21 +38,21 @@ import { fileURLToPath } from "node:url";
 describe("Build Greenwood With: ", function () {
   const LABEL =
     "Default Greenwood Configuration and Workspace w/Custom 404 Page in markdown and App Layout";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../../cli/src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
     });
 
     runSmokeTest(["public"], LABEL);
@@ -66,9 +65,11 @@ describe("Build Greenwood With: ", function () {
       let linkTags;
 
       before(async function () {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "404.html"));
-        jsFiles = await glob.promise(path.join(this.context.publicDir, "404.*.js"));
-        cssFiles = await glob.promise(path.join(this.context.publicDir, "styles/404.*.css"));
+        dom = await JSDOM.fromFile(fileURLToPath(new URL("404.html", this.context.publicDir)));
+        jsFiles = await glob.promise(fileURLToPath(new URL("404.*.js", this.context.publicDir)));
+        cssFiles = await glob.promise(
+          fileURLToPath(new URL("styles/404.*.css", this.context.publicDir)),
+        );
       });
 
       before(function () {
@@ -146,7 +147,7 @@ describe("Build Greenwood With: ", function () {
         });
 
         it("should not have any sourcemap inlining for Rollup HTML entry points", function () {
-          const html = fs.readFileSync(path.resolve(this.context.publicDir, "404.html"), "utf-8");
+          const html = fs.readFileSync(new URL("404.html", this.context.publicDir), "utf-8");
 
           expect(html).not.to.contain(/\/\/# sourceMappingURL=(.*)\.html\.map/);
         });
@@ -155,6 +156,6 @@ describe("Build Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

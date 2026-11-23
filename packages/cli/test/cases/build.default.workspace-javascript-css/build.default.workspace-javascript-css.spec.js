@@ -24,20 +24,19 @@
 import { expect } from "chai";
 import glob from "glob-promise";
 import { JSDOM } from "jsdom";
-import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Including JavaScript and CSS using <script>, <style>, and <link> tags";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
@@ -46,10 +45,10 @@ describe("Build Greenwood With: ", function () {
     let dom;
 
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
 
-      dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "index.html"));
+      dom = await JSDOM.fromFile(fileURLToPath(new URL("index.html", this.context.publicDir)));
     });
 
     describe('<script type="module" src="..."></script> tags in the <head>', function () {
@@ -65,13 +64,15 @@ describe("Build Greenwood With: ", function () {
       // this includes the non module file in a spec below
       it("should have the expected number of bundled .js files in the output directory", async function () {
         expect(
-          await glob.promise(path.join(this.context.publicDir, "*.*[a-zA-Z0-9].js")),
+          await glob.promise(fileURLToPath(new URL("*.*[a-zA-Z0-9].js", this.context.publicDir))),
         ).to.have.lengthOf(3);
       });
 
       it("should have the expected other.js file in the output directory", async function () {
         expect(
-          await glob.promise(path.join(this.context.publicDir, "other.*[a-zA-Z0-9].js")),
+          await glob.promise(
+            fileURLToPath(new URL("other.*[a-zA-Z0-9].js", this.context.publicDir)),
+          ),
         ).to.have.lengthOf(1);
       });
     });
@@ -139,7 +140,9 @@ describe("Build Greenwood With: ", function () {
 
       it("should have the expected non-module.js file in the output directory", async function () {
         expect(
-          await glob.promise(path.join(this.context.publicDir, "non-module.*[a-z0-9].js")),
+          await glob.promise(
+            fileURLToPath(new URL("non-module.*[a-z0-9].js", this.context.publicDir)),
+          ),
         ).to.have.lengthOf(1);
       });
     });
@@ -158,7 +161,7 @@ describe("Build Greenwood With: ", function () {
 
       it("should have the expected popup.js file in the output directory", async function () {
         expect(
-          await glob.promise(path.join(this.context.publicDir, "popup.*[a-z0-9].js")),
+          await glob.promise(fileURLToPath(new URL("popup.*[a-z0-9].js", this.context.publicDir))),
         ).to.have.lengthOf(1);
       });
     });
@@ -222,13 +225,13 @@ describe("Build Greenwood With: ", function () {
 
       it("should have the expected main.css file in the output directory", async function () {
         expect(
-          await glob.promise(path.join(this.context.publicDir, "styles", "main.*.css")),
+          await glob.promise(fileURLToPath(new URL("styles/main.*.css", this.context.publicDir))),
         ).to.have.lengthOf(1);
       });
 
       it("should have the expected other.css file in the output directory", async function () {
         expect(
-          await glob.promise(path.join(this.context.publicDir, "styles", "other.*.css")),
+          await glob.promise(fileURLToPath(new URL("styles/other.*.css", this.context.publicDir))),
         ).to.have.lengthOf(1);
       });
 
@@ -253,6 +256,6 @@ describe("Build Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

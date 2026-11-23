@@ -5,14 +5,12 @@
 import { expect } from "chai";
 import fs from "node:fs/promises";
 import net from "node:net";
-import path from "node:path";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 
 describe("Build Greenwood With: GraphQL Port Already In Use", function () {
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../../cli/src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   const runner = new Runner();
   const preferredPort = 4000;
   let output = "";
@@ -25,8 +23,8 @@ describe("Build Greenwood With: GraphQL Port Already In Use", function () {
       blocker.listen(preferredPort, resolve);
     });
 
-    await runner.setup(outputPath);
-    await runner.runCommand(cliPath, {
+    await runner.setup(outputUrl);
+    await runner.runCommand(cliUrl, {
       args: "build",
       onStdOut: (message) => {
         output += message;
@@ -44,18 +42,20 @@ describe("Build Greenwood With: GraphQL Port Already In Use", function () {
   });
 
   it("should query the fallback GraphQL port from a render worker", async function () {
-    const html = await fs.readFile(path.join(outputPath, "public/index.html"), "utf-8");
+    const html = await fs.readFile(new URL("public/index.html", outputUrl), "utf-8");
 
     expect(html).to.contain("<h1>GraphQL pages: 1</h1>");
     expect(html).not.to.contain("data-graphql-port");
   });
 
   it("should generate cached query data using the selected GraphQL port", async function () {
-    const files = await fs.readdir(path.join(outputPath, "public"));
+    const files = await fs.readdir(new URL("public", outputUrl));
     const caches = files.filter((file) => file.endsWith("-cache.json"));
 
     expect(caches).to.have.lengthOf(1);
-    const data = JSON.parse(await fs.readFile(path.join(outputPath, "public", caches[0]), "utf-8"));
+    const data = JSON.parse(
+      await fs.readFile(new URL(`public/${encodeURIComponent(caches[0])}`, outputUrl), "utf-8"),
+    );
     expect(data.graph).to.have.lengthOf(1);
     expect(data.graph[0].route).to.equal("/");
   });
@@ -64,6 +64,6 @@ describe("Build Greenwood With: GraphQL Port Already In Use", function () {
     if (blocker?.listening) {
       await new Promise((resolve) => blocker.close(resolve));
     }
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

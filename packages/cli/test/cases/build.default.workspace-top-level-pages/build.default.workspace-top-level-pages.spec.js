@@ -21,7 +21,6 @@
 import { expect } from "chai";
 import fs from "node:fs";
 import { JSDOM } from "jsdom";
-import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { Runner } from "gallinago";
@@ -29,21 +28,21 @@ import { fileURLToPath } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Default Greenwood Configuration and Default Workspace w/ Top Level Pages";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
     });
 
     runSmokeTest(["public", "index"], LABEL);
@@ -52,7 +51,7 @@ describe("Build Greenwood With: ", function () {
       let dom;
 
       before(async function () {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "index.html"));
+        dom = await JSDOM.fromFile(fileURLToPath(new URL("index.html", this.context.publicDir)));
       });
 
       it("should have custom <meta> tag in the <head>", function () {
@@ -83,11 +82,13 @@ describe("Build Greenwood With: ", function () {
       let dom;
 
       before(async function () {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "about", "index.html"));
+        dom = await JSDOM.fromFile(
+          fileURLToPath(new URL("about/index.html", this.context.publicDir)),
+        );
       });
 
       it("should create a top level about page with a directory and index.html", function () {
-        expect(fs.existsSync(path.join(this.context.publicDir, "about", "index.html"))).to.be.true;
+        expect(fs.existsSync(new URL("about/index.html", this.context.publicDir))).to.be.true;
       });
 
       it("should have the correct content for the about page", function () {
@@ -106,12 +107,13 @@ describe("Build Greenwood With: ", function () {
       let dom;
 
       before(async function () {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "contact", "index.html"));
+        dom = await JSDOM.fromFile(
+          fileURLToPath(new URL("contact/index.html", this.context.publicDir)),
+        );
       });
 
       it("should create a top level contact page with a directory and index.html", function () {
-        expect(fs.existsSync(path.join(this.context.publicDir, "contact", "index.html"))).to.be
-          .true;
+        expect(fs.existsSync(new URL("contact/index.html", this.context.publicDir))).to.be.true;
       });
 
       it("should have the correct content for the contact page", function () {
@@ -128,6 +130,6 @@ describe("Build Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

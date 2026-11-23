@@ -22,15 +22,13 @@
  */
 import { expect } from "chai";
 import net from "node:net";
-import path from "node:path";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
 
 // https://github.com/ProjectEvergreen/greenwood/issues/1717
 describe("Develop Greenwood With: ", function () {
   const LABEL = "Live Reload Port (35729) Already In Use";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   const liveReloadPort = 35729;
   let hostname;
   let selectedLiveReloadPort;
@@ -50,13 +48,13 @@ describe("Develop Greenwood With: ", function () {
         blocker.listen(liveReloadPort, resolve);
       });
 
-      await runner.setup(outputPath);
+      await runner.setup(outputUrl);
 
       await new Promise((resolve, reject) => {
         let output = "";
 
         runner
-          .runCommand(cliPath, {
+          .runCommand(cliUrl, {
             args: "develop",
             onStdOut: (message) => {
               output += message;
@@ -126,9 +124,6 @@ describe("Develop Greenwood With: ", function () {
     if (blocker?.listening) {
       await new Promise((resolve) => blocker.close(resolve));
     }
-    await runner.teardown([
-      path.join(outputPath, ".greenwood"),
-      path.join(outputPath, "node_modules"),
-    ]);
+    await runner.teardown([new URL(".greenwood", outputUrl), new URL("node_modules", outputUrl)]);
   });
 });

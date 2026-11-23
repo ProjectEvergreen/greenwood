@@ -47,16 +47,16 @@ import { fileURLToPath } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Default Optimization Configuration";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   const expectedCss = fs
-    .readFileSync(path.join(outputPath, "./fixtures/expected.css"), "utf-8")
+    .readFileSync(new URL("fixtures/expected.css", outputUrl), "utf-8")
     .replace(/\n/g, "");
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
@@ -67,23 +67,23 @@ describe("Build Greenwood With: ", function () {
       // if this gets fixed, we can remove the need for this setup
       // https://github.com/vercel/geist-font/issues/150
       const geistPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/geist/package.json`,
-        `${outputPath}/node_modules/geist/`,
+        new URL("../../../../../node_modules/geist/package.json", import.meta.url),
+        new URL("node_modules/geist/", outputUrl),
       );
       const geistFonts = await getDependencyFiles(
-        `${process.cwd()}/node_modules/geist/dist/fonts/geist-sans/*`,
-        `${outputPath}/node_modules/geist/dist/fonts/geist-sans/`,
+        new URL("../../../../../node_modules/geist/dist/fonts/geist-sans/*", import.meta.url),
+        new URL("node_modules/geist/dist/fonts/geist-sans/", outputUrl),
       );
 
-      await runner.setup(outputPath, { setupFiles: [...geistPackageJson, ...geistFonts] });
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl, { setupFiles: [...geistPackageJson, ...geistFonts] });
+      await runner.runCommand(cliUrl, { args: "build" });
     });
 
     describe("Output for JavaScript / CSS tags and files", function () {
       let dom;
 
       before(async function () {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "./index.html"));
+        dom = await JSDOM.fromFile(fileURLToPath(new URL("index.html", this.context.publicDir)));
       });
 
       it("should leave resource URLs in metadata and page text unchanged", function () {
@@ -104,7 +104,7 @@ describe("Build Greenwood With: ", function () {
 
       describe("<script> tag and preloading", function () {
         it("should bundle the JavaScript import alias into one output file", async function () {
-          const files = await glob.promise(path.join(this.context.publicDir, "*.js"));
+          const files = await glob.promise(fileURLToPath(new URL("*.js", this.context.publicDir)));
           const contents = await fs.promises.readFile(files[0], "utf-8");
 
           expect(files).to.have.lengthOf(1);
@@ -133,7 +133,7 @@ describe("Build Greenwood With: ", function () {
       describe("<link> tag and preloading", function () {
         it("should preserve replacement tokens in the emitted stylesheet filename", async function () {
           const styles = await glob.promise(
-            `${path.join(this.context.publicDir, "styles")}/main-*.css`,
+            fileURLToPath(new URL("styles/main-*.css", this.context.publicDir)),
           );
 
           expect(styles).to.have.lengthOf(1);
@@ -164,7 +164,9 @@ describe("Build Greenwood With: ", function () {
 
         // test custom CSS bundling
         it("should have the expect preload CSS content in the file", async function () {
-          const cssFiles = await glob.promise(path.join(this.context.publicDir, "styles/*.css"));
+          const cssFiles = await glob.promise(
+            fileURLToPath(new URL("styles/*.css", this.context.publicDir)),
+          );
           const customCss = await fs.promises.readFile(cssFiles[0], "utf-8");
 
           expect(cssFiles.length).to.be.equal(1);
@@ -208,12 +210,16 @@ describe("Build Greenwood With: ", function () {
           let dom;
 
           before(async function () {
-            dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "./index.html"));
+            dom = await JSDOM.fromFile(
+              fileURLToPath(new URL("index.html", this.context.publicDir)),
+            );
           });
 
           it("should have the expected @font-face file from node_modules copied into the output directory", async function () {
             expect(
-              await glob.promise(path.join(this.context.publicDir, `${fontPath}/*.woff2`)),
+              await glob.promise(
+                path.join(fileURLToPath(this.context.publicDir), `${fontPath}/*.woff2`),
+              ),
             ).to.have.lengthOf(1);
           });
 
@@ -231,13 +237,13 @@ describe("Build Greenwood With: ", function () {
 
           it("should have the expected background image from the user's workspace the output directory", async function () {
             expect(
-              await glob.promise(path.join(this.context.publicDir, imagePath)),
+              await glob.promise(path.join(fileURLToPath(this.context.publicDir), imagePath)),
             ).to.have.lengthOf(1);
           });
 
           it("should have the expected @font-face file bundle path in the referenced <style> tag in index.html", async function () {
             const mainCss = await glob.promise(
-              `${path.join(this.context.publicDir, "styles")}/main-*.css`,
+              fileURLToPath(new URL("styles/main-*.css", this.context.publicDir)),
             );
             const contents = await fs.promises.readFile(mainCss[0], "utf-8");
 
@@ -254,7 +260,7 @@ describe("Build Greenwood With: ", function () {
 
           it("should have the expected background image from the user's workspace the output directory", async function () {
             expect(
-              await glob.promise(path.join(this.context.publicDir, imagePath)),
+              await glob.promise(path.join(fileURLToPath(this.context.publicDir), imagePath)),
             ).to.have.lengthOf(1);
           });
 
@@ -273,7 +279,7 @@ describe("Build Greenwood With: ", function () {
 
           it("should have the expected resource reference from the user's workspace in the output directory", async function () {
             expect(
-              await glob.promise(path.join(this.context.publicDir, resourcePath)),
+              await glob.promise(path.join(fileURLToPath(this.context.publicDir), resourcePath)),
             ).to.have.lengthOf(1);
           });
         });
@@ -282,6 +288,6 @@ describe("Build Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

@@ -25,7 +25,6 @@ import { expect } from "chai";
 import fs from "node:fs";
 import glob from "glob-promise";
 import { JSDOM } from "jsdom";
-import path from "node:path";
 import {
   getOutputTeardownFiles,
   getDependencyFiles,
@@ -36,13 +35,13 @@ import { fileURLToPath } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Importing packages from node modules";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
@@ -57,24 +56,24 @@ describe("Build Greenwood With: ", function () {
       // https://unpkg.com/browse/font-awesome@4.7.0/package.json
       // https://github.com/FortAwesome/Font-Awesome/pull/19041
       const fontAwesomePackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/font-awesome/package.json`,
-        `${outputPath}/node_modules/font-awesome/`,
+        new URL("../../../../../node_modules/font-awesome/package.json", import.meta.url),
+        new URL("node_modules/font-awesome/", outputUrl),
       );
       const fontAwesomeCssFiles = await getDependencyFiles(
-        `${process.cwd()}/node_modules/font-awesome/css/*`,
-        `${outputPath}/node_modules/font-awesome/css/`,
+        new URL("../../../../../node_modules/font-awesome/css/*", import.meta.url),
+        new URL("node_modules/font-awesome/css/", outputUrl),
       );
       const fontAwesomeFontFiles = await getDependencyFiles(
-        `${process.cwd()}/node_modules/font-awesome/fonts/*`,
-        `${outputPath}/node_modules/font-awesome/fonts/`,
+        new URL("../../../../../node_modules/font-awesome/fonts/*", import.meta.url),
+        new URL("node_modules/font-awesome/fonts/", outputUrl),
       );
 
-      await runner.setup(outputPath, {
+      await runner.setup(outputUrl, {
         setupFiles: [...fontAwesomePackageJson, ...fontAwesomeCssFiles, ...fontAwesomeFontFiles],
       });
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.runCommand(cliUrl, { args: "build" });
 
-      dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "index.html"));
+      dom = await JSDOM.fromFile(fileURLToPath(new URL("index.html", this.context.publicDir)));
     });
 
     describe('<script src="..."> tag in the <head> tag', function () {
@@ -88,13 +87,15 @@ describe("Build Greenwood With: ", function () {
       });
 
       it("should have the total expected number of .js file in the output directory", async function () {
-        expect(await glob.promise(path.join(this.context.publicDir, "*.js"))).to.have.lengthOf(3);
+        expect(
+          await glob.promise(fileURLToPath(new URL("*.js", this.context.publicDir))),
+        ).to.have.lengthOf(3);
       });
 
       it("should have the expected main.js file in the output directory", async function () {
-        expect(await glob.promise(path.join(this.context.publicDir, "main.*.js"))).to.have.lengthOf(
-          1,
-        );
+        expect(
+          await glob.promise(fileURLToPath(new URL("main.*.js", this.context.publicDir))),
+        ).to.have.lengthOf(1);
       });
     });
 
@@ -108,9 +109,9 @@ describe("Build Greenwood With: ", function () {
       });
 
       it("should have the expected lit related files in the output directory", async function () {
-        expect(await glob.promise(path.join(this.context.publicDir, "lit*.js"))).to.have.lengthOf(
-          1,
-        );
+        expect(
+          await glob.promise(fileURLToPath(new URL("lit*.js", this.context.publicDir))),
+        ).to.have.lengthOf(1);
       });
 
       it("should have the expected inline node_modules content in the first inline script", async function () {
@@ -138,7 +139,7 @@ describe("Build Greenwood With: ", function () {
 
       it("should have the expected lit-html.js files in the output directory", async function () {
         expect(
-          await glob.promise(path.join(this.context.publicDir, "lit-html.*.js")),
+          await glob.promise(fileURLToPath(new URL("lit-html.*.js", this.context.publicDir))),
         ).to.have.lengthOf(1);
       });
     });
@@ -155,7 +156,9 @@ describe("Build Greenwood With: ", function () {
 
       it("should have the expected prism.css file in the output directory", async function () {
         expect(
-          await glob.promise(path.join(this.context.publicDir, "prism-tomorrow.*.css")),
+          await glob.promise(
+            fileURLToPath(new URL("prism-tomorrow.*.css", this.context.publicDir)),
+          ),
         ).to.have.lengthOf(1);
       });
     });
@@ -172,7 +175,7 @@ describe("Build Greenwood With: ", function () {
 
       it("should have the expected theme.css file in the output directory with the expected content", async function () {
         const themeFile = await glob.promise(
-          path.join(this.context.publicDir, "styles/theme.*.css"),
+          fileURLToPath(new URL("styles/theme.*.css", this.context.publicDir)),
         );
         const contents = fs.readFileSync(themeFile[0], "utf-8");
 
@@ -189,14 +192,14 @@ describe("Build Greenwood With: ", function () {
       it("should have the expected number of font files referenced in vendor CSS file in the output directory", async function () {
         expect(
           await glob.promise(
-            path.join(this.context.publicDir, "node-modules/font-awesome/fonts/*"),
+            fileURLToPath(new URL("node-modules/font-awesome/fonts/*", this.context.publicDir)),
           ),
         ).to.have.lengthOf(5);
       });
 
       it("should have the expected url link for the bundled font-awesome file", async function () {
         const themeFile = await glob.promise(
-          path.join(this.context.publicDir, "styles/theme.*.css"),
+          fileURLToPath(new URL("styles/theme.*.css", this.context.publicDir)),
         );
         const contents = fs.readFileSync(themeFile[0], "utf-8");
         const contentsRegex = new RegExp(
@@ -208,6 +211,6 @@ describe("Build Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

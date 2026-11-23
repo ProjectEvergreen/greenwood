@@ -46,16 +46,14 @@ import { expect } from "chai";
 import fs from "node:fs/promises";
 import glob from "glob-promise";
 import { JSDOM } from "jsdom";
-import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
-import { normalizePathnameForWindows } from "../../../../cli/src/lib/resource-utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "AWS Adapter plugin output";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../../cli/src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   const awsOutputFolder = new URL("./.aws-output/", import.meta.url);
   const awsApiFunctionsOutputUrl = new URL("./api/", awsOutputFolder);
   const awsRouteFunctionsOutputUrl = new URL("./routes/", awsOutputFolder);
@@ -64,15 +62,15 @@ describe("Build Greenwood With: ", function () {
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
     });
 
     describe("Default Output", function () {
@@ -80,12 +78,8 @@ describe("Build Greenwood With: ", function () {
       let routeFolders;
 
       before(async function () {
-        functionFolders = await glob.promise(
-          path.join(normalizePathnameForWindows(awsOutputFolder), "api/*"),
-        );
-        routeFolders = await glob.promise(
-          path.join(normalizePathnameForWindows(awsOutputFolder), "routes/*"),
-        );
+        functionFolders = await glob.promise(fileURLToPath(new URL("./api/*", awsOutputFolder)));
+        routeFolders = await glob.promise(fileURLToPath(new URL("./routes/*", awsOutputFolder)));
       });
 
       it("should output the expected number of serverless function output folders for SSR pages", function () {
@@ -132,7 +126,7 @@ describe("Build Greenwood With: ", function () {
 
       it("should not have a shared asset for the card component", async () => {
         const assets = await glob.promise(
-          path.join(normalizePathnameForWindows(awsApiFunctionsOutputUrl), "/greeting/*"),
+          fileURLToPath(new URL("./greeting/*", awsApiFunctionsOutputUrl)),
         );
         const exists = assets.find((asset) => {
           const name = asset.split("/").pop();
@@ -168,10 +162,7 @@ describe("Build Greenwood With: ", function () {
 
       it("should have a route chunk", async () => {
         const chunks = await glob.promise(
-          path.join(
-            normalizePathnameForWindows(awsApiFunctionsOutputUrl),
-            "/fragment/fragment.*.js",
-          ),
+          fileURLToPath(new URL("./fragment/fragment.*.js", awsApiFunctionsOutputUrl)),
         );
 
         expect(chunks.length).to.equal(1);
@@ -435,8 +426,8 @@ describe("Build Greenwood With: ", function () {
 
   after(async function () {
     await runner.teardown([
-      path.join(outputPath, ".aws-output"),
-      ...getOutputTeardownFiles(outputPath),
+      new URL(".aws-output", outputUrl),
+      ...getOutputTeardownFiles(outputUrl),
     ]);
   });
 });

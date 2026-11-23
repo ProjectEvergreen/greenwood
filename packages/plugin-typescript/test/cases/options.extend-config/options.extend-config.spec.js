@@ -39,20 +39,19 @@ import { expect } from "chai";
 import fs from "node:fs";
 import glob from "glob-promise";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
-import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
 
 xdescribe("Build Greenwood With: ", function () {
   const LABEL = "Custom TypeScript Options for extending Default Configuration";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../../cli/src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
@@ -61,10 +60,10 @@ xdescribe("Build Greenwood With: ", function () {
     let jsFiles;
 
     before(function () {
-      runner.setup(outputPath);
-      runner.runCommand(cliPath, { args: "build" });
+      runner.setup(outputUrl);
+      runner.runCommand(cliUrl, { args: "build" });
 
-      jsFiles = glob.sync(path.join(this.context.publicDir, "*.js"));
+      jsFiles = glob.sync(fileURLToPath(new URL("*.js", this.context.publicDir)));
     });
 
     runSmokeTest(["public", "index"], LABEL);
@@ -84,6 +83,6 @@ xdescribe("Build Greenwood With: ", function () {
   });
 
   after(function () {
-    runner.teardown(getOutputTeardownFiles(outputPath));
+    runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

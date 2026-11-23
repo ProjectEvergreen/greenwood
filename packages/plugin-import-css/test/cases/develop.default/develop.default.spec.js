@@ -23,15 +23,13 @@
  *
  */
 import { expect } from "chai";
-import path from "node:path";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 
 xdescribe("Develop Greenwood With: ", function () {
   const LABEL = "Import CSS plugin for using ESM with .css files";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../../cli/src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   const hostname = "http://localhost";
   const port = 1984;
   let runner;
@@ -45,14 +43,14 @@ xdescribe("Develop Greenwood With: ", function () {
 
   describe(LABEL, function () {
     before(async function () {
-      runner.setup(outputPath);
+      runner.setup(outputUrl);
 
       return new Promise((resolve) => {
         setTimeout(() => {
           resolve();
         }, 5000);
 
-        runner.runCommand(cliPath, { args: "develop" });
+        runner.runCommand(cliUrl, { args: "develop" });
       });
     });
 
@@ -114,6 +112,6 @@ xdescribe("Develop Greenwood With: ", function () {
 
   after(async function () {
     await runner.stopCommand();
-    await runner.teardown([path.join(outputPath, ".greenwood")]);
+    await runner.teardown([new URL(".greenwood", outputUrl)]);
   });
 });

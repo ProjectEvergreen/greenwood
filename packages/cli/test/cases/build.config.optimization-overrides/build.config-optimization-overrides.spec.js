@@ -24,45 +24,48 @@
 import { expect } from "chai";
 import glob from "glob-promise";
 import { JSDOM } from "jsdom";
-import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Optimization Overrides";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
     });
 
     describe("Cumulative output based on all override settings", function () {
       let dom;
 
       before(async function () {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "./index.html"));
+        dom = await JSDOM.fromFile(fileURLToPath(new URL("index.html", this.context.publicDir)));
       });
 
       it("should emit no Javascript files to the output directory", async function () {
-        const jsFiles = await glob.promise(path.join(this.context.publicDir, "**/*.js"));
+        const jsFiles = await glob.promise(
+          fileURLToPath(new URL("**/*.js", this.context.publicDir)),
+        );
 
         expect(jsFiles).to.have.lengthOf(0);
       });
 
       it("should emit no CSS files to the output directory", async function () {
-        const cssFiles = await glob.promise(path.join(this.context.publicDir, "**/*.css"));
+        const cssFiles = await glob.promise(
+          fileURLToPath(new URL("**/*.css", this.context.publicDir)),
+        );
 
         expect(cssFiles).to.have.lengthOf(0);
       });
@@ -92,7 +95,7 @@ describe("Build Greenwood With: ", function () {
       let dom;
 
       before(async function () {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "./index.html"));
+        dom = await JSDOM.fromFile(fileURLToPath(new URL("index.html", this.context.publicDir)));
       });
 
       it("should contain no <link> tags in the <head>", function () {
@@ -119,7 +122,7 @@ describe("Build Greenwood With: ", function () {
       let dom;
 
       before(async function () {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "./index.html"));
+        dom = await JSDOM.fromFile(fileURLToPath(new URL("index.html", this.context.publicDir)));
       });
 
       it("should contain no <link> tags in the <head>", function () {
@@ -149,7 +152,7 @@ describe("Build Greenwood With: ", function () {
       let dom;
 
       before(async function () {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "./index.html"));
+        dom = await JSDOM.fromFile(fileURLToPath(new URL("index.html", this.context.publicDir)));
       });
 
       it("should contain no <link> tags in the <head>", function () {
@@ -171,6 +174,6 @@ describe("Build Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

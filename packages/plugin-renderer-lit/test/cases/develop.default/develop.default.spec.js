@@ -25,21 +25,19 @@
  */
 import { expect } from "chai";
 import { JSDOM } from "jsdom";
-import path from "node:path";
 import { getDependencyFiles, getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
 
 describe("Develop Greenwood With: ", function () {
   const LABEL = "Lit Renderer";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../../cli/src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   const hostname = "http://127.0.0.1:1984";
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
@@ -47,98 +45,104 @@ describe("Develop Greenwood With: ", function () {
   describe(LABEL, function () {
     before(async function () {
       const lit = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/*.js`,
-        `${outputPath}/node_modules/lit/`,
+        new URL("../../../../../node_modules/lit/*.js", import.meta.url),
+        new URL("node_modules/lit/", outputUrl),
       );
       const litDecorators = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/decorators/*.js`,
-        `${outputPath}/node_modules/lit/decorators/`,
+        new URL("../../../../../node_modules/lit/decorators/*.js", import.meta.url),
+        new URL("node_modules/lit/decorators/", outputUrl),
       );
       const litDirectives = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/directives/*.js`,
-        `${outputPath}/node_modules/lit/directives/`,
+        new URL("../../../../../node_modules/lit/directives/*.js", import.meta.url),
+        new URL("node_modules/lit/directives/", outputUrl),
       );
       const litPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit/package.json`,
-        `${outputPath}/node_modules/lit/`,
+        new URL("../../../../../node_modules/lit/package.json", import.meta.url),
+        new URL("node_modules/lit/", outputUrl),
       );
       const litElement = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-element/*.js`,
-        `${outputPath}/node_modules/lit-element/`,
+        new URL("../../../../../node_modules/lit-element/*.js", import.meta.url),
+        new URL("node_modules/lit-element/", outputUrl),
       );
       const litElementPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-element/package.json`,
-        `${outputPath}/node_modules/lit-element/`,
+        new URL("../../../../../node_modules/lit-element/package.json", import.meta.url),
+        new URL("node_modules/lit-element/", outputUrl),
       );
       const litElementDecorators = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-element/decorators/*.js`,
-        `${outputPath}/node_modules/lit-element/decorators/`,
+        new URL("../../../../../node_modules/lit-element/decorators/*.js", import.meta.url),
+        new URL("node_modules/lit-element/decorators/", outputUrl),
       );
       const litHtml = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/*.js`,
-        `${outputPath}/node_modules/lit-html/`,
+        new URL("../../../../../node_modules/lit-html/*.js", import.meta.url),
+        new URL("node_modules/lit-html/", outputUrl),
       );
       const litHtmlNode = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/node/*.js`,
-        `${outputPath}/node_modules/lit-html/node/`,
+        new URL("../../../../../node_modules/lit-html/node/*.js", import.meta.url),
+        new URL("node_modules/lit-html/node/", outputUrl),
       );
       const litHtmlNodeDirectives = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/node/directives/*.js`,
-        `${outputPath}/node_modules/lit-html/node/directives/`,
+        new URL("../../../../../node_modules/lit-html/node/directives/*.js", import.meta.url),
+        new URL("node_modules/lit-html/node/directives/", outputUrl),
       );
       const litHtmlPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/package.json`,
-        `${outputPath}/node_modules/lit-html/`,
+        new URL("../../../../../node_modules/lit-html/package.json", import.meta.url),
+        new URL("node_modules/lit-html/", outputUrl),
       );
       const litHtmlDirectives = await getDependencyFiles(
-        `${process.cwd()}/node_modules/lit-html/directives/*.js`,
-        `${outputPath}/node_modules/lit-html/directives/`,
+        new URL("../../../../../node_modules/lit-html/directives/*.js", import.meta.url),
+        new URL("node_modules/lit-html/directives/", outputUrl),
       );
       // lit-html has a dependency on this
       // https://github.com/lit/lit/blob/main/packages/lit-html/package.json#L82
       const trustedTypes = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@types/trusted-types/package.json`,
-        `${outputPath}/node_modules/@types/trusted-types/`,
+        new URL("../../../../../node_modules/@types/trusted-types/package.json", import.meta.url),
+        new URL("node_modules/@types/trusted-types/", outputUrl),
       );
       const litReactiveElement = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit/reactive-element/*.js`,
-        `${outputPath}/node_modules/@lit/reactive-element/`,
+        new URL("../../../../../node_modules/@lit/reactive-element/*.js", import.meta.url),
+        new URL("node_modules/@lit/reactive-element/", outputUrl),
       );
       const litReactiveElementNode = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit/reactive-element/node/*.js`,
-        `${outputPath}/node_modules/@lit/reactive-element/node/`,
+        new URL("../../../../../node_modules/@lit/reactive-element/node/*.js", import.meta.url),
+        new URL("node_modules/@lit/reactive-element/node/", outputUrl),
       );
       const litReactiveElementDecorators = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit/reactive-element/decorators/*.js`,
-        `${outputPath}/node_modules/@lit/reactive-element/decorators/`,
+        new URL(
+          "../../../../../node_modules/@lit/reactive-element/decorators/*.js",
+          import.meta.url,
+        ),
+        new URL("node_modules/@lit/reactive-element/decorators/", outputUrl),
       );
       const litReactiveElementPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit/reactive-element/package.json`,
-        `${outputPath}/node_modules/@lit/reactive-element/`,
+        new URL("../../../../../node_modules/@lit/reactive-element/package.json", import.meta.url),
+        new URL("node_modules/@lit/reactive-element/", outputUrl),
       );
       const litSsrElementHydrationSupport = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit-labs/ssr-client/lit-element-hydrate-support.js`,
-        `${outputPath}/node_modules/@lit-labs/ssr-client/`,
+        new URL(
+          "../../../../../node_modules/@lit-labs/ssr-client/lit-element-hydrate-support.js",
+          import.meta.url,
+        ),
+        new URL("node_modules/@lit-labs/ssr-client/", outputUrl),
       );
       const litSsrHtmlHydrationSupport = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit-labs/ssr-client/lib/*.js`,
-        `${outputPath}/node_modules/@lit-labs/ssr-client/lib/`,
+        new URL("../../../../../node_modules/@lit-labs/ssr-client/lib/*.js", import.meta.url),
+        new URL("node_modules/@lit-labs/ssr-client/lib/", outputUrl),
       );
       const litSsrDomShimPackageJson = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit-labs/ssr-dom-shim/package.json`,
-        `${outputPath}/node_modules/@lit-labs/ssr-dom-shim/`,
+        new URL("../../../../../node_modules/@lit-labs/ssr-dom-shim/package.json", import.meta.url),
+        new URL("node_modules/@lit-labs/ssr-dom-shim/", outputUrl),
       );
       const litSsrDomShim = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit-labs/ssr-dom-shim/*.js`,
-        `${outputPath}/node_modules/@lit-labs/ssr-dom-shim/`,
+        new URL("../../../../../node_modules/@lit-labs/ssr-dom-shim/*.js", import.meta.url),
+        new URL("node_modules/@lit-labs/ssr-dom-shim/", outputUrl),
       );
       const litSsrDomShimLibs = await getDependencyFiles(
-        `${process.cwd()}/node_modules/@lit-labs/ssr-dom-shim/lib/*.js`,
-        `${outputPath}/node_modules/@lit-labs/ssr-dom-shim/lib/`,
+        new URL("../../../../../node_modules/@lit-labs/ssr-dom-shim/lib/*.js", import.meta.url),
+        new URL("node_modules/@lit-labs/ssr-dom-shim/lib/", outputUrl),
       );
 
       // would be nice to figure out why this test case still requires manually copying in dependencies
-      await runner.setup(outputPath, {
+      await runner.setup(outputUrl, {
         setupFiles: [
           ...lit,
           ...litPackageJson,
@@ -167,7 +171,7 @@ describe("Develop Greenwood With: ", function () {
 
       await new Promise((resolve, reject) => {
         runner
-          .runCommand(cliPath, {
+          .runCommand(cliUrl, {
             args: "develop",
             onStdOut: (message) => {
               if (message.includes("Started local development server at http://localhost:1984")) {
@@ -256,6 +260,6 @@ describe("Develop Greenwood With: ", function () {
 
   after(async function () {
     await runner.stopCommand();
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

@@ -19,7 +19,6 @@
  */
 import { expect } from "chai";
 import glob from "glob-promise";
-import path from "node:path";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
@@ -27,21 +26,21 @@ import { fileURLToPath } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Default Greenwood Configuration and Workspace with common meta file";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
     });
 
     runSmokeTest(["public"], LABEL);
@@ -50,7 +49,7 @@ describe("Build Greenwood With: ", function () {
       let favicons;
 
       before(async function () {
-        favicons = await glob(`${this.context.publicDir}/*.ico`);
+        favicons = await glob(fileURLToPath(new URL("*.ico", this.context.publicDir)));
       });
 
       it("should have one favicon file in the output directory", function () {
@@ -62,7 +61,7 @@ describe("Build Greenwood With: ", function () {
       let robots;
 
       before(async function () {
-        robots = await glob(`${this.context.publicDir}/*.txt`);
+        robots = await glob(fileURLToPath(new URL("*.txt", this.context.publicDir)));
       });
 
       it("should have one robots file in the output directory", function () {
@@ -74,7 +73,7 @@ describe("Build Greenwood With: ", function () {
       let sitemaps;
 
       before(async function () {
-        sitemaps = await glob(`${this.context.publicDir}/sitemap.xml`);
+        sitemaps = await glob(fileURLToPath(new URL("sitemap.xml", this.context.publicDir)));
       });
 
       it("should have one sitemap.xml file in the output directory", function () {
@@ -84,6 +83,6 @@ describe("Build Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

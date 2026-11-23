@@ -27,23 +27,21 @@
 import { expect } from "chai";
 import fs from "node:fs/promises";
 import { JSDOM } from "jsdom";
-import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
 
 // https://github.com/ProjectEvergreen/greenwood/issues/1768
 describe("Build Greenwood With: ", function () {
   const LABEL = "A getStaticPaths value that collides with an existing static page";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   const encodedSlugs = ["café", "hello world"];
   const runner = new Runner();
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
     });
 
     for (const slug of encodedSlugs) {
@@ -114,6 +112,6 @@ describe("Build Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

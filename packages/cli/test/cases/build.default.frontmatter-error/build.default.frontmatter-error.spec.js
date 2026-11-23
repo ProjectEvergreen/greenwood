@@ -22,38 +22,36 @@
 import * as chai from "chai";
 import { expect } from "chai";
 import chaiAsPromised from "chai-as-promised";
-import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
 
 chai.use(chaiAsPromised);
 
 describe("Build Greenwood With: ", function () {
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
 
   describe("A page with invalid YAML frontmatter", function () {
     before(async function () {
-      await runner.setup(outputPath);
+      await runner.setup(outputUrl);
     });
 
     it("should throw an error that the frontmatter for the page could not be parsed", async function () {
-      await expect(runner.runCommand(cliPath, { args: "build" })).to.be.rejectedWith(
+      await expect(runner.runCommand(cliUrl, { args: "build" })).to.be.rejectedWith(
         'Error parsing frontmatter for page "./broken.html"',
       );
     });
 
     it("should report the reason from the YAML parser instead of a raw js-yaml stack trace", async function () {
-      const error = await runner.runCommand(cliPath, { args: "build" }).then(
+      const error = await runner.runCommand(cliUrl, { args: "build" }).then(
         () => "",
         (err) => `${err}`,
       );
@@ -64,6 +62,6 @@ describe("Build Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

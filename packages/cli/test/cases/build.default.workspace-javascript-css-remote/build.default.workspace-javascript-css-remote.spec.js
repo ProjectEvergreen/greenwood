@@ -20,20 +20,19 @@
 import { expect } from "chai";
 import glob from "glob-promise";
 import { JSDOM } from "jsdom";
-import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Loading remote JavaScript and CSS using <script> and <link> tags";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
@@ -42,19 +41,23 @@ describe("Build Greenwood With: ", function () {
     let dom;
 
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
 
-      dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "index.html"));
+      dom = await JSDOM.fromFile(fileURLToPath(new URL("index.html", this.context.publicDir)));
     });
 
     describe("it should have the expected files in the output directory", function () {
       it("should output no javascript files", async function () {
-        expect(await glob.promise(path.join(this.context.publicDir, "*.js"))).to.have.lengthOf(0);
+        expect(
+          await glob.promise(fileURLToPath(new URL("*.js", this.context.publicDir))),
+        ).to.have.lengthOf(0);
       });
 
       it("should output no css files", async function () {
-        expect(await glob.promise(path.join(this.context.publicDir, "*.css"))).to.have.lengthOf(0);
+        expect(
+          await glob.promise(fileURLToPath(new URL("*.css", this.context.publicDir))),
+        ).to.have.lengthOf(0);
       });
     });
 
@@ -106,6 +109,6 @@ describe("Build Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

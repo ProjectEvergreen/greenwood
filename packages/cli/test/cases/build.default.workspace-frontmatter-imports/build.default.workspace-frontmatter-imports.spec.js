@@ -40,7 +40,6 @@ import { expect } from "chai";
 import fs from "node:fs";
 import glob from "glob-promise";
 import { JSDOM } from "jsdom";
-import path from "node:path";
 import { getOutputTeardownFiles, HASH_REGEX } from "../../../../../test/utils.js";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { Runner } from "gallinago";
@@ -48,21 +47,21 @@ import { fileURLToPath } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Default Greenwood Configuration and Workspace with Frontmatter Imports";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
     });
 
     runSmokeTest(["public", "index"], LABEL);
@@ -72,32 +71,40 @@ describe("Build Greenwood With: ", function () {
       let html;
 
       before(async function () {
-        const htmlPath = path.resolve(this.context.publicDir, "examples/demo", "index.html");
+        const htmlUrl = new URL("examples/demo/index.html", this.context.publicDir);
 
-        dom = await JSDOM.fromFile(path.resolve(htmlPath));
-        html = await fs.promises.readFile(htmlPath, "utf-8");
+        dom = await JSDOM.fromFile(fileURLToPath(htmlUrl));
+        html = await fs.promises.readFile(htmlUrl, "utf-8");
       });
 
       it("should output the expected number of JS files from frontmatter imports", async function () {
-        const jsFiles = await glob.promise(`${this.context.publicDir}**/**/*.js`);
+        const jsFiles = await glob.promise(
+          fileURLToPath(new URL("**/**/*.js", this.context.publicDir)),
+        );
 
         expect(jsFiles).to.have.lengthOf(5);
       });
 
       it("should output an unoptimized counter.css file from frontmatter import", async function () {
-        const cssFiles = await glob.promise(`${this.context.publicDir}**/**/counter.*.css`);
+        const cssFiles = await glob.promise(
+          fileURLToPath(new URL("**/**/counter.*.css", this.context.publicDir)),
+        );
 
         expect(cssFiles).to.have.lengthOf(1);
       });
 
       it("should output a counter.js file from frontmatter import", async function () {
-        const jsFiles = await glob.promise(`${this.context.publicDir}**/**/counter.*.js`);
+        const jsFiles = await glob.promise(
+          fileURLToPath(new URL("**/**/counter.*.js", this.context.publicDir)),
+        );
 
         expect(jsFiles).to.have.lengthOf(1);
       });
 
       it("should output a multi-hyphen.js file from frontmatter import", async function () {
-        const jsFiles = await glob.promise(`${this.context.publicDir}**/**/multi-hyphen.*.js`);
+        const jsFiles = await glob.promise(
+          fileURLToPath(new URL("**/**/multi-hyphen.*.js", this.context.publicDir)),
+        );
 
         expect(jsFiles).to.have.lengthOf(1);
       });
@@ -166,7 +173,7 @@ describe("Build Greenwood With: ", function () {
       describe("Frontmatter JavaScript import", () => {
         it("should output a transformed frontmatter-standard.js file from custom frontmatter import", async function () {
           const jsFiles = await glob.promise(
-            `${this.context.publicDir}**/**/frontmatter-standard.*.js`,
+            fileURLToPath(new URL("**/**/frontmatter-standard.*.js", this.context.publicDir)),
           );
           const contents = await fs.promises.readFile(jsFiles[0], "utf-8");
 
@@ -186,7 +193,7 @@ describe("Build Greenwood With: ", function () {
       describe("Custom Frontmatter JavaScript import format with expected contents transformed", () => {
         it("should output a transformed frontmatter-typescript.js file from custom frontmatter import", async function () {
           const jsFiles = await glob.promise(
-            `${this.context.publicDir}**/**/frontmatter-typescript.*.js`,
+            fileURLToPath(new URL("**/**/frontmatter-typescript.*.js", this.context.publicDir)),
           );
           const contents = await fs.promises.readFile(jsFiles[0], "utf-8");
 
@@ -207,7 +214,7 @@ describe("Build Greenwood With: ", function () {
       describe("Custom Frontmatter CSS import format with expected contents transformed", () => {
         it("should output a frontmatter-custom.css file from custom frontmatter import", async function () {
           const cssFiles = await glob.promise(
-            `${this.context.publicDir}**/**/frontmatter-custom.*.css`,
+            fileURLToPath(new URL("**/**/frontmatter-custom.*.css", this.context.publicDir)),
           );
           const contents = await fs.promises.readFile(cssFiles[0], "utf-8");
 
@@ -228,6 +235,6 @@ describe("Build Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

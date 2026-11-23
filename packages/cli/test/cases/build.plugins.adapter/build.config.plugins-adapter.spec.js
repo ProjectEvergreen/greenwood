@@ -41,29 +41,28 @@
  */
 import { expect } from "chai";
 import glob from "glob-promise";
-import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
 import { JSDOM } from "jsdom";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Generic Adapter Plugin with SSR Pages + API Routes";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
     });
 
     describe("Adapting an SSR Page", function () {
@@ -72,9 +71,7 @@ describe("Build Greenwood With: ", function () {
 
       before(async function () {
         const req = new Request(new URL("http://localhost:8080/index"));
-        const { handler } = await import(
-          new URL("./adapter-output/index.js", pathToFileURL(outputPath))
-        );
+        const { handler } = await import(new URL("./adapter-output/index.js", outputUrl));
 
         response = await handler(req);
         dom = new JSDOM(await response.text());
@@ -112,9 +109,8 @@ describe("Build Greenwood With: ", function () {
       let response;
 
       before(async function () {
-        const handler = (
-          await import(new URL("./adapter-output/api-greeting.js", pathToFileURL(outputPath)))
-        ).handler;
+        const handler = (await import(new URL("./adapter-output/api-greeting.js", outputUrl)))
+          .handler;
         const req = new Request(new URL("http://localhost:8080/api/greeting?name=Greenwood"));
 
         response = await handler(req);
@@ -136,9 +132,7 @@ describe("Build Greenwood With: ", function () {
 
       before(async function () {
         const handler = (
-          await import(
-            new URL("./adapter-output/api-nested-endpoint.js", pathToFileURL(outputPath))
-          )
+          await import(new URL("./adapter-output/api-nested-endpoint.js", outputUrl))
         ).handler;
         const req = new Request(new URL("http://localhost:8080/api/nested/endpoint"));
 
@@ -161,9 +155,8 @@ describe("Build Greenwood With: ", function () {
 
       before(async function () {
         const req = new Request(new URL("http://localhost:8080/blog/"));
-        const handler = (
-          await import(new URL("./adapter-output/blog-index.js", pathToFileURL(outputPath)))
-        ).handler;
+        const handler = (await import(new URL("./adapter-output/blog-index.js", outputUrl)))
+          .handler;
 
         response = await handler(req);
         dom = new JSDOM(await response.text());
@@ -187,9 +180,8 @@ describe("Build Greenwood With: ", function () {
 
       before(async function () {
         const req = new Request(new URL("http://localhost:8080/blog/first-post/"));
-        const handler = (
-          await import(new URL("./adapter-output/blog-first-post.js", pathToFileURL(outputPath)))
-        ).handler;
+        const handler = (await import(new URL("./adapter-output/blog-first-post.js", outputUrl)))
+          .handler;
 
         response = await handler(req);
         dom = new JSDOM(await response.text());
@@ -212,7 +204,9 @@ describe("Build Greenwood With: ", function () {
       let chunks;
 
       before(async function () {
-        chunks = await glob.promise(path.join(outputPath, "adapter-output/webhook.*.js"));
+        chunks = await glob.promise(
+          fileURLToPath(new URL("adapter-output/webhook.*.js", outputUrl)),
+        );
       });
 
       it("should contain one javascript file in the output directory", async function () {
@@ -225,7 +219,9 @@ describe("Build Greenwood With: ", function () {
       let chunks;
 
       before(async function () {
-        chunks = await glob.promise(path.join(outputPath, "adapter-output/about.route.chunk.*.js"));
+        chunks = await glob.promise(
+          fileURLToPath(new URL("adapter-output/about.route.chunk.*.js", outputUrl)),
+        );
       });
 
       it("should contain one javascript file in the output directory", async function () {
@@ -236,8 +232,8 @@ describe("Build Greenwood With: ", function () {
 
   after(async function () {
     await runner.teardown([
-      path.join(outputPath, "adapter-output"),
-      ...getOutputTeardownFiles(outputPath),
+      new URL("adapter-output", outputUrl),
+      ...getOutputTeardownFiles(outputUrl),
     ]);
   });
 });

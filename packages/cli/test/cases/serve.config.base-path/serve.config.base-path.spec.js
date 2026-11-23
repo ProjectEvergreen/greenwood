@@ -42,16 +42,15 @@ import { expect } from "chai";
 import fs from "node:fs";
 import glob from "glob-promise";
 import { JSDOM } from "jsdom";
-import path from "node:path";
 import { getOutputTeardownFiles, HASH_REGEX } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
 
 describe("Serve Greenwood With: ", function () {
   const LABEL = "Base Path Configuration";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
-  const publicPath = path.join(outputPath, "public/");
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
+  const publicUrl = new URL("public/", outputUrl);
   const hostname = "http://127.0.0.1:8080";
   const basePath = "/my-path";
   const jsHash = "eCbOYUm_";
@@ -66,12 +65,12 @@ describe("Serve Greenwood With: ", function () {
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
 
       await new Promise((resolve, reject) => {
         runner
-          .runCommand(cliPath, {
+          .runCommand(cliUrl, {
             args: "serve",
             onStdOut: (message) => {
               if (message.includes("Started server at http://localhost:8080")) {
@@ -283,11 +282,11 @@ describe("Serve Greenwood With: ", function () {
       let routerFiles;
 
       before(async function () {
-        dom = await JSDOM.fromFile(path.resolve(publicPath, "index.html"));
-        aboutDom = await JSDOM.fromFile(path.resolve(publicPath, "about/index.html"));
-        pages = await glob(`${publicPath}/*.html`);
-        partials = await glob(`${publicPath}/_routes/**/*.html`);
-        routerFiles = await glob(`${publicPath}/router.*.js`);
+        dom = await JSDOM.fromFile(fileURLToPath(new URL("index.html", publicUrl)));
+        aboutDom = await JSDOM.fromFile(fileURLToPath(new URL("about/index.html", publicUrl)));
+        pages = await glob(fileURLToPath(new URL("*.html", publicUrl)));
+        partials = await glob(fileURLToPath(new URL("_routes/**/*.html", publicUrl)));
+        routerFiles = await glob(fileURLToPath(new URL("router.*.js", publicUrl)));
       });
 
       it("should have one <script> tag in the <head> for the router", function () {
@@ -359,7 +358,7 @@ describe("Serve Greenwood With: ", function () {
       });
 
       it("should have the expected partial output to match the contents of the home page in the <router-outlet> tag in the <body>", function () {
-        const homePartial = fs.readFileSync(path.join(publicPath, "_routes/index.html"), "utf-8");
+        const homePartial = fs.readFileSync(new URL("_routes/index.html", publicUrl), "utf-8");
         const homeRouterOutlet = dom.window.document.querySelectorAll("body > router-outlet")[0];
 
         expect(homeRouterOutlet.innerHTML.replace(/\n/g, "").replace(/ /g, "")).to.contain(
@@ -369,7 +368,7 @@ describe("Serve Greenwood With: ", function () {
 
       it("should have the expected partial output to match the contents of the about page in the <router-outlet> tag in the <body>", function () {
         const aboutPartial = fs.readFileSync(
-          path.join(publicPath, "_routes/about/index.html"),
+          new URL("_routes/about/index.html", publicUrl),
           "utf-8",
         );
         const aboutRouterOutlet =
@@ -480,7 +479,7 @@ describe("Serve Greenwood With: ", function () {
 
       it("should have the expected content for each partial", function () {
         const contents = partials.map((partial) =>
-          fs.readFileSync(path.join(publicPath, `_routes/blog/${partial}`), "utf-8"),
+          fs.readFileSync(new URL(`_routes/blog/${partial}`, publicUrl), "utf-8"),
         );
         let matched = 0;
 
@@ -538,6 +537,6 @@ describe("Serve Greenwood With: ", function () {
 
   after(async function () {
     await runner.stopCommand();
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

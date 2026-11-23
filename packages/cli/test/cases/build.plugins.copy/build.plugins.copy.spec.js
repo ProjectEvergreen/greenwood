@@ -34,35 +34,35 @@ import { fileURLToPath } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "A Custom Copy Plugin";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
     });
 
     runSmokeTest(["public"], LABEL);
 
     describe("Copy Directory", function () {
       it("should create the expected output folder for prism.css assets", function () {
-        expect(fs.existsSync(path.join(this.context.publicDir, "node_modules/prismjs/themes"))).to
-          .be.true;
+        expect(fs.existsSync(new URL("node_modules/prismjs/themes", this.context.publicDir))).to.be
+          .true;
       });
 
       it("should contain files from the asset directory", async function () {
         expect(
           await glob.promise(
-            path.join(this.context.publicDir, "node_modules/prismjs/themes/*.css"),
+            fileURLToPath(new URL("node_modules/prismjs/themes/*.css", this.context.publicDir)),
           ),
         ).to.have.lengthOf(16);
       });
@@ -80,14 +80,16 @@ describe("Build Greenwood With: ", function () {
           "duplicate-destination-locations",
         ]) {
           expect(
-            await glob.promise(path.join(this.context.publicDir, sharedDir, "*.css")),
+            await glob.promise(
+              path.join(fileURLToPath(this.context.publicDir), sharedDir, "*.css"),
+            ),
           ).to.have.lengthOf(16);
         }
       });
 
       it("should let the last of two plugins sharing a destination win", function () {
         const contents = fs.readFileSync(
-          path.join(this.context.publicDir, "duplicate-destination-plugins/prism.min.css"),
+          new URL("duplicate-destination-plugins/prism.min.css", this.context.publicDir),
           "utf-8",
         );
 
@@ -96,7 +98,7 @@ describe("Build Greenwood With: ", function () {
 
       it("should let the last of two locations from one plugin sharing a destination win", function () {
         const contents = fs.readFileSync(
-          path.join(this.context.publicDir, "duplicate-destination-locations/prism.min.css"),
+          new URL("duplicate-destination-locations/prism.min.css", this.context.publicDir),
           "utf-8",
         );
 
@@ -105,7 +107,7 @@ describe("Build Greenwood With: ", function () {
 
       it("should let the last file copy to the same destination win", function () {
         const contents = fs.readFileSync(
-          path.join(this.context.publicDir, "duplicate-destination-files.css"),
+          new URL("duplicate-destination-files.css", this.context.publicDir),
           "utf-8",
         );
 
@@ -115,6 +117,6 @@ describe("Build Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

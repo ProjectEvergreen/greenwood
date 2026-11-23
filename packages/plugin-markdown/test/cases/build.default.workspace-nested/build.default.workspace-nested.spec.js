@@ -46,11 +46,9 @@
  */
 import { expect } from "chai";
 import fs from "node:fs";
-import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
 
 function generatePageHref(pagePath) {
   return new URL(`./src/pages/${pagePath}`, import.meta.url).href;
@@ -58,21 +56,21 @@ function generatePageHref(pagePath) {
 
 describe("Build Greenwood With Markdown Plugin: ", function () {
   const LABEL = "Default Greenwood Configuration and Default Workspace w/ Nested Directories";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../../cli/src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
     });
 
     runSmokeTest(["public", "index"], LABEL);
@@ -82,7 +80,7 @@ describe("Build Greenwood With Markdown Plugin: ", function () {
 
       before(async function () {
         graph = JSON.parse(
-          await fs.promises.readFile(path.join(this.context.publicDir, "graph.json"), "utf-8"),
+          await fs.promises.readFile(new URL("graph.json", this.context.publicDir), "utf-8"),
         );
       });
 
@@ -117,14 +115,14 @@ describe("Build Greenwood With Markdown Plugin: ", function () {
       });
 
       it("should create a top level blog pages directory", function () {
-        expect(fs.existsSync(path.join(this.context.publicDir, "./blog"))).to.be.true;
+        expect(fs.existsSync(new URL("blog", this.context.publicDir))).to.be.true;
       });
 
       it("should create a directory for each year of blog pages", function () {
-        expect(fs.existsSync(path.join(this.context.publicDir, "blog/2017"))).to.be.true;
-        expect(fs.existsSync(path.join(this.context.publicDir, "blog/2018"))).to.be.true;
-        expect(fs.existsSync(path.join(this.context.publicDir, "blog/2019"))).to.be.true;
-        expect(fs.existsSync(path.join(this.context.publicDir, "blog/2020"))).to.be.true;
+        expect(fs.existsSync(new URL("blog/2017", this.context.publicDir))).to.be.true;
+        expect(fs.existsSync(new URL("blog/2018", this.context.publicDir))).to.be.true;
+        expect(fs.existsSync(new URL("blog/2019", this.context.publicDir))).to.be.true;
+        expect(fs.existsSync(new URL("blog/2020", this.context.publicDir))).to.be.true;
       });
 
       it("should have the expected pages for 2017 blog pages", function () {
@@ -133,8 +131,8 @@ describe("Build Greenwood With Markdown Plugin: ", function () {
             return page.route.indexOf("2017") > 0;
           })
           .forEach((page) => {
-            const outputPath = path.join(this.context.publicDir, page.route, "index.html");
-            expect(fs.existsSync(outputPath)).to.be.true;
+            const pageUrl = new URL(`.${page.route}index.html`, this.context.publicDir);
+            expect(fs.existsSync(pageUrl)).to.be.true;
           });
       });
 
@@ -144,8 +142,8 @@ describe("Build Greenwood With Markdown Plugin: ", function () {
             return page.route.indexOf("2018") > 0;
           })
           .forEach((page) => {
-            const outputPath = path.join(this.context.publicDir, page.route, "index.html");
-            expect(fs.existsSync(outputPath)).to.be.true;
+            const pageUrl = new URL(`.${page.route}index.html`, this.context.publicDir);
+            expect(fs.existsSync(pageUrl)).to.be.true;
           });
       });
 
@@ -155,8 +153,8 @@ describe("Build Greenwood With Markdown Plugin: ", function () {
             return page.route.indexOf("2019") > 0;
           })
           .forEach((page) => {
-            const outputPath = path.join(this.context.publicDir, page.route, "index.html");
-            expect(fs.existsSync(outputPath)).to.be.true;
+            const pageUrl = new URL(`.${page.route}index.html`, this.context.publicDir);
+            expect(fs.existsSync(pageUrl)).to.be.true;
           });
       });
 
@@ -166,8 +164,8 @@ describe("Build Greenwood With Markdown Plugin: ", function () {
             return page.route.indexOf("2020") > 0;
           })
           .forEach((page) => {
-            const outputPath = path.join(this.context.publicDir, page.route, "index.html");
-            expect(fs.existsSync(outputPath)).to.be.true;
+            const pageUrl = new URL(`.${page.route}index.html`, this.context.publicDir);
+            expect(fs.existsSync(pageUrl)).to.be.true;
           });
       });
 
@@ -178,7 +176,7 @@ describe("Build Greenwood With Markdown Plugin: ", function () {
           })
           .forEach((page) => {
             const contents = fs.readFileSync(
-              path.join(this.context.publicDir, page.route, "index.html"),
+              new URL(`.${page.route}index.html`, this.context.publicDir),
               "utf-8",
             );
 
@@ -189,6 +187,6 @@ describe("Build Greenwood With Markdown Plugin: ", function () {
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

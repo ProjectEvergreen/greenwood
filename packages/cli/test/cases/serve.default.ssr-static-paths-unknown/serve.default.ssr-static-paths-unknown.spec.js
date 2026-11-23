@@ -21,21 +21,19 @@
  */
 import { expect } from "chai";
 import { JSDOM } from "jsdom";
-import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
 
 describe("Serve Greenwood With: ", function () {
   const LABEL = "Dynamic Routing for Get Static Paths with unknown dynamic route values";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   const hostname = "http://localhost:8080";
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
       hostname,
     };
     runner = new Runner();
@@ -43,12 +41,12 @@ describe("Serve Greenwood With: ", function () {
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
 
       await new Promise((resolve, reject) => {
         runner
-          .runCommand(cliPath, {
+          .runCommand(cliUrl, {
             args: "serve",
             onStdOut: (message) => {
               if (message.includes(`Started server at ${hostname}`)) {
@@ -120,6 +118,6 @@ describe("Serve Greenwood With: ", function () {
 
   after(async function () {
     await runner.stopCommand();
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

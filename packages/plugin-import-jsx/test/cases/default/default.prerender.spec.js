@@ -30,7 +30,6 @@
 import { expect } from "chai";
 import glob from "glob-promise";
 import { JSDOM } from "jsdom";
-import path from "node:path";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
@@ -38,21 +37,21 @@ import { fileURLToPath } from "node:url";
 
 describe("(Experimental) Build Greenwood With: ", function () {
   const LABEL = "Import JSX Plugin for client side bundling";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../../cli/src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner({ forwardParentArgs: true });
   });
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
     });
 
     runSmokeTest(["public"], LABEL);
@@ -62,8 +61,8 @@ describe("(Experimental) Build Greenwood With: ", function () {
       let scripts;
 
       before(async function () {
-        scripts = await glob.promise(path.join(this.context.publicDir, "*.js"));
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "./index.html"));
+        scripts = await glob.promise(fileURLToPath(new URL("*.js", this.context.publicDir)));
+        dom = await JSDOM.fromFile(fileURLToPath(new URL("index.html", this.context.publicDir)));
       });
 
       it("should contain one bundled output file in the output directory", function () {
@@ -81,6 +80,6 @@ describe("(Experimental) Build Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

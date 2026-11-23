@@ -46,19 +46,15 @@ import { expect } from "chai";
 import fs from "node:fs/promises";
 import glob from "glob-promise";
 import { JSDOM } from "jsdom";
-import path from "node:path";
-import {
-  checkResourceExists,
-  normalizePathnameForWindows,
-} from "../../../../cli/src/lib/resource-utils.js";
+import { checkResourceExists } from "../../../../cli/src/lib/resource-utils.js";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Vercel Adapter plugin output";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../../cli/src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   const vercelOutputFolder = new URL("./.vercel/output/", import.meta.url);
   const vercelFunctionsOutputUrl = new URL("./functions/", vercelOutputFolder);
   const hostname = "http://www.example.com";
@@ -66,15 +62,15 @@ describe("Build Greenwood With: ", function () {
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
     });
 
     describe("Default Output", function () {
@@ -84,7 +80,7 @@ describe("Build Greenwood With: ", function () {
       before(async function () {
         configFile = await fs.readFile(new URL("./config.json", vercelOutputFolder), "utf-8");
         functionFolders = await glob.promise(
-          path.join(normalizePathnameForWindows(vercelFunctionsOutputUrl), "**/*.func"),
+          fileURLToPath(new URL("./**/*.func", vercelFunctionsOutputUrl)),
         );
       });
 
@@ -99,7 +95,7 @@ describe("Build Greenwood With: ", function () {
       it("should output the expected package.json for each serverless function", function () {
         functionFolders.forEach(async (folder) => {
           const packageJson = await fs.readFile(
-            new URL("./package.json", `file://${folder}/`),
+            new URL("./package.json", pathToFileURL(`${folder}/`)),
             "utf-8",
           );
 
@@ -110,7 +106,7 @@ describe("Build Greenwood With: ", function () {
       it("should output the expected .vc-config.json for each serverless function", function () {
         functionFolders.forEach(async (folder) => {
           const packageJson = await fs.readFile(
-            new URL("./vc-config.json", `file://${folder}/`),
+            new URL("./vc-config.json", pathToFileURL(`${folder}/`)),
             "utf-8",
           );
 
@@ -123,14 +119,14 @@ describe("Build Greenwood With: ", function () {
 
     describe("Static directory output", function () {
       it("should return the expected response when the serverless adapter entry point handler is invoked", async function () {
-        const publicFiles = await glob.promise(path.join(outputPath, "public/**/**"));
+        const publicFiles = await glob.promise(fileURLToPath(new URL("public/**/**", outputUrl)));
 
         for (const file of publicFiles) {
           const buildOutputDestination = file.replace(
-            path.join(outputPath, "public"),
-            path.join(vercelOutputFolder.pathname, "static"),
+            fileURLToPath(new URL("public", outputUrl)),
+            fileURLToPath(new URL("static", vercelOutputFolder)),
           );
-          const itExists = await checkResourceExists(new URL(`file://${buildOutputDestination}`));
+          const itExists = await checkResourceExists(pathToFileURL(buildOutputDestination));
 
           expect(itExists).to.be.equal(true);
         }
@@ -176,7 +172,7 @@ describe("Build Greenwood With: ", function () {
 
       it("should not have a shared asset for the card component", async () => {
         const assets = await glob.promise(
-          path.join(normalizePathnameForWindows(vercelFunctionsOutputUrl), "/api/greeting.func/*"),
+          fileURLToPath(new URL("./api/greeting.func/*", vercelFunctionsOutputUrl)),
         );
         const exists = assets.find((asset) => {
           const name = asset.split("/").pop();
@@ -227,10 +223,7 @@ describe("Build Greenwood With: ", function () {
 
       it("should have a route chunk", async () => {
         const chunks = await glob.promise(
-          path.join(
-            normalizePathnameForWindows(vercelFunctionsOutputUrl),
-            "/api/fragment.func/fragment.*.js",
-          ),
+          fileURLToPath(new URL("./api/fragment.func/fragment.*.js", vercelFunctionsOutputUrl)),
         );
 
         expect(chunks.length).to.equal(1);
@@ -660,9 +653,6 @@ describe("Build Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.teardown([
-      path.join(outputPath, ".vercel"),
-      ...getOutputTeardownFiles(outputPath),
-    ]);
+    await runner.teardown([new URL(".vercel", outputUrl), ...getOutputTeardownFiles(outputUrl)]);
   });
 });

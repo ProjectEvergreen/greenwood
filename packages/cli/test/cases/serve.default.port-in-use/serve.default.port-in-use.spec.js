@@ -1,21 +1,19 @@
 import { expect } from "chai";
 import net from "node:net";
-import path from "node:path";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 
 describe("Serve Greenwood With: Production Server Port Already In Use", function () {
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   const preferredPort = 8183;
   let hostname;
   const runner = new Runner();
   let blocker;
 
   before(async function () {
-    await runner.setup(outputPath);
-    await runner.runCommand(cliPath, { args: "build" });
+    await runner.setup(outputUrl);
+    await runner.runCommand(cliUrl, { args: "build" });
 
     blocker = net.createServer();
     await new Promise((resolve, reject) => {
@@ -27,7 +25,7 @@ describe("Serve Greenwood With: Production Server Port Already In Use", function
       let output = "";
 
       runner
-        .runCommand(cliPath, {
+        .runCommand(cliUrl, {
           args: "serve",
           onStdOut: (message) => {
             output += message;
@@ -71,6 +69,6 @@ describe("Serve Greenwood With: Production Server Port Already In Use", function
     if (blocker?.listening) {
       await new Promise((resolve) => blocker.close(resolve));
     }
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

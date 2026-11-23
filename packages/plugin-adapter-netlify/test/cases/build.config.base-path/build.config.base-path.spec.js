@@ -34,28 +34,27 @@ import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
-import { normalizePathnameForWindows } from "../../../../cli/src/lib/resource-utils.js";
 import extract from "extract-zip";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Netlify Adapter plugin output w/ base path configuration";
   const basePath = "/my-app";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../../cli/src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   const netlifyFunctionsOutputUrl = new URL("./netlify/functions/", import.meta.url);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
     });
 
     describe("Default Output", function () {
@@ -63,10 +62,8 @@ describe("Build Greenwood With: ", function () {
       let redirectsFile;
 
       before(async function () {
-        zipFiles = await glob.promise(
-          path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), "*.zip"),
-        );
-        redirectsFile = await glob.promise(path.join(outputPath, "public/_redirects"));
+        zipFiles = await glob.promise(fileURLToPath(new URL("./*.zip", netlifyFunctionsOutputUrl)));
+        redirectsFile = await glob.promise(fileURLToPath(new URL("public/_redirects", outputUrl)));
       });
 
       it("should output the expected number of serverless function zip files", function () {
@@ -95,7 +92,7 @@ describe("Build Greenwood With: ", function () {
 
       before(async function () {
         apiFunctions = await glob.promise(
-          path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), "api-greeting.zip"),
+          fileURLToPath(new URL("./api-greeting.zip", netlifyFunctionsOutputUrl)),
         );
       });
 
@@ -108,7 +105,7 @@ describe("Build Greenwood With: ", function () {
         const name = path.basename(apiFunctions[0]).replace(".zip", "");
 
         await extract(apiFunctions[0], {
-          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name),
+          dir: fileURLToPath(new URL(`${name}/`, netlifyFunctionsOutputUrl)),
         });
         const { handler } = await import(
           new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl)
@@ -133,9 +130,7 @@ describe("Build Greenwood With: ", function () {
 
       before(async function () {
         pageFunctions = (
-          await glob.promise(
-            path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), "*.zip"),
-          )
+          await glob.promise(fileURLToPath(new URL("./*.zip", netlifyFunctionsOutputUrl)))
         ).filter((zipFile) => path.basename(zipFile).startsWith("users"));
       });
 
@@ -148,7 +143,7 @@ describe("Build Greenwood With: ", function () {
         const count = 1;
 
         await extract(pageFunctions[0], {
-          dir: path.join(normalizePathnameForWindows(netlifyFunctionsOutputUrl), name),
+          dir: fileURLToPath(new URL(`${name}/`, netlifyFunctionsOutputUrl)),
         });
         const { handler } = await import(
           new URL(`./${name}/${name}.js`, netlifyFunctionsOutputUrl)
@@ -177,10 +172,7 @@ describe("Build Greenwood With: ", function () {
       let redirectsFileContents;
 
       before(async function () {
-        redirectsFileContents = await fs.readFile(
-          path.join(outputPath, "public/_redirects"),
-          "utf-8",
-        );
+        redirectsFileContents = await fs.readFile(new URL("public/_redirects", outputUrl), "utf-8");
       });
 
       it("should return the expected response when the serverless adapter entry point handler is invoked", async function () {
@@ -194,9 +186,6 @@ ${basePath}/api/greeting /.netlify/functions/api-greeting 200
   });
 
   after(async function () {
-    await runner.teardown([
-      path.join(outputPath, "netlify"),
-      ...getOutputTeardownFiles(outputPath),
-    ]);
+    await runner.teardown([new URL("netlify", outputUrl), ...getOutputTeardownFiles(outputUrl)]);
   });
 });

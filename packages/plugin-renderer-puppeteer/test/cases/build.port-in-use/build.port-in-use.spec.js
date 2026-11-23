@@ -6,15 +6,13 @@
 import { expect } from "chai";
 import fs from "node:fs/promises";
 import net from "node:net";
-import path from "node:path";
 import { JSDOM } from "jsdom";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 
 describe("Build Greenwood With: Puppeteer and Active Content Ports Already In Use", function () {
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../../cli/src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   const runner = new Runner();
   const preferredContentPort = 1990;
   let blocker;
@@ -30,8 +28,8 @@ describe("Build Greenwood With: Puppeteer and Active Content Ports Already In Us
       blocker.listen(preferredContentPort, resolve);
     });
 
-    await runner.setup(outputPath);
-    await runner.runCommand(cliPath, {
+    await runner.setup(outputUrl);
+    await runner.runCommand(cliUrl, {
       args: "build",
       onStdOut: (message) => {
         output += message;
@@ -56,7 +54,7 @@ describe("Build Greenwood With: Puppeteer and Active Content Ports Already In Us
 
   for (const page of ["index.html", "about/index.html"]) {
     it(`should render ${page} with the selected prerender and content ports`, async function () {
-      const html = await fs.readFile(path.join(outputPath, "public", page), "utf-8");
+      const html = await fs.readFile(new URL(`public/${page}`, outputUrl), "utf-8");
       const { document } = new JSDOM(html).window;
 
       expect(document.querySelector("#server-origin").textContent).to.equal(
@@ -74,6 +72,6 @@ describe("Build Greenwood With: Puppeteer and Active Content Ports Already In Us
     if (blocker?.listening) {
       await new Promise((resolve) => blocker.close(resolve));
     }
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

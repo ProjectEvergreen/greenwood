@@ -25,15 +25,13 @@
  */
 import { expect } from "chai";
 import { JSDOM } from "jsdom";
-import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
 
 describe("Develop Greenwood With: ", function () {
   const LABEL = "Development Prerendering with Import Attributes";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   const hostname = "http://127.0.0.1:1984";
   let runner;
 
@@ -43,11 +41,11 @@ describe("Develop Greenwood With: ", function () {
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
+      await runner.setup(outputUrl);
 
       await new Promise((resolve, reject) => {
         runner
-          .runCommand(cliPath, {
+          .runCommand(cliUrl, {
             args: "develop",
             onStdOut: (message) => {
               if (message.includes("Started local development server at http://localhost:1984")) {
@@ -85,6 +83,6 @@ describe("Develop Greenwood With: ", function () {
 
   after(async function () {
     await runner.stopCommand();
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

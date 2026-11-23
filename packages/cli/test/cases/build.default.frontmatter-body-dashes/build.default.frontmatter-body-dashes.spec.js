@@ -20,7 +20,6 @@
  */
 import fs from "node:fs";
 import { JSDOM } from "jsdom";
-import path from "node:path";
 import { expect } from "chai";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
@@ -30,21 +29,21 @@ import { fileURLToPath } from "node:url";
 // https://github.com/ProjectEvergreen/greenwood/issues/1711
 describe("Build Greenwood With: ", function () {
   const LABEL = "Frontmatter With `---` Sequences In The Page Body";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
     });
 
     // only the "public" smoke tests here: the shared "index" suite asserts the body
@@ -56,10 +55,10 @@ describe("Build Greenwood With: ", function () {
       let html;
 
       before(async function () {
-        const htmlPath = path.resolve(this.context.publicDir, "./index.html");
+        const htmlUrl = new URL("index.html", this.context.publicDir);
 
-        dom = await JSDOM.fromFile(htmlPath);
-        html = await fs.promises.readFile(htmlPath, "utf-8");
+        dom = await JSDOM.fromFile(fileURLToPath(htmlUrl));
+        html = await fs.promises.readFile(htmlUrl, "utf-8");
       });
 
       it("should preserve the leading heading that comes before the inline dashes", function () {
@@ -90,6 +89,6 @@ describe("Build Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

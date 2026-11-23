@@ -48,24 +48,23 @@
  */
 import { expect } from "chai";
 import fs from "node:fs/promises";
-import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { Runner } from "gallinago";
 import { JSDOM } from "jsdom";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 
 describe("Build Greenwood With: Deno Deploy adapter and static files", function () {
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../../cli/src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   const serverUrl = new URL("./.deno-deploy/server.js", import.meta.url);
   let runner;
   let requestHandler;
 
   before(async function () {
-    this.context = { publicDir: path.join(outputPath, "public") };
+    this.context = { publicDir: new URL("public/", outputUrl) };
     runner = new Runner();
-    await runner.setup(outputPath);
-    await runner.runCommand(cliPath, { args: "build" });
+    await runner.setup(outputUrl);
+    await runner.runCommand(cliUrl, { args: "build" });
 
     const deno = globalThis.Deno;
     const originalServe = deno.serve;
@@ -205,7 +204,7 @@ describe("Build Greenwood With: Deno Deploy adapter and static files", function 
     const deno = globalThis.Deno;
     const previousDirectory = deno.cwd();
 
-    deno.chdir(outputPath);
+    deno.chdir(fileURLToPath(outputUrl));
 
     try {
       const response = await requestHandler(new Request("http://localhost/my-app/"));
@@ -222,7 +221,7 @@ describe("Build Greenwood With: Deno Deploy adapter and static files", function 
     const deno = globalThis.Deno;
     const previousDirectory = deno.cwd();
 
-    deno.chdir(outputPath);
+    deno.chdir(fileURLToPath(outputUrl));
 
     try {
       const event = await requestHandler(new Request("http://localhost/my-app/event/title/"));
@@ -238,7 +237,7 @@ describe("Build Greenwood With: Deno Deploy adapter and static files", function 
     const deno = globalThis.Deno;
     const previousDirectory = deno.cwd();
 
-    deno.chdir(outputPath);
+    deno.chdir(fileURLToPath(outputUrl));
 
     try {
       const topic = await requestHandler(new Request("http://localhost/my-app/topics/greenwood/"));
@@ -252,8 +251,8 @@ describe("Build Greenwood With: Deno Deploy adapter and static files", function 
 
   after(async function () {
     await runner.teardown([
-      path.join(outputPath, ".deno-deploy"),
-      ...getOutputTeardownFiles(outputPath),
+      new URL(".deno-deploy", outputUrl),
+      ...getOutputTeardownFiles(outputUrl),
     ]);
   });
 });

@@ -28,7 +28,6 @@
  */
 import { expect } from "chai";
 import { JSDOM } from "jsdom";
-import path from "node:path";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
@@ -38,21 +37,21 @@ describe("Build Greenwood With: ", function () {
   const LABEL =
     "Google Analytics Plugin with IP Anonymization tracking set to false and Default Workspace";
   const mockAnalyticsId = "UA-123456-1";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../../cli/src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
     });
 
     runSmokeTest(["public", "index"], LABEL);
@@ -61,7 +60,9 @@ describe("Build Greenwood With: ", function () {
       let inlineScript;
 
       before(async function () {
-        const dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "index.html"));
+        const dom = await JSDOM.fromFile(
+          fileURLToPath(new URL("index.html", this.context.publicDir)),
+        );
         const scriptTags = Array.from(dom.window.document.querySelectorAll("head script")).filter(
           (tag) => !tag.getAttribute("data-gwd"),
         );
@@ -93,7 +94,9 @@ describe("Build Greenwood With: ", function () {
       let trackingScript;
 
       before(async function () {
-        const dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "index.html"));
+        const dom = await JSDOM.fromFile(
+          fileURLToPath(new URL("index.html", this.context.publicDir)),
+        );
         const scriptTags = dom.window.document.querySelectorAll("head script");
 
         trackingScript = Array.prototype.slice.call(scriptTags).filter((script) => {
@@ -114,6 +117,6 @@ describe("Build Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

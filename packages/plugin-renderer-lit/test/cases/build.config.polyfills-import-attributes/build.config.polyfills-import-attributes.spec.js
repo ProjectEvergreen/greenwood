@@ -33,22 +33,19 @@
 import { expect } from "chai";
 import fs from "node:fs/promises";
 import { JSDOM } from "jsdom";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { Runner } from "gallinago";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 
 describe("Build Greenwood With Lit and the CSS import attributes polyfill", function () {
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
+  const cliUrl = new URL("../../../../cli/src/bin.js", import.meta.url);
   const outputUrl = new URL(".", import.meta.url);
-  const outputPath = fileURLToPath(outputUrl);
   let runner;
   let apiContents;
 
   before(async function () {
     runner = new Runner();
-    await runner.setup(outputPath);
-    await runner.runCommand(cliPath, { args: "build" });
+    await runner.setup(outputUrl);
+    await runner.runCommand(cliUrl, { args: "build" });
     apiContents = await fs.readFile(new URL("./public/api/fragment.js", outputUrl), "utf-8");
   });
 
@@ -81,6 +78,6 @@ describe("Build Greenwood With Lit and the CSS import attributes polyfill", func
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

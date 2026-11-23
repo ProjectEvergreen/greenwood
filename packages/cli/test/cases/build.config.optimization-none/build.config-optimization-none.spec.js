@@ -26,28 +26,27 @@ import { expect } from "chai";
 import fs from "node:fs";
 import glob from "glob-promise";
 import { JSDOM } from "jsdom";
-import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
 import { fileURLToPath } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "None Optimization Configuration";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
     });
 
     describe("Output for JavaScript / CSS tags and files", function () {
@@ -56,9 +55,11 @@ describe("Build Greenwood With: ", function () {
       let jsFiles;
 
       before(async function () {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "./index.html"));
-        jsFiles = await glob.promise(path.join(this.context.publicDir, "*.js"));
-        cssFiles = await glob.promise(`${path.join(this.context.publicDir, "styles")}/theme.*.css`);
+        dom = await JSDOM.fromFile(fileURLToPath(new URL("index.html", this.context.publicDir)));
+        jsFiles = await glob.promise(fileURLToPath(new URL("*.js", this.context.publicDir)));
+        cssFiles = await glob.promise(
+          fileURLToPath(new URL("styles/theme.*.css", this.context.publicDir)),
+        );
       });
 
       describe("<script> tag and preloading", function () {
@@ -75,7 +76,12 @@ describe("Build Greenwood With: ", function () {
         });
 
         it("should have the expected <script> tag in the <head>", function () {
-          const src = jsFiles[0].replace(this.context.publicDir.replace(/\\/g, "/"), "");
+          const src = jsFiles[0].replace(
+            fileURLToPath(this.context.publicDir)
+              .replace(/[/\\]$/, "")
+              .replace(/\\/g, "/"),
+            "",
+          );
           const scriptTags = Array.from(
             dom.window.document.querySelectorAll('head script[type="module"]'),
           ).filter((tag) => tag.getAttribute("src") === src);
@@ -84,7 +90,12 @@ describe("Build Greenwood With: ", function () {
         });
 
         it("should have the expected preload <script> tag in the <head>", function () {
-          const src = jsFiles[0].replace(this.context.publicDir.replace(/\\/g, "/"), "");
+          const src = jsFiles[0].replace(
+            fileURLToPath(this.context.publicDir)
+              .replace(/[/\\]$/, "")
+              .replace(/\\/g, "/"),
+            "",
+          );
           const scriptPreloadTags = Array.from(
             dom.window.document.querySelectorAll('head link[as="script"]'),
           );
@@ -114,7 +125,12 @@ describe("Build Greenwood With: ", function () {
         });
 
         it("should have the expected preload <link> tag in the <head>", function () {
-          const href = cssFiles[0].replace(this.context.publicDir.replace(/\\/g, "/"), "");
+          const href = cssFiles[0].replace(
+            fileURLToPath(this.context.publicDir)
+              .replace(/[/\\]$/, "")
+              .replace(/\\/g, "/"),
+            "",
+          );
           const linkPreloadTags = Array.from(
             dom.window.document.querySelectorAll('head link[as="style"]'),
           );
@@ -124,7 +140,12 @@ describe("Build Greenwood With: ", function () {
         });
 
         it("should have the expected <link> tag href  for theme.css", function () {
-          const href = cssFiles[0].replace(this.context.publicDir.replace(/\\/g, "/"), "");
+          const href = cssFiles[0].replace(
+            fileURLToPath(this.context.publicDir)
+              .replace(/[/\\]$/, "")
+              .replace(/\\/g, "/"),
+            "",
+          );
           const linkTags = Array.from(
             dom.window.document.querySelectorAll('head link[rel="stylesheet"]'),
           ).filter((tag) => tag.getAttribute("href") === href);
@@ -136,6 +157,6 @@ describe("Build Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

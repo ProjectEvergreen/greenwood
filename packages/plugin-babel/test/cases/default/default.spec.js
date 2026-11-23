@@ -28,7 +28,6 @@
 import { expect } from "chai";
 import fs from "node:fs";
 import glob from "glob-promise";
-import path from "node:path";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
@@ -36,21 +35,21 @@ import { fileURLToPath } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Default Babel configuration";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../../cli/src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
     });
 
     runSmokeTest(["public", "index"], LABEL);
@@ -58,7 +57,7 @@ describe("Build Greenwood With: ", function () {
     describe("Babel should process JavaScript that reference private class members / methods", function () {
       it("should output correctly processed JavaScript without private members", function () {
         const expectedJavaScript = "#x";
-        const jsFiles = glob.sync(path.join(this.context.publicDir, "*.js"));
+        const jsFiles = glob.sync(fileURLToPath(new URL("*.js", this.context.publicDir)));
         const javascript = fs.readFileSync(jsFiles[0], "utf-8");
 
         expect(jsFiles.length).to.equal(1);
@@ -68,6 +67,6 @@ describe("Build Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

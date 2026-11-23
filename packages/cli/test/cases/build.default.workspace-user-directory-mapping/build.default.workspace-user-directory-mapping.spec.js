@@ -34,7 +34,6 @@ import { expect } from "chai";
 import fs from "node:fs";
 import glob from "glob-promise";
 import { JSDOM } from "jsdom";
-import path from "node:path";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
@@ -42,21 +41,21 @@ import { fileURLToPath } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Default Greenwood Configuration and Workspace w/Naming Collisions";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
     });
 
     runSmokeTest(["public", "index"], LABEL);
@@ -65,7 +64,7 @@ describe("Build Greenwood With: ", function () {
       let dom;
 
       before(async function () {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "index.html"));
+        dom = await JSDOM.fromFile(fileURLToPath(new URL("index.html", this.context.publicDir)));
       });
 
       it("should create a public directory", function () {
@@ -73,11 +72,13 @@ describe("Build Greenwood With: ", function () {
       });
 
       it("should output an index.html file (home page)", function () {
-        expect(fs.existsSync(path.join(this.context.publicDir, "./index.html"))).to.be.true;
+        expect(fs.existsSync(new URL("index.html", this.context.publicDir))).to.be.true;
       });
 
       it("should output one JS bundle files", async function () {
-        expect(await glob.promise(path.join(this.context.publicDir, "./*.js"))).to.have.lengthOf(1);
+        expect(
+          await glob.promise(fileURLToPath(new URL("*.js", this.context.publicDir))),
+        ).to.have.lengthOf(1);
       });
 
       it("should have one <script> tags in the <head>", async function () {
@@ -109,15 +110,19 @@ describe("Build Greenwood With: ", function () {
       let dom;
 
       before(async function () {
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "pages/index.html"));
+        dom = await JSDOM.fromFile(
+          fileURLToPath(new URL("pages/index.html", this.context.publicDir)),
+        );
       });
 
       it("should output an index.html file (home page)", function () {
-        expect(fs.existsSync(path.join(this.context.publicDir, "pages", "index.html"))).to.be.true;
+        expect(fs.existsSync(new URL("pages/index.html", this.context.publicDir))).to.be.true;
       });
 
       it("should output one JS bundle files", async function () {
-        expect(await glob.promise(path.join(this.context.publicDir, "./*.js"))).to.have.lengthOf(1);
+        expect(
+          await glob.promise(fileURLToPath(new URL("*.js", this.context.publicDir))),
+        ).to.have.lengthOf(1);
       });
 
       it("should have one <script> tags in the <head>", async function () {
@@ -149,22 +154,20 @@ describe("Build Greenwood With: ", function () {
 
       before(async function () {
         pluginIndexPageDom = await JSDOM.fromFile(
-          path.resolve(this.context.publicDir, "plugins/index.html"),
+          fileURLToPath(new URL("plugins/index.html", this.context.publicDir)),
         );
         pluginHooksIndexPageDom = await JSDOM.fromFile(
-          path.resolve(this.context.publicDir, "plugins/index-hooks/index.html"),
+          fileURLToPath(new URL("plugins/index-hooks/index.html", this.context.publicDir)),
         );
       });
 
       it("should output an index.html file for the plugins index page", function () {
-        expect(fs.existsSync(path.join(this.context.publicDir, "plugins", "index.html"))).to.be
-          .true;
+        expect(fs.existsSync(new URL("plugins/index.html", this.context.publicDir))).to.be.true;
       });
 
       it("should output an index.html file for the plugins page with index in the filename", function () {
-        expect(
-          fs.existsSync(path.join(this.context.publicDir, "plugins/index-hooks", "index.html")),
-        ).to.be.true;
+        expect(fs.existsSync(new URL("plugins/index-hooks/index.html", this.context.publicDir))).to
+          .be.true;
       });
 
       it("should have the expected content in the <body> of the plugins page index.html", function () {
@@ -186,6 +189,6 @@ describe("Build Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

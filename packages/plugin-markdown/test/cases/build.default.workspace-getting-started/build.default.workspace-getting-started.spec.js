@@ -37,7 +37,6 @@ import { expect } from "chai";
 import fs from "node:fs";
 import glob from "glob-promise";
 import { JSDOM } from "jsdom";
-import path from "node:path";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { getOutputTeardownFiles, tagsMatch } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
@@ -45,21 +44,21 @@ import { fileURLToPath } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "Based on the Getting Started guide and repo";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../../cli/src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
     });
 
     runSmokeTest(["public"], LABEL);
@@ -69,10 +68,10 @@ describe("Build Greenwood With: ", function () {
       let html;
 
       before(async function () {
-        const htmlPath = path.resolve(this.context.publicDir, "index.html");
+        const htmlUrl = new URL("index.html", this.context.publicDir);
 
-        dom = await JSDOM.fromFile(path.resolve(this.context.publicDir, "index.html"));
-        html = await fs.promises.readFile(htmlPath, "utf-8");
+        dom = await JSDOM.fromFile(fileURLToPath(new URL("index.html", this.context.publicDir)));
+        html = await fs.promises.readFile(htmlUrl, "utf-8");
       });
 
       describe("document <html>", function () {
@@ -134,18 +133,18 @@ describe("Build Greenwood With: ", function () {
 
       describe("additional custom workspace output", function () {
         it("should create a new assets directory", function () {
-          expect(fs.existsSync(path.join(this.context.publicDir, "assets"))).to.be.true;
+          expect(fs.existsSync(new URL("assets", this.context.publicDir))).to.be.true;
         });
 
         it("should contain files from the asset directory", async function () {
-          expect(fs.existsSync(path.join(this.context.publicDir, "assets", "./greenwood-logo.png")))
-            .to.be.true;
+          expect(fs.existsSync(new URL("assets/greenwood-logo.png", this.context.publicDir))).to.be
+            .true;
         });
 
         it("should output two JS bundle files", async function () {
-          expect(await glob.promise(path.join(this.context.publicDir, "./*.js"))).to.have.lengthOf(
-            2,
-          );
+          expect(
+            await glob.promise(fileURLToPath(new URL("*.js", this.context.publicDir))),
+          ).to.have.lengthOf(2);
         });
 
         it("should have two <script> tags in the <head>", async function () {
@@ -158,7 +157,9 @@ describe("Build Greenwood With: ", function () {
 
         it("should output one CSS file", async function () {
           expect(
-            await glob.promise(`${path.join(this.context.publicDir, "styles")}/theme.*.css`),
+            await glob.promise(
+              fileURLToPath(new URL("styles/theme.*.css", this.context.publicDir)),
+            ),
           ).to.have.lengthOf(1);
         });
 
@@ -223,18 +224,17 @@ describe("Build Greenwood With: ", function () {
 
       before(async function () {
         dom = await JSDOM.fromFile(
-          path.resolve(this.context.publicDir, "blog/first-post/index.html"),
+          fileURLToPath(new URL("blog/first-post/index.html", this.context.publicDir)),
         );
       });
 
       it("should create a blog directory", function () {
-        expect(fs.existsSync(path.join(this.context.publicDir, "blog"))).to.be.true;
+        expect(fs.existsSync(new URL("blog", this.context.publicDir))).to.be.true;
       });
 
       it("should output an index.html file for first-post page", function () {
-        expect(
-          fs.existsSync(path.join(this.context.publicDir, "blog", "first-post", "./index.html")),
-        ).to.be.true;
+        expect(fs.existsSync(new URL("blog/first-post/index.html", this.context.publicDir))).to.be
+          .true;
       });
 
       it("should have two <script> tags in the <head>", async function () {
@@ -287,18 +287,17 @@ describe("Build Greenwood With: ", function () {
 
       before(async function () {
         dom = await JSDOM.fromFile(
-          path.resolve(this.context.publicDir, "blog/second-post/index.html"),
+          fileURLToPath(new URL("blog/second-post/index.html", this.context.publicDir)),
         );
       });
 
       it("should create a blog directory", function () {
-        expect(fs.existsSync(path.join(this.context.publicDir, "blog"))).to.be.true;
+        expect(fs.existsSync(new URL("blog", this.context.publicDir))).to.be.true;
       });
 
       it("should output an index.html file for first-post page", function () {
-        expect(
-          fs.existsSync(path.join(this.context.publicDir, "blog", "second-post", "./index.html")),
-        ).to.be.true;
+        expect(fs.existsSync(new URL("blog/second-post/index.html", this.context.publicDir))).to.be
+          .true;
       });
 
       it("should have two <script> tags in the <head>", async function () {
@@ -348,6 +347,6 @@ describe("Build Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

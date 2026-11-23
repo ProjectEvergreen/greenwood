@@ -21,29 +21,27 @@
 import * as chai from "chai";
 import { expect } from "chai";
 import chaiAsPromised from "chai-as-promised";
-import path from "node:path";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
 
 chai.use(chaiAsPromised);
 
 describe("Build Greenwood With: ", function () {
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
 
   describe("Custom Configuration with a bad value for Polyfills w/ Import Maps", function () {
     it("should throw an error that polyfill.importMaps must be a boolean", async function () {
-      await runner.setup(outputPath);
+      await runner.setup(outputUrl);
 
-      await expect(runner.runCommand(cliPath, { args: "build" })).to.be.rejectedWith(
+      await expect(runner.runCommand(cliUrl, { args: "build" })).to.be.rejectedWith(
         "Configuration error: polyfills.importMaps must be a boolean; true or false.  Passed value was typeof: object",
       );
     });

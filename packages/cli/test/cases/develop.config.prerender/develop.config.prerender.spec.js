@@ -41,17 +41,15 @@ import { expect } from "chai";
 import fs from "node:fs";
 import net from "node:net";
 import { JSDOM } from "jsdom";
-import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
 
 describe("Develop Greenwood With: ", function () {
   const LABEL = "Prerender Configuration";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
-  const messagePath = new URL("./src/components/message.js", import.meta.url);
-  const headerPath = new URL("./src/components/header.js", import.meta.url);
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
+  const messageUrl = new URL("./src/components/message.js", import.meta.url);
+  const headerUrl = new URL("./src/components/header.js", import.meta.url);
   const preferredPort = 21984;
   let runner;
   let blocker;
@@ -62,8 +60,8 @@ describe("Develop Greenwood With: ", function () {
   before(function () {
     runner = new Runner();
     blocker = net.createServer();
-    originalMessage = fs.readFileSync(messagePath, "utf-8");
-    originalHeader = fs.readFileSync(headerPath, "utf-8");
+    originalMessage = fs.readFileSync(messageUrl, "utf-8");
+    originalHeader = fs.readFileSync(headerUrl, "utf-8");
   });
 
   describe(LABEL, function () {
@@ -72,12 +70,12 @@ describe("Develop Greenwood With: ", function () {
         blocker.once("error", reject);
         blocker.listen(preferredPort, resolve);
       });
-      await runner.setup(outputPath);
+      await runner.setup(outputUrl);
 
       await new Promise((resolve, reject) => {
         let output = "";
         runner
-          .runCommand(cliPath, {
+          .runCommand(cliUrl, {
             args: "develop",
             onStdOut: (message) => {
               output += message;
@@ -323,12 +321,12 @@ describe("Develop Greenwood With: ", function () {
 
       before(async function () {
         await fs.promises.writeFile(
-          headerPath,
+          headerUrl,
           originalHeader.replace("<header>", "<header>Edited component "),
         );
         const componentResponse = await fetch(`${hostname}/`);
         componentDom = new JSDOM(await componentResponse.text());
-        await fs.promises.writeFile(messagePath, 'export const message = "Updated dependency";\n');
+        await fs.promises.writeFile(messageUrl, 'export const message = "Updated dependency";\n');
         const dependencyResponse = await fetch(`${hostname}/`);
         dependencyDom = new JSDOM(await dependencyResponse.text());
       });
@@ -346,8 +344,8 @@ describe("Develop Greenwood With: ", function () {
       });
 
       after(async function () {
-        await fs.promises.writeFile(headerPath, originalHeader);
-        await fs.promises.writeFile(messagePath, originalMessage);
+        await fs.promises.writeFile(headerUrl, originalHeader);
+        await fs.promises.writeFile(messageUrl, originalMessage);
       });
     });
 
@@ -359,7 +357,7 @@ describe("Develop Greenwood With: ", function () {
       before(async function () {
         try {
           await fs.promises.writeFile(
-            messagePath,
+            messageUrl,
             'throw new Error("Prerender failure");\nexport const message = "Broken";\n',
           );
           failures = await Promise.all([
@@ -368,7 +366,7 @@ describe("Develop Greenwood With: ", function () {
             fetch(`${hostname}/`),
           ]);
         } finally {
-          await fs.promises.writeFile(messagePath, originalMessage);
+          await fs.promises.writeFile(messageUrl, originalMessage);
         }
         response = await fetch(`${hostname}/`);
         dom = new JSDOM(await response.text());
@@ -415,8 +413,8 @@ describe("Develop Greenwood With: ", function () {
 
     describe("Development output", function () {
       it("should avoid writing production HTML", function () {
-        expect(fs.readdirSync(path.join(outputPath, ".greenwood"))).not.to.include("index.html");
-        expect(fs.existsSync(path.join(outputPath, "public"))).to.equal(false);
+        expect(fs.readdirSync(new URL(".greenwood", outputUrl))).not.to.include("index.html");
+        expect(fs.existsSync(new URL("public", outputUrl))).to.equal(false);
       });
     });
   });
@@ -424,6 +422,6 @@ describe("Develop Greenwood With: ", function () {
   after(async function () {
     await runner.stopCommand();
     await new Promise((resolve) => blocker.close(resolve));
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

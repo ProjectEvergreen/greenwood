@@ -11,13 +11,12 @@ import { JSDOM } from "jsdom";
 import path from "node:path";
 import { getOutputTeardownFiles } from "../../../../../test/utils.js";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
 
 describe("Serve Greenwood With: ", function () {
   const LABEL = "Independent SSR prerender and static export options";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
   const hostname = "http://127.0.0.1:8080";
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const outputUrl = new URL("./", import.meta.url);
   const publicDir = new URL("./public/", import.meta.url);
   let runner;
 
@@ -27,12 +26,12 @@ describe("Serve Greenwood With: ", function () {
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
 
       await new Promise((resolve, reject) => {
         runner
-          .runCommand(cliPath, {
+          .runCommand(cliUrl, {
             args: "serve",
             onStdOut: (message) => {
               if (message.includes("Started server at http://localhost:8080")) {
@@ -121,6 +120,6 @@ describe("Serve Greenwood With: ", function () {
 
   after(async function () {
     await runner.stopCommand();
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });

@@ -25,29 +25,27 @@
 import { expect } from "chai";
 import fs from "node:fs";
 import { JSDOM } from "jsdom";
-import path from "node:path";
 import { getOutputTeardownFiles, HASH_REGEX } from "../../../../../test/utils.js";
 import { runSmokeTest } from "../../../../../test/smoke-test.js";
 import { Runner } from "gallinago";
-import { fileURLToPath } from "node:url";
 
 describe("Build Greenwood With: ", function () {
   const LABEL = "A Server Rendered Application (SSR) that is statically exported";
-  const cliPath = path.join(process.cwd(), "packages/cli/src/bin.js");
-  const outputPath = fileURLToPath(new URL(".", import.meta.url));
+  const cliUrl = new URL("../../../src/bin.js", import.meta.url);
+  const outputUrl = new URL("./", import.meta.url);
   let runner;
 
   before(function () {
     this.context = {
-      publicDir: path.join(outputPath, "public"),
+      publicDir: new URL("public/", outputUrl),
     };
     runner = new Runner();
   });
 
   describe(LABEL, function () {
     before(async function () {
-      await runner.setup(outputPath);
-      await runner.runCommand(cliPath, { args: "build" });
+      await runner.setup(outputUrl);
+      await runner.runCommand(cliUrl, { args: "build" });
     });
 
     runSmokeTest(["public", "index"], LABEL);
@@ -58,10 +56,10 @@ describe("Build Greenwood With: ", function () {
 
       before(async function () {
         const graph = JSON.parse(
-          await fs.promises.readFile(path.join(outputPath, "public/graph.json"), "utf-8"),
+          await fs.promises.readFile(new URL("public/graph.json", outputUrl), "utf-8"),
         );
         const artistsHtml = await fs.promises.readFile(
-          path.join(outputPath, "public/artists/index.html"),
+          new URL("public/artists/index.html", outputUrl),
           "utf-8",
         );
 
@@ -164,6 +162,6 @@ describe("Build Greenwood With: ", function () {
   });
 
   after(async function () {
-    await runner.teardown(getOutputTeardownFiles(outputPath));
+    await runner.teardown(getOutputTeardownFiles(outputUrl));
   });
 });
