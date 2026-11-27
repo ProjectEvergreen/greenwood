@@ -4330,10 +4330,10 @@
   resolved "https://registry.yarnpkg.com/@poppinss/exception/-/exception-1.2.3.tgz#b713855e6c9fe2110fea0949455c50828145e64a"
   integrity sha512-dCED+QRChTVatE9ibtoaxc+WkdzOSjYTKi/+uacHWIsfodVfpsueo3+DKpgU5Px8qXjgmXkSvhXvSCz3fnP9lw==
 
-"@projectevergreen/acorn-jsx-esm@~0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@projectevergreen/acorn-jsx-esm/-/acorn-jsx-esm-0.1.0.tgz#9870be988907048b5b432425d6157b84f8e4fdef"
-  integrity sha512-ZBSkr0e2M4ylq74dTGHSkWI2dF3Mz8zwBLyzIXZMftecKDADcsCTj7bWltVgtdl8Rh4+bmY1jNWUw7AlSV/r7A==
+"@projectevergreen/acorn-jsx-esm@~0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@projectevergreen/acorn-jsx-esm/-/acorn-jsx-esm-0.1.1.tgz#49e8850b491c1ae65f1b8e7c5dadd51c6eec00ec"
+  integrity sha512-Qlq6Sx7Uv4JXFWp8KsxuP7npJaJeXfz+16vPQXZVdPzL1i36O0cnBfzYzss2Viu81b1e1KvHqUvJOOxGIf/tAg==
 
 "@protobufjs/aspromise@^1.1.1", "@protobufjs/aspromise@^1.1.2":
   version "1.1.2"
@@ -18961,12 +18961,12 @@ walk-up-path@^4.0.0:
   resolved "https://registry.yarnpkg.com/walk-up-path/-/walk-up-path-4.0.0.tgz#590666dcf8146e2d72318164f1f2ac6ef51d4198"
   integrity sha512-3hu+tD8YzSLGuFYtPRb48vdhKMi0KQV5sn+uWr8+7dMEq/2G/dtLrdDinkLjqq5TIbIBjYJ4Ax/n3YiaW7QM8A==
 
-wc-compiler@~0.23.0:
-  version "0.23.0"
-  resolved "https://registry.yarnpkg.com/wc-compiler/-/wc-compiler-0.23.0.tgz#9b8a9eb270aa2f4e12c9821225fb918632fe1f6f"
-  integrity sha512-paqenNTcn/Xv3H5/rH/ZH8EmQ1/2yG4VggiST8kNTo/vhFhHQf4fVFIe5HCb0v9BHgr4RnEMb430f/yWFrkQsg==
+wc-compiler@~0.24.0:
+  version "0.24.0"
+  resolved "https://registry.yarnpkg.com/wc-compiler/-/wc-compiler-0.24.0.tgz#a65245712c2f3898bc5e80a4865a50ae971bc9e7"
+  integrity sha512-D1hHTdu+OJn3+ZQy3wuRjWMN2dr0u9PXSkwXiPRRFYeG+S4wl96KAI1PjzdYkjDicyIORGbifEdV/IZP1Bk0wg==
   dependencies:
-    "@projectevergreen/acorn-jsx-esm" "~0.1.0"
+    "@projectevergreen/acorn-jsx-esm" "~0.1.1"
     acorn "^8.14.0"
     acorn-walk "^8.3.4"
     astring "^1.9.0"
